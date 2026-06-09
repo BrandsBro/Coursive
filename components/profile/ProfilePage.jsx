@@ -101,7 +101,7 @@ export default function ProfilePage() {
               <div style={{ display:"flex",gap:4 }}>
                 {DAYS.map((d, i) => (
                   <div key={d} style={{ width:24,height:24,borderRadius:7,background:weeklyActivity[i]?"#f97316":"rgba(255,255,255,0.08)",border:weeklyActivity[i]?"none":"1px solid rgba(255,255,255,0.1)",display:"flex",alignItems:"center",justifyContent:"center" }}>
-                    {completedDays[i]
+                    {weeklyActivity[i]
                       ? <CheckCircle2 size={13} color="#fff" />
                       : <span style={{ fontSize:8,color:"rgba(255,255,255,0.3)",fontWeight:600 }}>{d[0]}</span>}
                   </div>
