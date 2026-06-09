@@ -1,29 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Plus, Pencil, Trash2, BookOpen, Clock, Eye, EyeOff, X, Check } from "lucide-react";
+import { Plus, Pencil, Trash2, X, BookOpen, Clock, Sparkles } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-const EMPTY_COURSE = { id:"", title:"", description:"", emoji:"📚", gradient_from:"#6366f1", gradient_to:"#8b5cf6", hours:1, level:"Beginner", category:"Design" };
+const EMPTY = { id:"", title:"", description:"", emoji:"📚", gradient_from:"#6366f1", gradient_to:"#8b5cf6", hours:1, level:"Beginner", category:"Design" };
 const LEVELS = ["Beginner","Intermediate","Advanced"];
 const CATEGORIES = ["Design","Productivity","Video","No Code"];
+const PRESET_GRADIENTS = [
+  ["#ec4899","#8b5cf6"],["#6366f1","#0ea5e9"],["#f97316","#fbbf24"],
+  ["#ec4899","#f43f5e"],["#10b981","#06b6d4"],["#10a37f","#0ea5e9"],
+  ["#6b7280","#374151"],["#f59e0b","#ef4444"],["#8b5cf6","#4f46e5"],
+];
 
 export default function AdminCourses({ courses: initial }) {
-  const router = useRouter();
   const [courses, setCourses] = useState(initial);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState(EMPTY_COURSE);
+  const [form, setForm] = useState(EMPTY);
   const [loading, setLoading] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
   const update = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
-  const openAdd = () => { setForm(EMPTY_COURSE); setEditing(null); setShowForm(true); };
+  const openAdd = () => { setForm(EMPTY); setEditing(null); setShowForm(true); };
   const openEdit = (course) => {
-    setForm({ id:course.id, title:course.title, description:course.description, emoji:course.emoji, gradient_from:course.gradientFrom, gradient_to:course.gradientTo, hours:course.hours, level:course.level, category:course.category });
+    setForm({ id:course.id, title:course.title, description:course.description||"", emoji:course.emoji, gradient_from:course.gradientFrom, gradient_to:course.gradientTo, hours:course.hours, level:course.level, category:course.category });
     setEditing(course.id);
     setShowForm(true);
   };
@@ -31,52 +34,27 @@ export default function AdminCourses({ courses: initial }) {
   const handleSave = async () => {
     if (!form.id || !form.title) { alert("ID and Title are required"); return; }
     setLoading(true);
-
     const row = { id:form.id, title:form.title, description:form.description, emoji:form.emoji, gradient_from:form.gradient_from, gradient_to:form.gradient_to, hours:parseInt(form.hours), level:form.level, category:form.category, is_published:true };
-
     const { error } = await supabase.from("courses").upsert(row, { onConflict:"id" });
     if (error) { alert(error.message); setLoading(false); return; }
-
     setLoading(false);
     setShowForm(false);
-    // Update local state immediately
-    const updated = {
-      id: form.id,
-      title: form.title,
-      description: form.description,
-      emoji: form.emoji,
-      gradientFrom: form.gradient_from,
-      gradientTo: form.gradient_to,
-      hours: parseInt(form.hours),
-      level: form.level,
-      category: form.category,
-      units: editing ? courses.find(c => c.id === editing)?.units || [] : [],
-    };
-    if (editing) {
-      setCourses(prev => prev.map(c => c.id === editing ? updated : c));
-    } else {
-      setCourses(prev => [...prev, updated]);
-    }
+    const updated = { id:form.id, title:form.title, description:form.description, emoji:form.emoji, gradientFrom:form.gradient_from, gradientTo:form.gradient_to, hours:parseInt(form.hours), level:form.level, category:form.category, units:editing?courses.find(c=>c.id===editing)?.units||[]:[] };
+    if (editing) { setCourses(prev => prev.map(c => c.id === editing ? updated : c)); }
+    else { setCourses(prev => [...prev, updated]); }
   };
 
   const handleDelete = async (id) => {
-    // Delete related challenge_days first to avoid FK constraint
     await supabase.from("challenge_days").delete().eq("course_id", id);
-    // Delete lessons
     await supabase.from("lessons").delete().eq("course_id", id);
-    // Delete units
     await supabase.from("course_units").delete().eq("course_id", id);
-    // Now delete the course
     const { error } = await supabase.from("courses").delete().eq("id", id);
     if (error) { alert(error.message); return; }
     setCourses(prev => prev.filter(c => c.id !== id));
     setDeleteId(null);
   };
 
-  const togglePublish = async (course) => {
-    await supabase.from("courses").update({ is_published: !course.is_published }).eq("id", course.id);
-    router.refresh();
-  };
+  const previewGrad = `linear-gradient(135deg, ${form.gradient_from}, ${form.gradient_to})`;
 
   return (
     <AdminLayout>
@@ -88,145 +66,172 @@ export default function AdminCourses({ courses: initial }) {
             <h1 style={{ fontSize:24, fontWeight:900, color:"#0f172a", margin:0 }}>Courses</h1>
             <p style={{ color:"#64748B", fontSize:14, marginTop:4 }}>{courses.length} courses in database</p>
           </div>
-          <button onClick={openAdd} style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 18px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#6366f1,#4f46e5)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 12px rgba(99,102,241,0.3)" }}>
-            <Plus size={16} /> Add Course
+          <button onClick={openAdd} style={{ display:"flex", alignItems:"center", gap:8, padding:"11px 20px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#6366f1,#4f46e5)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(99,102,241,0.35)" }}>
+            <Plus size={16}/> Add Course
           </button>
         </div>
 
         {/* Course list */}
-        <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
           {courses.map(course => (
-            <div key={course.id} style={{ background:"#fff", borderRadius:16, border:"1.5px solid #F1F5F9", padding:"16px 20px", display:"flex", alignItems:"center", gap:14 }}>
-              {/* Emoji */}
-              <div style={{ width:48, height:48, borderRadius:13, background:`linear-gradient(135deg,${course.gradientFrom},${course.gradientTo})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>
+            <div key={course.id} style={{ background:"#fff", borderRadius:16, border:"1.5px solid #F1F5F9", padding:"14px 18px", display:"flex", alignItems:"center", gap:14, transition:"all 0.15s" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor="#E0E7FF"; e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,0.06)"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor="#F1F5F9"; e.currentTarget.style.boxShadow="none"; }}>
+              <div style={{ width:46, height:46, borderRadius:13, background:`linear-gradient(135deg,${course.gradientFrom},${course.gradientTo})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>
                 {course.emoji}
               </div>
-
-              {/* Info */}
               <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:2 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
                   <h3 style={{ fontSize:14, fontWeight:700, color:"#0f172a", margin:0 }}>{course.title}</h3>
-                  <span style={{ fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:999, background:"#F0F9FF", color:"#0369A1" }}>{course.category}</span>
-                  <span style={{ fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:999, background:"#F0FDF4", color:"#15803D" }}>{course.level}</span>
+                  <span style={{ fontSize:10, fontWeight:600, padding:"2px 7px", borderRadius:999, background:"#F0F9FF", color:"#0369A1" }}>{course.category}</span>
+                  <span style={{ fontSize:10, fontWeight:600, padding:"2px 7px", borderRadius:999, background:"#F0FDF4", color:"#15803D" }}>{course.level}</span>
                 </div>
-                <p style={{ fontSize:12, color:"#94A3B8", margin:0, display:"flex", gap:12 }}>
-                  <span>ID: {course.id}</span>
-                  <span><BookOpen size={10} style={{ verticalAlign:"middle" }} /> {course.units.flatMap(u=>u.lessons).length} lessons</span>
-                  <span><Clock size={10} style={{ verticalAlign:"middle" }} /> {course.hours}h</span>
+                <p style={{ fontSize:11, color:"#94A3B8", margin:0 }}>
+                  {course.id} &nbsp;·&nbsp; {course.units.flatMap(u=>u.lessons).length} lessons &nbsp;·&nbsp; {course.hours}h
                 </p>
               </div>
-
-              {/* Actions */}
               <div style={{ display:"flex", gap:6, flexShrink:0 }}>
-                <button onClick={() => openEdit(course)} style={{ padding:"7px 12px", borderRadius:9, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:12, fontWeight:600, color:"#374151", cursor:"pointer", display:"flex", alignItems:"center", gap:5 }}>
-                  <Pencil size={12} /> Edit
+                <button onClick={() => openEdit(course)} style={{ padding:"7px 14px", borderRadius:9, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:12, fontWeight:600, color:"#374151", cursor:"pointer", display:"flex", alignItems:"center", gap:5 }}>
+                  <Pencil size={12}/> Edit
                 </button>
                 {deleteId === course.id ? (
                   <div style={{ display:"flex", gap:4 }}>
-                    <button onClick={() => handleDelete(course.id)} style={{ padding:"7px 10px", borderRadius:9, border:"none", background:"#EF4444", color:"#fff", fontSize:12, fontWeight:700, cursor:"pointer" }}>Confirm</button>
+                    <button onClick={() => handleDelete(course.id)} style={{ padding:"7px 12px", borderRadius:9, border:"none", background:"#EF4444", color:"#fff", fontSize:12, fontWeight:700, cursor:"pointer" }}>Delete</button>
                     <button onClick={() => setDeleteId(null)} style={{ padding:"7px 10px", borderRadius:9, border:"1.5px solid #E2E8F0", background:"#fff", color:"#374151", fontSize:12, cursor:"pointer" }}>Cancel</button>
                   </div>
                 ) : (
-                  <button onClick={() => setDeleteId(course.id)} style={{ padding:"7px 10px", borderRadius:9, border:"1.5px solid #FEE2E2", background:"#FFF", color:"#EF4444", fontSize:12, cursor:"pointer", display:"flex", alignItems:"center", gap:4 }}>
-                    <Trash2 size={12} />
+                  <button onClick={() => setDeleteId(course.id)} style={{ padding:"7px 10px", borderRadius:9, border:"1.5px solid #FEE2E2", background:"#fff", color:"#EF4444", fontSize:12, cursor:"pointer", display:"flex", alignItems:"center" }}>
+                    <Trash2 size={13}/>
                   </button>
                 )}
               </div>
             </div>
           ))}
         </div>
+      </div>
 
-        {/* Add/Edit Form Modal */}
-        {showForm && (
-          <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.5)", zIndex:100, display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
-            <div style={{ background:"#fff", borderRadius:24, width:"100%", maxWidth:560, maxHeight:"90vh", overflow:"auto", padding:32 }}>
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:24 }}>
-                <h2 style={{ fontSize:18, fontWeight:800, color:"#0f172a", margin:0 }}>{editing ? "Edit Course" : "Add New Course"}</h2>
-                <button onClick={() => setShowForm(false)} style={{ background:"none", border:"none", cursor:"pointer", padding:4 }}>
-                  <X size={20} color="#94A3B8" />
-                </button>
+      {/* ── Modal ── */}
+      {showForm && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(15,23,42,0.6)", zIndex:100, display:"flex", alignItems:"center", justifyContent:"center", padding:20, backdropFilter:"blur(4px)" }}>
+          <div style={{ background:"#fff", borderRadius:28, width:"100%", maxWidth:580, maxHeight:"92vh", overflow:"auto", boxShadow:"0 32px 80px rgba(0,0,0,0.3)" }}>
+
+            {/* Modal header with gradient preview */}
+            <div style={{ background:previewGrad, padding:"28px 32px 24px", borderRadius:"28px 28px 0 0", position:"relative" }}>
+              <div style={{ position:"absolute", top:-20, right:-20, width:120, height:120, borderRadius:"50%", background:"rgba(255,255,255,0.08)" }} />
+              <button onClick={() => setShowForm(false)} style={{ position:"absolute", top:16, right:16, width:32, height:32, borderRadius:"50%", background:"rgba(255,255,255,0.2)", border:"none", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                <X size={16} color="#fff"/>
+              </button>
+              <div style={{ display:"flex", alignItems:"center", gap:14 }}>
+                <div style={{ width:60, height:60, borderRadius:18, background:"rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:30 }}>
+                  {form.emoji || "📚"}
+                </div>
+                <div>
+                  <p style={{ color:"rgba(255,255,255,0.7)", fontSize:11, fontWeight:700, letterSpacing:1, margin:"0 0 4px" }}>
+                    {editing ? "EDITING COURSE" : "NEW COURSE"}
+                  </p>
+                  <h2 style={{ color:"#fff", fontSize:20, fontWeight:900, margin:0 }}>
+                    {form.title || "Course title"}
+                  </h2>
+                  <p style={{ color:"rgba(255,255,255,0.6)", fontSize:12, margin:"3px 0 0" }}>
+                    {form.category} · {form.level} · {form.hours}h
+                  </p>
+                </div>
               </div>
+            </div>
 
-              <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                <FormField label="Course ID" hint="e.g. canva-ai (no spaces)">
-                  <input value={form.id} onChange={e => update("id", e.target.value.toLowerCase().replace(/\s/g,"-"))} disabled={!!editing} placeholder="canva-ai" style={inputStyle} />
-                </FormField>
-                <FormField label="Title">
-                  <input value={form.title} onChange={e => update("title", e.target.value)} placeholder="Canva AI" style={inputStyle} />
-                </FormField>
-                <FormField label="Description">
-                  <textarea value={form.description} onChange={e => update("description", e.target.value)} placeholder="Short description..." style={{ ...inputStyle, height:70, resize:"vertical" }} />
-                </FormField>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
-                  <FormField label="Emoji">
-                    <input value={form.emoji} onChange={e => update("emoji", e.target.value)} placeholder="🎨" style={inputStyle} />
-                  </FormField>
-                  <FormField label="Hours">
-                    <input type="number" value={form.hours} onChange={e => update("hours", e.target.value)} style={inputStyle} />
-                  </FormField>
+            {/* Form body */}
+            <div style={{ padding:"24px 32px 32px" }}>
+              <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+
+                {/* ID + Emoji row */}
+                <div style={{ display:"grid", gridTemplateColumns:"1fr auto", gap:12 }}>
+                  <Field label="Course ID" hint="e.g. canva-ai">
+                    <input value={form.id} onChange={e => update("id", e.target.value.toLowerCase().replace(/\s/g,"-"))} disabled={!!editing} placeholder="course-id" style={inputSt(!!editing)} />
+                  </Field>
+                  <Field label="Emoji">
+                    <input value={form.emoji} onChange={e => update("emoji", e.target.value)} placeholder="🎨" style={{ ...inputSt(), width:70, textAlign:"center", fontSize:22 }} />
+                  </Field>
                 </div>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
-                  <FormField label="Gradient From">
-                    <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-                      <input type="color" value={form.gradient_from} onChange={e => update("gradient_from", e.target.value)} style={{ width:36, height:36, borderRadius:8, border:"1.5px solid #E2E8F0", cursor:"pointer" }} />
-                      <input value={form.gradient_from} onChange={e => update("gradient_from", e.target.value)} style={{ ...inputStyle, flex:1 }} />
+
+                {/* Title */}
+                <Field label="Title">
+                  <input value={form.title} onChange={e => update("title", e.target.value)} placeholder="Course title" style={inputSt()} />
+                </Field>
+
+                {/* Description */}
+                <Field label="Description">
+                  <textarea value={form.description} onChange={e => update("description", e.target.value)} placeholder="Short description of the course..." style={{ ...inputSt(), height:72, resize:"vertical" }} />
+                </Field>
+
+                {/* Gradient */}
+                <Field label="Gradient Colors">
+                  {/* Presets */}
+                  <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:10 }}>
+                    {PRESET_GRADIENTS.map(([from, to], i) => (
+                      <button key={i} onClick={() => { update("gradient_from", from); update("gradient_to", to); }}
+                        style={{ width:32, height:32, borderRadius:8, background:`linear-gradient(135deg,${from},${to})`, border:form.gradient_from===from?"2.5px solid #0f172a":"2px solid transparent", cursor:"pointer" }} />
+                    ))}
+                  </div>
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
+                    <div style={{ display:"flex", gap:8, alignItems:"center", background:"#F8FAFC", borderRadius:10, padding:"8px 12px", border:"1.5px solid #E2E8F0" }}>
+                      <input type="color" value={form.gradient_from} onChange={e => update("gradient_from", e.target.value)} style={{ width:28, height:28, borderRadius:6, border:"none", cursor:"pointer", padding:0, background:"none" }} />
+                      <span style={{ fontSize:11, color:"#64748B", fontWeight:600 }}>{form.gradient_from}</span>
                     </div>
-                  </FormField>
-                  <FormField label="Gradient To">
-                    <div style={{ display:"flex", gap:8, alignItems:"center" }}>
-                      <input type="color" value={form.gradient_to} onChange={e => update("gradient_to", e.target.value)} style={{ width:36, height:36, borderRadius:8, border:"1.5px solid #E2E8F0", cursor:"pointer" }} />
-                      <input value={form.gradient_to} onChange={e => update("gradient_to", e.target.value)} style={{ ...inputStyle, flex:1 }} />
+                    <div style={{ display:"flex", gap:8, alignItems:"center", background:"#F8FAFC", borderRadius:10, padding:"8px 12px", border:"1.5px solid #E2E8F0" }}>
+                      <input type="color" value={form.gradient_to} onChange={e => update("gradient_to", e.target.value)} style={{ width:28, height:28, borderRadius:6, border:"none", cursor:"pointer", padding:0, background:"none" }} />
+                      <span style={{ fontSize:11, color:"#64748B", fontWeight:600 }}>{form.gradient_to}</span>
                     </div>
-                  </FormField>
-                </div>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>
-                  <FormField label="Level">
-                    <select value={form.level} onChange={e => update("level", e.target.value)} style={inputStyle}>
-                      {LEVELS.map(l => <option key={l}>{l}</option>)}
-                    </select>
-                  </FormField>
-                  <FormField label="Category">
-                    <select value={form.category} onChange={e => update("category", e.target.value)} style={inputStyle}>
+                  </div>
+                </Field>
+
+                {/* Level + Category + Hours */}
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 80px", gap:12 }}>
+                  <Field label="Category">
+                    <select value={form.category} onChange={e => update("category", e.target.value)} style={inputSt()}>
                       {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                     </select>
-                  </FormField>
-                </div>
-
-                {/* Preview */}
-                <div style={{ background:"#F8FAFC", borderRadius:14, padding:14, display:"flex", alignItems:"center", gap:12 }}>
-                  <div style={{ width:48, height:48, borderRadius:13, background:`linear-gradient(135deg,${form.gradient_from},${form.gradient_to})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24 }}>
-                    {form.emoji}
-                  </div>
-                  <div>
-                    <p style={{ fontSize:14, fontWeight:700, color:"#0f172a", margin:0 }}>{form.title || "Course title"}</p>
-                    <p style={{ fontSize:12, color:"#94A3B8", margin:0 }}>{form.category} · {form.level} · {form.hours}h</p>
-                  </div>
+                  </Field>
+                  <Field label="Level">
+                    <select value={form.level} onChange={e => update("level", e.target.value)} style={inputSt()}>
+                      {LEVELS.map(l => <option key={l}>{l}</option>)}
+                    </select>
+                  </Field>
+                  <Field label="Hours">
+                    <input type="number" min="1" value={form.hours} onChange={e => update("hours", e.target.value)} style={inputSt()} />
+                  </Field>
                 </div>
               </div>
 
-              <div style={{ display:"flex", gap:10, marginTop:20 }}>
-                <button onClick={() => setShowForm(false)} style={{ flex:1, padding:"12px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:13, fontWeight:600, color:"#374151", cursor:"pointer" }}>
+              {/* Actions */}
+              <div style={{ display:"flex", gap:10, marginTop:24 }}>
+                <button onClick={() => setShowForm(false)} style={{ flex:1, padding:"13px", borderRadius:13, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:13, fontWeight:600, color:"#374151", cursor:"pointer" }}>
                   Cancel
                 </button>
-                <button onClick={handleSave} disabled={loading} style={{ flex:2, padding:"12px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#6366f1,#4f46e5)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                <button onClick={handleSave} disabled={loading} style={{ flex:2, padding:"13px", borderRadius:13, border:"none", background:previewGrad, color:"#fff", fontSize:14, fontWeight:700, cursor:loading?"not-allowed":"pointer", boxShadow:`0 4px 16px rgba(0,0,0,0.2)`, opacity:loading?0.7:1 }}>
                   {loading ? "Saving..." : (editing ? "Save Changes" : "Add Course")}
                 </button>
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
 
-const inputStyle = { width:"100%", padding:"10px 12px", borderRadius:10, border:"1.5px solid #E2E8F0", fontSize:13, outline:"none", background:"#fff", color:"#0f172a", boxSizing:"border-box" };
+const inputSt = (disabled) => ({
+  width:"100%", padding:"10px 13px", borderRadius:10,
+  border:"1.5px solid #E2E8F0", fontSize:13, outline:"none",
+  background: disabled ? "#F8FAFC" : "#fff",
+  color: disabled ? "#94A3B8" : "#0f172a",
+  boxSizing:"border-box", cursor: disabled ? "not-allowed" : "auto",
+});
 
-function FormField({ label, hint, children }) {
+function Field({ label, hint, children }) {
   return (
     <div>
       <label style={{ fontSize:12, fontWeight:700, color:"#374151", display:"block", marginBottom:6 }}>
-        {label} {hint && <span style={{ color:"#94A3B8", fontWeight:400 }}>({hint})</span>}
+        {label} {hint && <span style={{ color:"#94A3B8", fontWeight:400, fontSize:11 }}>· {hint}</span>}
       </label>
       {children}
     </div>
