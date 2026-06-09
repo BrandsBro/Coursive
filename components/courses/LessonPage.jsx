@@ -206,8 +206,9 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   const { markLessonComplete, markCertificateEarned, getCompletedLessons, markChallengeDay } = useProgress();
 
   const isChallenge = !!challengeId && !!challengeDay;
-  const total = content.length;
-  const currentSection = content[revealed - 1];
+  const safeContent = Array.isArray(content) && safeContent.length > 0 ? content : [{ type: "text", text: `Welcome to ${lesson?.title || "this lesson"}! Content coming soon.` }];
+  const total = safeContent.length;
+  const currentSection = safeContent[revealed - 1];
   const isInteractiveActive = currentSection?.type === "interactive" && !interactiveDone;
   const isLastSection = revealed === total;
   const allLessons = course.units.flatMap(u => u.lessons);
@@ -274,7 +275,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
             </div>
           )}
           <div style={{ flex:1, display:"flex", alignItems:"center", gap:6, justifyContent:"center" }}>
-            {content.map((_,i) => <div key={i} style={{ borderRadius:999, transition:"all 0.3s", width:i<revealed?24:8, height:8, background:i<revealed?"#5B4EFF":"#e5e7eb" }} />)}
+            {safeContent.map((_,i) => <div key={i} style={{ borderRadius:999, transition:"all 0.3s", width:i<revealed?24:8, height:8, background:i<revealed?"#5B4EFF":"#e5e7eb" }} />)}
           </div>
           <div style={{ width:40 }} />
         </div>

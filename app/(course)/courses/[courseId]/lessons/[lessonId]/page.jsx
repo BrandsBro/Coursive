@@ -1,5 +1,6 @@
 import LessonPage from "@/components/courses/LessonPage";
 import { getCourseById } from "@/lib/db";
+import { getLessonContent } from "@/data/lessonContent";
 import { notFound } from "next/navigation";
 
 export const revalidate = 60;
@@ -18,10 +19,17 @@ export default async function LessonDetailPage({ params, searchParams }) {
 
   if (!lesson) return notFound();
 
+  // Try to get content with full ID, then fall back to short ID
+  const shortId = lessonId.includes("_") ? lessonId.split("_").pop() : lessonId;
+  const content = getLessonContent(courseId, lessonId)
+    || getLessonContent(courseId, shortId)
+    || [];
+
   return (
     <LessonPage
       course={course}
       lesson={lesson}
+      content={content}
       mode={sp?.mode || "read"}
       challengeId={sp?.challengeId || null}
       challengeDay={sp?.day ? parseInt(sp.day) : null}
