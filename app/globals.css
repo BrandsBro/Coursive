@@ -53,3 +53,28 @@ body {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* Fix browser autofill dark background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 40px #1a1535 inset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #a78bfa;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.28) !important;
+}
+
+/* Auth page responsive */
+@media (max-width: 768px) {
+  .auth-left-panel {
+    display: none !important;
+  }
+  .auth-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
