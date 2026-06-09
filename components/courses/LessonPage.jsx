@@ -206,7 +206,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   const { markLessonComplete, markCertificateEarned, getCompletedLessons, markChallengeDay } = useProgress();
 
   const isChallenge = !!challengeId && !!challengeDay;
-  const safeContent = Array.isArray(content) && safeContent.length > 0 ? content : [{ type: "text", text: `Welcome to ${lesson?.title || "this lesson"}! Content coming soon.` }];
+  const safeContent = Array.isArray(content) && content.length > 0 ? content : [{ type: "text", text: `Welcome to ${lesson?.title || "this lesson"}! Content coming soon.` }];
   const total = safeContent.length;
   const currentSection = safeContent[revealed - 1];
   const isInteractiveActive = currentSection?.type === "interactive" && !interactiveDone;
