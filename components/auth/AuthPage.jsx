@@ -21,6 +21,7 @@ export default function AuthPage({ mode }) {
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isMobile, setIsMobile] = useState(false);
@@ -182,7 +183,7 @@ export default function AuthPage({ mode }) {
       {/* Submit button */}
       <button
         onClick={handleSubmit}
-        disabled={loading}
+        disabled={loading || redirecting}
         style={{
           width: "100%", marginTop: 16, padding: "13px", borderRadius: 12, border: "none",
           background: loading ? "rgba(99,102,241,0.5)" : "linear-gradient(135deg,#7c3aed,#4f46e5)",
