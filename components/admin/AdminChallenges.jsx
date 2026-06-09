@@ -104,6 +104,9 @@ export default function AdminChallenges({ challenges: initial }) {
               </div>
 
               <div style={{ display:"flex", gap:6, flexShrink:0 }}>
+                <a href={"/admin/challenges/" + ch.id} style={{ padding:"7px 14px", borderRadius:9, border:"1.5px solid #E2E8F0", background:"#FFF7ED", fontSize:12, fontWeight:600, color:"#f59e0b", cursor:"pointer", display:"flex", alignItems:"center", gap:5, textDecoration:"none" }}>
+                  Manage
+                </a>
                 <button onClick={() => openEdit(ch)} style={{ padding:"7px 14px", borderRadius:9, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:12, fontWeight:600, color:"#374151", cursor:"pointer", display:"flex", alignItems:"center", gap:5 }}>
                   <Pencil size={12}/> Edit
                 </button>
