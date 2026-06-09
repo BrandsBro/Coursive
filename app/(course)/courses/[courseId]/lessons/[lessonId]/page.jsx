@@ -1,9 +1,10 @@
 import LessonPage from "@/components/courses/LessonPage";
 import { getCourseById } from "@/lib/db";
 import { getLessonContent } from "@/data/lessonContent";
+import { getLessonContentFromDB } from "@/lib/getlessonContent";
 import { notFound } from "next/navigation";
 
-export const revalidate = 60;
+export const revalidate = 0;
 
 export default async function LessonDetailPage({ params, searchParams }) {
   const { courseId, lessonId } = await params;
@@ -12,16 +13,17 @@ export default async function LessonDetailPage({ params, searchParams }) {
   const course = await getCourseById(courseId);
   if (!course) return notFound();
 
-  // Find lesson — works with both old (l1) and new (canva-ai_unit-1_l1) IDs
   const allLessons = course.units.flatMap(u => u.lessons);
   const lesson = allLessons.find(l => l.id === lessonId)
     || allLessons.find(l => l.id.endsWith(`_${lessonId}`));
 
   if (!lesson) return notFound();
 
-  // Try to get content with full ID, then fall back to short ID
+  // Try DB content first, then fall back to static file
   const shortId = lessonId.includes("_") ? lessonId.split("_").pop() : lessonId;
-  const content = getLessonContent(courseId, lessonId)
+  const dbContent = await getLessonContentFromDB(lesson.id);
+  const content = dbContent
+    || getLessonContent(courseId, lessonId)
     || getLessonContent(courseId, shortId)
     || [];
 
