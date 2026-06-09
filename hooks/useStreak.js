@@ -145,14 +145,18 @@ export function useStreak() {
 }
 
 function buildWeeklyActivity(dates) {
-  // Always return 7 booleans — Mon to Sun of current week
+  // Map to Mon(0)...Sun(6) of the CURRENT week
   const days = [false, false, false, false, false, false, false];
   if (!Array.isArray(dates)) return days;
 
   const today = new Date();
+  const dow = today.getDay(); // 0=Sun, 1=Mon ... 6=Sat
+  // How many days back to get to Monday
+  const toMonday = dow === 0 ? -6 : 1 - dow;
+
   for (let i = 0; i < 7; i++) {
     const d = new Date(today);
-    d.setDate(d.getDate() - (6 - i));
+    d.setDate(today.getDate() + toMonday + i);
     const str = d.toISOString().split("T")[0];
     days[i] = dates.includes(str);
   }
