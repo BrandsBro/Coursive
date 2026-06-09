@@ -33,7 +33,6 @@ export default function AuthPage({ mode }) {
   }, []);
 
   async function handleSubmit() {
-    console.log("BUTTON CLICKED", {email, password, isLogin});
     setError("");
     setSuccess("");
 
@@ -60,8 +59,6 @@ export default function AuthPage({ mode }) {
         password: password,
       });
 
-      console.log("RAW DATA:", JSON.stringify(data));
-      console.log("RAW ERROR:", JSON.stringify(err));
       setLoading(false);
 
       if (err) {
