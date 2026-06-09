@@ -39,10 +39,34 @@ export default function AdminCourses({ courses: initial }) {
 
     setLoading(false);
     setShowForm(false);
-    router.refresh();
+    // Update local state immediately
+    const updated = {
+      id: form.id,
+      title: form.title,
+      description: form.description,
+      emoji: form.emoji,
+      gradientFrom: form.gradient_from,
+      gradientTo: form.gradient_to,
+      hours: parseInt(form.hours),
+      level: form.level,
+      category: form.category,
+      units: editing ? courses.find(c => c.id === editing)?.units || [] : [],
+    };
+    if (editing) {
+      setCourses(prev => prev.map(c => c.id === editing ? updated : c));
+    } else {
+      setCourses(prev => [...prev, updated]);
+    }
   };
 
   const handleDelete = async (id) => {
+    // Delete related challenge_days first to avoid FK constraint
+    await supabase.from("challenge_days").delete().eq("course_id", id);
+    // Delete lessons
+    await supabase.from("lessons").delete().eq("course_id", id);
+    // Delete units
+    await supabase.from("course_units").delete().eq("course_id", id);
+    // Now delete the course
     const { error } = await supabase.from("courses").delete().eq("id", id);
     if (error) { alert(error.message); return; }
     setCourses(prev => prev.filter(c => c.id !== id));
