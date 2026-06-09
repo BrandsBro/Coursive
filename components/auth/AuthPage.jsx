@@ -45,7 +45,7 @@ export default function AuthPage({ mode }) {
     } else {
       const { error: err } = await supabase.auth.signUp({ email: form.email, password: form.password, options: { data: { full_name: form.name } } });
       if (err) { setError(err.message); setLoading(false); return; }
-      setSuccess("Account created! Check your email to confirm.");
+      setSuccess("✅ Account created! We sent a confirmation email — click the link inside to activate your account, then sign in.");
       setLoading(false);
     }
   };
