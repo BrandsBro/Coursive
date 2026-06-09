@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Home, BookOpen, Trophy, Flame, ChevronDown, LogOut, User, Settings, Shield } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { useStreak } from "@/hooks/useStreak";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/AuthContext";
 import { supabase } from "@/lib/supabase";
@@ -20,6 +21,7 @@ export default function Navbar() {
   const { user } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const { streak } = useStreak();
   const menuRef = useRef(null);
 
   const initials = user?.user_metadata?.full_name
@@ -99,7 +101,7 @@ export default function Navbar() {
           {/* Streak */}
           <div className="flex items-center gap-1.5 bg-orange-50 text-orange-500 px-3 py-1.5 rounded-xl text-sm font-semibold">
             <Flame size={15} fill="#f97316"/>
-            <span>1</span>
+            <span>{streak}</span>
           </div>
 
           {/* User dropdown */}

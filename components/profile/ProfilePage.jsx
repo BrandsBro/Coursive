@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Award, Flame, BookOpen, Trophy, Target, TrendingUp, CheckCircle2, ArrowRight, Download, Calendar } from "lucide-react";
 import { useProgress } from "@/hooks/useProgress";
+import { useStreak } from "@/hooks/useStreak";
 import { useAuth } from "@/lib/AuthContext";
 import { supabase } from "@/lib/supabase";
 import { courses } from "@/data/courses";
@@ -31,6 +32,7 @@ const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 export default function ProfilePage() {
   const { user } = useAuth();
   const { getCoursePercent, getCompletedLessons, hasCertificate, getChallengeDayPercent, hasJoinedChallenge } = useProgress();
+  const { streak, longestStreak, weeklyActivity } = useStreak();
   const [profile, setProfile] = useState(null);
   const [activeTab, setActiveTab] = useState("courses");
   const [memberSince, setMemberSince] = useState("");
@@ -61,8 +63,7 @@ export default function ProfilePage() {
   const inProgressCourses = courses.filter(c => { const p = getCoursePercent(c.id, c.units.flatMap(u=>u.lessons).length); return p > 0 && p < 100; });
   const notStarted = courses.filter(c => getCoursePercent(c.id, c.units.flatMap(u=>u.lessons).length) === 0);
 
-  const completedDays = [true, false, false, false, false, false, false];
-  const streak = completedDays.filter(Boolean).length;
+
 
   return (
     <div style={{ display:"flex",flexDirection:"column",gap:24,maxWidth:900,margin:"0 auto" }}>
@@ -99,7 +100,7 @@ export default function ProfilePage() {
               </div>
               <div style={{ display:"flex",gap:4 }}>
                 {DAYS.map((d, i) => (
-                  <div key={d} style={{ width:24,height:24,borderRadius:7,background:completedDays[i]?"#f97316":"rgba(255,255,255,0.08)",border:completedDays[i]?"none":"1px solid rgba(255,255,255,0.1)",display:"flex",alignItems:"center",justifyContent:"center" }}>
+                  <div key={d} style={{ width:24,height:24,borderRadius:7,background:weeklyActivity[i]?"#f97316":"rgba(255,255,255,0.08)",border:weeklyActivity[i]?"none":"1px solid rgba(255,255,255,0.1)",display:"flex",alignItems:"center",justifyContent:"center" }}>
                     {completedDays[i]
                       ? <CheckCircle2 size={13} color="#fff" />
                       : <span style={{ fontSize:8,color:"rgba(255,255,255,0.3)",fontWeight:600 }}>{d[0]}</span>}
