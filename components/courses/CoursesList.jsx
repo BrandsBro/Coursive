@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Search, BookOpen, Clock, Trophy, ArrowRight, CheckCircle2, Play } from "lucide-react";
-import { courses } from "@/data/courses";
+
 import { useProgress } from "@/hooks/useProgress";
 
 const CATS = ["All", "Design", "Productivity", "Video", "No Code"];
@@ -18,7 +18,7 @@ const S = {
   "notion-ai":            { g:"linear-gradient(135deg,#6b7280,#374151)", e:"📓", a:"#6b7280", al:"rgba(107,114,128,0.12)" },
 };
 
-export default function CoursesList() {
+export default function CoursesList({ courses = [] }) {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("All");
   const { getCoursePercent } = useProgress();

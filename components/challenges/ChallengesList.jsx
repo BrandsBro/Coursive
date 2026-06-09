@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { challenges } from "@/data/challenges";
+
 import { useProgress } from "@/hooks/useProgress";
 import { Clock, BarChart2, Flame, ArrowRight, CheckCircle2 } from "lucide-react";
 
@@ -15,7 +15,7 @@ const CARD_STYLES = [
   { grad:"linear-gradient(135deg,#43e97b,#38f9d7)", light:"#ecfdf5", tag:"#065f46", tagBg:"#d1fae5" },
 ];
 
-export default function ChallengesList() {
+export default function ChallengesList({ challenges = [] }) {
   const { getChallengeDayPercent, hasJoinedChallenge } = useProgress();
   const [filter, setFilter] = useState("All");
 

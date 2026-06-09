@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { courses } from "@/data/courses";
 import { useProgress } from "@/hooks/useProgress";
 
 const S = {
@@ -14,7 +13,7 @@ const S = {
   "notion-ai":            { g:"linear-gradient(135deg,#6b7280,#374151)", e:"📓", a:"#6b7280" },
 };
 
-export default function ExploreAITools() {
+export default function ExploreAITools({ courses = [] }) {
   const { getCoursePercent } = useProgress();
 
   return (

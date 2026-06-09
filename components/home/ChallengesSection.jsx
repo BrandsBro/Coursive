@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import { ArrowRight, Flame, CheckCircle2 } from "lucide-react";
-import { challenges } from "@/data/challenges";
 import { useProgress } from "@/hooks/useProgress";
 
 const S = [
@@ -11,7 +10,7 @@ const S = [
   { g:"linear-gradient(135deg,#43e97b,#38f9d7)", a:"#065f46", l:"#ecfdf5", t:"#064e3b" },
 ];
 
-export default function ChallengesSection() {
+export default function ChallengesSection({ challenges = [] }) {
   const { getChallengeDayPercent, hasJoinedChallenge } = useProgress();
 
   return (

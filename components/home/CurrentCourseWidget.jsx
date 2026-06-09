@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { Play, BookOpen, CheckCircle2, Layers } from "lucide-react";
 import { useProgress } from "@/hooks/useProgress";
-import { courses } from "@/data/courses";
 
 const STYLES = {
   "canva-ai":             { grad:"linear-gradient(135deg,#ec4899 0%,#8b5cf6 100%)", emoji:"🎨", accent:"#8b5cf6" },
@@ -14,7 +13,7 @@ const STYLES = {
   "notion-ai":            { grad:"linear-gradient(135deg,#374151 0%,#111827 100%)", emoji:"📓", accent:"#6b7280" },
 };
 
-export default function CurrentCourseWidget() {
+export default function CurrentCourseWidget({ courses = [] }) {
   const { getCoursePercent, getCompletedLessons } = useProgress();
 
   const activeCourse = courses.find(c => {

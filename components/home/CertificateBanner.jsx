@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { Award, ChevronRight, Star } from "lucide-react";
 import { useProgress } from "@/hooks/useProgress";
-import { courses } from "@/data/courses";
 
 const CERT = [
   { id:"chatgpt",               emoji:"🤖", color:"#10A37F", glow:"rgba(16,163,127,0.4)" },
@@ -12,7 +11,7 @@ const CERT = [
   { id:"communicating-with-ai", emoji:"💬", color:"#F97316", glow:"rgba(249,115,22,0.4)" },
 ];
 
-export default function CertificateBanner() {
+export default function CertificateBanner({ courses = [] }) {
   const { getCoursePercent } = useProgress();
   const overallPct = Math.round(
     CERT.reduce((s, c) => {

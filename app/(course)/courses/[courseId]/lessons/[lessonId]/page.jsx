@@ -1,16 +1,19 @@
-import { courses } from "@/data/courses";
-import { getLessonContent } from "@/data/lessonContent";
 import LessonPage from "@/components/courses/LessonPage";
+import { getCourseById } from "@/lib/db";
+import { getLessonContent } from "@/data/lessonContent";
 import { notFound } from "next/navigation";
+
+export const revalidate = 60;
 
 export default async function LessonDetailPage({ params, searchParams }) {
   const { courseId, lessonId } = await params;
   const sp = await searchParams;
 
-  const course = courses.find((c) => c.id === courseId);
+  const course = await getCourseById(courseId);
   if (!course) return notFound();
 
-  const lesson = course.units.flatMap((u) => u.lessons).find((l) => l.id === lessonId);
+  const allLessons = course.units.flatMap(u => u.lessons);
+  const lesson = allLessons.find(l => l.id === lessonId);
   if (!lesson) return notFound();
 
   const content = getLessonContent(courseId, lessonId);
