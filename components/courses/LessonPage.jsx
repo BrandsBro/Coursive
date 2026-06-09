@@ -1,4 +1,5 @@
 "use client";
+import { useStreak } from "@/hooks/useStreak";
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -201,6 +202,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   const [retakeSection, setRetakeSection] = useState(null);
   const [showCertificate, setShowCertificate] = useState(false);
   const bottomRef = useRef(null);
+  const { updateStreak } = useStreak();
   const { markLessonComplete, markCertificateEarned, getCompletedLessons, markChallengeDay } = useProgress();
 
   const isChallenge = !!challengeId && !!challengeDay;
@@ -224,7 +226,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   };
 
   const handleFinish = () => {
-    markLessonComplete(course.id, lesson.id);
+    updateStreak(); markLessonComplete(course.id, lesson.id);
 
     if (isChallenge) {
       markChallengeDay(challengeId, challengeDay);

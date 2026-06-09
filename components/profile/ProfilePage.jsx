@@ -54,13 +54,13 @@ export default function ProfilePage() {
   const initials = displayName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0,2);
 
   // Stats
-  const totalLessonsDone = courses.reduce((sum, c) => sum + getCompletedLessons(c.id).length, 0);
-  const certsEarned = courses.filter(c => hasCertificate(c.id)).length;
+  const totalLessonsDone = (courses || []).reduce((sum, c) => sum + (getCompletedLessons(c.id) || []).length, 0);
+  const certsEarned = (courses || []).filter(c => hasCertificate(c.id)).length;
   const coursesStarted = courses.filter(c => getCoursePercent(c.id, c.units.flatMap(u=>u.lessons).length) > 0).length;
-  const challengesJoined = challenges.filter(c => hasJoinedChallenge(c.id)).length;
+  const challengesJoined = (challenges || []).filter(c => hasJoinedChallenge(c.id)).length;
 
-  const completedCourses = courses.filter(c => getCoursePercent(c.id, c.units.flatMap(u=>u.lessons).length) === 100);
-  const inProgressCourses = courses.filter(c => { const p = getCoursePercent(c.id, c.units.flatMap(u=>u.lessons).length); return p > 0 && p < 100; });
+  const completedCourses = (courses || []).filter(c => getCoursePercent(c.id, c.units.flatMap(u=>u.lessons).length) === 100);
+  const inProgressCourses = (courses || []).filter(c => { const p = getCoursePercent(c.id, c.units.flatMap(u=>u.lessons).length); return p > 0 && p < 100; });
   const notStarted = courses.filter(c => getCoursePercent(c.id, c.units.flatMap(u=>u.lessons).length) === 0);
 
 

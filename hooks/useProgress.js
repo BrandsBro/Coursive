@@ -1,13 +1,11 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
-import { useStreak } from "@/hooks/useStreak";
 
 export function useProgress() {
   const [userId, setUserId] = useState(null);
   const [progress, setProgress] = useState({});
   const [loaded, setLoaded] = useState(false);
-  const { updateStreak } = useStreak();
 
   // Get current user
   useEffect(() => {
@@ -66,7 +64,6 @@ export function useProgress() {
   const markLessonComplete = useCallback(async (courseId, lessonId) => {
     if (!userId) return;
     await supabase.from("lesson_progress").upsert({ user_id: userId, course_id: courseId, lesson_id: lessonId }, { onConflict: "user_id,course_id,lesson_id" });
-    await updateStreak();
     setProgress(prev => {
       const course = prev[courseId] || { completedLessons: [], certificateEarned: false };
       if (course.completedLessons.includes(lessonId)) return prev;
@@ -137,6 +134,5 @@ export function useProgress() {
     getCoursePercent, isCourseComplete, hasCertificate, resetCourse,
     joinChallenge, markChallengeDay, hasJoinedChallenge,
     getChallengeCompletedDays, getChallengeDayPercent, resetChallenge,
-    updateStreak,
   };
 }

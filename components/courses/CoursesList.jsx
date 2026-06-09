@@ -30,7 +30,7 @@ export default function CoursesList({ courses = [] }) {
   });
 
   const inProgress = courses.filter(c => {
-    const total = c.units.flatMap(u => u.lessons).length;
+    const total = (c.units || []).flatMap(u => u.lessons || []).length;
     const pct = getCoursePercent(c.id, total);
     return pct > 0 && pct < 100;
   }).length;
