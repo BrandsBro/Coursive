@@ -38,14 +38,29 @@ export default function AuthPage({ mode }) {
     if (!isLogin && !form.name) { setError("Please enter your name"); return; }
     if (form.password.length < 6) { setError("Password must be at least 6 characters"); return; }
     setLoading(true);
-    if (isLogin) {
-      const { error: err } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password });
-      if (err) { setError(err.message); setLoading(false); return; }
-      router.push("/"); router.refresh();
-    } else {
-      const { error: err } = await supabase.auth.signUp({ email: form.email, password: form.password, options: { data: { full_name: form.name } } });
-      if (err) { setError(err.message); setLoading(false); return; }
-      setSuccess("✅ Account created! We sent a confirmation email — click the link inside to activate your account, then sign in.");
+    try {
+      if (isLogin) {
+        const { error: err } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password });
+        if (err) {
+          const msg = err.message.toLowerCase();
+          if (msg.includes("email not confirmed")) {
+            setError("Please confirm your email first — check your inbox and click the confirmation link.");
+          } else if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
+            setError("Wrong email or password. Please try again.");
+          } else {
+            setError(err.message);
+          }
+          setLoading(false); return;
+        }
+        router.push("/"); router.refresh();
+      } else {
+        const { error: err } = await supabase.auth.signUp({ email: form.email, password: form.password, options: { data: { full_name: form.name } } });
+        if (err) { setError(err.message); setLoading(false); return; }
+        setSuccess("Check your email and click the confirmation link to activate your account.");
+        setLoading(false);
+      }
+    } catch (e) {
+      setError("Something went wrong. Please try again.");
       setLoading(false);
     }
   };
