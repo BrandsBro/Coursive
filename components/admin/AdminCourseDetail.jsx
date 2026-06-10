@@ -1,5 +1,4 @@
 "use client";
-import LessonContentEditor from "@/components/admin/LessonContentEditor";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -20,7 +19,6 @@ export default function AdminCourseDetail({ course: initial }) {
   const [activeUnit, setActiveUnit] = useState(null);
   const [loading, setLoading] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [editingContent, setEditingContent] = useState(null);
 
   const grad = `linear-gradient(135deg,${course.gradientFrom},${course.gradientTo})`;
 
@@ -168,7 +166,7 @@ export default function AdminCourseDetail({ course: initial }) {
                     <p style={{ fontSize:11,color:"#94A3B8",margin:0 }}>{lesson.type} · {lesson.duration} min</p>
                   </div>
                   <div style={{ display:"flex",gap:6 }}>
-                    <button onClick={() => setEditingContent(lesson)} style={btnSm("#EEF2FF","#6366f1","#C7D2FE")}>
+                    <button onClick={() => router.push(`/admin/builder/${lesson.id}?title=${encodeURIComponent(lesson.title)}&backTo=${encodeURIComponent("/admin/courses/" + course.id)}`)} style={btnSm("#EEF2FF","#6366f1","#C7D2FE")}>
                       ✍️ Content
                     </button>
                     <button onClick={() => { setActiveUnit(unit.id); setLessonForm({ id:lesson.id, title:lesson.title, type:lesson.type, duration:lesson.duration }); }} style={btnSm()}>
@@ -206,14 +204,7 @@ export default function AdminCourseDetail({ course: initial }) {
           <ModalActions onCancel={() => setUnitForm(null)} onSave={saveUnit} loading={loading} label={unitForm.id?"Save Changes":"Add Unit"} />
         </Modal>
       )}
-
-      {/* ── Content Editor ── */}
-      {editingContent && (
-        <LessonContentEditor
-          lessonId={editingContent.id}
-          lessonTitle={editingContent.title}
-          onClose={() => setEditingContent(null)}
-        />
+/>
       )}
 
       {/* ── Lesson Modal ── */}
