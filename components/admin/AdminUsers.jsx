@@ -96,7 +96,7 @@ export default function AdminUsers() {
                 {u.is_admin?"Admin":"User"}
               </span>
               <span style={{ fontSize:12, color:"#94A3B8", whiteSpace:"nowrap" }}>{timeAgo(u.created_at)}</span>
-              <div style={{ display:"flex", gap:6" }}>
+              <div style={{ display:"flex", gap:6 }}>
                 <button onClick={()=>toggleAdmin(u.id,u.is_admin)} title={u.is_admin?"Remove admin":"Make admin"} style={{ width:30, height:30, borderRadius:8, border:`1.5px solid ${u.is_admin?"#FEE2E2":"#E2E8F0"}`, background:"#fff", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center" }}>
                   {u.is_admin ? <ShieldOff size={13} color="#EF4444"/> : <Shield size={13} color="#6366f1"/>}
                 </button>
