@@ -1,4 +1,5 @@
 "use client";
+import AvatarUpload from "@/components/profile/AvatarUpload";
 import CertificateGenerator from "@/components/courses/CertificateGenerator";
 
 import Link from "next/link";
@@ -35,6 +36,7 @@ export default function ProfilePage() {
   const { getCoursePercent, getCompletedLessons, hasCertificate, getChallengeDayPercent, hasJoinedChallenge } = useProgress();
   const { streak, longestStreak, weeklyActivity } = useStreak();
   const [certCourse, setCertCourse] = useState(null);
+  const [avatarUrl, setAvatarUrl] = useState(user?.user_metadata?.avatar_url || null);
   const [profile, setProfile] = useState(null);
   const [activeTab, setActiveTab] = useState("courses");
   const [memberSince, setMemberSince] = useState("");
