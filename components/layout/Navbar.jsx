@@ -4,7 +4,7 @@ import NotificationBell from "@/components/layout/NotificationBell";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, BookOpen, Trophy, Flame, ChevronDown, LogOut, User, Settings, Shield } from "lucide-react";
+import { Home, BookOpen, Trophy, Flame, ChevronDown, LogOut, User, Settings, Shield, Search } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useStreak } from "@/hooks/useStreak";
 import { cn } from "@/lib/utils";
