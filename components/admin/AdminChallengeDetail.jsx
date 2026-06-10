@@ -89,7 +89,7 @@ export default function AdminChallengeDetail({ challenge: initial, courses }) {
         <div style={{ background:"#EFF6FF",borderRadius:14,padding:"12px 16px",border:"1.5px solid #BFDBFE",display:"flex",gap:10,alignItems:"flex-start" }}>
           <LinkIcon size={16} color="#2563eb" style={{ flexShrink:0,marginTop:1 }}/>
           <p style={{ fontSize:13,color:"#1e40af",margin:0,lineHeight:1.5 }}>
-            <strong>Linked to courses:</strong> Each day maps to a course lesson. The content you build in that lesson appears here for students. Use <strong>✍️ Content</strong> to build lesson content.
+            <strong>Independent content:</strong> Each challenge day has its own content — separate from courses. Use <strong>✍️ Content</strong> to build what students see for that day. The course mapping is optional metadata only.
           </p>
         </div>
 
@@ -108,9 +108,7 @@ export default function AdminChallengeDetail({ challenge: initial, courses }) {
                   setDeleteTarget={setDeleteTarget}
                   onEdit={() => setDayForm({ day_number:day.day, topic:day.topic, emoji:day.emoji, course_id:day.courseId||"", lesson_id:day.lessonId||"" })}
                   onDelete={() => deleteDay(day.day)}
-                  onContent={() => day.lessonId
-                    ? router.push(`/admin/builder/${day.lessonId}?title=${encodeURIComponent("Day "+day.day+" - "+day.topic)}&backTo=${encodeURIComponent("/admin/challenges/"+challenge.id)}`)
-                    : alert("Map this day to a course lesson first using Edit, then build content.")}
+                  onContent={() => router.push(`/admin/builder/challenge_${challenge.id}_day_${day.day}?title=${encodeURIComponent("Day "+day.day+" - "+day.topic)}&backTo=${encodeURIComponent("/admin/challenges/"+challenge.id)}`)}
                 />
               ))}
             </div>
