@@ -54,7 +54,9 @@ export function BlockPreview({ block }) {
     case "image":
       return c.src ? (
         <figure style={{ margin:0 }}>
-          <img src={c.src} alt={c.alt} style={{ width:"100%", borderRadius:16, display:"block" }}/>
+          <img src={c.src} alt={c.alt||""} style={{ width:"100%", borderRadius:16, display:"block" }}
+            onError={e => { e.target.style.display="none"; }}
+          />
           {c.caption && <figcaption style={{ fontSize:12, color:"#94A3B8", textAlign:"center", marginTop:8, fontStyle:"italic" }}>{c.caption}</figcaption>}
         </figure>
       ) : <Placeholder icon="🖼️" text="Image"/>;
@@ -169,13 +171,23 @@ function ImageE({ content, onChange }) {
         <ImagePlus size={16}/> {content.src ? "Change image" : "Choose / upload image"}
       </button>
       {content.src && (
-        <div style={{ borderRadius:12, overflow:"hidden", border:"1.5px solid #E2E8F0" }}>
-          <img src={content.src} alt={content.alt} style={{ width:"100%", maxHeight:180, objectFit:"cover", display:"block" }}/>
+        <div style={{ borderRadius:12, overflow:"hidden", border:"1.5px solid #E2E8F0", background:"#F8FAFC" }}>
+          <img
+            src={content.src}
+            alt={content.alt||""}
+            style={{ width:"100%", maxHeight:180, objectFit:"cover", display:"block" }}
+            onError={e => { e.target.style.display="none"; e.target.nextSibling.style.display="flex"; }}
+          />
+          <div style={{ display:"none", padding:20, alignItems:"center", justifyContent:"center", flexDirection:"column", gap:6, color:"#94A3B8" }}>
+            <span style={{ fontSize:24 }}>🖼️</span>
+            <span style={{ fontSize:12 }}>Cannot load image preview</span>
+            <span style={{ fontSize:10, wordBreak:"break-all", maxWidth:"100%" }}>{content.src}</span>
+          </div>
         </div>
       )}
       <input value={content.alt||""} onChange={e => onChange({ ...content, alt:e.target.value })} placeholder="Alt text (accessibility)" style={inp()}/>
       <input value={content.caption||""} onChange={e => onChange({ ...content, caption:e.target.value })} placeholder="Caption (optional)" style={inp()}/>
-      {lib && <MediaLibrary accept="image" onSelect={m => onChange({ ...content, src:m.url, alt:content.alt||m.filename })} onClose={() => setLib(false)}/>}
+      {lib && <MediaLibrary accept="image" onSelect={m => { console.log("Selected media:", m); onChange({ ...content, src:m.url, alt:content.alt||m.filename }); }} onClose={() => setLib(false)}/>}
     </div>
   );
 }
