@@ -17,7 +17,8 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
 
   const safeContent = Array.isArray(content) && content.length > 0
     ? content
-    : [{ type:"text", text:`Welcome to "${lesson?.title}"! Content coming soon.` }];
+    : [];
+  const hasContent = safeContent.length > 0;
 
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -90,6 +91,13 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
 
         {/* ── Content blocks ── */}
         <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
+          {!hasContent && (
+            <div style={{ textAlign:"center", padding:"60px 20px", background:"#fff", borderRadius:24, border:"2px dashed #E2E8F0" }}>
+              <div style={{ fontSize:48, marginBottom:16 }}>🚧</div>
+              <h3 style={{ fontSize:18, fontWeight:800, color:"#0f172a", margin:"0 0 8px" }}>Content coming soon</h3>
+              <p style={{ fontSize:14, color:"#94A3B8", margin:0 }}>This lesson is being built. Check back soon!</p>
+            </div>
+          )}
           {safeContent.map((block, idx) => (
             <ContentBlock
               key={block.id || idx}
