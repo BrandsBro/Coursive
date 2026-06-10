@@ -12,7 +12,7 @@ import { useStreak } from "@/hooks/useStreak";
 
 export default function LessonPage({ course, lesson, content, mode, challengeId, challengeDay, firstJoin }) {
   const router = useRouter();
-  const { markLessonComplete, isLessonComplete, markChallengeDay } = useProgress();
+  const { markLessonComplete, getCompletedLessons, markChallengeDay } = useProgress();
   const { updateStreak } = useStreak();
 
   const safeContent = Array.isArray(content) && content.length > 0
@@ -32,7 +32,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   const nextLesson = allLessons[currentIdx + 1];
   const prevLesson = allLessons[currentIdx - 1];
 
-  const isComplete = isLessonComplete(course?.id, lesson?.id);
+  const isComplete = (getCompletedLessons(course?.id) || []).includes(lesson?.id);
 
   const handleComplete = async () => {
     await updateStreak();
