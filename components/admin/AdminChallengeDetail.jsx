@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { ChevronLeft, Plus, Pencil, Trash2, X } from "lucide-react";
@@ -10,6 +11,7 @@ const EMPTY_DAY = { topic:"", emoji:"🚀", course_id:"", lesson_id:"" };
 const EMOJIS = ["🚀","⭐","💼","🛠️","🤖","💬","🎨","🔍","⚡","🎬","💻","📊","📱","🌟","🔄","🎯","📚","💡","🔥","🏆"];
 
 export default function AdminChallengeDetail({ challenge: initial, courses }) {
+  const router = useRouter();
   const [challenge, setChallenge] = useState(initial);
   const [dayForm, setDayForm] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -93,6 +95,7 @@ export default function AdminChallengeDetail({ challenge: initial, courses }) {
                 </p>
               </div>
               <div style={{ display:"flex",gap:6,flexShrink:0 }}>
+                <button onClick={() => day.lessonId ? router.push("/admin/builder/" + day.lessonId + "?title=" + encodeURIComponent("Day " + day.day + " - " + day.topic) + "&backTo=" + encodeURIComponent("/admin/challenges/" + challenge.id)) : alert("First map this day to a course lesson using Edit, then you can build its content.")} style={btnSm("#EEF2FF","#6366f1","#C7D2FE")}>✍️ Content</button>
                 <button onClick={() => setDayForm({ day_number:day.day, topic:day.topic, emoji:day.emoji, course_id:day.courseId||"", lesson_id:day.lessonId||"" })} style={btnSm()}>
                   <Pencil size={11}/> Edit
                 </button>
