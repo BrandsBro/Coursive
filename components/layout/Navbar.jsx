@@ -1,4 +1,5 @@
 "use client";
+import NotificationBell from "@/components/layout/NotificationBell";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -97,6 +98,9 @@ export default function Navbar() {
               </div>
             </Link>
           )}
+
+          {/* Notifications */}
+          <NotificationBell />
 
           {/* Streak */}
           <div className="flex items-center gap-1.5 bg-orange-50 text-orange-500 px-3 py-1.5 rounded-xl text-sm font-semibold">

@@ -1,4 +1,5 @@
 "use client";
+import { useNotifications } from "@/hooks/useNotifications";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -14,6 +15,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   const router = useRouter();
   const { markLessonComplete, getCompletedLessons, markChallengeDay } = useProgress();
   const { updateStreak } = useStreak();
+  const { send: sendNotification } = useNotifications();
 
   const safeContent = Array.isArray(content) && content.length > 0
     ? content
@@ -38,6 +40,14 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   const handleComplete = async () => {
     await updateStreak();
     await markLessonComplete(course?.id, lesson?.id);
+    // Send notifications
+    await sendNotification("lesson", "Lesson complete! 📚", `You finished "${lesson?.title}"`, "📚", `/courses/${course?.id}`);
+    // Check if all lessons done → certificate notification
+    const allLessons = (course?.units||[]).flatMap(u=>u.lessons||[]);
+    const nowDone = (getCompletedLessons(course?.id)||[]).length + 1;
+    if (nowDone >= allLessons.length) {
+      await sendNotification("certificate", "Certificate earned! 🏆", `You completed "${course?.title}" — download your certificate.`, "🏆", "/profile");
+    }
     if (challengeId && challengeDay) {
       await markChallengeDay(challengeId, challengeDay);
     }
