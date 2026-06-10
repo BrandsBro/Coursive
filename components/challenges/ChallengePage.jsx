@@ -1,4 +1,5 @@
 "use client";
+import ChallengeLeaderboard from "@/components/challenges/ChallengeLeaderboard";
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -49,6 +50,7 @@ export default function ChallengePage({ challenge }) {
 
   const { joinChallenge, hasJoinedChallenge, getChallengeCompletedDays, resetChallenge } = useProgress();
 
+  const [activeTab, setActiveTab] = useState("overview");
   const [phase, setPhase] = useState("detail");
   const [rating, setRating] = useState(0);
   const [confirmReset, setConfirmReset] = useState(false);
@@ -294,6 +296,20 @@ export default function ChallengePage({ challenge }) {
           </button>
         </div>
       </div>
+          {/* Tabs */}
+      <div style={{ display:"flex", gap:6, background:"#F1F5F9", borderRadius:14, padding:4, marginTop:24 }}>
+        {[["overview","📚 Overview"],["leaderboard","🏆 Leaderboard"]].map(([val,label]) => (
+          <button key={val} onClick={() => setActiveTab(val)} style={{ flex:1, padding:"10px", borderRadius:11, border:"none", background:activeTab===val?"#fff":"transparent", color:activeTab===val?"#0f172a":"#64748B", fontSize:13, fontWeight:700, cursor:"pointer", boxShadow:activeTab===val?"0 2px 8px rgba(0,0,0,0.08)":"none", transition:"all 0.15s" }}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === "leaderboard" && (
+        <div style={{ marginTop:20 }}>
+          <ChallengeLeaderboard challenge={challenge}/>
+        </div>
+      )}
     </div>
   );
 }
