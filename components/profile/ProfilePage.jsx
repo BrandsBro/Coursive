@@ -1,4 +1,5 @@
 "use client";
+import CertificateGenerator from "@/components/courses/CertificateGenerator";
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -33,6 +34,7 @@ export default function ProfilePage() {
   const { user } = useAuth();
   const { getCoursePercent, getCompletedLessons, hasCertificate, getChallengeDayPercent, hasJoinedChallenge } = useProgress();
   const { streak, longestStreak, weeklyActivity } = useStreak();
+  const [certCourse, setCertCourse] = useState(null);
   const [profile, setProfile] = useState(null);
   const [activeTab, setActiveTab] = useState("courses");
   const [memberSince, setMemberSince] = useState("");
@@ -64,6 +66,8 @@ export default function ProfilePage() {
   const notStarted = courses.filter(c => getCoursePercent(c.id, c.units.flatMap(u=>u.lessons).length) === 0);
 
 
+
+  const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Graduate";
 
   return (
     <div style={{ display:"flex",flexDirection:"column",gap:24,maxWidth:900,margin:"0 auto" }}>
@@ -273,5 +277,14 @@ export default function ProfilePage() {
         )}
       </div>
     </div>
+
+      {certCourse && (
+        <CertificateGenerator
+          course={certCourse}
+          userName={userName}
+          completedDate={new Date().toISOString()}
+          onClose={() => setCertCourse(null)}
+        />
+      )}
   );
 }

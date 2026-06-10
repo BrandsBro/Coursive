@@ -1,4 +1,5 @@
 "use client";
+import CertificateGenerator from "@/components/courses/CertificateGenerator";
 import { useNotifications } from "@/hooks/useNotifications";
 
 import { useState, useEffect } from "react";
@@ -29,6 +30,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   const [fillChecked, setFillChecked] = useState({});
   const [completed, setCompleted] = useState(false);
   const [showComplete, setShowComplete] = useState(false);
+  const [showCert, setShowCert] = useState(false);
 
   const allLessons = (course?.units || []).flatMap(u => u.lessons || []);
   const currentIdx = allLessons.findIndex(l => l.id === lesson?.id);
@@ -51,6 +53,10 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
     if (challengeId && challengeDay) {
       await markChallengeDay(challengeId, challengeDay);
     }
+    // Check if last lesson in course
+    const allLessons = (course?.units||[]).flatMap(u=>u.lessons||[]);
+    const isLastLesson = !allLessons[currentIdx + 1];
+    if (isLastLesson) setTimeout(() => setShowCert(true), 2200);
     setCompleted(true);
     setShowComplete(true);
   };
@@ -168,6 +174,15 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
         </div>
       )}
     </div>
+
+      {showCert && (
+        <CertificateGenerator
+          course={course}
+          userName=""
+          completedDate={new Date().toISOString()}
+          onClose={() => setShowCert(false)}
+        />
+      )}
   );
 }
 
