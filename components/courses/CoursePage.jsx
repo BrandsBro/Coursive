@@ -1,4 +1,6 @@
 "use client";
+import CourseReviews from "@/components/courses/CourseReviews";
+import StarRating from "@/components/courses/StarRating";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -118,6 +120,11 @@ export default function CoursePage({ course, allCourses }) {
           onClose={() => setShowCertificate(false)}
         />
       )}
+          {/* Reviews */}
+      <div style={{ marginTop:40, paddingTop:32, borderTop:"1px solid #F1F5F9" }}>
+        <h2 style={{ fontSize:22, fontWeight:900, color:"#0f172a", margin:"0 0 24px" }}>Student Reviews</h2>
+        <CourseReviews courseId={course.id} courseName={course.title}/>
+      </div>
     </div>
   );
 }
