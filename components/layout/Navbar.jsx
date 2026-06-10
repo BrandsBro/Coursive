@@ -1,4 +1,5 @@
 "use client";
+import SearchModal from "@/components/layout/SearchModal";
 import NotificationBell from "@/components/layout/NotificationBell";
 
 import Link from "next/link";
@@ -22,6 +23,7 @@ export default function Navbar() {
   const { user } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const { streak } = useStreak();
   const menuRef = useRef(null);
 
@@ -32,6 +34,18 @@ export default function Navbar() {
   const displayName = user?.user_metadata?.full_name
     || user?.email?.split("@")[0]
     || "Learner";
+
+  // Search shortcut Cmd+K / Ctrl+K
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setShowSearch(true);
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
 
   // Check admin status
   useEffect(() => {
@@ -98,6 +112,15 @@ export default function Navbar() {
               </div>
             </Link>
           )}
+
+          {/* Search */}
+          <button onClick={() => setShowSearch(true)} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 14px", borderRadius:11, border:"1.5px solid #E2E8F0", background:"#F8FAFC", color:"#94A3B8", fontSize:13, cursor:"pointer", transition:"all 0.15s" }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor="#7c3aed"; e.currentTarget.style.color="#7c3aed"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor="#E2E8F0"; e.currentTarget.style.color="#94A3B8"; }}>
+            <Search size={14}/>
+            <span style={{ fontSize:12 }}>Search</span>
+            <kbd style={{ padding:"1px 5px", borderRadius:5, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:10, fontWeight:700 }}>⌘K</kbd>
+          </button>
 
           {/* Notifications */}
           <NotificationBell />
