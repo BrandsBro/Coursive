@@ -22,6 +22,7 @@ export default function AuthPage({ mode }) {
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isMobile, setIsMobile] = useState(false);
