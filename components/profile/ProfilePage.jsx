@@ -176,109 +176,6 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* ── Tabs ── */}
-      <div>
-        <div style={{ display:"flex",gap:4,background:"#F1F5F9",borderRadius:14,padding:4,marginBottom:18,width:"fit-content" }}>
-          {[["courses","📚 Courses"],["challenges","🔥 Challenges"]].map(([t,l]) => (
-            <button key={t} onClick={() => setActiveTab(t)} style={{ padding:"8px 18px",borderRadius:10,fontSize:13,fontWeight:700,cursor:"pointer",border:"none",background:activeTab===t?"#fff":"transparent",color:activeTab===t?"#0f172a":"#64748B",boxShadow:activeTab===t?"0 2px 8px rgba(0,0,0,0.08)":"none",transition:"all 0.15s" }}>
-              {l}
-            </button>
-          ))}
-        </div>
-
-        {/* Courses tab */}
-        {activeTab === "courses" && (
-          <div style={{ display:"flex",flexDirection:"column",gap:20 }}>
-            {[
-              { label:"In progress", dot:"#f59e0b", list:inProgressCourses },
-              { label:"Completed",   dot:"#22C55E", list:completedCourses  },
-              { label:"Not started", dot:"#E2E8F0", list:notStarted        },
-            ].map(({ label, dot, list }) => list.length > 0 && (
-              <div key={label}>
-                <h3 style={{ fontSize:14,fontWeight:700,color:list===notStarted?"#94A3B8":"#0f172a",margin:"0 0 10px",display:"flex",alignItems:"center",gap:6 }}>
-                  <div style={{ width:7,height:7,borderRadius:"50%",background:dot }} />
-                  {label} ({list.length})
-                </h3>
-                <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
-                  {list.map(course => {
-                    const s = COURSE_STYLES[course.id] || { g:"linear-gradient(135deg,#6366f1,#8b5cf6)",e:"📚",a:"#6366f1" };
-                    const total = course.units.flatMap(u=>u.lessons).length;
-                    const pct = getCoursePercent(course.id, total);
-                    return (
-                      <Link key={course.id} href={`/courses/${course.id}`} style={{ textDecoration:"none" }}>
-                        <div style={{ background:"#fff",borderRadius:16,border:"1.5px solid #F1F5F9",padding:"12px 16px",display:"flex",alignItems:"center",gap:12,cursor:"pointer",transition:"all 0.15s" }}
-                          onMouseEnter={e => { e.currentTarget.style.borderColor=`${s.a}30`; e.currentTarget.style.boxShadow=`0 4px 14px ${s.a}12`; }}
-                          onMouseLeave={e => { e.currentTarget.style.borderColor="#F1F5F9"; e.currentTarget.style.boxShadow="none"; }}>
-                          <div style={{ width:44,height:44,borderRadius:13,background:s.g,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0 }}>{s.e}</div>
-                          <div style={{ flex:1,minWidth:0 }}>
-                            <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:4 }}>
-                              <h4 style={{ fontSize:13,fontWeight:700,color:"#0f172a",margin:0 }}>{course.title}</h4>
-                              {pct===100 && <span style={{ background:"#F0FDF4",border:"1px solid #BBF7D0",borderRadius:999,padding:"1px 7px",fontSize:10,fontWeight:700,color:"#15803D" }}>✓ Done</span>}
-                            </div>
-                            <div style={{ display:"flex",alignItems:"center",gap:8 }}>
-                              <div style={{ flex:1,background:"#F1F5F9",borderRadius:999,height:4,overflow:"hidden" }}>
-                                <div style={{ height:4,borderRadius:999,background:s.g,width:`${pct}%`,transition:"width 0.6s" }} />
-                              </div>
-                              <span style={{ fontSize:11,fontWeight:700,color:s.a,minWidth:28 }}>{pct}%</span>
-                            </div>
-                          </div>
-                          <ArrowRight size={14} color="#CBD5E1" />
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Challenges tab */}
-        {activeTab === "challenges" && (
-          <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
-            {challenges.map((ch, i) => {
-              const s = CH_STYLES[i%CH_STYLES.length];
-              const joined = hasJoinedChallenge(ch.id);
-              const pct = getChallengeDayPercent(ch.id, ch.days);
-              const daysDone = Math.round((pct/100)*ch.days);
-              return (
-                <Link key={ch.id} href={`/challenges/${ch.id}${joined?"?joined=true":""}`} style={{ textDecoration:"none" }}>
-                  <div style={{ background:"#fff",borderRadius:16,border:"1.5px solid #F1F5F9",padding:"12px 16px",display:"flex",alignItems:"center",gap:12,cursor:"pointer",transition:"all 0.15s" }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor=`${s.a}30`; e.currentTarget.style.boxShadow=`0 4px 14px ${s.a}12`; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor="#F1F5F9"; e.currentTarget.style.boxShadow="none"; }}>
-                    <div style={{ width:44,height:44,borderRadius:13,background:s.g,display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,flexShrink:0 }}>{ch.emoji}</div>
-                    <div style={{ flex:1,minWidth:0 }}>
-                      <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:3 }}>
-                        <h4 style={{ fontSize:13,fontWeight:700,color:"#0f172a",margin:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{ch.title}</h4>
-                        {joined && <span style={{ background:`${s.a}15`,color:s.a,fontSize:10,fontWeight:700,padding:"1px 7px",borderRadius:999,flexShrink:0 }}>Enrolled</span>}
-                      </div>
-                      {joined ? (
-                        <div style={{ display:"flex",alignItems:"center",gap:8 }}>
-                          <div style={{ flex:1,background:"#F1F5F9",borderRadius:999,height:4,overflow:"hidden" }}>
-                            <div style={{ height:4,borderRadius:999,background:s.g,width:`${pct}%`,transition:"width 0.6s" }} />
-                          </div>
-                          <span style={{ fontSize:11,color:"#94A3B8",flexShrink:0 }}>{daysDone}/{ch.days} days</span>
-                        </div>
-                      ) : (
-                        <p style={{ fontSize:12,color:"#94A3B8",margin:0 }}>{ch.days} days · {ch.level}</p>
-                      )}
-                    </div>
-                    <ArrowRight size={14} color="#CBD5E1" />
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </div>
 
       {certCourse && (
         <CertificateGenerator
@@ -288,5 +185,6 @@ export default function ProfilePage() {
           onClose={() => setCertCourse(null)}
         />
       )}
+                </div>
   );
 }

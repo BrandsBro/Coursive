@@ -365,20 +365,23 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
         <div style={{ padding:"16px 20px", borderRadius:16, background:bg, border:`1.5px solid ${border}`, display:"flex", gap:12, alignItems:"flex-start" }}>
           <span style={{ fontSize:18, flexShrink:0, marginTop:1 }}>{emoji}</span>
           <p style={{ fontSize:14, color, margin:0, lineHeight:1.65, fontWeight:500 }}>{c.text}</p>
+
+      {listenMode && (
+        <ListenMode
+          lesson={lesson}
+          content={safeContent}
+          onClose={() => setListenMode(false)}
+        />
+      )}
+
+      {showCert && (
+        <CertificateGenerator
+          course={course}
+          userName=""
+          completedDate={new Date().toISOString()}
+          onClose={() => setShowCert(false)}
+        />
+      )}
         </div>
-      );
-    }
-
-    case "divider":
-      return c.style==="dots"
-        ? <div style={{ textAlign:"center", color:"#CBD5E1", fontSize:18, letterSpacing:10, padding:"8px 0" }}>• • •</div>
-        : c.style==="space"
-        ? <div style={{ height:24 }}/>
-        : <hr style={{ border:"none", borderTop:"2px solid #F1F5F9", margin:0 }}/>;
-
-    default:
-      // Legacy content format fallback
-      if (c.text) return <p style={{ fontSize:15, lineHeight:1.8, color:"#374151", margin:0 }}>{c.text}</p>;
-      return null;
-  }
+  );
 }
