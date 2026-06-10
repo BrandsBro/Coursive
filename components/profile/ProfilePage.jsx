@@ -176,6 +176,12 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {certCourse && (
         <CertificateGenerator
@@ -185,6 +191,6 @@ export default function ProfilePage() {
           onClose={() => setCertCourse(null)}
         />
       )}
-                </div>
+    </div>
   );
 }
