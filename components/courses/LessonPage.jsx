@@ -1,4 +1,5 @@
 "use client";
+import ListenMode from "@/components/courses/ListenMode";
 import CertificateGenerator from "@/components/courses/CertificateGenerator";
 import { useNotifications } from "@/hooks/useNotifications";
 
@@ -30,6 +31,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   const [fillChecked, setFillChecked] = useState({});
   const [completed, setCompleted] = useState(false);
   const [showComplete, setShowComplete] = useState(false);
+  const [listenMode, setListenMode] = useState(false);
   const [showCert, setShowCert] = useState(false);
 
   const allLessons = (course?.units || []).flatMap(u => u.lessons || []);
@@ -79,6 +81,9 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
         </Link>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           <span style={{ fontSize:12, color:"#94A3B8" }}>{lesson?.duration} min read</span>
+          <button onClick={() => setListenMode(true)} style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 14px", borderRadius:10, border:"1.5px solid #E2E8F0", background:"#fff", color:"#0891b2", fontSize:12, fontWeight:700, cursor:"pointer" }}>
+            🎧 Listen
+          </button>
           {isComplete && (
             <span style={{ display:"flex", alignItems:"center", gap:4, background:"#F0FDF4", color:"#16A34A", fontSize:12, fontWeight:700, padding:"4px 10px", borderRadius:999 }}>
               <Check size={12}/> Complete
@@ -174,6 +179,14 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
         </div>
       )}
     </div>
+
+      {listenMode && (
+        <ListenMode
+          lesson={lesson}
+          content={safeContent}
+          onClose={() => setListenMode(false)}
+        />
+      )}
 
       {showCert && (
         <CertificateGenerator
