@@ -2,13 +2,17 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, BookOpen, Trophy, LogOut, Settings, ChevronRight } from "lucide-react";
+import { LayoutDashboard, BookOpen, Trophy, Users, TrendingUp, HardDrive, Settings } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const NAV = [
-  { href:"/admin",            icon:LayoutDashboard, label:"Dashboard"  },
-  { href:"/admin/courses",    icon:BookOpen,        label:"Courses"    },
-  { href:"/admin/challenges", icon:Trophy,          label:"Challenges" },
+  { href:"/admin",            icon:LayoutDashboard, label:"Dashboard"   },
+  { href:"/admin/courses",    icon:BookOpen,        label:"Courses"     },
+  { href:"/admin/challenges", icon:Trophy,          label:"Challenges"  },
+  { href:"/admin/users",      icon:Users,           label:"Users"       },
+  { href:"/admin/analytics",  icon:TrendingUp,      label:"Analytics"   },
+  { href:"/admin/media",      icon:HardDrive,       label:"Media"       },
+  { href:"/admin/settings",   icon:Settings,        label:"Settings"    },
 ];
 
 export default function AdminLayout({ children }) {
