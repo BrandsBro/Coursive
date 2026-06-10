@@ -204,8 +204,6 @@ export default function AdminCourseDetail({ course: initial }) {
           <ModalActions onCancel={() => setUnitForm(null)} onSave={saveUnit} loading={loading} label={unitForm.id?"Save Changes":"Add Unit"} />
         </Modal>
       )}
-/>
-      )}
 
       {/* ── Lesson Modal ── */}
       {lessonForm && (

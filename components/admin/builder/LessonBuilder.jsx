@@ -240,7 +240,7 @@ export default function LessonBuilder({ lessonId, lessonTitle, backTo }) {
 // ── Sortable block wrapper ──
 function SortableBlock({ block, isActive, onToggle, onChange, onDelete, onDuplicate }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: block.id });
-  const def = BLOCK_DEFS[block.type];
+  const def = BLOCK_DEFS[block.type] || { icon:"❓", label:"Unknown", color:"#64748B", bg:"#F8FAFC", preview:()=>"Unknown block type" };
 
   const style = {
     transform: CSS.Transform.toString(transform),
