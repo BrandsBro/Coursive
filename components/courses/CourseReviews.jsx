@@ -124,14 +124,15 @@ export default function CourseReviews({ courseId, courseName }) {
 
   const approvedReviews = reviews.filter(r => r.approved === true || r.user_id === user?.id);
   const total = reviews.filter(r => r.approved).length;
-  const approvedOnly = reviews.filter(r => r.approved);
-  const avg = approvedOnly.length ? approvedOnly.reduce((s,r)=>s+r.rating,0)/approvedOnly.length : 0;
+  const approvedOnly = reviews.filter(r => r.approved === true || r.approved === "true" || r.approved === "t");
+  const avg = approvedOnly.length ? (approvedOnly.reduce((s,r)=>s+r.rating,0)/approvedOnly.length) : 0;
   const dist = [5,4,3,2,1].map(s=>({
     star:s,
     count:approvedOnly.filter(r=>r.rating===s).length,
     pct:approvedOnly.length?Math.round(approvedOnly.filter(r=>r.rating===s).length/approvedOnly.length*100):0
   }));
-  const others = reviews.filter(r => r.user_id !== user?.id && r.approved === true);
+  console.log("All reviews:", reviews.map(r=>({id:r.id,approved:r.approved,type:typeof r.approved})));
+  const others = reviews.filter(r => r.user_id !== user?.id && (r.approved === true || r.approved === "true" || r.approved === "t"));
   const showForm = user && !myReview;
 
   if (loading) return <div style={{padding:40,textAlign:"center"}}><Loader size={22} color="#94A3B8" className="bspin"/></div>;
