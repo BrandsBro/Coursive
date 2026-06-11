@@ -42,14 +42,14 @@ export default function CurrentCourseWidget({ courses = [] }) {
               <BookOpen size={10} color="#fff" />
               <span style={{ color:"#fff",fontSize:10,fontWeight:700,letterSpacing:0.5 }}>CURRENT COURSE</span>
             </div>
-            <h3 style={{ color:"#fff",fontSize:24,fontWeight:900,margin:"0 0 4px",lineHeight:1.15 }}>{activeCourse.title}</h3>
+            <h3 style={{ color:"#fff",fontSize:"clamp(18px,4vw,24px)",fontWeight:900,margin:"0 0 4px",lineHeight:1.15 }}>{activeCourse.title}</h3>
             <p style={{ color:"rgba(255,255,255,0.65)",fontSize:13,margin:0 }}>{activeCourse.description}</p>
           </div>
-          <div style={{ fontSize:56,lineHeight:1,marginTop:-4 }}>{s.emoji}</div>
+          <div style={{ fontSize:48,lineHeight:1,marginTop:-4,flexShrink:0 }}>{s.emoji}</div>
         </div>
 
         {/* Stats row */}
-        <div style={{ display:"flex",gap:16,marginBottom:0 }}>
+        <div style={{ display:"flex",gap:8,flexWrap:"wrap",marginBottom:0 }}>
           {[
             { icon:<Layers size={13} color="rgba(255,255,255,0.7)" />, label:`${total} lessons` },
             { icon:<CheckCircle2 size={13} color="rgba(255,255,255,0.7)" />, label:`${done} done` },

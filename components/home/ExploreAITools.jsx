@@ -28,7 +28,7 @@ export default function ExploreAITools({ courses = [] }) {
         </Link>
       </div>
 
-      <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(165px,1fr))",gap:14 }}>
+      <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(160px, 1fr)))",gap:14 }}>
         {courses.map((course) => {
           const s = S[course.id] || { g:"linear-gradient(135deg,#6366f1,#8b5cf6)", e:"📚", a:"#6366f1" };
           const total = course.units.flatMap(u => u.lessons).length;
