@@ -18,7 +18,7 @@ function Stars({ value, onChange, size=28, readonly=false }) {
           onClick={() => !readonly && onChange?.(s)}
           onMouseEnter={() => !readonly && setHov(s)}
           onMouseLeave={() => !readonly && setHov(0)}
-          style={{ background:"none", border:"none", cursor:readonly?"default":"pointer", padding:1, lineHeight:1, transition:"transform 0.1s", transform:hov===s&&!readonly?"scale(1.2)":"scale(1)" }}>
+          style={{ background:"none", border:"none", cursor:readonly?"default":"pointer", padding:1, lineHeight:1, transition:"transform 0.1s", transform:(!readonly&&hov===s)?"scale(1.2)":"scale(1)" }}>
           <svg width={size} height={size} viewBox="0 0 24 24">
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
               fill={s<=show?"#f59e0b":"#E2E8F0"} stroke={s<=show?"#f59e0b":"#E2E8F0"} strokeWidth="1"/>
@@ -36,7 +36,10 @@ const ago = d => {
   if(days<30) return days+"d ago";
   return Math.floor(days/30)+"mo ago";
 };
-const inits = n => n?n.split(" ").map(x=>x[0]).join("").toUpperCase().slice(0,2):"?";
+
+const inits = n => n ? n.split(" ").map(x=>x[0]).join("").toUpperCase().slice(0,2) : "?";
+
+const isApproved = r => r.approved === true || r.approved === "true" || r.approved === "t";
 
 export default function CourseReviews({ courseId, courseName }) {
   const { user } = useAuth();
@@ -53,19 +56,18 @@ export default function CourseReviews({ courseId, courseName }) {
   const load = async () => {
     setLoading(true);
     try {
-      // Fetch reviews
       const { data: reviewData, error } = await supabase
         .from("course_reviews")
         .select("id, course_id, user_id, rating, review, created_at, updated_at, approved")
         .eq("course_id", courseId)
         .order("created_at", { ascending: false });
 
-      if (error) { console.error("Reviews fetch error:", error); setLoading(false); return; }
+      if (error) { console.error(error); setLoading(false); return; }
 
-      const reviews = reviewData || [];
+      const all = reviewData || [];
 
-      // Fetch profiles for those users
-      const userIds = [...new Set(reviews.map(r => r.user_id))];
+      // Fetch profiles
+      const userIds = [...new Set(all.map(r => r.user_id))];
       let profileMap = {};
       if (userIds.length > 0) {
         const { data: profileData } = await supabase
@@ -75,16 +77,16 @@ export default function CourseReviews({ courseId, courseName }) {
         (profileData || []).forEach(p => { profileMap[p.id] = p; });
       }
 
-      // Merge
-      const all = reviews.map(r => ({ ...r, profiles: profileMap[r.user_id] || null }));
-      setReviews(all);
+      const merged = all.map(r => ({ ...r, profiles: profileMap[r.user_id] || null }));
+      setReviews(merged);
 
       if (user) {
-        const mine = all.find(r => r.user_id === user.id);
+        const mine = merged.find(r => r.user_id === user.id);
         if (mine) { setMyReview(mine); setRating(mine.rating); setText(mine.review || ""); }
+        else { setMyReview(null); }
       }
     } catch(e) {
-      console.error("Load error:", e);
+      console.error(e);
     }
     setLoading(false);
   };
@@ -92,56 +94,35 @@ export default function CourseReviews({ courseId, courseName }) {
   const submit = async () => {
     if (!rating || !user) return;
     setSubmitting(true);
-    try {
-      const { error } = await supabase.from("course_reviews").upsert(
-        {
-          course_id: courseId,
-          user_id: user.id,
-          rating,
-          review: text.trim() || null,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "course_id,user_id" }
-      );
-      if (error) {
-        console.error("Review save error:", error);
-        alert("Could not save review: " + error.message);
-        setSubmitting(false);
-        return;
-      }
-      setSaved(true);
-      setEditing(false);
-      setTimeout(() => setSaved(false), 3000);
-      await load();
-    } catch (e) {
-      console.error("Review error:", e);
-      alert("Error: " + e.message);
-    }
+    const { error } = await supabase.from("course_reviews").upsert(
+      { course_id: courseId, user_id: user.id, rating, review: text.trim() || null, approved: false, updated_at: new Date().toISOString() },
+      { onConflict: "course_id,user_id" }
+    );
+    if (error) { alert("Error: " + error.message); setSubmitting(false); return; }
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
+    await load();
     setSubmitting(false);
   };
 
-
-
-  const approvedReviews = reviews.filter(r => r.approved === true || r.user_id === user?.id);
-  const total = reviews.filter(r => r.approved).length;
-  const approvedOnly = reviews.filter(r => r.approved === true || r.approved === "true" || r.approved === "t");
-  const avg = approvedOnly.length ? (approvedOnly.reduce((s,r)=>s+r.rating,0)/approvedOnly.length) : 0;
-  const dist = [5,4,3,2,1].map(s=>({
-    star:s,
-    count:approvedOnly.filter(r=>r.rating===s).length,
-    pct:approvedOnly.length?Math.round(approvedOnly.filter(r=>r.rating===s).length/approvedOnly.length*100):0
+  // Only approved reviews from others
+  const others = reviews.filter(r => r.user_id !== user?.id && isApproved(r));
+  const approvedOnly = reviews.filter(r => isApproved(r));
+  const total = approvedOnly.length;
+  const avg = total ? approvedOnly.reduce((s,r) => s+r.rating, 0) / total : 0;
+  const dist = [5,4,3,2,1].map(s => ({
+    star: s,
+    count: approvedOnly.filter(r => r.rating===s).length,
+    pct: total ? Math.round(approvedOnly.filter(r => r.rating===s).length/total*100) : 0,
   }));
-  console.log("All reviews:", reviews.map(r=>({id:r.id,approved:r.approved,type:typeof r.approved})));
-  const others = reviews.filter(r => r.user_id !== user?.id && (r.approved === true || r.approved === "true" || r.approved === "t"));
-  const showForm = user && !myReview;
 
   if (loading) return <div style={{padding:40,textAlign:"center"}}><Loader size={22} color="#94A3B8" className="bspin"/></div>;
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:20, paddingBottom:40 }}>
 
-      {/* Aggregate — only when reviews exist */}
-      {total>0 && (
+      {/* Aggregate */}
+      {total > 0 && (
         <div style={{ background:"#0f172a", borderRadius:20, padding:"24px 28px", display:"flex", gap:28, alignItems:"center" }}>
           <div style={{ textAlign:"center", flexShrink:0 }}>
             <p style={{ fontSize:52, fontWeight:900, color:"#fff", margin:0, lineHeight:1 }}>{avg.toFixed(1)}</p>
@@ -149,7 +130,7 @@ export default function CourseReviews({ courseId, courseName }) {
             <p style={{ fontSize:12, color:"rgba(255,255,255,0.4)", margin:0 }}>{total} review{total!==1?"s":""}</p>
           </div>
           <div style={{ flex:1, display:"flex", flexDirection:"column", gap:6 }}>
-            {dist.map(({star,count,pct})=>(
+            {dist.map(({star,count,pct}) => (
               <div key={star} style={{ display:"flex", alignItems:"center", gap:8 }}>
                 <span style={{ fontSize:11, color:"rgba(255,255,255,0.4)", width:8 }}>{star}</span>
                 <svg width={12} height={12} viewBox="0 0 24 24" style={{flexShrink:0}}>
@@ -165,30 +146,31 @@ export default function CourseReviews({ courseId, courseName }) {
         </div>
       )}
 
-      {/* My existing review */}
+      {/* Your submitted review */}
       {user && myReview && (
         <div style={{ background:"#FFFBEB", borderRadius:18, border:"1.5px solid #FDE68A", padding:"18px 20px" }}>
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <div style={{ width:38,height:38,borderRadius:"50%",background:"linear-gradient(135deg,#f59e0b,#d97706)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:14,fontWeight:800,flexShrink:0 }}>
-                {inits(user?.user_metadata?.full_name||user?.email)}
-              </div>
-              <div>
-                <p style={{ fontSize:12,fontWeight:700,color:"#92400E",margin:"0 0 3px" }}>Your review</p>
-                <Stars value={myReview.rating} size={15} readonly/>
-              </div>
+          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
+            <div style={{ width:38,height:38,borderRadius:"50%",background:"linear-gradient(135deg,#f59e0b,#d97706)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:14,fontWeight:800,flexShrink:0 }}>
+              {inits(user?.user_metadata?.full_name || user?.email)}
             </div>
-
+            <div>
+              <p style={{ fontSize:12,fontWeight:700,color:"#92400E",margin:"0 0 4px" }}>Your review</p>
+              <Stars value={myReview.rating} size={15} readonly/>
+            </div>
           </div>
-          {myReview.review && <p style={{ fontSize:14,color:"#374151",margin:0,lineHeight:1.65,paddingTop:10,borderTop:"1px solid #FDE68A" }}>"{myReview.review}"</p>}
+          {myReview.review && (
+            <p style={{ fontSize:14,color:"#374151",margin:0,lineHeight:1.65,paddingTop:10,borderTop:"1px solid #FDE68A" }}>
+              "{myReview.review}"
+            </p>
+          )}
         </div>
       )}
 
-      {/* Write/Edit form */}
-      {showForm && (
+      {/* Review form — only if no existing review */}
+      {user && !myReview && (
         <div style={{ background:"#fff", borderRadius:18, border:"1.5px solid #E2E8F0", overflow:"hidden" }}>
           <div style={{ background:"linear-gradient(135deg,#1e1b4b,#0f172a)", padding:"16px 22px" }}>
-            <p style={{ color:"#fff",fontSize:15,fontWeight:800,margin:0 }}>{editing?"Edit your review":"Rate this course"}</p>
+            <p style={{ color:"#fff",fontSize:15,fontWeight:800,margin:0 }}>Rate this course</p>
             <p style={{ color:"rgba(255,255,255,0.4)",fontSize:12,margin:"2px 0 0" }}>Your feedback helps other learners</p>
           </div>
           <div style={{ padding:"20px 22px", display:"flex", flexDirection:"column", gap:16 }}>
@@ -196,38 +178,31 @@ export default function CourseReviews({ courseId, courseName }) {
               <p style={{ fontSize:11,fontWeight:700,color:"#374151",margin:"0 0 8px",letterSpacing:0.5 }}>YOUR RATING</p>
               <div style={{ display:"flex", alignItems:"center", gap:14 }}>
                 <Stars value={rating} onChange={setRating} size={32}/>
-                {rating>0 && <span style={{ fontSize:14,fontWeight:700,color:LABEL_COLORS[rating] }}>{LABELS[rating]}</span>}
+                {rating > 0 && <span style={{ fontSize:14,fontWeight:700,color:LABEL_COLORS[rating] }}>{LABELS[rating]}</span>}
               </div>
             </div>
             <div>
               <p style={{ fontSize:11,fontWeight:700,color:"#374151",margin:"0 0 8px",letterSpacing:0.5 }}>
                 WRITTEN REVIEW <span style={{ color:"#94A3B8",fontWeight:400,textTransform:"none",letterSpacing:0 }}>· optional</span>
               </p>
-              <textarea value={text} onChange={e=>setText(e.target.value)}
-                placeholder={"What did you think of "+courseName+"?"}
+              <textarea value={text} onChange={e => setText(e.target.value)}
+                placeholder={"What did you think of " + courseName + "?"}
                 style={{ width:"100%",minHeight:90,padding:"11px 14px",borderRadius:12,border:"1.5px solid #E2E8F0",fontSize:14,resize:"vertical",outline:"none",boxSizing:"border-box",fontFamily:"inherit",lineHeight:1.6,color:"#374151" }}
-                onFocus={e=>e.target.style.borderColor="#f59e0b"}
-                onBlur={e=>e.target.style.borderColor="#E2E8F0"}
+                onFocus={e => e.target.style.borderColor="#f59e0b"}
+                onBlur={e => e.target.style.borderColor="#E2E8F0"}
               />
             </div>
-            <div style={{ display:"flex", gap:10 }}>
-              {editing && (
-                <button onClick={()=>{setEditing(false);setRating(myReview.rating);setText(myReview.review||"");}}
-                  style={{ flex:1,padding:"11px",borderRadius:11,border:"1.5px solid #E2E8F0",background:"#fff",fontSize:13,fontWeight:600,color:"#374151",cursor:"pointer" }}>
-                  Cancel
-                </button>
-              )}
-              <button onClick={submit} disabled={!rating||submitting}
-                style={{ flex:2,padding:"12px",borderRadius:11,border:"none",
-                  background:!rating?"#F1F5F9":"linear-gradient(135deg,#f59e0b,#d97706)",
-                  color:!rating?"#94A3B8":"#fff",fontSize:14,fontWeight:700,cursor:!rating?"not-allowed":"pointer",
-                  display:"flex",alignItems:"center",justifyContent:"center",gap:8,
-                  boxShadow:rating?"0 4px 14px rgba(245,158,11,0.3)":"none",transition:"all 0.15s" }}>
-                {submitting?<><Loader size={14} className="bspin"/> Submitting...</>
-                 :saved?<><Check size={14}/> Saved!</>
-                 :saved?"✓ Submitted! Pending approval":"⭐ "+(editing?"Save Changes":"Submit Review")}
-              </button>
-            </div>
+            <button onClick={submit} disabled={!rating || submitting}
+              style={{ width:"100%",padding:"13px",borderRadius:12,border:"none",
+                background:!rating?"#F1F5F9":"linear-gradient(135deg,#f59e0b,#d97706)",
+                color:!rating?"#94A3B8":"#fff",
+                fontSize:14,fontWeight:700,cursor:!rating?"not-allowed":"pointer",
+                display:"flex",alignItems:"center",justifyContent:"center",gap:8,
+                boxShadow:rating?"0 4px 14px rgba(245,158,11,0.3)":"none",transition:"all 0.15s" }}>
+              {submitting ? <><Loader size={14} className="bspin"/> Submitting...</>
+               : saved ? <><Check size={14}/> Submitted!</>
+               : "⭐ Submit Review"}
+            </button>
           </div>
         </div>
       )}
@@ -240,28 +215,28 @@ export default function CourseReviews({ courseId, courseName }) {
         </div>
       )}
 
-      {/* Other reviews */}
-      {others.length>0 && (
+      {/* Approved reviews from others */}
+      {others.length > 0 && (
         <div>
           <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:14 }}>
             <MessageCircle size={16} color="#94A3B8"/>
             <h3 style={{ fontSize:15,fontWeight:800,color:"#0f172a",margin:0 }}>All Reviews ({others.length})</h3>
           </div>
           <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-            {others.map(r=>(
+            {others.map(r => (
               <div key={r.id} style={{ background:"#fff",borderRadius:16,border:"1.5px solid #F1F5F9",padding:"16px 20px",transition:"all 0.15s" }}
-                onMouseEnter={e=>{e.currentTarget.style.borderColor="#FDE68A";e.currentTarget.style.boxShadow="0 3px 12px rgba(0,0,0,0.06)";}}
-                onMouseLeave={e=>{e.currentTarget.style.borderColor="#F1F5F9";e.currentTarget.style.boxShadow="none";}}>
+                onMouseEnter={e => { e.currentTarget.style.borderColor="#FDE68A"; e.currentTarget.style.boxShadow="0 3px 12px rgba(0,0,0,0.06)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor="#F1F5F9"; e.currentTarget.style.boxShadow="none"; }}>
                 <div style={{ display:"flex", alignItems:"flex-start", gap:12 }}>
                   <div style={{ width:40,height:40,borderRadius:"50%",background:"linear-gradient(135deg,#7c3aed,#4f46e5)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:800,color:"#fff",flexShrink:0,overflow:"hidden" }}>
                     {r.profiles?.avatar_url
-                      ?<img src={r.profiles.avatar_url} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                      :inits(r.profiles?.full_name||"User")}
+                      ? <img src={r.profiles.avatar_url} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                      : inits(r.profiles?.full_name || "User")}
                   </div>
                   <div style={{ flex:1,minWidth:0 }}>
                     <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:5 }}>
                       <div>
-                        <p style={{ fontSize:14,fontWeight:700,color:"#0f172a",margin:"0 0 3px" }}>{r.profiles?.full_name||"Student"}</p>
+                        <p style={{ fontSize:14,fontWeight:700,color:"#0f172a",margin:"0 0 3px" }}>{r.profiles?.full_name || "Student"}</p>
                         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                           <Stars value={r.rating} size={14} readonly/>
                           <span style={{ fontSize:12,fontWeight:700,color:LABEL_COLORS[r.rating] }}>{LABELS[r.rating]}</span>
@@ -269,7 +244,11 @@ export default function CourseReviews({ courseId, courseName }) {
                       </div>
                       <span style={{ fontSize:11,color:"#94A3B8",flexShrink:0 }}>{ago(r.created_at)}</span>
                     </div>
-                    {r.review && <p style={{ fontSize:13,color:"#374151",margin:"10px 0 0",lineHeight:1.65,paddingTop:10,borderTop:"1px solid #F8FAFC" }}>"{r.review}"</p>}
+                    {r.review && (
+                      <p style={{ fontSize:13,color:"#374151",margin:"10px 0 0",lineHeight:1.65,paddingTop:10,borderTop:"1px solid #F8FAFC" }}>
+                        "{r.review}"
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -278,7 +257,7 @@ export default function CourseReviews({ courseId, courseName }) {
         </div>
       )}
 
-      {total===0 && (
+      {total === 0 && !myReview && (
         <div style={{ textAlign:"center",padding:"40px 20px",background:"#fff",borderRadius:18,border:"2px dashed #E2E8F0" }}>
           <div style={{ fontSize:40,marginBottom:12 }}>⭐</div>
           <p style={{ fontSize:15,fontWeight:800,color:"#0f172a",margin:"0 0 4px" }}>No reviews yet</p>
@@ -290,7 +269,3 @@ export default function CourseReviews({ courseId, courseName }) {
     </div>
   );
 }
-
-const ctrl = (bg="#fff",color="#374151",border="1.5px solid #E2E8F0") => ({
-  display:"flex",alignItems:"center",gap:5,padding:"6px 11px",borderRadius:8,border,background:bg,color,fontSize:12,fontWeight:600,cursor:"pointer"
-});
