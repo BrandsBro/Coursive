@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader, Edit2, Trash2, Check, MessageCircle } from "lucide-react";
+import { Loader, Check, MessageCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/AuthContext";
 
@@ -44,7 +44,6 @@ export default function CourseReviews({ courseId, courseName }) {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [editing, setEditing] = useState(false);
   const [rating, setRating] = useState(0);
   const [text, setText] = useState("");
   const [myReview, setMyReview] = useState(null);
@@ -121,11 +120,7 @@ export default function CourseReviews({ courseId, courseName }) {
     setSubmitting(false);
   };
 
-  const del = async () => {
-    if (!confirm("Delete your review?")) return;
-    await supabase.from("course_reviews").delete().eq("course_id",courseId).eq("user_id",user.id);
-    setMyReview(null); setRating(0); setText(""); load();
-  };
+
 
   const approvedReviews = reviews.filter(r => r.approved === true || r.user_id === user?.id);
   const total = reviews.filter(r => r.approved).length;
@@ -137,7 +132,7 @@ export default function CourseReviews({ courseId, courseName }) {
     pct:approvedOnly.length?Math.round(approvedOnly.filter(r=>r.rating===s).length/approvedOnly.length*100):0
   }));
   const others = reviews.filter(r => r.user_id !== user?.id && r.approved === true);
-  const showForm = user && (!myReview||editing);
+  const showForm = user && !myReview;
 
   if (loading) return <div style={{padding:40,textAlign:"center"}}><Loader size={22} color="#94A3B8" className="bspin"/></div>;
 
@@ -178,21 +173,11 @@ export default function CourseReviews({ courseId, courseName }) {
                 {inits(user?.user_metadata?.full_name||user?.email)}
               </div>
               <div>
-                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:3 }}>
-                <p style={{ fontSize:12,fontWeight:700,color:"#92400E",margin:0 }}>Your review</p>
-                {!myReview.approved && (
-                  <span style={{ fontSize:10,fontWeight:700,background:"#FFF7ED",color:"#c2410c",border:"1px solid #FED7AA",borderRadius:999,padding:"1px 7px" }}>
-                    ⏳ Pending approval
-                  </span>
-                )}
-              </div>
+                <p style={{ fontSize:12,fontWeight:700,color:"#92400E",margin:"0 0 3px" }}>Your review</p>
                 <Stars value={myReview.rating} size={15} readonly/>
               </div>
             </div>
-            <div style={{ display:"flex", gap:6 }}>
-              <button onClick={()=>setEditing(true)} style={ctrl()}><Edit2 size={12}/> Edit</button>
-              <button onClick={del} style={ctrl("#FEF2F2","#EF4444","#FEE2E2")}><Trash2 size={12}/></button>
-            </div>
+
           </div>
           {myReview.review && <p style={{ fontSize:14,color:"#374151",margin:0,lineHeight:1.65,paddingTop:10,borderTop:"1px solid #FDE68A" }}>"{myReview.review}"</p>}
         </div>
