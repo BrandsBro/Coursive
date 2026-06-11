@@ -28,7 +28,7 @@ export default function BrowseCourses({ courses = [] }) {
         </Link>
       </div>
 
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(150px, 1fr))", gap:14 }}>
+      <div className="courses-grid">
         {courses.map((course) => {
           const s = STYLES[course.id] || { g:"linear-gradient(135deg,#6366f1,#8b5cf6)", e:"📚", a:"#6366f1" };
           const total = (course.units || []).flatMap(u => u.lessons || []).length;
@@ -62,6 +62,20 @@ export default function BrowseCourses({ courses = [] }) {
           );
         })}
       </div>
+    </div>
+      <style>{`
+        .courses-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+          gap: 14px;
+        }
+        @media (max-width: 640px) {
+          .courses-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+          }
+        }
+      `}</style>
     </div>
   );
 }

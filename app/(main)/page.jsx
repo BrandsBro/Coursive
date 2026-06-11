@@ -1,7 +1,6 @@
 import CertificateBanner from "@/components/home/CertificateBanner";
 import CurrentCourseWidget from "@/components/home/CurrentCourseWidget";
 import WeeklyStreaks from "@/components/home/WeeklyStreaks";
-import PromptsLibraryBanner from "@/components/home/PromptsLibraryBanner";
 import ChallengesSection from "@/components/home/ChallengesSection";
 import BrowseCourses from "@/components/home/BrowseCourses";
 import { getAllCourses, getAllChallenges } from "@/lib/db";
@@ -44,8 +43,7 @@ export default async function HomePage() {
           <CurrentCourseWidget courses={courses} />
           <WeeklyStreaks />
         </div>
-        <PromptsLibraryBanner />
-                <BrowseCourses courses={courses} />
+                        <BrowseCourses courses={courses} />
         <ChallengesSection challenges={challenges} />
       </div>
     </>
