@@ -42,12 +42,20 @@ export default function AdminReviews() {
   };
 
   const approve = async (id) => {
-    await supabase.from("course_reviews").update({ approved: true }).eq("id", id);
+    const { error } = await supabase
+      .from("course_reviews")
+      .update({ approved: true })
+      .eq("id", id);
+    if (error) { alert("Error: " + error.message); return; }
     setReviews(prev => prev.map(r => r.id === id ? { ...r, approved: true } : r));
   };
 
   const reject = async (id) => {
-    await supabase.from("course_reviews").update({ approved: false }).eq("id", id);
+    const { error } = await supabase
+      .from("course_reviews")
+      .update({ approved: false })
+      .eq("id", id);
+    if (error) { alert("Error: " + error.message); return; }
     setReviews(prev => prev.map(r => r.id === id ? { ...r, approved: false } : r));
   };
 
