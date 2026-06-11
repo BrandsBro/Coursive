@@ -3,6 +3,7 @@ import CurrentCourseWidget from "@/components/home/CurrentCourseWidget";
 import WeeklyStreaks from "@/components/home/WeeklyStreaks";
 import PromptsLibraryBanner from "@/components/home/PromptsLibraryBanner";
 import ChallengesSection from "@/components/home/ChallengesSection";
+import BrowseCourses from "@/components/home/BrowseCourses";
 import { getAllCourses, getAllChallenges } from "@/lib/db";
 
 export const revalidate = 60;
@@ -44,7 +45,8 @@ export default async function HomePage() {
           <WeeklyStreaks />
         </div>
         <PromptsLibraryBanner />
-                <ChallengesSection challenges={challenges} />
+                <BrowseCourses courses={courses} />
+        <ChallengesSection challenges={challenges} />
       </div>
     </>
   );
