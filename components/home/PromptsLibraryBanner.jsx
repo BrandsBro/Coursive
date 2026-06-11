@@ -5,7 +5,7 @@ const CHIPS = ["✍️ Cold email", "🎨 UI design", "💻 Debug code", "📊 D
 
 export default function PromptsLibraryBanner() {
   return (
-    <Link href="/ai-tools" style={{ textDecoration:"none" }}>
+    <Link href="/courses" style={{ textDecoration:"none" }}>
       <div style={{
         background:"linear-gradient(135deg,#09090b 0%,#18103a 50%,#0f1f3d 100%)",
         borderRadius:24,padding:"22px 28px",position:"relative",overflow:"hidden",cursor:"pointer",

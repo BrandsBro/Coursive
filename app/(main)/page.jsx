@@ -2,7 +2,6 @@ import CertificateBanner from "@/components/home/CertificateBanner";
 import CurrentCourseWidget from "@/components/home/CurrentCourseWidget";
 import WeeklyStreaks from "@/components/home/WeeklyStreaks";
 import PromptsLibraryBanner from "@/components/home/PromptsLibraryBanner";
-import ExploreAITools from "@/components/home/ExploreAITools";
 import ChallengesSection from "@/components/home/ChallengesSection";
 import { getAllCourses, getAllChallenges } from "@/lib/db";
 
@@ -45,8 +44,7 @@ export default async function HomePage() {
           <WeeklyStreaks />
         </div>
         <PromptsLibraryBanner />
-        <ExploreAITools courses={courses} />
-        <ChallengesSection challenges={challenges} />
+                <ChallengesSection challenges={challenges} />
       </div>
     </>
   );

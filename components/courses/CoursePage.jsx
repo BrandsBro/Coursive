@@ -97,7 +97,7 @@ export default function CoursePage({ course, allCourses }) {
                 <h2 className="font-bold text-gray-900 text-base leading-snug">{course.units[0]?.title}</h2>
               </div>
             </div>
-            <Link href="/ai-tools"
+            <Link href="/courses"
               className="border-l border-gray-100 flex items-center justify-center px-5 shrink-0 hover:bg-gray-50 transition-colors rounded-r-2xl">
               <Menu size={18} className="text-gray-400" />
             </Link>
