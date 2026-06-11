@@ -18,6 +18,20 @@ export default function BrowseCourses({ courses = [] }) {
 
   return (
     <div>
+      <style>{`
+        .courses-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+          gap: 14px;
+        }
+        @media (max-width: 640px) {
+          .courses-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+          }
+        }
+      `}</style>
+
       <div style={{ display:"flex", alignItems:"flex-end", justifyContent:"space-between", marginBottom:18 }}>
         <div>
           <h2 style={{ fontSize:21, fontWeight:900, color:"#0f172a", margin:"0 0 2px" }}>Browse Courses</h2>
@@ -33,11 +47,10 @@ export default function BrowseCourses({ courses = [] }) {
           const s = STYLES[course.id] || { g:"linear-gradient(135deg,#6366f1,#8b5cf6)", e:"📚", a:"#6366f1" };
           const total = (course.units || []).flatMap(u => u.lessons || []).length;
           const pct = getCoursePercent(course.id, total);
-
           return (
             <Link key={course.id} href={"/courses/" + course.id} style={{ textDecoration:"none" }}>
               <div
-                style={{ background:"#fff", borderRadius:20, overflow:"hidden", border:"1.5px solid #F0F0F0", cursor:"pointer", transition:"all 0.2s" }}
+                style={{ background:"#fff", borderRadius:20, overflow:"hidden", border:"1.5px solid #F0F0F0", cursor:"pointer", transition:"all 0.2s", height:"100%" }}
                 onMouseEnter={e => { e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.boxShadow="0 12px 30px "+s.a+"30"; e.currentTarget.style.borderColor=s.a+"40"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"; e.currentTarget.style.borderColor="#F0F0F0"; }}
               >
