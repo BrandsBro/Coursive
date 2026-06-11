@@ -59,7 +59,6 @@ export default function CourseReviews({ courseId, courseName }) {
         .from("course_reviews")
         .select("id, course_id, user_id, rating, review, created_at, updated_at, approved")
         .eq("course_id", courseId)
-        .eq("approved", true)
         .order("created_at", { ascending: false });
 
       if (error) { console.error("Reviews fetch error:", error); setLoading(false); return; }
@@ -128,14 +127,16 @@ export default function CourseReviews({ courseId, courseName }) {
     setMyReview(null); setRating(0); setText(""); load();
   };
 
-  const total = reviews.length;
-  const avg = total ? reviews.reduce((s,r)=>s+r.rating,0)/total : 0;
+  const approvedReviews = reviews.filter(r => r.approved === true || r.user_id === user?.id);
+  const total = reviews.filter(r => r.approved).length;
+  const approvedOnly = reviews.filter(r => r.approved);
+  const avg = approvedOnly.length ? approvedOnly.reduce((s,r)=>s+r.rating,0)/approvedOnly.length : 0;
   const dist = [5,4,3,2,1].map(s=>({
     star:s,
-    count:reviews.filter(r=>r.rating===s).length,
-    pct:total?Math.round(reviews.filter(r=>r.rating===s).length/total*100):0
+    count:approvedOnly.filter(r=>r.rating===s).length,
+    pct:approvedOnly.length?Math.round(approvedOnly.filter(r=>r.rating===s).length/approvedOnly.length*100):0
   }));
-  const others = reviews.filter(r=>r.user_id!==user?.id);
+  const others = reviews.filter(r => r.user_id !== user?.id && r.approved === true);
   const showForm = user && (!myReview||editing);
 
   if (loading) return <div style={{padding:40,textAlign:"center"}}><Loader size={22} color="#94A3B8" className="bspin"/></div>;
@@ -177,7 +178,14 @@ export default function CourseReviews({ courseId, courseName }) {
                 {inits(user?.user_metadata?.full_name||user?.email)}
               </div>
               <div>
-                <p style={{ fontSize:12,fontWeight:700,color:"#92400E",margin:"0 0 3px" }}>Your review</p>
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:3 }}>
+                <p style={{ fontSize:12,fontWeight:700,color:"#92400E",margin:0 }}>Your review</p>
+                {!myReview.approved && (
+                  <span style={{ fontSize:10,fontWeight:700,background:"#FFF7ED",color:"#c2410c",border:"1px solid #FED7AA",borderRadius:999,padding:"1px 7px" }}>
+                    ⏳ Pending approval
+                  </span>
+                )}
+              </div>
                 <Stars value={myReview.rating} size={15} readonly/>
               </div>
             </div>
