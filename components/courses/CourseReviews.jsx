@@ -165,7 +165,7 @@ export default function CourseReviews({ courseId, courseName }) {
       )}
 
       {/* My existing review */}
-      {user && myReview && !editing && (
+      {user && myReview && (
         <div style={{ background:"#FFFBEB", borderRadius:18, border:"1.5px solid #FDE68A", padding:"18px 20px" }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
             <div style={{ display:"flex", alignItems:"center", gap:10 }}>
