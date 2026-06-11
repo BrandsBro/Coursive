@@ -57,7 +57,8 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
     <div style={{ minHeight:"100vh", background:"#F8FAFC" }}>
 
       {/* Top bar */}
-      <div style={{ background:"#fff", borderBottom:"1px solid #F1F5F9", padding:"0 24px", height:58, display:"flex", alignItems:"center", justifyContent:"space-between", position:"sticky", top:0, zIndex:50 }}>
+      <div style={{ background:"#fff", borderBottom:"1px solid #F1F5F9", height:58, position:"sticky", top:0, zIndex:50 }}>
+      <div style={{ maxWidth:720, margin:"0 auto", padding:"0 20px", height:"100%", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <Link href={"/courses/" + course?.id} style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:6, color:"#64748B", fontSize:13, fontWeight:600 }}>
           <ChevronLeft size={16}/> {course?.title}
         </Link>
@@ -71,6 +72,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
               <Check size={12}/> Complete
             </span>
           )}
+        </div>
         </div>
       </div>
 
