@@ -24,21 +24,21 @@ export default function CertificateBanner({ courses = [] }) {
   return (
     <div style={{
       background:"linear-gradient(135deg,#1a0533 0%,#2d1b69 45%,#1e3a5f 100%)",
-      borderRadius:24, padding:"24px 28px", position:"relative", overflow:"hidden",
+      borderRadius:24, padding:"20px", position:"relative", overflow:"hidden",
     }}>
-      <div style={{ position:"absolute",top:-60,right:80,width:220,height:220,borderRadius:"50%",background:"rgba(139,92,246,0.08)" }} />
+      <div style={{ overflow:"hidden", position:"absolute",top:-60,right:80,width:220,height:220,borderRadius:"50%",background:"rgba(139,92,246,0.08)" }} />
       <div style={{ position:"absolute",bottom:-40,left:160,width:140,height:140,borderRadius:"50%",background:"rgba(99,102,241,0.07)" }} />
       <div style={{ position:"absolute",top:10,right:280,width:6,height:6,borderRadius:"50%",background:"#a78bfa",opacity:0.8 }} />
       <div style={{ position:"absolute",top:30,right:240,width:4,height:4,borderRadius:"50%",background:"#818cf8",opacity:0.6 }} />
 
-      <div style={{ position:"relative",zIndex:1,display:"flex",alignItems:"center",gap:28 }}>
+      <div style={{ position:"relative",zIndex:1,display:"flex",alignItems:"center",gap:20,flexWrap:"wrap" }}>
         {/* Icon */}
         <div style={{ width:52,height:52,borderRadius:16,background:"rgba(167,139,250,0.2)",border:"1px solid rgba(167,139,250,0.3)",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0 }}>
           <Award size={24} color="#a78bfa" />
         </div>
 
         {/* Text */}
-        <div style={{ flex:1 }}>
+        <div style={{ flex:1, minWidth:160 }}>
           <div style={{ display:"flex",alignItems:"center",gap:6,marginBottom:4 }}>
             <span style={{ background:"rgba(167,139,250,0.2)",color:"#c4b5fd",fontSize:10,fontWeight:700,padding:"2px 8px",borderRadius:999,letterSpacing:0.8 }}>
               AI MASTERY PROGRAM
@@ -55,7 +55,7 @@ export default function CertificateBanner({ courses = [] }) {
         </div>
 
         {/* Course badges */}
-        <div style={{ display:"flex",alignItems:"center",gap:8,flexShrink:0 }}>
+        <div style={{ display:"flex",alignItems:"center",gap:6,flexShrink:0,flexWrap:"wrap" }}>
           {CERT.map((c) => {
             const course = courses.find(x => x.id === c.id);
             const total = course ? course.units.flatMap(u => u.lessons).length : 0;
@@ -65,7 +65,7 @@ export default function CertificateBanner({ courses = [] }) {
               <Link key={c.id} href={`/courses/${c.id}`} style={{ textDecoration:"none" }}>
                 <div title={course?.title}>
                   <div style={{
-                    width:44,height:44,borderRadius:13,fontSize:20,
+                    width:40,height:40,borderRadius:12,fontSize:18,
                     display:"flex",alignItems:"center",justifyContent:"center",
                     background: done ? c.color : "rgba(255,255,255,0.06)",
                     border: done ? "none" : "1.5px solid rgba(255,255,255,0.12)",

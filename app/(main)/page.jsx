@@ -15,38 +15,39 @@ export default async function HomePage() {
   ]);
 
   return (
-    <div className="home-wrapper">
-      <CertificateBanner courses={courses} />
-      <div className="home-grid">
-        <CurrentCourseWidget courses={courses} />
-        <WeeklyStreaks />
-      </div>
-      <PromptsLibraryBanner />
-      <ExploreAITools courses={courses} />
-      <ChallengesSection challenges={challenges} />
-
+    <>
       <style>{`
-        .home-wrapper {
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-          padding: 0 4px;
-        }
         .home-grid {
           display: grid;
-          grid-template-columns: 1fr 320px;
+          grid-template-columns: 1fr 300px;
+          gap: 20px;
+        }
+        .home-stack {
+          display: flex;
+          flex-direction: column;
           gap: 20px;
         }
         @media (max-width: 768px) {
           .home-grid {
             grid-template-columns: 1fr;
-          }
-          .home-wrapper {
             gap: 16px;
-            padding: 0;
+          }
+          .home-stack {
+            gap: 16px;
           }
         }
       `}</style>
-    </div>
+
+      <div className="home-stack">
+        <CertificateBanner courses={courses} />
+        <div className="home-grid">
+          <CurrentCourseWidget courses={courses} />
+          <WeeklyStreaks />
+        </div>
+        <PromptsLibraryBanner />
+        <ExploreAITools courses={courses} />
+        <ChallengesSection challenges={challenges} />
+      </div>
+    </>
   );
 }

@@ -203,9 +203,10 @@ export default function CourseRoadmap({ course, completedLessons = [], onViewCer
 
                       <div className="relative">
                         {isActive && (
-                          <div className={`absolute top-0 z-30 w-64 ${isLeft?"left-[88px]":"right-[88px]"}`}>
-                            <LessonPopup lesson={lesson} courseId={course.id} onClose={() => setActiveLesson(null)} />
-                          </div>
+                          <div style={{ position:"absolute", top:0, zIndex:30, left:"50%", transform:"translateX(-50%)" }}>
+                            <div style={{ position:"absolute", left:"50%", transform:"translateX(-50%)", width:"min(280px,80vw)", zIndex:50 }}>
+                              <LessonPopup lesson={lesson} courseId={course.id} onClose={() => setActiveLesson(null)} />
+                            </div>
                         )}
 
                         <button
