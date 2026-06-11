@@ -49,8 +49,22 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   };
 
   const handleNext = () => {
-    if (nextLesson) router.push("/courses/" + course.id + "/lessons/" + nextLesson.id + "?mode=" + mode);
-    else router.push("/courses/" + course.id);
+    if (challengeId) {
+      // Extract day number from lesson id: challenge_X_day_N
+      const parts = lesson?.id?.split("_day_");
+      const currentDay = parts ? parseInt(parts[parts.length - 1]) : 1;
+      const nextDay = currentDay + 1;
+      const totalDays = course?.units?.[0]?.lessons?.length || 0;
+      if (nextDay <= totalDays) {
+        router.push("/challenges/" + challengeId + "/day/" + nextDay);
+      } else {
+        router.push("/challenges/" + challengeId + "?joined=true");
+      }
+    } else if (nextLesson) {
+      router.push("/courses/" + course.id + "/lessons/" + nextLesson.id + "?mode=" + mode);
+    } else {
+      router.push("/courses/" + course.id);
+    }
   };
 
   return (
@@ -59,8 +73,8 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
       {/* Top bar */}
       <div style={{ background:"#fff", borderBottom:"1px solid #F1F5F9", height:58, position:"sticky", top:0, zIndex:50 }}>
       <div style={{ maxWidth:720, margin:"0 auto", padding:"0 20px", height:"100%", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-        <Link href={"/courses/" + course?.id} style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:6, color:"#64748B", fontSize:13, fontWeight:600 }}>
-          <ChevronLeft size={16}/> {course?.title}
+        <Link href={challengeId ? "/challenges/"+challengeId : "/courses/"+(course?.id||"")} style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:6, color:"#64748B", fontSize:13, fontWeight:600 }}>
+          <ChevronLeft size={16}/> {challengeId ? "Back to Challenge" : course?.title}
         </Link>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
           <span style={{ fontSize:12, color:"#94A3B8" }}>{lesson?.duration} min read</span>
@@ -109,7 +123,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
         {/* Bottom nav */}
         <div style={{ marginTop:48, paddingTop:32, borderTop:"1px solid #F1F5F9", display:"flex", gap:12, alignItems:"center", justifyContent:"space-between" }}>
           {prevLesson ? (
-            <Link href={"/courses/" + course.id + "/lessons/" + prevLesson.id + "?mode=" + mode} style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:6, padding:"11px 18px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", color:"#374151", fontSize:13, fontWeight:600 }}>
+            <Link href={challengeId ? "/challenges/" + challengeId + "/day/" + (parseInt(lesson?.id?.split("_day_").pop()) - 1) : "/courses/" + course.id + "/lessons/" + prevLesson.id + "?mode=" + mode} style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:6, padding:"11px 18px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", color:"#374151", fontSize:13, fontWeight:600 }}>
               <ChevronLeft size={15}/> Previous
             </Link>
           ) : <div/>}

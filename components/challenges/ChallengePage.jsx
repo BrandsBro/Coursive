@@ -70,7 +70,7 @@ export default function ChallengePage({ challenge }) {
   const handleJoin = () => {
     joinChallenge(challenge.id);
     const day1 = challenge.challengeDays[0];
-    router.push(`/courses/${day1.courseId}/lessons/${day1.lessonId}?challengeId=${challenge.id}&day=1&firstJoin=true`);
+    router.push(`/challenges/${challenge.id}/day/1`);
   };
 
   const handleLetsGo = () => router.push(`/challenges/${challenge.id}?joined=true`);
@@ -79,7 +79,7 @@ export default function ChallengePage({ challenge }) {
   // ← Any accessible day (done OR current) can be started
   const handleGoToDay = (day) => {
     const d = challenge.challengeDays[day - 1];
-    router.push(`/courses/${d.courseId}/lessons/${d.lessonId}?challengeId=${challenge.id}&day=${day}`);
+    router.push(`/challenges/${challenge.id}/day/${day}`);
   };
 
   const handleReset = () => { resetChallenge(challenge.id); setConfirmReset(false); };
