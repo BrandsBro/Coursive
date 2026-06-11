@@ -39,7 +39,7 @@ const ago = d => {
 
 const inits = n => n ? n.split(" ").map(x=>x[0]).join("").toUpperCase().slice(0,2) : "?";
 
-const isApproved = r => r.approved === true || r.approved === "true" || r.approved === "t";
+const isApproved = r => r.approved === true;
 
 export default function CourseReviews({ courseId, courseName }) {
   const { user } = useAuth();
@@ -106,7 +106,7 @@ export default function CourseReviews({ courseId, courseName }) {
   };
 
   // Only approved reviews from others
-  const others = reviews.filter(r => r.user_id !== user?.id && isApproved(r));
+  const others = reviews.filter(r => r.user_id !== user?.id && r.approved === true);
   const approvedOnly = reviews.filter(r => isApproved(r));
   const total = approvedOnly.length;
   const avg = total ? approvedOnly.reduce((s,r) => s+r.rating, 0) / total : 0;
