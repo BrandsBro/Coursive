@@ -120,10 +120,12 @@ export default function CoursePage({ course, allCourses }) {
           onClose={() => setShowCertificate(false)}
         />
       )}
-          {/* Reviews */}
-      <div style={{ marginTop:40, paddingTop:32, borderTop:"1px solid #F1F5F9" }}>
-        <h2 style={{ fontSize:22, fontWeight:900, color:"#0f172a", margin:"0 0 24px" }}>Student Reviews</h2>
-        <CourseReviews courseId={course.id} courseName={course.title}/>
+      {/* Reviews */}
+      <div style={{ borderTop:"1px solid #F1F5F9", marginTop:40, paddingTop:40 }}>
+        <div className="max-w-5xl mx-auto px-6">
+          <h2 style={{ fontSize:22, fontWeight:900, color:"#0f172a", margin:"0 0 24px" }}>Student Reviews</h2>
+          <CourseReviews courseId={course.id} courseName={course.title}/>
+        </div>
       </div>
     </div>
   );

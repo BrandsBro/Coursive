@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, BookOpen, Trophy, Users, TrendingUp, HardDrive, Settings, ChevronRight, LogOut } from "lucide-react";
+import { LayoutDashboard, BookOpen, Trophy, Users, TrendingUp, HardDrive, Settings, ChevronRight, LogOut, MessageSquare } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const NAV = [
