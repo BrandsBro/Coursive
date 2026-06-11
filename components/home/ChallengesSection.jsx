@@ -25,8 +25,8 @@ export default function ChallengesSection({ challenges = [] }) {
         </Link>
       </div>
 
-      <div style={{ display:"grid",gridTemplateColumns:"repeat(2, 1fr)""repeat(auto-fill,minmax(210px,1fr))",gap:14 }}>
-        {challenges.map((ch, i) => {
+      <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(280px, 1fr))",gap:14 }}>
+        {challenges.slice(0, 2).map((ch, i) => {
           const s = S[i % S.length];
           const pct = getChallengeDayPercent(ch.id, ch.days);
           const joined = hasJoinedChallenge(ch.id);
