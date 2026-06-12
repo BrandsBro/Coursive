@@ -432,9 +432,9 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
                         onClick={() => setAnswers(p=>({...p,["bo_"+idx]:{...selectedMap,[String(i)]:selectedMap[String(i)]===opt?undefined:opt}}))}
                         style={{
                           padding:"11px 22px", borderRadius:12,
-                          border: selectedMap[i]===opt?"2px solid #0891b2":"2px solid #BAE6FD",
-                          background: selectedMap[i]===opt?"#E0F2FE":"#fff",
-                          color: selectedMap[i]===opt?"#0369a1":"#374151",
+                          border: (selectedMap[String(i)]===opt||selectedMap[i]===opt)?"2px solid #0891b2":"2px solid #BAE6FD",
+                          background: (selectedMap[String(i)]===opt||selectedMap[i]===opt)?"#E0F2FE":"#fff",
+                          color: (selectedMap[String(i)]===opt||selectedMap[i]===opt)?"#0369a1":"#374151",
                           fontSize:15, fontWeight:700, cursor:"pointer", transition:"all 0.15s",
                         }}>
                         {opt}
@@ -490,8 +490,19 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
                     </button>
                   </div>
                   {showAns && (
-                    <div style={{ marginTop:12, padding:"14px 16px", borderRadius:12, background:"#F0FDF4", border:"1.5px solid #86efac" }}>
-                      {blanks.map((b,i) => <p key={i} style={{ fontSize:14, color:"#166534", margin:"0 0 4px", fontWeight:600 }}>Blank {i+1}: <strong>{b.correct}</strong></p>)}
+                    <div style={{ marginTop:12 }}>
+                      <div style={{ padding:"14px 16px", borderRadius:12, background:"#F0FDF4", border:"1.5px solid #86efac", marginBottom:12 }}>
+                        {blanks.map((b,i) => <p key={i} style={{ fontSize:14, color:"#166534", margin:"0 0 4px", fontWeight:600 }}>Blank {i+1}: <strong>{b.correct}</strong></p>)}
+                      </div>
+                      {c.successText && <div style={{ padding:"14px 16px", borderRadius:12, background:"#F0F9FF", border:"1.5px solid #BAE6FD", marginBottom:12 }}><p style={{ fontSize:14, color:"#0369a1", margin:0, lineHeight:1.65 }}>{c.successText}</p></div>}
+                      {(c.successImages||[]).filter(Boolean).map((url,si) => <img key={si} src={url} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12 }}/>)}
+                      {(c.successVideos||[]).filter(Boolean).map((url,si) => (
+                        <div key={si} style={{ borderRadius:16, overflow:"hidden", aspectRatio:"16/9", background:"#000", marginBottom:12 }}>
+                          {url.includes("youtube")||url.includes("youtu.be")
+                            ? <iframe width="100%" height="100%" src={"https://www.youtube.com/embed/"+(url.split("v=")[1]?.split("&")[0]||url.split("youtu.be/")[1]?.split("?")[0])} style={{ border:"none" }} allowFullScreen/>
+                            : <video src={url} controls style={{ width:"100%", height:"100%" }}/>}
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
