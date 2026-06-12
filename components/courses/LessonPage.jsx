@@ -371,8 +371,8 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       const selectedMap = answers["bo_"+idx] || {};
       const isChecked = checked["bo_"+idx];
       const showAns = fillShowAnswer?.["bo_"+idx];
-      const allFilled = Object.keys(selectedMap).filter(k=>selectedMap[k]!==undefined).length === blankCount;
-      const allCorrect = blanks.length > 0 && blanks.every((b,i) => selectedMap[i] === b.correct);
+      const allFilled = Object.keys(selectedMap).filter(k=>selectedMap[k]!==undefined && selectedMap[k]!==null && selectedMap[k]!=="").length === blankCount;
+      const allCorrect = blanks.length > 0 && blanks.every((b,i) => selectedMap[i] === b.correct || selectedMap[String(i)] === b.correct);
 
       const getOptions = (i) => {
         const b = blanks[i];
@@ -408,12 +408,12 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
                   <span style={{
                     display:"inline-block", minWidth:90, padding:"4px 14px", margin:"0 3px",
                     borderRadius:10,
-                    border: isChecked ? "2px solid "+(selectedMap[part.blankIdx]===blanks[part.blankIdx]?.correct?"#22c55e":"#ef4444") : selectedMap[part.blankIdx] ? "2px solid #0891b2" : "2px dashed #93c5fd",
+                    border: isChecked ? "2px solid "+((selectedMap[part.blankIdx]||selectedMap[String(part.blankIdx)])===blanks[part.blankIdx]?.correct?"#22c55e":"#ef4444") : selectedMap[part.blankIdx] ? "2px solid #0891b2" : "2px dashed #93c5fd",
                     background: isChecked ? (selectedMap[part.blankIdx]===blanks[part.blankIdx]?.correct?"#F0FDF4":"#FEF2F2") : selectedMap[part.blankIdx] ? "#E0F2FE" : "#fff",
                     color: isChecked ? (selectedMap[part.blankIdx]===blanks[part.blankIdx]?.correct?"#166534":"#991B1B") : selectedMap[part.blankIdx] ? "#0369a1" : "#94A3B8",
                     fontWeight:700, fontSize:17, textAlign:"center", transition:"all 0.2s",
                   }}>
-                    {selectedMap[part.blankIdx] || "______"}
+                    {selectedMap[part.blankIdx] || selectedMap[String(part.blankIdx)] || "______"}
                   </span>
                 )}
               </span>
@@ -429,7 +429,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
                   <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
                     {getOptions(i).map((opt,j) => (
                       <button key={j}
-                        onClick={() => setAnswers(p=>({...p,["bo_"+idx]:{...selectedMap,[i]:selectedMap[i]===opt?undefined:opt}}))}
+                        onClick={() => setAnswers(p=>({...p,["bo_"+idx]:{...selectedMap,[String(i)]:selectedMap[String(i)]===opt?undefined:opt}}))}
                         style={{
                           padding:"11px 22px", borderRadius:12,
                           border: selectedMap[i]===opt?"2px solid #0891b2":"2px solid #BAE6FD",
