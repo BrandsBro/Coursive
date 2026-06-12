@@ -18,6 +18,10 @@ const S = {
   "notion-ai":            { g:"linear-gradient(135deg,#6b7280,#374151)", e:"📓", a:"#6b7280", al:"rgba(107,114,128,0.12)" },
 };
 
+const coursesGridStyle = `
+  .courses-list-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap:20px; }
+  @media (max-width: 640px) { .courses-list-grid { grid-template-columns: repeat(2, 1fr); gap:12px; } }
+`;
 export default function CoursesList({ courses = [] }) {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("All");
@@ -128,7 +132,7 @@ export default function CoursesList({ courses = [] }) {
       {cat === "All" && !q && inProgress > 0 && (
         <div>
           <h2 style={{ fontSize:17,fontWeight:800,color:"#0f172a",margin:"0 0 14px" }}>Continue learning</h2>
-          <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(300px,1fr))",gap:14 }}>
+          <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(220px, 1fr))",gap:14 }}>
             {courses.filter(c => {
               const total = c.units.flatMap(u => u.lessons).length;
               const pct = getCoursePercent(c.id, total);
@@ -145,7 +149,7 @@ export default function CoursesList({ courses = [] }) {
         )}
 
         {filtered.length > 0 ? (
-          <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:16 }}>
+          <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fill, minmax(220px, 1fr))",gap:16 }}>
             {filtered.map(course => (
               <CourseCard key={course.id} course={course} getCoursePercent={getCoursePercent} />
             ))}

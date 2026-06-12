@@ -81,8 +81,9 @@ export default function BrowseCourses({ courses = [] }) {
       </div>
 
       <style>{`
+        .browse-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap:16px; }
         @media (max-width: 640px) {
-          .browse-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .browse-grid { grid-template-columns: repeat(2, 1fr); gap:12px; }
         }
       `}</style>
     </div>
