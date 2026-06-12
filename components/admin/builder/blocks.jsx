@@ -259,19 +259,31 @@ function QuizE({ content, onChange }) {
 }
 
 function BlankOptionsE({ content, onChange }) {
+  const [lib, setLib] = useState(false);
+  const [libType, setLibType] = useState("image");
   const wrongOptions = content.wrongOptions || ["", "", ""];
   const sentence = content.sentence || "";
   const blankWord = content.blankWord || "";
+  const successImages = content.successImages || [];
+  const successVideos = content.successVideos || [];
   const prompt = blankWord && sentence.includes(blankWord)
-    ? sentence.replace(blankWord, "___")
-    : sentence;
+    ? sentence.replace(blankWord, "___") : sentence;
+
+  const addImage = (url) => onChange({ ...content, successImages:[...successImages, url] });
+  const removeImage = (i) => onChange({ ...content, successImages:successImages.filter((_,x)=>x!==i) });
+  const addVideo = (url) => { if(url) onChange({ ...content, successVideos:[...successVideos, url] }); };
+  const removeVideo = (i) => onChange({ ...content, successVideos:successVideos.filter((_,x)=>x!==i) });
+
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:12, paddingTop:12 }}>
+      {/* Sentence */}
       <div>
         <label style={lbl()}>Full Sentence</label>
         <input value={sentence} onChange={e => onChange({ ...content, sentence:e.target.value })}
           placeholder="The capital of France is Paris" style={inp()}/>
       </div>
+
+      {/* Blank word */}
       <div>
         <label style={lbl()}>Word to Blank <span style={{ color:"#22c55e", fontWeight:600 }}>· correct answer</span></label>
         <input value={blankWord} onChange={e => onChange({ ...content, blankWord:e.target.value })}
@@ -280,28 +292,74 @@ function BlankOptionsE({ content, onChange }) {
           <p style={{ fontSize:12, color:"#6366f1", margin:"6px 0 0" }}>Preview: <strong>{prompt}</strong></p>
         )}
       </div>
+
+      {/* Wrong options */}
       <div>
         <label style={lbl()}>Wrong Options <span style={{ color:"#94A3B8", fontWeight:400 }}>· 2-3 distractors</span></label>
         {wrongOptions.map((opt, i) => (
           <input key={i} value={opt}
             onChange={e => { const o=[...wrongOptions]; o[i]=e.target.value; onChange({ ...content, wrongOptions:o }); }}
-            placeholder={"Wrong option " + (i+1) + " e.g. London"}
+            placeholder={"Wrong option " + (i+1)}
             style={{ ...inp(), marginBottom:6 }}/>
         ))}
       </div>
+
+      {/* Explanation */}
       <div>
         <label style={lbl()}>Explanation <span style={{ color:"#94A3B8", fontWeight:400 }}>· optional</span></label>
         <input value={content.explanation||""} onChange={e => onChange({ ...content, explanation:e.target.value })}
           placeholder="Why this is correct..." style={inp()}/>
       </div>
+
+      {/* Success section */}
       <div style={{ paddingTop:10, borderTop:"1px solid #F1F5F9" }}>
-        <label style={lbl()}>🎉 Success Image <span style={{ color:"#94A3B8", fontWeight:400 }}>· shows when correct</span></label>
-        <input value={content.successImage||""} onChange={e => onChange({ ...content, successImage:e.target.value })}
-          placeholder="Image URL" style={{ ...inp(), marginBottom:6 }}/>
-        <label style={lbl()}>🎬 Success Video</label>
-        <input value={content.successVideo||""} onChange={e => onChange({ ...content, successVideo:e.target.value })}
-          placeholder="YouTube or video URL" style={inp()}/>
+        <label style={lbl()}>🎉 Success Content <span style={{ color:"#94A3B8", fontWeight:400 }}>· shows when correct</span></label>
+
+        {/* Success text */}
+        <textarea value={content.successText||""} onChange={e => onChange({ ...content, successText:e.target.value })}
+          placeholder="Great job! Paris is indeed the capital of France, home to the Eiffel Tower..."
+          style={{ ...inp(), minHeight:70, resize:"vertical", marginBottom:10 }}/>
+
+        {/* Success images */}
+        <label style={lbl()}>Images <span style={{ color:"#94A3B8", fontWeight:400 }}>· multiple allowed</span></label>
+        {successImages.map((url, i) => (
+          <div key={i} style={{ display:"flex", gap:6, marginBottom:6, alignItems:"center" }}>
+            <img src={url} alt="" style={{ width:48, height:48, borderRadius:8, objectFit:"cover", flexShrink:0 }}/>
+            <input value={url} onChange={e => { const imgs=[...successImages]; imgs[i]=e.target.value; onChange({ ...content, successImages:imgs }); }}
+              style={{ ...inp(), flex:1 }}/>
+            <button onClick={() => removeImage(i)} style={{ padding:"4px 8px", borderRadius:6, border:"none", background:"#FEF2F2", color:"#ef4444", cursor:"pointer", fontSize:12 }}>✕</button>
+          </div>
+        ))}
+        <div style={{ display:"flex", gap:6, marginBottom:10 }}>
+          <button onClick={() => { setLibType("image"); setLib(true); }}
+            style={mediaBtn("#059669")}><ImageIcon size={14}/> Upload Image</button>
+          <button onClick={() => { const url=prompt("Enter image URL:"); if(url) addImage(url); }}
+            style={mediaBtn("#6366f1")}><Link2 size={14}/> Add URL</button>
+        </div>
+
+        {/* Success videos */}
+        <label style={lbl()}>Videos <span style={{ color:"#94A3B8", fontWeight:400 }}>· multiple allowed</span></label>
+        {successVideos.map((url, i) => (
+          <div key={i} style={{ display:"flex", gap:6, marginBottom:6, alignItems:"center" }}>
+            <div style={{ width:48, height:48, borderRadius:8, background:"#000", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+              <Film size={20} color="#fff"/>
+            </div>
+            <input value={url} onChange={e => { const vids=[...successVideos]; vids[i]=e.target.value; onChange({ ...content, successVideos:vids }); }}
+              style={{ ...inp(), flex:1 }}/>
+            <button onClick={() => removeVideo(i)} style={{ padding:"4px 8px", borderRadius:6, border:"none", background:"#FEF2F2", color:"#ef4444", cursor:"pointer", fontSize:12 }}>✕</button>
+          </div>
+        ))}
+        <div style={{ display:"flex", gap:6 }}>
+          <button onClick={() => { setLibType("video"); setLib(true); }}
+            style={mediaBtn("#dc2626")}><Film size={14}/> Upload Video</button>
+          <button onClick={() => { const url=window.prompt("Enter video/YouTube URL:"); if(url) addVideo(url); }}
+            style={mediaBtn("#6366f1")}><Link2 size={14}/> Add URL</button>
+        </div>
       </div>
+
+      {lib && <MediaLibrary accept={libType}
+        onSelect={m => { libType==="image" ? addImage(m.url) : addVideo(m.url); setLib(false); }}
+        onClose={() => setLib(false)}/>}
     </div>
   );
 }

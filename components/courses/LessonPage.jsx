@@ -463,14 +463,38 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
                     <p style={{ fontSize:16, fontWeight:800, color:"#166534", margin:"0 0 2px" }}>🎉 Correct!</p>
                     {c.explanation && <p style={{ fontSize:13, color:"#166534", margin:0 }}>{c.explanation}</p>}
                   </div>
-                  {c.successImage && (
+                  {/* Success text */}
+                  {c.successText && (
+                    <div style={{ padding:"14px 16px", borderRadius:12, background:"#F0F9FF", border:"1.5px solid #BAE6FD", marginBottom:12 }}>
+                      <p style={{ fontSize:14, color:"#0369a1", margin:0, lineHeight:1.65 }}>{c.successText}</p>
+                    </div>
+                  )}
+                  {/* Success images - multiple */}
+                  {(c.successImages||[]).filter(Boolean).map((url, i) => (
+                    <img key={i} src={url} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12 }}/>
+                  ))}
+                  {/* Legacy single image */}
+                  {c.successImage && !(c.successImages||[]).length && (
                     <img src={c.successImage} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12 }}/>
                   )}
-                  {c.successVideo && (
-                    <div style={{ borderRadius:16, overflow:"hidden", aspectRatio:"16/9", background:"#000" }}>
-                      {c.successVideo.includes("youtube") || c.successVideo.includes("youtu.be") ? (
+                  {/* Success videos - multiple */}
+                  {(c.successVideos||[]).filter(Boolean).map((url, i) => (
+                    <div key={i} style={{ borderRadius:16, overflow:"hidden", aspectRatio:"16/9", background:"#000", marginBottom:12 }}>
+                      {url.includes("youtube")||url.includes("youtu.be") ? (
                         <iframe width="100%" height="100%"
-                          src={"https://www.youtube.com/embed/" + (c.successVideo.split("v=")[1]?.split("&")[0] || c.successVideo.split("youtu.be/")[1]?.split("?")[0])}
+                          src={"https://www.youtube.com/embed/"+(url.split("v=")[1]?.split("&")[0]||url.split("youtu.be/")[1]?.split("?")[0])}
+                          style={{ border:"none", display:"block" }} allowFullScreen/>
+                      ) : (
+                        <video src={url} controls autoPlay style={{ width:"100%", height:"100%" }}/>
+                      )}
+                    </div>
+                  ))}
+                  {/* Legacy single video */}
+                  {c.successVideo && !(c.successVideos||[]).length && (
+                    <div style={{ borderRadius:16, overflow:"hidden", aspectRatio:"16/9", background:"#000" }}>
+                      {c.successVideo.includes("youtube")||c.successVideo.includes("youtu.be") ? (
+                        <iframe width="100%" height="100%"
+                          src={"https://www.youtube.com/embed/"+(c.successVideo.split("v=")[1]?.split("&")[0]||c.successVideo.split("youtu.be/")[1]?.split("?")[0])}
                           style={{ border:"none", display:"block" }} allowFullScreen/>
                       ) : (
                         <video src={c.successVideo} controls autoPlay style={{ width:"100%", height:"100%" }}/>
