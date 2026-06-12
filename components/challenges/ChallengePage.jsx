@@ -1,4 +1,5 @@
 "use client";
+import ChallengeReviews from "@/components/challenges/ChallengeReviews";
 import ChallengeLeaderboard from "@/components/challenges/ChallengeLeaderboard";
 
 import { useState, useEffect } from "react";
@@ -171,70 +172,8 @@ export default function ChallengePage({ challenge }) {
           </div>
           <h3 className="text-lg font-bold text-gray-900 mb-3">How does it work?</h3>
           <p className="text-gray-600 leading-relaxed text-base mb-8">{challenge.description}</p>
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Success Stories</h3>
-          <div className="flex flex-col gap-4">
-            {challenge.reviews.map((review, i) => (
-              <div key={i} className="border border-gray-100 rounded-2xl p-4" style={{ background:"#fafafa" }}>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold text-gray-900 text-sm">{review.name}</span>
-                  <div className="flex items-center gap-1.5"><CheckCircle2 size={14} className="text-green-500" /><span className="text-xs text-green-600 font-semibold">Verified customer</span></div>
-                </div>
-                <p className="text-gray-600 text-sm leading-relaxed mb-3">{review.text}</p>
-                <div style={{ display:"flex",gap:3 }}>{Array.from({ length:review.stars }).map((_,j) => <Star key={j} size={14} fill="#F59E0B" color="#F59E0B" />)}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  /* ── TRACKER ── */
-  return (
-    <div className="min-h-screen bg-white">
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-100">
-        <div className="max-w-2xl mx-auto flex items-center justify-between px-5 h-14">
-          <button onClick={() => router.push('/challenges')} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-            <ChevronLeft size={20} className="text-gray-700" />
-          </button>
-          <h1 className="font-bold text-gray-900 text-base truncate flex-1 text-center px-4">{challenge.title}</h1>
-          <button onClick={() => setConfirmReset(!confirmReset)} className="p-2 hover:bg-gray-100 rounded-xl transition-colors shrink-0" title="Restart challenge">
-            <RotateCcw size={18} className={confirmReset ? "text-red-500" : "text-gray-400"} />
-          </button>
-        </div>
-      </div>
-
-      <div className="max-w-2xl mx-auto w-full px-5 pt-4 pb-2">
-        {confirmReset && <ConfirmReset onConfirm={handleReset} onCancel={() => setConfirmReset(false)} />}
-
-        <h2 className="text-xl font-bold text-gray-900 mb-0.5">{challenge.title}</h2>
-        <p className="text-sm text-gray-500 mb-3">{challenge.subtitle}</p>
-        <div className="flex items-center gap-3 mb-3">
-          <div className="flex-1 bg-gray-100 rounded-full h-2">
-            <div className="bg-primary h-2 rounded-full transition-all" style={{ width:`${progress}%` }} />
-          </div>
-          <span className="text-xs font-semibold text-gray-500 shrink-0">{progress}%</span>
-        </div>
-
-        {/* Day dots */}
-        <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth:"none" }}>
-          {challenge.challengeDays.map((d) => {
-            const isDone = completedDays.has(d.day);
-            const isCur  = d.day === currentDay;
-            return (
-              <button key={d.day}
-                onClick={() => (isDone || isCur) ? handleGoToDay(d.day) : null}
-                style={{ background:"none",border:"none",cursor:isDone||isCur?"pointer":"default",padding:0 }}
-                className="flex flex-col items-center gap-1 shrink-0"
-              >
-                <div style={{ width:28,height:28,borderRadius:"50%",background:isDone?"#22C55E":isCur?"#5B4EFF":"transparent",border:isDone||isCur?"none":"2px solid #D1D5DB",display:"flex",alignItems:"center",justifyContent:"center" }}>
-                  {isDone && <Check size={14} color="#fff" strokeWidth={3} />}
-                </div>
-                <span style={{ fontSize:10,color:isCur?"#5B4EFF":isDone?"#22C55E":"#9CA3AF",fontWeight:500 }}>D{d.day}</span>
-              </button>
-            );
-          })}
-        </div>
+          <h3 className="text-lg font-bold text-gray-900 mb-4">What students say</h3>
+          <ChallengeReviews challengeId={challenge.id} challengeName={challenge.title} topOnly={true}/>
       </div>
 
       <div className="max-w-2xl mx-auto w-full px-5 pb-24">
