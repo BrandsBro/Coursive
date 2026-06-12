@@ -122,6 +122,32 @@ export function BlockPreview({ block }) {
       const [emoji,color,bg,border] = map[c.style||"info"];
       return <div style={{ padding:"14px 18px", borderRadius:14, background:bg, border:`1.5px solid ${border}` }}><p style={{ fontSize:14, color, margin:0, lineHeight:1.6 }}>{emoji} {c.text||"Callout text"}</p></div>;
     }
+    case "blankoptions": {
+      const words = (c.sentence||"").split(" ").filter(Boolean);
+      const marked = c.markedWords || [];
+      return (
+        <div style={{ background:"#F0F9FF", borderRadius:14, padding:"14px 16px", border:"1.5px solid #BAE6FD" }}>
+          <p style={{ fontSize:11, fontWeight:700, color:"#0369a1", margin:"0 0 8px" }}>✏️ FILL IN THE BLANK</p>
+          <p style={{ fontSize:15, color:"#0f172a", margin:"0 0 10px", lineHeight:1.8 }}>
+            {words.map((w,i) => (
+              <span key={i}>
+                {marked.includes(i)
+                  ? <span style={{ display:"inline-block", padding:"2px 12px", borderRadius:8, border:"2px dashed #93c5fd", color:"#94A3B8", fontWeight:700, margin:"0 3px" }}>______</span>
+                  : w
+                }{" "}
+              </span>
+            ))}
+          </p>
+          {(c.blanks||[]).length > 0 && (
+            <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+              {(c.blanks||[]).map((b,i) => [b.correct,b.w1,b.w2,b.w3].filter(Boolean).map((opt,j) => (
+                <span key={i+"-"+j} style={{ padding:"6px 14px", borderRadius:10, border:"1.5px solid #BAE6FD", background:"#fff", fontSize:13, color:"#374151" }}>{opt}</span>
+              )))}
+            </div>
+          )}
+        </div>
+      );
+    }
     case "divider":
       return c.style==="dots"
         ? <div style={{ textAlign:"center", color:"#CBD5E1", fontSize:20, letterSpacing:8 }}>• • •</div>
