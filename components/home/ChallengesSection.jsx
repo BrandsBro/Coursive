@@ -18,7 +18,7 @@ export default function ChallengesSection({ challenges = [] }) {
         </Link>
       </div>
 
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(2, 1fr)", gap:16 }}>
+      <div className="ch-grid">
         {challenges.map((ch, i) => {
           const pct = getChallengeDayPercent(ch.id, ch.days);
           const joined = hasJoinedChallenge(ch.id);
@@ -72,10 +72,10 @@ export default function ChallengesSection({ challenges = [] }) {
         })}
       </div>
 
+
       <style>{`
-        @media (max-width: 480px) {
-          .challenges-grid { grid-template-columns: 1fr !important; }
-        }
+        .ch-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+        @media (max-width: 640px) { .ch-grid { grid-template-columns:1fr; gap:12px; } }
       `}</style>
     </div>
   );

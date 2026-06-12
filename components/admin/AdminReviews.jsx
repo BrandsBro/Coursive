@@ -14,10 +14,14 @@ export default function AdminReviews() {
 
   const load = async () => {
     setLoading(true);
-    const { data: reviewData } = await supabase
-      .from("course_reviews")
-      .select("id, course_id, user_id, rating, review, approved, created_at")
-      .order("created_at", { ascending: false });
+    const [{ data: courseReviews }, { data: challengeReviews }] = await Promise.all([
+      supabase.from("course_reviews").select("id, course_id, user_id, rating, review, approved, created_at").order("created_at", { ascending: false }),
+      supabase.from("challenge_user_reviews").select("id, challenge_id, user_id, rating, review, approved, created_at").order("created_at", { ascending: false }),
+    ]);
+    const reviewData = [
+      ...(courseReviews||[]).map(r => ({ ...r, reviewType:"course", entityId:r.course_id })),
+      ...(challengeReviews||[]).map(r => ({ ...r, reviewType:"challenge", entityId:r.challenge_id })),
+    ].sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
 
     const reviews = reviewData || [];
     const userIds = [...new Set(reviews.map(r => r.user_id))];

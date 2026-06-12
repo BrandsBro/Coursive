@@ -78,3 +78,13 @@ input::placeholder {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* Mobile 2-column grids */
+@media (max-width: 640px) {
+  .browse-grid,
+  .cl-grid,
+  .courses-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+}
