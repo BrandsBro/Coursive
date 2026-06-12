@@ -14,6 +14,12 @@ const STYLES = {
 };
 
 export default function CurrentCourseWidget({ courses = [] }) {
+  if (!courses || courses.length === 0) return (
+    <div style={{ background:"#fff", borderRadius:24, border:"1px solid #EFEFEF", padding:"40px 24px", textAlign:"center" }}>
+      <div style={{ fontSize:32, marginBottom:8 }}>📚</div>
+      <p style={{ fontSize:14, color:"#94A3B8", margin:0 }}>No courses yet</p>
+    </div>
+  );
   const { getCoursePercent, getCompletedLessons } = useProgress();
 
   const activeCourse = courses.find(c => {

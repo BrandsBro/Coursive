@@ -1,4 +1,5 @@
 import LessonPage from "@/components/courses/LessonPage";
+import ChallengeReviews from "@/components/challenges/ChallengeReviews";
 import { getChallengeById } from "@/lib/db";
 import { getLessonContentFromDB } from "@/lib/getlessonContent";
 import { notFound } from "next/navigation";
@@ -16,11 +17,9 @@ export default async function ChallengeDayPage({ params, searchParams }) {
   const challengeDay = challenge.challengeDays?.find(d => d.day === dayNum);
   if (!challengeDay) return notFound();
 
-  // Use challenge-specific content ID
   const contentId = `challenge_${challengeId}_day_${dayNum}`;
   const content = await getLessonContentFromDB(contentId) || [];
 
-  // Build a fake lesson object for LessonPage
   const lesson = {
     id: contentId,
     title: challengeDay.topic || `Day ${dayNum}`,
@@ -28,7 +27,6 @@ export default async function ChallengeDayPage({ params, searchParams }) {
     duration: 10,
   };
 
-  // Build a fake course object for LessonPage
   const course = {
     id: challengeId,
     title: challenge.title,
@@ -50,13 +48,25 @@ export default async function ChallengeDayPage({ params, searchParams }) {
   };
 
   return (
-    <LessonPage
-      course={course}
-      lesson={lesson}
-      content={content}
-      mode={sp?.mode || "read"}
-      challengeId={challengeId}
-      challengeDay={dayNum}
-    />
+    <div>
+      <LessonPage
+        course={course}
+        lesson={lesson}
+        content={content}
+        mode={sp?.mode || "read"}
+        challengeId={challengeId}
+        challengeDay={dayNum}
+      />
+      <div style={{ maxWidth:680, margin:"0 auto", padding:"40px 20px 80px" }}>
+        <h2 style={{ fontSize:20, fontWeight:900, color:"#0f172a", margin:"0 0 20px" }}>
+          Rate this Challenge
+        </h2>
+        <ChallengeReviews
+          challengeId={challengeId}
+          challengeName={challenge.title}
+          topOnly={false}
+        />
+      </div>
+    </div>
   );
 }

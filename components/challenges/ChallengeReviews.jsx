@@ -102,6 +102,7 @@ export default function ChallengeReviews({ challengeId, challengeName, topOnly=f
     if (displayReviews.length === 0) return null;
     return (
       <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+        <h3 style={{ fontSize:18, fontWeight:900, color:"#0f172a", margin:"0 0 4px" }}>What students say</h3>
         {displayReviews.map(r => (
           <div key={r.id} style={{ background:"#fff", borderRadius:16, border:"1.5px solid #F1F5F9", padding:"16px 18px" }}>
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:r.review?10:0 }}>

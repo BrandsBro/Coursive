@@ -14,58 +14,44 @@ export default function AdminReviews() {
 
   const load = async () => {
     setLoading(true);
-    const [{ data: courseReviews }, { data: challengeReviews }] = await Promise.all([
-      supabase.from("course_reviews").select("id, course_id, user_id, rating, review, approved, created_at").order("created_at", { ascending: false }),
-      supabase.from("challenge_user_reviews").select("id, challenge_id, user_id, rating, review, approved, created_at").order("created_at", { ascending: false }),
-    ]);
-    const reviewData = [
-      ...(courseReviews||[]).map(r => ({ ...r, reviewType:"course", entityId:r.course_id })),
-      ...(challengeReviews||[]).map(r => ({ ...r, reviewType:"challenge", entityId:r.challenge_id })),
-    ].sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-
-    const reviews = reviewData || [];
-    const userIds = [...new Set(reviews.map(r => r.user_id))];
-    const courseIds = [...new Set(reviews.map(r => r.course_id))];
-
-    const [{ data: profiles }, { data: courses }] = await Promise.all([
-      supabase.from("profiles").select("id, full_name, email, avatar_url").in("id", userIds),
-      supabase.from("courses").select("id, title, emoji").in("id", courseIds),
-    ]);
-
-    const profileMap = {};
-    (profiles||[]).forEach(p => profileMap[p.id] = p);
-    const courseMap = {};
-    (courses||[]).forEach(c => courseMap[c.id] = c);
-
-    setReviews(reviews.map(r => ({
-      ...r,
-      profile: profileMap[r.user_id] || null,
-      course: courseMap[r.course_id] || null,
-    })));
+    try {
+      const res = await fetch('/api/admin/reviews');
+      const data = await res.json();
+      setReviews(data || []);
+    } catch(e) {
+      console.error(e);
+    }
     setLoading(false);
   };
 
   const approve = async (id) => {
-    const { error } = await supabase
-      .from("course_reviews")
-      .update({ approved: true })
-      .eq("id", id);
-    if (error) { alert("Error: " + error.message); return; }
+    const review = reviews.find(r => r.id === id);
+    await fetch('/api/admin/reviews', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, approved: true, reviewType: review?.reviewType })
+    });
     setReviews(prev => prev.map(r => r.id === id ? { ...r, approved: true } : r));
   };
 
   const reject = async (id) => {
-    const { error } = await supabase
-      .from("course_reviews")
-      .update({ approved: false })
-      .eq("id", id);
-    if (error) { alert("Error: " + error.message); return; }
+    const review = reviews.find(r => r.id === id);
+    await fetch('/api/admin/reviews', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, approved: false, reviewType: review?.reviewType })
+    });
     setReviews(prev => prev.map(r => r.id === id ? { ...r, approved: false } : r));
   };
 
   const del = async (id) => {
     if (!confirm("Delete this review permanently?")) return;
-    await supabase.from("course_reviews").delete().eq("id", id);
+    const review = reviews.find(r => r.id === id);
+    await fetch('/api/admin/reviews', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, reviewType: review?.reviewType })
+    });
     setReviews(prev => prev.filter(r => r.id !== id));
   };
 

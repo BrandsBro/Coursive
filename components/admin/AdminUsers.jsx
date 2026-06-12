@@ -16,23 +16,36 @@ export default function AdminUsers() {
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from("profiles")
-      .select("id, full_name, email, is_admin, created_at, avatar_url")
-      .order("created_at", { ascending:false });
-    setUsers(data||[]);
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, email, is_admin, created_at, avatar_url")
+        .order("created_at", { ascending: false });
+      if (error) console.error("Users error:", error);
+      setUsers(data || []);
+    } catch(e) {
+      console.error(e);
+    }
     setLoading(false);
   };
 
   const toggleAdmin = async (id, current) => {
-    await supabase.from("profiles").update({ is_admin:!current }).eq("id", id);
-    setUsers(prev => prev.map(u => u.id===id ? {...u, is_admin:!current} : u));
+    await fetch('/api/admin/users', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, is_admin: !current })
+    });
+    setUsers(prev => prev.map(u => u.id === id ? { ...u, is_admin: !current } : u));
   };
 
   const deleteUser = async (id) => {
-    await supabase.from("profiles").delete().eq("id", id);
-    setUsers(prev => prev.filter(u => u.id!==id));
-    setDeleteTarget(null);
+    if (!confirm("Delete this user permanently?")) return;
+    await fetch('/api/admin/users', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
+    setUsers(prev => prev.filter(u => u.id !== id));
   };
 
   const timeAgo = (d) => {
