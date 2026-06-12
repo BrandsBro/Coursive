@@ -363,53 +363,57 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
     }
     case "blankoptions": {
       const sentence = c.sentence || "";
+      const markedWords = c.markedWords || [];
       const blanks = c.blanks || [];
-      const parts = sentence.split("___");
-      const blankCount = parts.length - 1;
+      const words = sentence.split(" ").filter(Boolean);
+      const blankCount = markedWords.length;
 
-      // Per-blank state
       const selectedMap = answers["bo_"+idx] || {};
       const isChecked = checked["bo_"+idx];
       const showAns = fillShowAnswer?.["bo_"+idx];
+      const allFilled = Object.keys(selectedMap).filter(k=>selectedMap[k]!==undefined).length === blankCount;
+      const allCorrect = blanks.length > 0 && blanks.every((b,i) => selectedMap[i] === b.correct);
 
-      // Check if all blanks correct
-      const allCorrect = blanks.length > 0 && blanks.every((b, i) => selectedMap[i] === b.correct);
-      const allFilled = blankCount > 0 && Object.keys(selectedMap).length === blankCount;
-
-      // Build shuffled options per blank
-      const getOptions = (blankIdx) => {
-        const b = blanks[blankIdx];
+      const getOptions = (i) => {
+        const b = blanks[i];
         if (!b) return [];
-        const all = [b.correct, ...(b.wrongOptions||[]).filter(Boolean)];
-        const seed = (idx * 100 + blankIdx) * 9301 + 49297;
-        return all.sort((a,b) => ((seed % 233280)/233280) - 0.5);
+        return [b.correct, b.w1, b.w2, b.w3].filter(Boolean).sort(() => Math.sin(idx*100+i*37) - 0.5);
       };
+
+      // Build sentence display with blanks
+      let blankIndex = 0;
+      const sentenceParts = [];
+      words.forEach((word, wi) => {
+        if (markedWords.includes(wi)) {
+          const bi = markedWords.indexOf(wi);
+          sentenceParts.push({ type:"blank", blankIdx:bi });
+        } else {
+          sentenceParts.push({ type:"word", text:word });
+        }
+      });
 
       return (
         <div style={{ background:"#F0F9FF", borderRadius:20, padding:24, border:"1.5px solid #BAE6FD" }}>
-          <p style={{ fontSize:12, fontWeight:700, color:"#0369a1", margin:"0 0 16px", letterSpacing:0.5 }}>✏️ FILL IN THE BLANK{blankCount > 1 ? "S" : ""}</p>
+          <p style={{ fontSize:12, fontWeight:700, color:"#0369a1", margin:"0 0 16px", letterSpacing:0.5 }}>
+            ✏️ FILL IN THE BLANK{blankCount>1?"S":""}
+          </p>
 
-          {/* Sentence with blanks */}
-          <p style={{ fontSize:18, color:"#0f172a", margin:"0 0 24px", lineHeight:2, fontWeight:500, flexWrap:"wrap" }}>
-            {parts.map((part, i) => (
+          {/* Sentence with blanks inline */}
+          <p style={{ fontSize:18, color:"#0f172a", margin:"0 0 24px", lineHeight:2.2, fontWeight:500 }}>
+            {sentenceParts.map((part, i) => (
               <span key={i}>
-                {part}
-                {i < parts.length - 1 && (
+                {part.type === "word" ? (
+                  part.text + " "
+                ) : (
                   <span style={{
-                    display:"inline-block", minWidth:90, padding:"3px 14px", margin:"0 4px",
-                    borderRadius:8,
-                    border: isChecked
-                      ? "2px solid " + (selectedMap[i] === (blanks[i]?.correct) ? "#22c55e" : "#ef4444")
-                      : selectedMap[i] ? "2px solid #0891b2" : "2px dashed #93c5fd",
-                    background: isChecked
-                      ? selectedMap[i] === (blanks[i]?.correct) ? "#F0FDF4" : "#FEF2F2"
-                      : selectedMap[i] ? "#E0F2FE" : "#fff",
-                    color: isChecked
-                      ? selectedMap[i] === (blanks[i]?.correct) ? "#166534" : "#991B1B"
-                      : selectedMap[i] ? "#0369a1" : "#94A3B8",
+                    display:"inline-block", minWidth:90, padding:"4px 14px", margin:"0 3px",
+                    borderRadius:10,
+                    border: isChecked ? "2px solid "+(selectedMap[part.blankIdx]===blanks[part.blankIdx]?.correct?"#22c55e":"#ef4444") : selectedMap[part.blankIdx] ? "2px solid #0891b2" : "2px dashed #93c5fd",
+                    background: isChecked ? (selectedMap[part.blankIdx]===blanks[part.blankIdx]?.correct?"#F0FDF4":"#FEF2F2") : selectedMap[part.blankIdx] ? "#E0F2FE" : "#fff",
+                    color: isChecked ? (selectedMap[part.blankIdx]===blanks[part.blankIdx]?.correct?"#166534":"#991B1B") : selectedMap[part.blankIdx] ? "#0369a1" : "#94A3B8",
                     fontWeight:700, fontSize:17, textAlign:"center", transition:"all 0.2s",
                   }}>
-                    {selectedMap[i] || "______"}
+                    {selectedMap[part.blankIdx] || "______"}
                   </span>
                 )}
               </span>
@@ -418,21 +422,19 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
 
           {/* Options per blank */}
           {!isChecked && (
-            <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:16, marginBottom:20 }}>
               {Array.from({ length: blankCount }, (_, i) => (
                 <div key={i}>
-                  {blankCount > 1 && (
-                    <p style={{ fontSize:11, fontWeight:700, color:"#0369a1", margin:"0 0 8px" }}>BLANK {i+1}</p>
-                  )}
+                  {blankCount > 1 && <p style={{ fontSize:11, fontWeight:700, color:"#0369a1", margin:"0 0 8px" }}>BLANK {i+1}</p>}
                   <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-                    {getOptions(i).map((opt, j) => (
+                    {getOptions(i).map((opt,j) => (
                       <button key={j}
-                        onClick={() => setAnswers(p => ({ ...p, ["bo_"+idx]: { ...selectedMap, [i]: selectedMap[i]===opt ? undefined : opt } }))}
+                        onClick={() => setAnswers(p=>({...p,["bo_"+idx]:{...selectedMap,[i]:selectedMap[i]===opt?undefined:opt}}))}
                         style={{
-                          padding:"10px 20px", borderRadius:12,
-                          border: selectedMap[i] === opt ? "2px solid #0891b2" : "2px solid #BAE6FD",
-                          background: selectedMap[i] === opt ? "#E0F2FE" : "#fff",
-                          color: selectedMap[i] === opt ? "#0369a1" : "#374151",
+                          padding:"11px 22px", borderRadius:12,
+                          border: selectedMap[i]===opt?"2px solid #0891b2":"2px solid #BAE6FD",
+                          background: selectedMap[i]===opt?"#E0F2FE":"#fff",
+                          color: selectedMap[i]===opt?"#0369a1":"#374151",
                           fontSize:15, fontWeight:700, cursor:"pointer", transition:"all 0.15s",
                         }}>
                         {opt}
@@ -444,40 +446,30 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
             </div>
           )}
 
-          {/* Check button */}
+          {/* Check */}
           {!isChecked && allFilled && (
-            <button onClick={() => setChecked(p => ({...p, ["bo_"+idx]: true}))}
-              style={{ marginTop:16, padding:"12px 28px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#0891b2,#0369a1)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(8,145,178,0.3)" }}>
+            <button onClick={() => setChecked(p=>({...p,["bo_"+idx]:true}))}
+              style={{ padding:"12px 28px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#0891b2,#0369a1)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
               Check Answer ✓
             </button>
           )}
 
           {/* Result */}
           {isChecked && (
-            <div style={{ marginTop:16 }}>
+            <div>
               {allCorrect ? (
                 <div>
                   <div style={{ padding:"14px 18px", borderRadius:14, background:"#F0FDF4", border:"2px solid #86efac", marginBottom:16 }}>
-                    <p style={{ fontSize:16, fontWeight:800, color:"#166534", margin:"0 0 2px" }}>🎉 {blankCount > 1 ? "All correct!" : "Correct!"}</p>
+                    <p style={{ fontSize:16, fontWeight:800, color:"#166534", margin:"0 0 2px" }}>🎉 {blankCount>1?"All correct!":"Correct!"}</p>
                     {c.explanation && <p style={{ fontSize:13, color:"#166534", margin:0 }}>{c.explanation}</p>}
                   </div>
-                  {c.successText && (
-                    <div style={{ padding:"14px 16px", borderRadius:12, background:"#F0F9FF", border:"1.5px solid #BAE6FD", marginBottom:12 }}>
-                      <p style={{ fontSize:14, color:"#0369a1", margin:0, lineHeight:1.65 }}>{c.successText}</p>
-                    </div>
-                  )}
-                  {(c.successImages||[]).filter(Boolean).map((url, i) => (
-                    <img key={i} src={url} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12 }}/>
-                  ))}
-                  {(c.successVideos||[]).filter(Boolean).map((url, i) => (
+                  {c.successText && <div style={{ padding:"14px 16px", borderRadius:12, background:"#F0F9FF", border:"1.5px solid #BAE6FD", marginBottom:12 }}><p style={{ fontSize:14, color:"#0369a1", margin:0, lineHeight:1.65 }}>{c.successText}</p></div>}
+                  {(c.successImages||[]).filter(Boolean).map((url,i) => <img key={i} src={url} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12 }}/>)}
+                  {(c.successVideos||[]).filter(Boolean).map((url,i) => (
                     <div key={i} style={{ borderRadius:16, overflow:"hidden", aspectRatio:"16/9", background:"#000", marginBottom:12 }}>
-                      {url.includes("youtube")||url.includes("youtu.be") ? (
-                        <iframe width="100%" height="100%"
-                          src={"https://www.youtube.com/embed/"+(url.split("v=")[1]?.split("&")[0]||url.split("youtu.be/")[1]?.split("?")[0])}
-                          style={{ border:"none" }} allowFullScreen/>
-                      ) : (
-                        <video src={url} controls autoPlay style={{ width:"100%", height:"100%" }}/>
-                      )}
+                      {url.includes("youtube")||url.includes("youtu.be")
+                        ? <iframe width="100%" height="100%" src={"https://www.youtube.com/embed/"+(url.split("v=")[1]?.split("&")[0]||url.split("youtu.be/")[1]?.split("?")[0])} style={{ border:"none" }} allowFullScreen/>
+                        : <video src={url} controls autoPlay style={{ width:"100%",height:"100%" }}/>}
                     </div>
                   ))}
                 </div>
@@ -485,7 +477,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
                 <div>
                   <div style={{ padding:"14px 18px", borderRadius:14, background:"#FEF2F2", border:"2px solid #fca5a5", marginBottom:14 }}>
                     <p style={{ fontSize:16, fontWeight:800, color:"#991B1B", margin:"0 0 2px" }}>❌ Not quite!</p>
-                    <p style={{ fontSize:13, color:"#991B1B", margin:0 }}>Some blanks are incorrect. Try again!</p>
+                    <p style={{ fontSize:13, color:"#991B1B", margin:0 }}>Try again!</p>
                   </div>
                   <div style={{ display:"flex", gap:10 }}>
                     <button onClick={() => { setChecked(p=>({...p,["bo_"+idx]:false})); setAnswers(p=>({...p,["bo_"+idx]:{}})); }}
@@ -499,11 +491,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
                   </div>
                   {showAns && (
                     <div style={{ marginTop:12, padding:"14px 16px", borderRadius:12, background:"#F0FDF4", border:"1.5px solid #86efac" }}>
-                      {blanks.map((b, i) => (
-                        <p key={i} style={{ fontSize:14, color:"#166534", margin:"0 0 4px", fontWeight:600 }}>
-                          Blank {i+1}: <strong>{b.correct}</strong>
-                        </p>
-                      ))}
+                      {blanks.map((b,i) => <p key={i} style={{ fontSize:14, color:"#166534", margin:"0 0 4px", fontWeight:600 }}>Blank {i+1}: <strong>{b.correct}</strong></p>)}
                     </div>
                   )}
                 </div>

@@ -260,16 +260,45 @@ function QuizE({ content, onChange }) {
 
 function BlankOptionsE({ content, onChange }) {
   const [lib, setLib] = useState(false);
-  const [libFor, setLibFor] = useState(null); // "image" or "video"
+  const [libFor, setLibFor] = useState("image");
 
   const sentence = content.sentence || "";
-  const blankCount = (sentence.match(/___/g) || []).length;
   const blanks = content.blanks || [];
   const successImages = content.successImages || [];
   const successVideos = content.successVideos || [];
 
-  // Sync blanks array length with blank count in sentence
-  const syncedBlanks = Array.from({ length: blankCount }, (_, i) => blanks[i] || { correct:"", wrongOptions:["","",""] });
+  // Split sentence into words for clicking
+  const words = sentence.split(" ").filter(Boolean);
+
+  // Find which words are marked as blanks
+  const markedBlanks = content.markedWords || []; // array of word indices
+
+  // Build preview with ___ replacing marked words
+  const preview = words.map((w, i) => markedBlanks.includes(i) ? "___" : w).join(" ");
+
+  // Sync blanks data
+  const blankCount = markedBlanks.length;
+  const syncedBlanks = Array.from({ length: blankCount }, (_, i) =>
+    blanks[i] || { correct: words[markedBlanks[i]] || "", w1:"", w2:"", w3:"" }
+  );
+
+  const toggleWord = (wordIdx) => {
+    let newMarked = [...markedBlanks];
+    if (newMarked.includes(wordIdx)) {
+      newMarked = newMarked.filter(i => i !== wordIdx);
+    } else {
+      newMarked = [...newMarked, wordIdx].sort((a,b)=>a-b);
+    }
+    // Auto-set correct answers from the words
+    const newBlanks = newMarked.map((wi, i) => ({
+      ...(blanks[i] || {}),
+      correct: words[wi] || "",
+      w1: blanks[i]?.w1 || "",
+      w2: blanks[i]?.w2 || "",
+      w3: blanks[i]?.w3 || "",
+    }));
+    onChange({ ...content, markedWords: newMarked, blanks: newBlanks });
+  };
 
   const updateBlank = (i, key, val) => {
     const b = [...syncedBlanks];
@@ -277,68 +306,95 @@ function BlankOptionsE({ content, onChange }) {
     onChange({ ...content, blanks: b });
   };
 
-  const updateWrong = (blankIdx, optIdx, val) => {
-    const b = [...syncedBlanks];
-    const opts = [...(b[blankIdx].wrongOptions || ["","",""])];
-    opts[optIdx] = val;
-    b[blankIdx] = { ...b[blankIdx], wrongOptions: opts };
-    onChange({ ...content, blanks: b });
-  };
-
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:14, paddingTop:12 }}>
 
-      {/* Sentence */}
+      {/* Step 1 - Write sentence */}
       <div>
-        <label style={lbl()}>Sentence <span style={{ color:"#94A3B8", fontWeight:400 }}>· use ___ for each blank</span></label>
-        <input value={sentence}
-          onChange={e => onChange({ ...content, sentence:e.target.value, blanks:[] })}
-          placeholder="The ___ of France is ___"
-          style={inp()}/>
-        {blankCount > 0 && (
-          <p style={{ fontSize:12, color:"#6366f1", margin:"4px 0 0" }}>✦ {blankCount} blank{blankCount>1?"s":""} detected</p>
-        )}
+        <label style={lbl()}>Step 1 · Write the full sentence</label>
+        <textarea value={sentence}
+          onChange={e => onChange({ ...content, sentence:e.target.value, markedWords:[], blanks:[] })}
+          placeholder="My name is Mahtab and I live in Dhaka"
+          style={{ ...inp(), minHeight:70, resize:"vertical" }}/>
       </div>
 
-      {/* Per-blank options */}
-      {syncedBlanks.map((blank, i) => (
-        <div key={i} style={{ background:"#F8FAFC", borderRadius:12, padding:12, border:"1.5px solid #E2E8F0" }}>
-          <p style={{ fontSize:11, fontWeight:700, color:"#6366f1", margin:"0 0 10px" }}>BLANK {i+1}</p>
+      {/* Step 2 - Click words to blank */}
+      {words.length > 0 && (
+        <div>
+          <label style={lbl()}>Step 2 · Click words to make them blank</label>
+          <p style={{ fontSize:11, color:"#94A3B8", margin:"0 0 10px" }}>Click a word to turn it into a blank. Click again to undo.</p>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:8, padding:"14px", background:"#F8FAFC", borderRadius:12, border:"1.5px solid #E2E8F0" }}>
+            {words.map((word, i) => {
+              const isBlank = markedBlanks.includes(i);
+              const blankNum = markedBlanks.indexOf(i) + 1;
+              return (
+                <button key={i} onClick={() => toggleWord(i)}
+                  style={{
+                    padding:"8px 14px", borderRadius:10, fontSize:15, fontWeight:isBlank?800:500,
+                    border: isBlank ? "2px solid #6366f1" : "1.5px solid #E2E8F0",
+                    background: isBlank ? "#EEF2FF" : "#fff",
+                    color: isBlank ? "#6366f1" : "#374151",
+                    cursor:"pointer", transition:"all 0.15s",
+                    position:"relative",
+                  }}>
+                  {isBlank ? "___" : word}
+                  {isBlank && (
+                    <span style={{ position:"absolute", top:-8, right:-6, background:"#6366f1", color:"#fff", borderRadius:"50%", width:16, height:16, fontSize:9, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      {blankNum}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-          <label style={lbl()}>Correct Answer</label>
-          <input value={blank.correct||""} onChange={e => updateBlank(i, "correct", e.target.value)}
-            placeholder="e.g. Paris" style={{ ...inp(), borderColor:"#22c55e", marginBottom:10 }}/>
+          {/* Preview */}
+          {markedBlanks.length > 0 && (
+            <div style={{ marginTop:8, padding:"10px 14px", borderRadius:10, background:"#EEF2FF", border:"1.5px solid #c7d2fe" }}>
+              <p style={{ fontSize:11, fontWeight:700, color:"#6366f1", margin:"0 0 3px" }}>PREVIEW</p>
+              <p style={{ fontSize:14, color:"#0f172a", margin:0 }}>{preview}</p>
+            </div>
+          )}
+        </div>
+      )}
 
-          <label style={lbl()}>Wrong Options</label>
-          {(blank.wrongOptions||["","",""]).map((opt, j) => (
-            <input key={j} value={opt} onChange={e => updateWrong(i, j, e.target.value)}
-              placeholder={"Wrong option " + (j+1)}
-              style={{ ...inp(), marginBottom:6 }}/>
+      {/* Step 3 - Wrong options per blank */}
+      {blankCount > 0 && (
+        <div>
+          <label style={lbl()}>Step 3 · Add 3 wrong options for each blank</label>
+          {syncedBlanks.map((blank, i) => (
+            <div key={i} style={{ background:"#F8FAFC", borderRadius:12, padding:12, border:"1.5px solid #E2E8F0", marginBottom:10 }}>
+              <p style={{ fontSize:11, fontWeight:800, color:"#6366f1", margin:"0 0 10px" }}>
+                BLANK {i+1} · Correct: <span style={{ color:"#22c55e" }}>{blank.correct}</span>
+              </p>
+              {["w1","w2","w3"].map((key,j) => (
+                <input key={key} value={blank[key]||""} onChange={e => updateBlank(i,key,e.target.value)}
+                  placeholder={"Wrong option "+(j+1)} style={{ ...inp(), marginBottom:6 }}/>
+              ))}
+            </div>
           ))}
         </div>
-      ))}
+      )}
 
       {/* Explanation */}
       <div>
         <label style={lbl()}>Explanation <span style={{ color:"#94A3B8", fontWeight:400 }}>· optional</span></label>
-        <input value={content.explanation||""} onChange={e => onChange({ ...content, explanation:e.target.value })}
-          placeholder="Why these are correct..." style={inp()}/>
+        <textarea value={content.explanation||""} onChange={e => onChange({ ...content, explanation:e.target.value })}
+          placeholder="Why these are correct..." style={{ ...inp(), minHeight:50, resize:"vertical" }}/>
       </div>
 
       {/* Success content */}
-      <div style={{ paddingTop:10, borderTop:"1px solid #F1F5F9" }}>
-        <label style={lbl()}>🎉 Success Text <span style={{ color:"#94A3B8", fontWeight:400 }}>· shows when all correct</span></label>
+      <div style={{ paddingTop:12, borderTop:"1px solid #F1F5F9" }}>
+        <label style={lbl()}>🎉 Success Content <span style={{ color:"#94A3B8", fontWeight:400 }}>· shows when all correct</span></label>
         <textarea value={content.successText||""} onChange={e => onChange({ ...content, successText:e.target.value })}
-          placeholder="Great job! Here's more about this..." style={{ ...inp(), minHeight:60, resize:"vertical", marginBottom:10 }}/>
+          placeholder="Great job! Here's more context..." style={{ ...inp(), minHeight:60, resize:"vertical", marginBottom:10 }}/>
 
-        <label style={lbl()}>Images <span style={{ color:"#94A3B8", fontWeight:400 }}>· multiple</span></label>
-        {successImages.map((url, i) => (
+        <label style={lbl()}>Images</label>
+        {successImages.map((url,i) => (
           <div key={i} style={{ display:"flex", gap:6, marginBottom:6, alignItems:"center" }}>
-            <img src={url} alt="" style={{ width:44, height:44, borderRadius:8, objectFit:"cover", flexShrink:0 }}/>
-            <input value={url} onChange={e => { const imgs=[...successImages]; imgs[i]=e.target.value; onChange({ ...content, successImages:imgs }); }}
-              style={{ ...inp(), flex:1 }}/>
-            <button onClick={() => onChange({ ...content, successImages:successImages.filter((_,x)=>x!==i) })}
-              style={{ padding:"4px 8px", borderRadius:6, border:"none", background:"#FEF2F2", color:"#ef4444", cursor:"pointer" }}>✕</button>
+            <img src={url} alt="" style={{ width:44,height:44,borderRadius:8,objectFit:"cover",flexShrink:0 }}/>
+            <input value={url} onChange={e => { const a=[...successImages]; a[i]=e.target.value; onChange({ ...content, successImages:a }); }} style={{ ...inp(), flex:1 }}/>
+            <button onClick={() => onChange({ ...content, successImages:successImages.filter((_,x)=>x!==i) })} style={{ padding:"4px 8px",borderRadius:6,border:"none",background:"#FEF2F2",color:"#ef4444",cursor:"pointer" }}>✕</button>
           </div>
         ))}
         <div style={{ display:"flex", gap:6, marginBottom:10 }}>
@@ -346,16 +402,12 @@ function BlankOptionsE({ content, onChange }) {
           <button onClick={() => { const u=window.prompt("Image URL:"); if(u) onChange({ ...content, successImages:[...successImages,u] }); }} style={mediaBtn("#6366f1")}><Link2 size={13}/> URL</button>
         </div>
 
-        <label style={lbl()}>Videos <span style={{ color:"#94A3B8", fontWeight:400 }}>· multiple</span></label>
-        {successVideos.map((url, i) => (
+        <label style={lbl()}>Videos</label>
+        {successVideos.map((url,i) => (
           <div key={i} style={{ display:"flex", gap:6, marginBottom:6, alignItems:"center" }}>
-            <div style={{ width:44, height:44, borderRadius:8, background:"#1f2937", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-              <Film size={18} color="#fff"/>
-            </div>
-            <input value={url} onChange={e => { const vids=[...successVideos]; vids[i]=e.target.value; onChange({ ...content, successVideos:vids }); }}
-              style={{ ...inp(), flex:1 }}/>
-            <button onClick={() => onChange({ ...content, successVideos:successVideos.filter((_,x)=>x!==i) })}
-              style={{ padding:"4px 8px", borderRadius:6, border:"none", background:"#FEF2F2", color:"#ef4444", cursor:"pointer" }}>✕</button>
+            <div style={{ width:44,height:44,borderRadius:8,background:"#1f2937",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0 }}><Film size={18} color="#fff"/></div>
+            <input value={url} onChange={e => { const a=[...successVideos]; a[i]=e.target.value; onChange({ ...content, successVideos:a }); }} style={{ ...inp(), flex:1 }}/>
+            <button onClick={() => onChange({ ...content, successVideos:successVideos.filter((_,x)=>x!==i) })} style={{ padding:"4px 8px",borderRadius:6,border:"none",background:"#FEF2F2",color:"#ef4444",cursor:"pointer" }}>✕</button>
           </div>
         ))}
         <div style={{ display:"flex", gap:6 }}>
@@ -365,11 +417,7 @@ function BlankOptionsE({ content, onChange }) {
       </div>
 
       {lib && <MediaLibrary accept={libFor}
-        onSelect={m => {
-          if(libFor==="image") onChange({ ...content, successImages:[...successImages, m.url] });
-          else onChange({ ...content, successVideos:[...successVideos, m.url] });
-          setLib(false);
-        }}
+        onSelect={m => { libFor==="image" ? onChange({ ...content, successImages:[...successImages,m.url] }) : onChange({ ...content, successVideos:[...successVideos,m.url] }); setLib(false); }}
         onClose={() => setLib(false)}/>}
     </div>
   );
