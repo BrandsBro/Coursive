@@ -37,71 +37,7 @@ export function BlockEditor({ block, onChange }) {
     case "fillblank": return <FillE {...props}/>;
     case "keypoints": return <KeyE {...props}/>;
     case "callout":   return <CalloutE {...props}/>;
-    case "blankoptions": {
-      const update = (key, val) => onChange({ ...block, content: { ...block.content, [key]: val } });
-      const sentence = block.content.sentence || "";
-      const blankWord = block.content.blankWord || "";
-      const wrongOptions = block.content.wrongOptions || ["", "", ""];
-
-      // Auto-generate prompt with ___ replacing the blank word
-      const prompt = blankWord && sentence.includes(blankWord)
-        ? sentence.replace(blankWord, "___")
-        : sentence;
-
-      return (
-        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-          {/* Full sentence */}
-          <div>
-            <p style={{ fontSize:11, fontWeight:700, color:"#374151", margin:"0 0 6px" }}>FULL SENTENCE</p>
-            <input value={sentence} onChange={e => update("sentence", e.target.value)}
-              placeholder="The capital of France is Paris"
-              style={{ width:"100%", padding:"9px 12px", borderRadius:9, border:"1.5px solid #E2E8F0", fontSize:14, boxSizing:"border-box" }}/>
-          </div>
-
-          {/* Word to blank */}
-          <div>
-            <p style={{ fontSize:11, fontWeight:700, color:"#374151", margin:"0 0 6px" }}>WORD TO BLANK (correct answer)</p>
-            <input value={blankWord} onChange={e => update("blankWord", e.target.value)}
-              placeholder="Paris"
-              style={{ width:"100%", padding:"9px 12px", borderRadius:9, border:"1.5px solid #22c55e", fontSize:14, boxSizing:"border-box" }}/>
-            {prompt && blankWord && (
-              <p style={{ fontSize:12, color:"#6366f1", margin:"6px 0 0" }}>Preview: <strong>{prompt}</strong></p>
-            )}
-          </div>
-
-          {/* Wrong options */}
-          <div>
-            <p style={{ fontSize:11, fontWeight:700, color:"#374151", margin:"0 0 6px" }}>WRONG OPTIONS (2-3 distractors)</p>
-            {wrongOptions.map((opt, i) => (
-              <input key={i} value={opt} onChange={e => {
-                const o = [...wrongOptions]; o[i] = e.target.value; update("wrongOptions", o);
-              }}
-                placeholder={"Wrong option " + (i+1) + " e.g. London"}
-                style={{ width:"100%", padding:"8px 10px", borderRadius:8, border:"1.5px solid #E2E8F0", fontSize:13, marginBottom:6, boxSizing:"border-box" }}/>
-            ))}
-          </div>
-
-          {/* Explanation */}
-          <div>
-            <p style={{ fontSize:11, fontWeight:700, color:"#374151", margin:"0 0 6px" }}>EXPLANATION (optional)</p>
-            <input value={block.content.explanation||""} onChange={e=>update("explanation",e.target.value)}
-              placeholder="Why this is correct..."
-              style={{ width:"100%", padding:"8px 10px", borderRadius:8, border:"1.5px solid #E2E8F0", fontSize:13, boxSizing:"border-box" }}/>
-          </div>
-
-          {/* Success media */}
-          <div style={{ paddingTop:10, borderTop:"1px solid #F1F5F9" }}>
-            <p style={{ fontSize:11, fontWeight:700, color:"#374151", margin:"0 0 6px" }}>🎉 SUCCESS MEDIA</p>
-            <input value={block.content.successImage||""} onChange={e=>update("successImage",e.target.value)}
-              placeholder="Image URL (shows when correct)"
-              style={{ width:"100%", padding:"8px 10px", borderRadius:8, border:"1.5px solid #E2E8F0", fontSize:13, marginBottom:6, boxSizing:"border-box" }}/>
-            <input value={block.content.successVideo||""} onChange={e=>update("successVideo",e.target.value)}
-              placeholder="Video URL (shows when correct)"
-              style={{ width:"100%", padding:"8px 10px", borderRadius:8, border:"1.5px solid #E2E8F0", fontSize:13, boxSizing:"border-box" }}/>
-          </div>
-        </div>
-      );
-    }
+    case "blankoptions": return <BlankOptionsE {...props}/>;
     case "divider":   return <DividerE {...props}/>;
     default: return null;
   }
@@ -318,6 +254,54 @@ function QuizE({ content, onChange }) {
         </div>
       </div>
       <div><label style={lbl()}>Explanation <span style={{ color:"#94A3B8", fontWeight:400 }}>· shown after</span></label><textarea value={content.explanation||""} onChange={e => onChange({ ...content, explanation:e.target.value })} placeholder="Why is this correct?" style={{ ...inp(), minHeight:60, resize:"vertical" }}/></div>
+    </div>
+  );
+}
+
+function BlankOptionsE({ content, onChange }) {
+  const wrongOptions = content.wrongOptions || ["", "", ""];
+  const sentence = content.sentence || "";
+  const blankWord = content.blankWord || "";
+  const prompt = blankWord && sentence.includes(blankWord)
+    ? sentence.replace(blankWord, "___")
+    : sentence;
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:12, paddingTop:12 }}>
+      <div>
+        <label style={lbl()}>Full Sentence</label>
+        <input value={sentence} onChange={e => onChange({ ...content, sentence:e.target.value })}
+          placeholder="The capital of France is Paris" style={inp()}/>
+      </div>
+      <div>
+        <label style={lbl()}>Word to Blank <span style={{ color:"#22c55e", fontWeight:600 }}>· correct answer</span></label>
+        <input value={blankWord} onChange={e => onChange({ ...content, blankWord:e.target.value })}
+          placeholder="Paris" style={{ ...inp(), borderColor:"#22c55e" }}/>
+        {prompt && blankWord && (
+          <p style={{ fontSize:12, color:"#6366f1", margin:"6px 0 0" }}>Preview: <strong>{prompt}</strong></p>
+        )}
+      </div>
+      <div>
+        <label style={lbl()}>Wrong Options <span style={{ color:"#94A3B8", fontWeight:400 }}>· 2-3 distractors</span></label>
+        {wrongOptions.map((opt, i) => (
+          <input key={i} value={opt}
+            onChange={e => { const o=[...wrongOptions]; o[i]=e.target.value; onChange({ ...content, wrongOptions:o }); }}
+            placeholder={"Wrong option " + (i+1) + " e.g. London"}
+            style={{ ...inp(), marginBottom:6 }}/>
+        ))}
+      </div>
+      <div>
+        <label style={lbl()}>Explanation <span style={{ color:"#94A3B8", fontWeight:400 }}>· optional</span></label>
+        <input value={content.explanation||""} onChange={e => onChange({ ...content, explanation:e.target.value })}
+          placeholder="Why this is correct..." style={inp()}/>
+      </div>
+      <div style={{ paddingTop:10, borderTop:"1px solid #F1F5F9" }}>
+        <label style={lbl()}>🎉 Success Image <span style={{ color:"#94A3B8", fontWeight:400 }}>· shows when correct</span></label>
+        <input value={content.successImage||""} onChange={e => onChange({ ...content, successImage:e.target.value })}
+          placeholder="Image URL" style={{ ...inp(), marginBottom:6 }}/>
+        <label style={lbl()}>🎬 Success Video</label>
+        <input value={content.successVideo||""} onChange={e => onChange({ ...content, successVideo:e.target.value })}
+          placeholder="YouTube or video URL" style={inp()}/>
+      </div>
     </div>
   );
 }
