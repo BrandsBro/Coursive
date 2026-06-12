@@ -362,45 +362,83 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       );
     }
     case "blankoptions": {
+      const sentence = c.sentence || "";
+      const blankWord = c.blankWord || "";
+      const wrongOptions = (c.wrongOptions || []).filter(Boolean);
+      
+      // Build shuffled options: correct + wrong ones
+      const allOptions = [blankWord, ...wrongOptions]
+        .filter(Boolean)
+        .sort(() => {
+          // Use a stable shuffle based on block idx
+          const seed = idx * 9301 + 49297;
+          return (seed % 233280) / 233280 - 0.5;
+        });
+
+      // Derive prompt
+      const prompt = blankWord && sentence.includes(blankWord)
+        ? sentence.replace(blankWord, "___")
+        : sentence + " ___";
+
       const selected = answers["bo_"+idx];
       const isChecked = checked["bo_"+idx];
-      const isCorrect = selected === c.correct;
-      const showAnswer = fillShowAnswer?.["bo_"+idx];
-      const options = c.options || [];
+      const isCorrect = selected === blankWord;
+      const showAns = fillShowAnswer?.["bo_"+idx];
+
       return (
         <div style={{ background:"#F0F9FF", borderRadius:20, padding:24, border:"1.5px solid #BAE6FD" }}>
-          <p style={{ fontSize:12, fontWeight:700, color:"#0369a1", margin:"0 0 14px", letterSpacing:0.5 }}>✏️ FILL IN THE BLANK</p>
+          <p style={{ fontSize:12, fontWeight:700, color:"#0369a1", margin:"0 0 16px", letterSpacing:0.5 }}>✏️ FILL IN THE BLANK</p>
 
-          {/* Prompt with blank */}
-          <p style={{ fontSize:17, color:"#0f172a", margin:"0 0 20px", lineHeight:1.7, fontWeight:500 }}>
-            {(c.prompt||"").split("___").map((part, i, arr) => (
+          {/* Sentence with blank */}
+          <p style={{ fontSize:18, color:"#0f172a", margin:"0 0 24px", lineHeight:1.7, fontWeight:500 }}>
+            {prompt.split("___").map((part, i, arr) => (
               <span key={i}>
                 {part}
-                {i < arr.length-1 && (
+                {i < arr.length - 1 && (
                   <span style={{
-                    display:"inline-block", minWidth:120, padding:"2px 12px",
-                    borderBottom: isChecked ? "2px solid "+(isCorrect?"#22c55e":"#ef4444") : "2px dashed #0891b2",
-                    color: isChecked ? (isCorrect?"#166534":"#991B1B") : selected!==undefined ? "#0369a1" : "#94A3B8",
-                    fontWeight:700, textAlign:"center", fontSize:17
+                    display:"inline-block",
+                    minWidth:100,
+                    padding:"3px 16px",
+                    margin:"0 4px",
+                    borderRadius:8,
+                    border: isChecked
+                      ? "2px solid " + (isCorrect ? "#22c55e" : "#ef4444")
+                      : selected ? "2px solid #0891b2" : "2px dashed #93c5fd",
+                    background: isChecked
+                      ? isCorrect ? "#F0FDF4" : "#FEF2F2"
+                      : selected ? "#E0F2FE" : "#fff",
+                    color: isChecked
+                      ? isCorrect ? "#166534" : "#991B1B"
+                      : selected ? "#0369a1" : "#94A3B8",
+                    fontWeight: 700,
+                    fontSize: 17,
+                    textAlign: "center",
+                    transition: "all 0.2s",
                   }}>
-                    {selected !== undefined ? options[selected] : "______"}
+                    {selected || "______"}
                   </span>
                 )}
               </span>
             ))}
           </p>
 
-          {/* Options */}
+          {/* Option buttons */}
           {!isChecked && (
-            <div style={{ display:"flex", flexWrap:"wrap", gap:10, marginBottom:16 }}>
-              {options.map((opt, i) => (
-                <button key={i} onClick={() => setAnswers(p=>({...p,["bo_"+idx]:i}))}
+            <div style={{ display:"flex", flexWrap:"wrap", gap:10, marginBottom:20 }}>
+              {allOptions.map((opt, i) => (
+                <button key={i}
+                  onClick={() => setAnswers(p => ({...p, ["bo_"+idx]: selected === opt ? undefined : opt}))}
                   style={{
-                    padding:"10px 20px", borderRadius:12,
-                    border: selected===i ? "2px solid #0891b2" : "1.5px solid #BAE6FD",
-                    background: selected===i ? "#E0F2FE" : "#fff",
-                    color: selected===i ? "#0369a1" : "#374151",
-                    fontSize:14, fontWeight:600, cursor:"pointer", transition:"all 0.15s"
+                    padding:"12px 22px",
+                    borderRadius:14,
+                    border: selected === opt ? "2px solid #0891b2" : "2px solid #BAE6FD",
+                    background: selected === opt ? "#E0F2FE" : "#fff",
+                    color: selected === opt ? "#0369a1" : "#374151",
+                    fontSize:15,
+                    fontWeight:700,
+                    cursor:"pointer",
+                    transition:"all 0.15s",
+                    boxShadow: selected === opt ? "0 2px 8px rgba(8,145,178,0.2)" : "none",
                   }}>
                   {opt}
                 </button>
@@ -409,10 +447,10 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
           )}
 
           {/* Check button */}
-          {!isChecked && selected !== undefined && (
-            <button onClick={() => setChecked(p=>({...p,["bo_"+idx]:true}))}
-              style={{ padding:"11px 24px", borderRadius:11, border:"none", background:"linear-gradient(135deg,#0891b2,#0369a1)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(8,145,178,0.3)" }}>
-              Check Answer
+          {!isChecked && selected && (
+            <button onClick={() => setChecked(p => ({...p, ["bo_"+idx]: true}))}
+              style={{ padding:"12px 28px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#0891b2,#0369a1)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(8,145,178,0.3)" }}>
+              Check Answer ✓
             </button>
           )}
 
@@ -421,19 +459,19 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
             <div>
               {isCorrect ? (
                 <div>
-                  <div style={{ padding:"12px 16px", borderRadius:12, background:"#F0FDF4", border:"1.5px solid #86efac", marginBottom:16 }}>
-                    <p style={{ fontSize:15, fontWeight:800, color:"#166534", margin:"0 0 2px" }}>🎉 Correct!</p>
+                  <div style={{ padding:"14px 18px", borderRadius:14, background:"#F0FDF4", border:"2px solid #86efac", marginBottom:16 }}>
+                    <p style={{ fontSize:16, fontWeight:800, color:"#166534", margin:"0 0 2px" }}>🎉 Correct!</p>
                     {c.explanation && <p style={{ fontSize:13, color:"#166534", margin:0 }}>{c.explanation}</p>}
                   </div>
                   {c.successImage && (
                     <img src={c.successImage} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12 }}/>
                   )}
                   {c.successVideo && (
-                    <div style={{ borderRadius:16, overflow:"hidden", aspectRatio:"16/9", background:"#000", marginBottom:12 }}>
-                      {c.successVideo.includes("youtube")||c.successVideo.includes("youtu.be") ? (
+                    <div style={{ borderRadius:16, overflow:"hidden", aspectRatio:"16/9", background:"#000" }}>
+                      {c.successVideo.includes("youtube") || c.successVideo.includes("youtu.be") ? (
                         <iframe width="100%" height="100%"
-                          src={"https://www.youtube.com/embed/"+(c.successVideo.split("v=")[1]?.split("&")[0]||c.successVideo.split("youtu.be/")[1]?.split("?")[0])}
-                          style={{ border:"none" }} allowFullScreen/>
+                          src={"https://www.youtube.com/embed/" + (c.successVideo.split("v=")[1]?.split("&")[0] || c.successVideo.split("youtu.be/")[1]?.split("?")[0])}
+                          style={{ border:"none", display:"block" }} allowFullScreen/>
                       ) : (
                         <video src={c.successVideo} controls autoPlay style={{ width:"100%", height:"100%" }}/>
                       )}
@@ -442,24 +480,24 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
                 </div>
               ) : (
                 <div>
-                  <div style={{ padding:"12px 16px", borderRadius:12, background:"#FEF2F2", border:"1.5px solid #fca5a5", marginBottom:14 }}>
-                    <p style={{ fontSize:15, fontWeight:800, color:"#991B1B", margin:"0 0 2px" }}>❌ Not quite!</p>
-                    <p style={{ fontSize:13, color:"#991B1B", margin:0 }}>Try again or see the correct answer.</p>
+                  <div style={{ padding:"14px 18px", borderRadius:14, background:"#FEF2F2", border:"2px solid #fca5a5", marginBottom:14 }}>
+                    <p style={{ fontSize:16, fontWeight:800, color:"#991B1B", margin:"0 0 2px" }}>❌ Not quite!</p>
+                    <p style={{ fontSize:13, color:"#991B1B", margin:0 }}>Give it another try!</p>
                   </div>
                   <div style={{ display:"flex", gap:10 }}>
                     <button onClick={() => { setChecked(p=>({...p,["bo_"+idx]:false})); setAnswers(p=>({...p,["bo_"+idx]:undefined})); }}
-                      style={{ flex:1, padding:"11px", borderRadius:11, border:"1.5px solid #BAE6FD", background:"#fff", fontSize:13, fontWeight:700, color:"#0891b2", cursor:"pointer" }}>
+                      style={{ flex:1, padding:"12px", borderRadius:12, border:"2px solid #BAE6FD", background:"#fff", fontSize:14, fontWeight:700, color:"#0891b2", cursor:"pointer" }}>
                       🔄 Try Again
                     </button>
                     <button onClick={() => setFillShowAnswer(p=>({...p,["bo_"+idx]:true}))}
-                      style={{ flex:1, padding:"11px", borderRadius:11, border:"none", background:"linear-gradient(135deg,#374151,#1f2937)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                      style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"#1f2937", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
                       👁 See Answer
                     </button>
                   </div>
-                  {showAnswer && (
-                    <div style={{ marginTop:12, padding:"12px 16px", borderRadius:12, background:"#F8FAFC", border:"1.5px solid #E2E8F0" }}>
-                      <p style={{ fontSize:13, color:"#374151", margin:0 }}>
-                        ✅ Correct answer: <strong style={{ color:"#166534" }}>{options[c.correct]}</strong>
+                  {showAns && (
+                    <div style={{ marginTop:12, padding:"12px 16px", borderRadius:12, background:"#F0FDF4", border:"1.5px solid #86efac" }}>
+                      <p style={{ fontSize:14, color:"#166534", margin:0, fontWeight:600 }}>
+                        ✅ Answer: <strong>{blankWord}</strong>
                       </p>
                     </div>
                   )}
