@@ -17,7 +17,8 @@ export const BLOCK_DEFS = {
   fillblank: { icon:"✏️", label:"Fill Blank",desc:"Type the answer",  color:"#db2777", bg:"#FDF2F8", default:{ prompt:"", answer:"", hint:"" },                preview:c=>c.prompt||"No prompt" },
   keypoints: { icon:"⭐", label:"Key Points",desc:"Bullet list",      color:"#0d9488", bg:"#F0FDFA", default:{ title:"Key Takeaways", points:["","",""] },     preview:c=>(c.points||[]).filter(Boolean).join(", ")||"No points" },
   callout:   { icon:"💡", label:"Callout",   desc:"Highlight box",    color:"#65a30d", bg:"#F7FEE7", default:{ text:"", style:"info" },                        preview:c=>c.text||"Empty callout" },
-  divider:   { icon:"➖", label:"Divider",   desc:"Visual break",     color:"#64748b", bg:"#F8FAFC", default:{ style:"line" },                                 preview:()=>"Section divider" },
+  divider:      { icon:"➖", label:"Divider",       desc:"Visual break",        color:"#64748b", bg:"#F8FAFC", default:{ style:"line" },                                                          preview:()=>"Section divider" },
+  blankoptions: { icon:"🔤", label:"Blank + Options", desc:"Pick word from sentence", color:"#0891b2", bg:"#E0F2FE", default:{ sentence:"", blankWord:"", wrongOptions:["","",""], explanation:"" }, preview:c=>c.sentence||"No sentence" },
 };
 
 // ─────────────────────────────────────────────
