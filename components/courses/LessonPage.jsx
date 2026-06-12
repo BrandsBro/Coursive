@@ -363,166 +363,147 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
     }
     case "blankoptions": {
       const sentence = c.sentence || "";
-      const blankWord = c.blankWord || "";
-      const wrongOptions = (c.wrongOptions || []).filter(Boolean);
-      
-      // Build shuffled options: correct + wrong ones
-      const allOptions = [blankWord, ...wrongOptions]
-        .filter(Boolean)
-        .sort(() => {
-          // Use a stable shuffle based on block idx
-          const seed = idx * 9301 + 49297;
-          return (seed % 233280) / 233280 - 0.5;
-        });
+      const blanks = c.blanks || [];
+      const parts = sentence.split("___");
+      const blankCount = parts.length - 1;
 
-      // Derive prompt
-      const prompt = blankWord && sentence.includes(blankWord)
-        ? sentence.replace(blankWord, "___")
-        : sentence + " ___";
-
-      const selected = answers["bo_"+idx];
+      // Per-blank state
+      const selectedMap = answers["bo_"+idx] || {};
       const isChecked = checked["bo_"+idx];
-      const isCorrect = selected === blankWord;
       const showAns = fillShowAnswer?.["bo_"+idx];
+
+      // Check if all blanks correct
+      const allCorrect = blanks.length > 0 && blanks.every((b, i) => selectedMap[i] === b.correct);
+      const allFilled = blankCount > 0 && Object.keys(selectedMap).length === blankCount;
+
+      // Build shuffled options per blank
+      const getOptions = (blankIdx) => {
+        const b = blanks[blankIdx];
+        if (!b) return [];
+        const all = [b.correct, ...(b.wrongOptions||[]).filter(Boolean)];
+        const seed = (idx * 100 + blankIdx) * 9301 + 49297;
+        return all.sort((a,b) => ((seed % 233280)/233280) - 0.5);
+      };
 
       return (
         <div style={{ background:"#F0F9FF", borderRadius:20, padding:24, border:"1.5px solid #BAE6FD" }}>
-          <p style={{ fontSize:12, fontWeight:700, color:"#0369a1", margin:"0 0 16px", letterSpacing:0.5 }}>✏️ FILL IN THE BLANK</p>
+          <p style={{ fontSize:12, fontWeight:700, color:"#0369a1", margin:"0 0 16px", letterSpacing:0.5 }}>✏️ FILL IN THE BLANK{blankCount > 1 ? "S" : ""}</p>
 
-          {/* Sentence with blank */}
-          <p style={{ fontSize:18, color:"#0f172a", margin:"0 0 24px", lineHeight:1.7, fontWeight:500 }}>
-            {prompt.split("___").map((part, i, arr) => (
+          {/* Sentence with blanks */}
+          <p style={{ fontSize:18, color:"#0f172a", margin:"0 0 24px", lineHeight:2, fontWeight:500, flexWrap:"wrap" }}>
+            {parts.map((part, i) => (
               <span key={i}>
                 {part}
-                {i < arr.length - 1 && (
+                {i < parts.length - 1 && (
                   <span style={{
-                    display:"inline-block",
-                    minWidth:100,
-                    padding:"3px 16px",
-                    margin:"0 4px",
+                    display:"inline-block", minWidth:90, padding:"3px 14px", margin:"0 4px",
                     borderRadius:8,
                     border: isChecked
-                      ? "2px solid " + (isCorrect ? "#22c55e" : "#ef4444")
-                      : selected ? "2px solid #0891b2" : "2px dashed #93c5fd",
+                      ? "2px solid " + (selectedMap[i] === (blanks[i]?.correct) ? "#22c55e" : "#ef4444")
+                      : selectedMap[i] ? "2px solid #0891b2" : "2px dashed #93c5fd",
                     background: isChecked
-                      ? isCorrect ? "#F0FDF4" : "#FEF2F2"
-                      : selected ? "#E0F2FE" : "#fff",
+                      ? selectedMap[i] === (blanks[i]?.correct) ? "#F0FDF4" : "#FEF2F2"
+                      : selectedMap[i] ? "#E0F2FE" : "#fff",
                     color: isChecked
-                      ? isCorrect ? "#166534" : "#991B1B"
-                      : selected ? "#0369a1" : "#94A3B8",
-                    fontWeight: 700,
-                    fontSize: 17,
-                    textAlign: "center",
-                    transition: "all 0.2s",
+                      ? selectedMap[i] === (blanks[i]?.correct) ? "#166534" : "#991B1B"
+                      : selectedMap[i] ? "#0369a1" : "#94A3B8",
+                    fontWeight:700, fontSize:17, textAlign:"center", transition:"all 0.2s",
                   }}>
-                    {selected || "______"}
+                    {selectedMap[i] || "______"}
                   </span>
                 )}
               </span>
             ))}
           </p>
 
-          {/* Option buttons */}
+          {/* Options per blank */}
           {!isChecked && (
-            <div style={{ display:"flex", flexWrap:"wrap", gap:10, marginBottom:20 }}>
-              {allOptions.map((opt, i) => (
-                <button key={i}
-                  onClick={() => setAnswers(p => ({...p, ["bo_"+idx]: selected === opt ? undefined : opt}))}
-                  style={{
-                    padding:"12px 22px",
-                    borderRadius:14,
-                    border: selected === opt ? "2px solid #0891b2" : "2px solid #BAE6FD",
-                    background: selected === opt ? "#E0F2FE" : "#fff",
-                    color: selected === opt ? "#0369a1" : "#374151",
-                    fontSize:15,
-                    fontWeight:700,
-                    cursor:"pointer",
-                    transition:"all 0.15s",
-                    boxShadow: selected === opt ? "0 2px 8px rgba(8,145,178,0.2)" : "none",
-                  }}>
-                  {opt}
-                </button>
+            <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+              {Array.from({ length: blankCount }, (_, i) => (
+                <div key={i}>
+                  {blankCount > 1 && (
+                    <p style={{ fontSize:11, fontWeight:700, color:"#0369a1", margin:"0 0 8px" }}>BLANK {i+1}</p>
+                  )}
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+                    {getOptions(i).map((opt, j) => (
+                      <button key={j}
+                        onClick={() => setAnswers(p => ({ ...p, ["bo_"+idx]: { ...selectedMap, [i]: selectedMap[i]===opt ? undefined : opt } }))}
+                        style={{
+                          padding:"10px 20px", borderRadius:12,
+                          border: selectedMap[i] === opt ? "2px solid #0891b2" : "2px solid #BAE6FD",
+                          background: selectedMap[i] === opt ? "#E0F2FE" : "#fff",
+                          color: selectedMap[i] === opt ? "#0369a1" : "#374151",
+                          fontSize:15, fontWeight:700, cursor:"pointer", transition:"all 0.15s",
+                        }}>
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           )}
 
           {/* Check button */}
-          {!isChecked && selected && (
+          {!isChecked && allFilled && (
             <button onClick={() => setChecked(p => ({...p, ["bo_"+idx]: true}))}
-              style={{ padding:"12px 28px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#0891b2,#0369a1)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(8,145,178,0.3)" }}>
+              style={{ marginTop:16, padding:"12px 28px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#0891b2,#0369a1)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(8,145,178,0.3)" }}>
               Check Answer ✓
             </button>
           )}
 
           {/* Result */}
           {isChecked && (
-            <div>
-              {isCorrect ? (
+            <div style={{ marginTop:16 }}>
+              {allCorrect ? (
                 <div>
                   <div style={{ padding:"14px 18px", borderRadius:14, background:"#F0FDF4", border:"2px solid #86efac", marginBottom:16 }}>
-                    <p style={{ fontSize:16, fontWeight:800, color:"#166534", margin:"0 0 2px" }}>🎉 Correct!</p>
+                    <p style={{ fontSize:16, fontWeight:800, color:"#166534", margin:"0 0 2px" }}>🎉 {blankCount > 1 ? "All correct!" : "Correct!"}</p>
                     {c.explanation && <p style={{ fontSize:13, color:"#166534", margin:0 }}>{c.explanation}</p>}
                   </div>
-                  {/* Success text */}
                   {c.successText && (
                     <div style={{ padding:"14px 16px", borderRadius:12, background:"#F0F9FF", border:"1.5px solid #BAE6FD", marginBottom:12 }}>
                       <p style={{ fontSize:14, color:"#0369a1", margin:0, lineHeight:1.65 }}>{c.successText}</p>
                     </div>
                   )}
-                  {/* Success images - multiple */}
                   {(c.successImages||[]).filter(Boolean).map((url, i) => (
                     <img key={i} src={url} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12 }}/>
                   ))}
-                  {/* Legacy single image */}
-                  {c.successImage && !(c.successImages||[]).length && (
-                    <img src={c.successImage} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12 }}/>
-                  )}
-                  {/* Success videos - multiple */}
                   {(c.successVideos||[]).filter(Boolean).map((url, i) => (
                     <div key={i} style={{ borderRadius:16, overflow:"hidden", aspectRatio:"16/9", background:"#000", marginBottom:12 }}>
                       {url.includes("youtube")||url.includes("youtu.be") ? (
                         <iframe width="100%" height="100%"
                           src={"https://www.youtube.com/embed/"+(url.split("v=")[1]?.split("&")[0]||url.split("youtu.be/")[1]?.split("?")[0])}
-                          style={{ border:"none", display:"block" }} allowFullScreen/>
+                          style={{ border:"none" }} allowFullScreen/>
                       ) : (
                         <video src={url} controls autoPlay style={{ width:"100%", height:"100%" }}/>
                       )}
                     </div>
                   ))}
-                  {/* Legacy single video */}
-                  {c.successVideo && !(c.successVideos||[]).length && (
-                    <div style={{ borderRadius:16, overflow:"hidden", aspectRatio:"16/9", background:"#000" }}>
-                      {c.successVideo.includes("youtube")||c.successVideo.includes("youtu.be") ? (
-                        <iframe width="100%" height="100%"
-                          src={"https://www.youtube.com/embed/"+(c.successVideo.split("v=")[1]?.split("&")[0]||c.successVideo.split("youtu.be/")[1]?.split("?")[0])}
-                          style={{ border:"none", display:"block" }} allowFullScreen/>
-                      ) : (
-                        <video src={c.successVideo} controls autoPlay style={{ width:"100%", height:"100%" }}/>
-                      )}
-                    </div>
-                  )}
                 </div>
               ) : (
                 <div>
                   <div style={{ padding:"14px 18px", borderRadius:14, background:"#FEF2F2", border:"2px solid #fca5a5", marginBottom:14 }}>
                     <p style={{ fontSize:16, fontWeight:800, color:"#991B1B", margin:"0 0 2px" }}>❌ Not quite!</p>
-                    <p style={{ fontSize:13, color:"#991B1B", margin:0 }}>Give it another try!</p>
+                    <p style={{ fontSize:13, color:"#991B1B", margin:0 }}>Some blanks are incorrect. Try again!</p>
                   </div>
                   <div style={{ display:"flex", gap:10 }}>
-                    <button onClick={() => { setChecked(p=>({...p,["bo_"+idx]:false})); setAnswers(p=>({...p,["bo_"+idx]:undefined})); }}
+                    <button onClick={() => { setChecked(p=>({...p,["bo_"+idx]:false})); setAnswers(p=>({...p,["bo_"+idx]:{}})); }}
                       style={{ flex:1, padding:"12px", borderRadius:12, border:"2px solid #BAE6FD", background:"#fff", fontSize:14, fontWeight:700, color:"#0891b2", cursor:"pointer" }}>
                       🔄 Try Again
                     </button>
                     <button onClick={() => setFillShowAnswer(p=>({...p,["bo_"+idx]:true}))}
                       style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"#1f2937", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
-                      👁 See Answer
+                      👁 See Answers
                     </button>
                   </div>
                   {showAns && (
-                    <div style={{ marginTop:12, padding:"12px 16px", borderRadius:12, background:"#F0FDF4", border:"1.5px solid #86efac" }}>
-                      <p style={{ fontSize:14, color:"#166534", margin:0, fontWeight:600 }}>
-                        ✅ Answer: <strong>{blankWord}</strong>
-                      </p>
+                    <div style={{ marginTop:12, padding:"14px 16px", borderRadius:12, background:"#F0FDF4", border:"1.5px solid #86efac" }}>
+                      {blanks.map((b, i) => (
+                        <p key={i} style={{ fontSize:14, color:"#166534", margin:"0 0 4px", fontWeight:600 }}>
+                          Blank {i+1}: <strong>{b.correct}</strong>
+                        </p>
+                      ))}
                     </div>
                   )}
                 </div>
