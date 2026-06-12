@@ -23,6 +23,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   const [checked, setChecked] = useState({});
   const [fillInputs, setFillInputs] = useState({});
   const [fillChecked, setFillChecked] = useState({});
+  const [fillShowAnswer, setFillShowAnswer] = useState({});
   const [completed, setCompleted] = useState(false);
   const [showComplete, setShowComplete] = useState(false);
   const [listenMode, setListenMode] = useState(false);
@@ -116,6 +117,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
               checked={checked} setChecked={setChecked}
               fillInputs={fillInputs} setFillInputs={setFillInputs}
               fillChecked={fillChecked} setFillChecked={setFillChecked}
+              fillShowAnswer={fillShowAnswer} setFillShowAnswer={setFillShowAnswer}
             />
           ))}
         </div>
@@ -173,7 +175,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   );
 }
 
-function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fillInputs, setFillInputs, fillChecked, setFillChecked }) {
+function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fillInputs, setFillInputs, fillChecked, setFillChecked, fillShowAnswer, setFillShowAnswer }) {
   const c = block.content || block;
 
   switch (block.type) {
@@ -265,20 +267,206 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       );
     }
     case "fillblank": {
-      const val = fillInputs[idx]||"";
+      const val = fillInputs[idx] || "";
       const isChecked = fillChecked[idx];
-      const isCorrect = val.trim().toLowerCase()===(c.answer||"").trim().toLowerCase();
+      const isCorrect = val.trim().toLowerCase() === (c.answer||"").trim().toLowerCase();
+      const showAnswer = fillShowAnswer?.[idx];
       return (
         <div style={{ background:"#FDF2F8", borderRadius:20, padding:24, border:"1.5px solid #FBCFE8" }}>
           <p style={{ fontSize:12, fontWeight:700, color:"#9d174d", margin:"0 0 12px", letterSpacing:0.5 }}>✏️ FILL IN THE BLANK</p>
+          
+          {/* Prompt with blank */}
           <p style={{ fontSize:16, color:"#0f172a", margin:"0 0 16px", lineHeight:1.6 }}>
             {(c.prompt||"").split("___").map((part, i, arr) => (
-              <span key={i}>{part}{i<arr.length-1&&<input value={val} onChange={e=>!isChecked&&setFillInputs(p=>({...p,[idx]:e.target.value}))} placeholder="type answer..." style={{ display:"inline-block", width:140, borderBottom:"2px solid "+(isChecked?isCorrect?"#22c55e":"#ef4444":"#db2777"), border:"none", borderBottom:"2px solid "+(isChecked?isCorrect?"#22c55e":"#ef4444":"#db2777"), outline:"none", fontSize:16, fontWeight:700, color:"#db2777", textAlign:"center", background:"transparent", padding:"2px 4px" }}/>}</span>
+              <span key={i}>{part}{i < arr.length-1 && (
+                <input
+                  value={val}
+                  onChange={e => !isChecked && setFillInputs(p => ({...p,[idx]:e.target.value}))}
+                  onKeyDown={e => e.key==="Enter" && val && !isChecked && setFillChecked(p=>({...p,[idx]:true}))}
+                  placeholder="type answer..."
+                  disabled={isChecked}
+                  style={{ display:"inline-block", width:160, borderBottom:"2px solid "+(isChecked?isCorrect?"#22c55e":"#ef4444":"#db2777"), border:"none", borderBottom:"2px solid "+(isChecked?isCorrect?"#22c55e":"#ef4444":"#db2777"), outline:"none", fontSize:16, fontWeight:700, color:isChecked?isCorrect?"#166534":"#991B1B":"#db2777", textAlign:"center", background:"transparent", padding:"2px 4px" }}
+                />
+              )}</span>
             ))}
           </p>
-          {c.hint&&!isChecked&&<p style={{ fontSize:13, color:"#be185d", margin:"0 0 14px" }}>💡 Hint: {c.hint}</p>}
-          {!isChecked&&val&&<button onClick={()=>setFillChecked(p=>({...p,[idx]:true}))} style={{ padding:"10px 20px", borderRadius:10, border:"none", background:"linear-gradient(135deg,#db2777,#9d174d)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>Check</button>}
-          {isChecked&&<div style={{ padding:"12px 16px", borderRadius:12, background:isCorrect?"#F0FDF4":"#FEF2F2", border:"1.5px solid "+(isCorrect?"#86efac":"#fca5a5") }}><p style={{ fontSize:14, fontWeight:700, color:isCorrect?"#166534":"#991B1B", margin:0 }}>{isCorrect?"🎉 Correct!":"❌ Answer: "+c.answer}</p></div>}
+
+          {/* Hint */}
+          {c.hint && !isChecked && (
+            <p style={{ fontSize:13, color:"#be185d", margin:"0 0 14px" }}>💡 Hint: {c.hint}</p>
+          )}
+
+          {/* Check button */}
+          {!isChecked && val && (
+            <button onClick={() => setFillChecked(p=>({...p,[idx]:true}))}
+              style={{ padding:"10px 20px", borderRadius:10, border:"none", background:"linear-gradient(135deg,#db2777,#9d174d)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+              Check
+            </button>
+          )}
+
+          {/* Result */}
+          {isChecked && (
+            <div>
+              {isCorrect ? (
+                <div>
+                  <div style={{ padding:"12px 16px", borderRadius:12, background:"#F0FDF4", border:"1.5px solid #86efac", marginBottom:16 }}>
+                    <p style={{ fontSize:15, fontWeight:800, color:"#166534", margin:"0 0 2px" }}>🎉 Correct!</p>
+                    <p style={{ fontSize:13, color:"#166534", margin:0 }}>Great job!</p>
+                  </div>
+                  {/* Success media */}
+                  {c.successImage && (
+                    <div style={{ borderRadius:16, overflow:"hidden", marginBottom:12 }}>
+                      <img src={c.successImage} alt="Success" style={{ width:"100%", display:"block", borderRadius:16 }}/>
+                    </div>
+                  )}
+                  {c.successVideo && (
+                    <div style={{ borderRadius:16, overflow:"hidden", marginBottom:12, aspectRatio:"16/9", background:"#000" }}>
+                      {c.successVideo.includes("youtube") || c.successVideo.includes("youtu.be") ? (
+                        <iframe width="100%" height="100%"
+                          src={"https://www.youtube.com/embed/" + (c.successVideo.split("v=")[1]?.split("&")[0] || c.successVideo.split("youtu.be/")[1]?.split("?")[0])}
+                          style={{ border:"none", display:"block" }} allowFullScreen/>
+                      ) : (
+                        <video src={c.successVideo} controls autoPlay style={{ width:"100%", height:"100%" }}/>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <div style={{ padding:"12px 16px", borderRadius:12, background:"#FEF2F2", border:"1.5px solid #fca5a5", marginBottom:14 }}>
+                    <p style={{ fontSize:15, fontWeight:800, color:"#991B1B", margin:"0 0 2px" }}>❌ Not quite!</p>
+                    <p style={{ fontSize:13, color:"#991B1B", margin:0 }}>Give it another shot or peek at the answer.</p>
+                  </div>
+                  <div style={{ display:"flex", gap:10 }}>
+                    <button onClick={() => { setFillChecked(p=>({...p,[idx]:false})); setFillInputs(p=>({...p,[idx]:""})); }}
+                      style={{ flex:1, padding:"11px", borderRadius:11, border:"1.5px solid #FBCFE8", background:"#fff", fontSize:13, fontWeight:700, color:"#db2777", cursor:"pointer" }}>
+                      🔄 Try Again
+                    </button>
+                    <button onClick={() => setFillShowAnswer(p=>({...p,[idx]:true}))}
+                      style={{ flex:1, padding:"11px", borderRadius:11, border:"none", background:"linear-gradient(135deg,#374151,#1f2937)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                      👁 See Answer
+                    </button>
+                  </div>
+                  {showAnswer && (
+                    <div style={{ marginTop:12, padding:"12px 16px", borderRadius:12, background:"#F8FAFC", border:"1.5px solid #E2E8F0" }}>
+                      <p style={{ fontSize:13, color:"#374151", margin:0 }}>
+                        ✅ The answer is: <strong style={{ color:"#166534" }}>{c.answer}</strong>
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    }
+    case "blankoptions": {
+      const selected = answers["bo_"+idx];
+      const isChecked = checked["bo_"+idx];
+      const isCorrect = selected === c.correct;
+      const showAnswer = fillShowAnswer?.["bo_"+idx];
+      const options = c.options || [];
+      return (
+        <div style={{ background:"#F0F9FF", borderRadius:20, padding:24, border:"1.5px solid #BAE6FD" }}>
+          <p style={{ fontSize:12, fontWeight:700, color:"#0369a1", margin:"0 0 14px", letterSpacing:0.5 }}>✏️ FILL IN THE BLANK</p>
+
+          {/* Prompt with blank */}
+          <p style={{ fontSize:17, color:"#0f172a", margin:"0 0 20px", lineHeight:1.7, fontWeight:500 }}>
+            {(c.prompt||"").split("___").map((part, i, arr) => (
+              <span key={i}>
+                {part}
+                {i < arr.length-1 && (
+                  <span style={{
+                    display:"inline-block", minWidth:120, padding:"2px 12px",
+                    borderBottom: isChecked ? "2px solid "+(isCorrect?"#22c55e":"#ef4444") : "2px dashed #0891b2",
+                    color: isChecked ? (isCorrect?"#166534":"#991B1B") : selected!==undefined ? "#0369a1" : "#94A3B8",
+                    fontWeight:700, textAlign:"center", fontSize:17
+                  }}>
+                    {selected !== undefined ? options[selected] : "______"}
+                  </span>
+                )}
+              </span>
+            ))}
+          </p>
+
+          {/* Options */}
+          {!isChecked && (
+            <div style={{ display:"flex", flexWrap:"wrap", gap:10, marginBottom:16 }}>
+              {options.map((opt, i) => (
+                <button key={i} onClick={() => setAnswers(p=>({...p,["bo_"+idx]:i}))}
+                  style={{
+                    padding:"10px 20px", borderRadius:12,
+                    border: selected===i ? "2px solid #0891b2" : "1.5px solid #BAE6FD",
+                    background: selected===i ? "#E0F2FE" : "#fff",
+                    color: selected===i ? "#0369a1" : "#374151",
+                    fontSize:14, fontWeight:600, cursor:"pointer", transition:"all 0.15s"
+                  }}>
+                  {opt}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Check button */}
+          {!isChecked && selected !== undefined && (
+            <button onClick={() => setChecked(p=>({...p,["bo_"+idx]:true}))}
+              style={{ padding:"11px 24px", borderRadius:11, border:"none", background:"linear-gradient(135deg,#0891b2,#0369a1)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(8,145,178,0.3)" }}>
+              Check Answer
+            </button>
+          )}
+
+          {/* Result */}
+          {isChecked && (
+            <div>
+              {isCorrect ? (
+                <div>
+                  <div style={{ padding:"12px 16px", borderRadius:12, background:"#F0FDF4", border:"1.5px solid #86efac", marginBottom:16 }}>
+                    <p style={{ fontSize:15, fontWeight:800, color:"#166534", margin:"0 0 2px" }}>🎉 Correct!</p>
+                    {c.explanation && <p style={{ fontSize:13, color:"#166534", margin:0 }}>{c.explanation}</p>}
+                  </div>
+                  {c.successImage && (
+                    <img src={c.successImage} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12 }}/>
+                  )}
+                  {c.successVideo && (
+                    <div style={{ borderRadius:16, overflow:"hidden", aspectRatio:"16/9", background:"#000", marginBottom:12 }}>
+                      {c.successVideo.includes("youtube")||c.successVideo.includes("youtu.be") ? (
+                        <iframe width="100%" height="100%"
+                          src={"https://www.youtube.com/embed/"+(c.successVideo.split("v=")[1]?.split("&")[0]||c.successVideo.split("youtu.be/")[1]?.split("?")[0])}
+                          style={{ border:"none" }} allowFullScreen/>
+                      ) : (
+                        <video src={c.successVideo} controls autoPlay style={{ width:"100%", height:"100%" }}/>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <div style={{ padding:"12px 16px", borderRadius:12, background:"#FEF2F2", border:"1.5px solid #fca5a5", marginBottom:14 }}>
+                    <p style={{ fontSize:15, fontWeight:800, color:"#991B1B", margin:"0 0 2px" }}>❌ Not quite!</p>
+                    <p style={{ fontSize:13, color:"#991B1B", margin:0 }}>Try again or see the correct answer.</p>
+                  </div>
+                  <div style={{ display:"flex", gap:10 }}>
+                    <button onClick={() => { setChecked(p=>({...p,["bo_"+idx]:false})); setAnswers(p=>({...p,["bo_"+idx]:undefined})); }}
+                      style={{ flex:1, padding:"11px", borderRadius:11, border:"1.5px solid #BAE6FD", background:"#fff", fontSize:13, fontWeight:700, color:"#0891b2", cursor:"pointer" }}>
+                      🔄 Try Again
+                    </button>
+                    <button onClick={() => setFillShowAnswer(p=>({...p,["bo_"+idx]:true}))}
+                      style={{ flex:1, padding:"11px", borderRadius:11, border:"none", background:"linear-gradient(135deg,#374151,#1f2937)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                      👁 See Answer
+                    </button>
+                  </div>
+                  {showAnswer && (
+                    <div style={{ marginTop:12, padding:"12px 16px", borderRadius:12, background:"#F8FAFC", border:"1.5px solid #E2E8F0" }}>
+                      <p style={{ fontSize:13, color:"#374151", margin:0 }}>
+                        ✅ Correct answer: <strong style={{ color:"#166534" }}>{options[c.correct]}</strong>
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       );
     }
