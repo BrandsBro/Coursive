@@ -77,7 +77,12 @@ export default function ChallengesList({ challenges = [] }) {
       </div>
 
       {/* Grid */}
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(320px, 1fr))", gap:20 }}>
+      <style>{`
+        .challenges-list-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+        @media (max-width: 1024px) { .challenges-list-grid { grid-template-columns:repeat(2,1fr); gap:14px; } }
+        @media (max-width: 640px) { .challenges-list-grid { grid-template-columns:repeat(2,1fr); gap:12px; } }
+      `}</style>
+      <div className="challenges-list-grid">
         {filtered.map((challenge, i) => {
           const s       = CARD_STYLES[i % CARD_STYLES.length];
           const percent = getChallengeDayPercent(challenge.id, challenge.days);

@@ -19,7 +19,8 @@ const S = {
 };
 
 const coursesGridStyle = `
-  .courses-list-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap:20px; }
+  .courses-list-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:20px; }
+  @media (max-width: 1024px) { .courses-list-grid { grid-template-columns: repeat(2, 1fr); gap:14px; } }
   @media (max-width: 640px) { .courses-list-grid { grid-template-columns: repeat(2, 1fr); gap:12px; } }
 `;
 

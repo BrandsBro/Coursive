@@ -74,7 +74,8 @@ export default function ChallengesSection({ challenges = [] }) {
 
 
       <style>{`
-        .ch-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+        .ch-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+        @media (max-width: 1024px) { .ch-grid { grid-template-columns:repeat(2,1fr); gap:12px; } }
         @media (max-width: 640px) { .ch-grid { grid-template-columns:1fr; gap:12px; } }
       `}</style>
     </div>

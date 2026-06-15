@@ -68,7 +68,7 @@ export default function BrowseCourses({ courses = [] }) {
       <style>{`
         .courses-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+          grid-template-columns: repeat(4, 1fr);
           gap: 14px;
         }
         @media (max-width: 640px) {
