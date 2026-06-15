@@ -92,9 +92,9 @@ export default function ChallengesList({ challenges = [] }) {
 
           return (
             <Link key={challenge.id} href={`/challenges/${challenge.id}${joined?"?joined=true":""}`}
-              style={{ textDecoration:"none" }}>
+              style={{ textDecoration:"none", display:"block", height:"100%" }}>
               <div
-                style={{ background:"#fff", borderRadius:20, overflow:"hidden", border:"1px solid #F0F0F0", boxShadow:"0 2px 8px rgba(0,0,0,0.05)", transition:"all 0.2s ease", cursor:"pointer" }}
+                style={{ background:"#fff", borderRadius:20, overflow:"hidden", border:"1px solid #F0F0F0", boxShadow:"0 2px 8px rgba(0,0,0,0.05)", transition:"all 0.2s ease", cursor:"pointer", height:"100%", display:"flex", flexDirection:"column" }}
                 onMouseEnter={e => { e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.boxShadow="0 16px 40px rgba(0,0,0,0.12)"; }}
                 onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,0.05)"; }}
               >
@@ -126,7 +126,7 @@ export default function ChallengesList({ challenges = [] }) {
                 </div>
 
                 {/* Body */}
-                <div style={{ padding:"20px 22px 22px" }}>
+                <div style={{ padding:"20px 22px 22px", flex:1, display:"flex", flexDirection:"column" }}>
                   <h3 style={{ fontSize:15, fontWeight:800, color:"#111827", margin:"0 0 5px", lineHeight:1.3 }}>
                     {challenge.title}
                   </h3>
@@ -163,7 +163,7 @@ export default function ChallengesList({ challenges = [] }) {
                   )}
 
                   {/* CTA row */}
-                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:s.light, borderRadius:12, padding:"11px 14px" }}>
+                  <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:s.light, borderRadius:12, padding:"11px 14px", marginTop:"auto" }}>
                     <span style={{ fontSize:13, fontWeight:700, color:s.tag }}>
                       {!joined ? "Start challenge"
                         : percent === 0 ? "Continue"

@@ -181,13 +181,14 @@ function CourseCard({ course, getCoursePercent, isHighlighted }) {
   const isStarted = pct > 0;
 
   return (
-    <Link href={`/courses/${course.id}`} style={{ textDecoration:"none" }}>
+    <Link href={`/courses/${course.id}`} style={{ textDecoration:"none", display:"block", height:"100%" }}>
       <div
         style={{
           background:"#fff",borderRadius:22,overflow:"hidden",cursor:"pointer",
           border: isHighlighted ? `1.5px solid ${s.a}40` : "1.5px solid #F1F5F9",
           boxShadow: isHighlighted ? `0 4px 20px ${s.a}18` : "0 2px 8px rgba(0,0,0,0.05)",
           transition:"all 0.2s",
+          height:"100%", display:"flex", flexDirection:"column",
         }}
         onMouseEnter={e => { e.currentTarget.style.transform="translateY(-5px)"; e.currentTarget.style.boxShadow=`0 16px 40px ${s.a}25`; e.currentTarget.style.borderColor=`${s.a}40`; }}
         onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow=isHighlighted?`0 4px 20px ${s.a}18`:"0 2px 8px rgba(0,0,0,0.05)"; e.currentTarget.style.borderColor=isHighlighted?`${s.a}40`:"#F1F5F9"; }}
@@ -218,7 +219,7 @@ function CourseCard({ course, getCoursePercent, isHighlighted }) {
         </div>
 
         {/* Body */}
-        <div style={{ padding:"18px 20px 20px" }}>
+        <div style={{ padding:"18px 20px 20px", flex:1, display:"flex", flexDirection:"column" }}>
           <h3 style={{ fontSize:16,fontWeight:800,color:"#0f172a",margin:"0 0 4px",lineHeight:1.3 }}>{course.title}</h3>
           <p style={{ fontSize:13,color:"#64748B",margin:"0 0 14px",lineHeight:1.55,overflow:"hidden",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical" }}>
             {course.description}
@@ -239,6 +240,7 @@ function CourseCard({ course, getCoursePercent, isHighlighted }) {
           </div>
 
           {/* Progress or CTA */}
+          <div style={{ marginTop:"auto" }}>
           {isStarted ? (
             <div>
               <div style={{ display:"flex",justifyContent:"space-between",marginBottom:5 }}>
@@ -259,6 +261,7 @@ function CourseCard({ course, getCoursePercent, isHighlighted }) {
               </div>
             </div>
           )}
+          </div>
         </div>
       </div>
     </Link>

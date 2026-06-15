@@ -24,8 +24,8 @@ export default function ChallengesSection({ challenges = [] }) {
           const joined = hasJoinedChallenge(ch.id);
 
           return (
-            <Link key={ch.id} href={"/challenges/"+ch.id} style={{ textDecoration:"none" }}>
-              <div style={{ background:"#fff", borderRadius:20, overflow:"hidden", border:"1.5px solid #F1F5F9", transition:"all 0.2s", cursor:"pointer", height:"100%" }}
+            <Link key={ch.id} href={"/challenges/"+ch.id} style={{ textDecoration:"none", display:"block", height:"100%" }}>
+              <div style={{ background:"#fff", borderRadius:20, overflow:"hidden", border:"1.5px solid #F1F5F9", transition:"all 0.2s", cursor:"pointer", height:"100%", display:"flex", flexDirection:"column" }}
                 onMouseEnter={e=>{ e.currentTarget.style.transform="translateY(-3px)"; e.currentTarget.style.boxShadow="0 12px 32px rgba(0,0,0,0.1)"; }}
                 onMouseLeave={e=>{ e.currentTarget.style.transform=""; e.currentTarget.style.boxShadow=""; }}>
 
@@ -46,7 +46,7 @@ export default function ChallengesSection({ challenges = [] }) {
                 </div>
 
                 {/* Bottom */}
-                <div style={{ padding:"14px 16px" }}>
+                <div style={{ padding:"14px 16px", flex:1, display:"flex", flexDirection:"column", justifyContent:"flex-end" }}>
                   {pct > 0 ? (
                     <div>
                       <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>

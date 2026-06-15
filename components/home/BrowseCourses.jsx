@@ -36,9 +36,9 @@ export default function BrowseCourses({ courses = [] }) {
             const pct = getCoursePercent(course.id, total);
 
             return (
-              <Link key={course.id} href={"/courses/" + course.id} style={{ textDecoration: "none" }}>
+              <Link key={course.id} href={"/courses/" + course.id} style={{ textDecoration: "none", display: "block", height: "100%" }}>
                 <div
-                  style={{ background: "#fff", borderRadius: 20, overflow: "hidden", border: "1.5px solid #F0F0F0", cursor: "pointer", transition: "all 0.2s" }}
+                  style={{ background: "#fff", borderRadius: 20, overflow: "hidden", border: "1.5px solid #F0F0F0", cursor: "pointer", transition: "all 0.2s", height: "100%", display: "flex", flexDirection: "column" }}
                   onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 30px " + s.a + "30"; e.currentTarget.style.borderColor = s.a + "40"; } }
                   onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = "#F0F0F0"; } }
                 >
@@ -49,9 +49,9 @@ export default function BrowseCourses({ courses = [] }) {
                       <div style={{ position: "absolute", top: 8, right: 8, background: "#22C55E", color: "#fff", fontSize: 8, fontWeight: 700, padding: "2px 7px", borderRadius: 999 }}>✓ DONE</div>
                     )}
                   </div>
-                  <div style={{ padding: "12px 14px 14px" }}>
+                  <div style={{ padding: "12px 14px 14px", flex: 1, display: "flex", flexDirection: "column" }}>
                     <h3 style={{ fontSize: 13, fontWeight: 800, color: "#0f172a", margin: "0 0 2px", lineHeight: 1.3 }}>{course.title}</h3>
-                    <p style={{ fontSize: 11, color: "#94A3B8", margin: "0 0 8px" }}>{total} lessons · {course.hours}h</p>
+                    <p style={{ fontSize: 11, color: "#94A3B8", margin: "0 0 8px", flex: 1 }}>{total} lessons · {course.hours}h</p>
                     {pct > 0 && (
                       <div style={{ background: "#F1F5F9", borderRadius: 999, height: 4, overflow: "hidden" }}>
                         <div style={{ height: "100%", borderRadius: 999, background: s.g, width: pct + "%", transition: "width 0.6s" }} />
