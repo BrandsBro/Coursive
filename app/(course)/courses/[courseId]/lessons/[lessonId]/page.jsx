@@ -19,13 +19,9 @@ export default async function LessonDetailPage({ params, searchParams }) {
 
   if (!lesson) return notFound();
 
-  // Try DB content first, then fall back to static file
-  const shortId = lessonId.includes("_") ? lessonId.split("_").pop() : lessonId;
+  // Use DB content only - no static fallback
   const dbContent = await getLessonContentFromDB(lesson.id);
-  const content = dbContent
-    || getLessonContent(courseId, lessonId)
-    || getLessonContent(courseId, shortId)
-    || [];
+  const content = dbContent || [];
 
   return (
     <LessonPage
