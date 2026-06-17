@@ -42,9 +42,9 @@ export default function BrowseCourses({ courses = [] }) {
                   onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 30px " + s.a + "30"; e.currentTarget.style.borderColor = s.a + "40"; } }
                   onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = "#F0F0F0"; } }
                 >
-                  <div style={{ background: s.g, height: 100, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 42, position: "relative", overflow: "hidden" }}>
+                  <div style={{ background: course.imageUrl ? `url(${course.imageUrl}) center/cover` : s.g, height: 100, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 42, position: "relative", overflow: "hidden" }}>
                     <div style={{ position: "absolute", top: -20, right: -20, width: 80, height: 80, borderRadius: "50%", background: "rgba(255,255,255,0.1)" }} />
-                    <span style={{ position: "relative", zIndex: 1 }}>{s.e}</span>
+                    {!course.imageUrl && <span style={{ position: "relative", zIndex: 1 }}>{s.e}</span>}
                     {pct === 100 && (
                       <div style={{ position: "absolute", top: 8, right: 8, background: "#22C55E", color: "#fff", fontSize: 8, fontWeight: 700, padding: "2px 7px", borderRadius: 999 }}>✓ DONE</div>
                     )}

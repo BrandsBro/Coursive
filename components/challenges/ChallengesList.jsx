@@ -99,13 +99,13 @@ export default function ChallengesList({ challenges = [] }) {
                 onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,0.05)"; }}
               >
                 {/* Hero */}
-                <div style={{ background:s.grad, height:165, padding:"24px 26px", position:"relative", overflow:"hidden", display:"flex", flexDirection:"column", justifyContent:"space-between" }}>
+                <div style={{ background:challenge.imageUrl ? `url(${challenge.imageUrl}) center/cover` : s.grad, height:165, padding:"24px 26px", position:"relative", overflow:"hidden", display:"flex", flexDirection:"column", justifyContent:"space-between" }}>
                   <div style={{ position:"absolute", top:-40, right:-40, width:140, height:140, borderRadius:"50%", background:"rgba(255,255,255,0.09)" }} />
                   <div style={{ position:"absolute", bottom:-24, left:40, width:96, height:96, borderRadius:"50%", background:"rgba(255,255,255,0.06)" }} />
 
                   {/* Top row */}
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", position:"relative", zIndex:1 }}>
-                    <span style={{ fontSize:44, lineHeight:1 }}>{challenge.emoji}</span>
+                    {!challenge.imageUrl && <span style={{ fontSize:44, lineHeight:1 }}>{challenge.emoji}</span>}
                     {joined && (
                       <div style={{ background:"rgba(255,255,255,0.92)", borderRadius:10, padding:"4px 10px", display:"flex", alignItems:"center", gap:5 }}>
                         <CheckCircle2 size={12} color="#22C55E" />

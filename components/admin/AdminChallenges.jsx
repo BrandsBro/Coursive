@@ -3,9 +3,10 @@
 import { useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Plus, Pencil, Trash2, X } from "lucide-react";
+import MediaLibrary from "@/components/admin/builder/MediaLibrary";
 import { supabase } from "@/lib/supabase";
 
-const EMPTY = { id:"", title:"", subtitle:"", description:"", emoji:"🚀", gradient_bg:"linear-gradient(135deg,#6366f1,#8b5cf6)", days:14, level:"Beginner" };
+const EMPTY = { id:"", title:"", subtitle:"", description:"", emoji:"🚀", image_url:"", gradient_bg:"linear-gradient(135deg,#6366f1,#8b5cf6)", days:14, level:"Beginner" };
 const LEVELS = ["Beginner","Intermediate","Advanced"];
 
 const PRESETS = [
@@ -35,7 +36,7 @@ export default function AdminChallenges({ challenges: initial }) {
 
   const openAdd = () => { setForm(EMPTY); setEditing(null); setShowForm(true); };
   const openEdit = (ch) => {
-    setForm({ id:ch.id, title:ch.title, subtitle:ch.subtitle||"", description:ch.description||"", emoji:ch.emoji, gradient_bg:ch.gradientBg, days:ch.days, level:ch.level });
+    setForm({ id:ch.id, title:ch.title, subtitle:ch.subtitle||"", description:ch.description||"", emoji:ch.emoji, image_url:ch.imageUrl||"", gradient_bg:ch.gradientBg, days:ch.days, level:ch.level });
     setEditing(ch.id);
     setShowForm(true);
   };
@@ -45,13 +46,13 @@ export default function AdminChallenges({ challenges: initial }) {
     setLoading(true);
     const { error } = await supabase.from("challenges").upsert({
       id:form.id, title:form.title, subtitle:form.subtitle, description:form.description,
-      emoji:form.emoji, gradient_bg:form.gradient_bg, days:parseInt(form.days),
+      emoji:form.emoji, image_url:form.image_url||null, gradient_bg:form.gradient_bg, days:parseInt(form.days),
       level:form.level, is_published:true,
     }, { onConflict:"id" });
     if (error) { alert(error.message); setLoading(false); return; }
     setLoading(false);
     setShowForm(false);
-    const updated = { id:form.id, title:form.title, subtitle:form.subtitle, description:form.description, emoji:form.emoji, gradientBg:form.gradient_bg, days:parseInt(form.days), level:form.level, challengeDays:[], reviews:[] };
+    const updated = { id:form.id, title:form.title, subtitle:form.subtitle, description:form.description, emoji:form.emoji, imageUrl:form.image_url, gradientBg:form.gradient_bg, days:parseInt(form.days), level:form.level, challengeDays:[], reviews:[] };
     if (editing) { setChallenges(prev => prev.map(c => c.id === editing ? updated : c)); }
     else { setChallenges(prev => [...prev, updated]); }
   };
@@ -90,8 +91,8 @@ export default function AdminChallenges({ challenges: initial }) {
               onMouseLeave={e => { e.currentTarget.style.borderColor="#F1F5F9"; e.currentTarget.style.boxShadow="none"; }}>
 
               {/* Emoji hero */}
-              <div style={{ width:48, height:48, borderRadius:13, background:ch.gradientBg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>
-                {ch.emoji}
+              <div style={{ width:48, height:48, borderRadius:13, background:ch.imageUrl?`url(${ch.imageUrl}) center/cover`:ch.gradientBg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>
+                {!ch.imageUrl && ch.emoji}
               </div>
 
               <div style={{ flex:1, minWidth:0 }}>
@@ -139,7 +140,7 @@ export default function AdminChallenges({ challenges: initial }) {
               </button>
               <div style={{ display:"flex", alignItems:"center", gap:14, position:"relative", zIndex:1 }}>
                 <div style={{ width:64,height:64,borderRadius:20,background:"rgba(255,255,255,0.2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32 }}>
-                  {form.emoji || "🚀"}
+                  {form.image_url ? <img src={form.image_url} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", borderRadius:"inherit" }}/> : (form.emoji || "🚀")}
                 </div>
                 <div>
                   <p style={{ color:"rgba(255,255,255,0.65)",fontSize:10,fontWeight:700,letterSpacing:1,margin:"0 0 4px" }}>

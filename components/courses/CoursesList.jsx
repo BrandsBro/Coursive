@@ -194,11 +194,11 @@ function CourseCard({ course, getCoursePercent, isHighlighted }) {
         onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow=isHighlighted?`0 4px 20px ${s.a}18`:"0 2px 8px rgba(0,0,0,0.05)"; e.currentTarget.style.borderColor=isHighlighted?`${s.a}40`:"#F1F5F9"; }}
       >
         {/* Hero */}
-        <div style={{ background:s.g,height:155,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"20px 22px",position:"relative",overflow:"hidden" }}>
+        <div style={{ background:course.imageUrl ? `url(${course.imageUrl}) center/cover` : s.g,height:155,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"20px 22px",position:"relative",overflow:"hidden" }}>
           <div style={{ position:"absolute",top:-30,right:-30,width:130,height:130,borderRadius:"50%",background:"rgba(255,255,255,0.09)" }} />
           <div style={{ position:"absolute",bottom:-20,left:40,width:80,height:80,borderRadius:"50%",background:"rgba(255,255,255,0.06)" }} />
           
-          <span style={{ fontSize:52,position:"relative",zIndex:1,filter:"drop-shadow(0 4px 12px rgba(0,0,0,0.2))" }}>{s.e}</span>
+          {!course.imageUrl && <span style={{ fontSize:52,position:"relative",zIndex:1,filter:"drop-shadow(0 4px 12px rgba(0,0,0,0.2))" }}>{s.e}</span>}
 
           <div style={{ position:"relative",zIndex:1,display:"flex",flexDirection:"column",alignItems:"flex-end",gap:6 }}>
             <span style={{ background:"rgba(255,255,255,0.22)",color:"#fff",fontSize:10,fontWeight:700,padding:"3px 10px",borderRadius:999,letterSpacing:0.5 }}>

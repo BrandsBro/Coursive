@@ -3,9 +3,10 @@
 import { useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Plus, Pencil, Trash2, X, BookOpen, Clock, Sparkles } from "lucide-react";
+import MediaLibrary from "@/components/admin/builder/MediaLibrary";
 import { supabase } from "@/lib/supabase";
 
-const EMPTY = { id:"", title:"", description:"", emoji:"📚", gradient_from:"#6366f1", gradient_to:"#8b5cf6", hours:1, level:"Beginner", category:"Design" };
+const EMPTY = { id:"", title:"", description:"", emoji:"📚", image_url:"", gradient_from:"#6366f1", gradient_to:"#8b5cf6", hours:1, level:"Beginner", category:"Design" };
 const LEVELS = ["Beginner","Intermediate","Advanced"];
 const CATEGORIES = ["Design","Productivity","Video","No Code"];
 const PRESET_GRADIENTS = [
@@ -26,7 +27,7 @@ export default function AdminCourses({ courses: initial }) {
 
   const openAdd = () => { setForm(EMPTY); setEditing(null); setShowForm(true); };
   const openEdit = (course) => {
-    setForm({ id:course.id, title:course.title, description:course.description||"", emoji:course.emoji, gradient_from:course.gradientFrom, gradient_to:course.gradientTo, hours:course.hours, level:course.level, category:course.category });
+    setForm({ id:course.id, title:course.title, description:course.description||"", emoji:course.emoji, image_url:course.imageUrl||"", gradient_from:course.gradientFrom, gradient_to:course.gradientTo, hours:course.hours, level:course.level, category:course.category });
     setEditing(course.id);
     setShowForm(true);
   };
@@ -34,12 +35,12 @@ export default function AdminCourses({ courses: initial }) {
   const handleSave = async () => {
     if (!form.id || !form.title) { alert("ID and Title are required"); return; }
     setLoading(true);
-    const row = { id:form.id, title:form.title, description:form.description, emoji:form.emoji, gradient_from:form.gradient_from, gradient_to:form.gradient_to, hours:parseInt(form.hours), level:form.level, category:form.category, is_published:true };
+    const row = { id:form.id, title:form.title, description:form.description, emoji:form.emoji, image_url:form.image_url||null, gradient_from:form.gradient_from, gradient_to:form.gradient_to, hours:parseInt(form.hours), level:form.level, category:form.category, is_published:true };
     const { error } = await supabase.from("courses").upsert(row, { onConflict:"id" });
     if (error) { alert(error.message); setLoading(false); return; }
     setLoading(false);
     setShowForm(false);
-    const updated = { id:form.id, title:form.title, description:form.description, emoji:form.emoji, gradientFrom:form.gradient_from, gradientTo:form.gradient_to, hours:parseInt(form.hours), level:form.level, category:form.category, units:editing?courses.find(c=>c.id===editing)?.units||[]:[] };
+    const updated = { id:form.id, title:form.title, description:form.description, emoji:form.emoji, imageUrl:form.image_url, gradientFrom:form.gradient_from, gradientTo:form.gradient_to, hours:parseInt(form.hours), level:form.level, category:form.category, units:editing?courses.find(c=>c.id===editing)?.units||[]:[] };
     if (editing) { setCourses(prev => prev.map(c => c.id === editing ? updated : c)); }
     else { setCourses(prev => [...prev, updated]); }
   };
@@ -77,8 +78,8 @@ export default function AdminCourses({ courses: initial }) {
             <div key={course.id} style={{ background:"#fff", borderRadius:16, border:"1.5px solid #F1F5F9", padding:"14px 18px", display:"flex", alignItems:"center", gap:14, transition:"all 0.15s" }}
               onMouseEnter={e => { e.currentTarget.style.borderColor="#E0E7FF"; e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,0.06)"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor="#F1F5F9"; e.currentTarget.style.boxShadow="none"; }}>
-              <div style={{ width:46, height:46, borderRadius:13, background:`linear-gradient(135deg,${course.gradientFrom},${course.gradientTo})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>
-                {course.emoji}
+              <div style={{ width:46, height:46, borderRadius:13, background:course.imageUrl?`url(${course.imageUrl}) center/cover`:`linear-gradient(135deg,${course.gradientFrom},${course.gradientTo})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>
+                {!course.imageUrl && course.emoji}
               </div>
               <div style={{ flex:1, minWidth:0 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
@@ -126,7 +127,7 @@ export default function AdminCourses({ courses: initial }) {
               </button>
               <div style={{ display:"flex", alignItems:"center", gap:14 }}>
                 <div style={{ width:60, height:60, borderRadius:18, background:"rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:30 }}>
-                  {form.emoji || "📚"}
+                  {form.image_url ? <img src={form.image_url} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", borderRadius:"inherit" }}/> : (form.emoji || "📚")}
                 </div>
                 <div>
                   <p style={{ color:"rgba(255,255,255,0.7)", fontSize:11, fontWeight:700, letterSpacing:1, margin:"0 0 4px" }}>

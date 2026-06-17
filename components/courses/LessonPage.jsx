@@ -131,9 +131,15 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
           ) : <div/>}
 
           {!isComplete && !completed ? (
-            <button onClick={handleComplete} style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(124,58,237,0.4)" }}>
-              ✓ Mark Complete
-            </button>
+            hasContent ? (
+              <button onClick={handleComplete} style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(124,58,237,0.4)" }}>
+                ✓ Mark Complete
+              </button>
+            ) : (
+              <button disabled style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"#E2E8F0", color:"#94A3B8", fontSize:14, fontWeight:700, cursor:"not-allowed" }}>
+                Content not ready yet
+              </button>
+            )
           ) : (
             <button onClick={handleNext} style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#22c55e,#16a34a)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7 }}>
               {nextLesson ? <><span>Next Lesson</span><ChevronRight size={15}/></> : <><Trophy size={15}/><span>Finish Course</span></>}

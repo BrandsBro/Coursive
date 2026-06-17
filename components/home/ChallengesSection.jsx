@@ -30,10 +30,10 @@ export default function ChallengesSection({ challenges = [] }) {
                 onMouseLeave={e=>{ e.currentTarget.style.transform=""; e.currentTarget.style.boxShadow=""; }}>
 
                 {/* Gradient header */}
-                <div style={{ background:ch.gradientBg||"linear-gradient(135deg,#667eea,#764ba2)", height:130, padding:"16px", display:"flex", flexDirection:"column", justifyContent:"space-between", position:"relative", overflow:"hidden" }}>
+                <div style={{ background:ch.imageUrl ? `url(${ch.imageUrl}) center/cover` : (ch.gradientBg||"linear-gradient(135deg,#667eea,#764ba2)"), height:130, padding:"16px", display:"flex", flexDirection:"column", justifyContent:"space-between", position:"relative", overflow:"hidden" }}>
                   <div style={{ position:"absolute", top:-30, right:-30, width:120, height:120, borderRadius:"50%", background:"rgba(255,255,255,0.08)" }}/>
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
-                    <span style={{ fontSize:36 }}>{ch.emoji}</span>
+                    {!ch.imageUrl && <span style={{ fontSize:36 }}>{ch.emoji}</span>}
                     <div style={{ background:"rgba(255,255,255,0.2)", borderRadius:999, padding:"4px 10px", display:"flex", alignItems:"center", gap:4 }}>
                       <Zap size={11} color="#fff" fill="#fff"/>
                       <span style={{ color:"#fff", fontSize:11, fontWeight:800 }}>{ch.days} DAYS</span>
