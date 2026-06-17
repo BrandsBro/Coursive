@@ -46,7 +46,7 @@ export async function middleware(req) {
       .from("profiles")
       .select("is_admin")
       .eq("id", session.user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile?.is_admin) {
       return NextResponse.redirect(new URL("/", req.url));
