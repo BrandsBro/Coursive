@@ -11,7 +11,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import {
   ChevronLeft, Save, Check, Plus, Trash2, GripVertical, Eye, EyeOff,
-  Loader, Copy, Settings2
+  Loader, Copy
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import MediaLibrary from "@/components/admin/builder/MediaLibrary";
@@ -98,19 +98,44 @@ export default function LessonBuilder({ lessonId, lessonTitle, backTo }) {
   const saveAll = async () => {
     setSaving(true);
     try {
-      // Re-index and persist
       for (let i = 0; i < blocks.length; i++) {
         const b = blocks[i];
-        const row = { lesson_id: lessonId, type: b.type, content: b.content, order_index: i };
+        const row = {
+          lesson_id: lessonId,
+          type: b.type,
+          content: b.content,
+          order_index: i,
+        };
+
         if (b.isNew || b.id.startsWith("new-")) {
-          const { data } = await supabase.from("lesson_content").insert(row).select().single();
-          if (data) setBlocks(prev => prev.map(x => x.id === b.id ? { ...data } : x));
+          // New block — insert
+          const { data, error } = await supabase
+            .from("lesson_content")
+            .insert(row)
+            .select()
+            .single();
+          if (error) {
+            console.error("Insert error:", error);
+            // If conflict, try upsert
+            if (error.code === "23505") {
+              await supabase.from("lesson_content").upsert({ ...row }, { onConflict: "lesson_id,order_index" });
+            }
+          } else if (data) {
+            setBlocks(prev => prev.map(x => x.id === b.id ? { ...data, content: data.content || {} } : x));
+          }
         } else {
-          await supabase.from("lesson_content").update(row).eq("id", b.id);
+          // Existing block — update
+          const { error } = await supabase
+            .from("lesson_content")
+            .update(row)
+            .eq("id", b.id);
+          if (error) console.error("Update error:", error);
         }
       }
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
+      // Reload to get fresh data from DB
+      await load();
     } catch (e) {
       alert("Save error: " + e.message);
     }
@@ -120,7 +145,7 @@ export default function LessonBuilder({ lessonId, lessonTitle, backTo }) {
   return (
     <div style={{ minHeight:"100vh", background:"#F1F5F9", display:"flex", flexDirection:"column" }}>
 
-      {/* ── Top bar ── */}
+      {/* Top bar */}
       <div style={{ background:"#0f172a", padding:"0 20px", height:60, display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0, position:"sticky", top:0, zIndex:50 }}>
         <div style={{ display:"flex", alignItems:"center", gap:14 }}>
           <button onClick={() => router.push(backTo)} style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 14px", borderRadius:10, border:"1px solid rgba(255,255,255,0.12)", background:"rgba(255,255,255,0.06)", color:"rgba(255,255,255,0.8)", fontSize:13, fontWeight:600, cursor:"pointer" }}>
@@ -144,14 +169,12 @@ export default function LessonBuilder({ lessonId, lessonTitle, backTo }) {
         </div>
       </div>
 
-      {/* ── Body: split screen ── */}
+      {/* Body */}
       <div style={{ flex:1, display:"flex", overflow:"hidden" }}>
 
-        {/* LEFT: editor (hidden in full preview) */}
         {!previewMode && (
           <div style={{ flex:1, overflow:"auto", padding:"24px 28px", borderRight:"1px solid #E2E8F0" }}>
             <div style={{ maxWidth:560, margin:"0 auto" }}>
-
               {loading ? (
                 <div style={{ textAlign:"center", padding:60, color:"#94A3B8" }}>
                   <Loader size={28} className="bspin" style={{ margin:"0 auto 12px" }}/>
@@ -192,7 +215,7 @@ export default function LessonBuilder({ lessonId, lessonTitle, backTo }) {
           </div>
         )}
 
-        {/* RIGHT: live preview */}
+        {/* Preview */}
         <div style={{ flex:previewMode ? 1 : "0 0 42%", overflow:"auto", padding:"24px 28px", background:previewMode?"#fff":"#FAFBFC" }}>
           <div style={{ maxWidth:previewMode?640:420, margin:"0 auto" }}>
             {!previewMode && (
@@ -211,7 +234,7 @@ export default function LessonBuilder({ lessonId, lessonTitle, backTo }) {
         </div>
       </div>
 
-      {/* ── Block picker ── */}
+      {/* Block picker */}
       {showPicker && (
         <div onClick={() => setShowPicker(false)} style={{ position:"fixed", inset:0, zIndex:300, display:"flex", alignItems:"center", justifyContent:"center", padding:20, background:"rgba(15,23,42,0.6)", backdropFilter:"blur(4px)" }}>
           <div onClick={e => e.stopPropagation()} style={{ background:"#fff", borderRadius:24, padding:24, width:"100%", maxWidth:620, boxShadow:"0 32px 80px rgba(0,0,0,0.3)" }}>
@@ -237,7 +260,6 @@ export default function LessonBuilder({ lessonId, lessonTitle, backTo }) {
   );
 }
 
-// ── Sortable block wrapper ──
 function SortableBlock({ block, isActive, onToggle, onChange, onDelete, onDuplicate }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: block.id });
   const def = BLOCK_DEFS[block.type] || { icon:"❓", label:"Unknown", color:"#64748B", bg:"#F8FAFC", preview:()=>"Unknown block type" };
@@ -251,7 +273,6 @@ function SortableBlock({ block, isActive, onToggle, onChange, onDelete, onDuplic
 
   return (
     <div ref={setNodeRef} style={{ ...style, background:"#fff", borderRadius:16, border:`1.5px solid ${isActive?def.color+"60":"#E2E8F0"}`, overflow:"hidden", boxShadow:isActive?`0 4px 20px ${def.color}15`:"0 1px 3px rgba(0,0,0,0.04)", marginBottom:2 }}>
-      {/* Header */}
       <div style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 12px", background:isActive?def.bg:"#fff" }}>
         <button {...attributes} {...listeners} style={{ cursor:"grab", border:"none", background:"none", padding:2, display:"flex", touchAction:"none" }}>
           <GripVertical size={16} color="#CBD5E1"/>
@@ -266,7 +287,6 @@ function SortableBlock({ block, isActive, onToggle, onChange, onDelete, onDuplic
           <button onClick={onDelete} title="Delete" style={{ ...ctrl(), color:"#EF4444", borderColor:"#FEE2E2" }}><Trash2 size={12}/></button>
         </div>
       </div>
-      {/* Editor */}
       {isActive && (
         <div style={{ padding:"4px 14px 16px", borderTop:`1px solid ${def.color}20` }}>
           <BlockEditor block={block} onChange={onChange} />
@@ -276,7 +296,6 @@ function SortableBlock({ block, isActive, onToggle, onChange, onDelete, onDuplic
   );
 }
 
-// ── Insert line between blocks ──
 function InsertLine({ onClick }) {
   const [hover, setHover] = useState(false);
   return (
