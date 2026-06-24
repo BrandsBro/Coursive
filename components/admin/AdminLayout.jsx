@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, BookOpen, Trophy, Users, TrendingUp, HardDrive, Settings, ChevronRight, LogOut, MessageSquare } from "lucide-react";
+import { LayoutDashboard, BookOpen, Trophy, Users, TrendingUp, HardDrive, Settings, ChevronRight, LogOut, MessageSquare, ClipboardList } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const NAV = [
   { href:"/admin",            icon:LayoutDashboard, label:"Dashboard"   },
   { href:"/admin/courses",    icon:BookOpen,        label:"Courses"     },
   { href:"/admin/challenges", icon:Trophy,          label:"Challenges"  },
+  { href:"/admin/quiz",       icon:ClipboardList,   label:"Quiz Flow"   },
   { href:"/admin/users",      icon:Users,           label:"Users"       },
   { href:"/admin/analytics",  icon:TrendingUp,      label:"Analytics"   },
   { href:"/admin/media",      icon:HardDrive,       label:"Media"       },
@@ -41,9 +42,9 @@ export default function AdminLayout({ children }) {
         </div>
 
         {/* Nav */}
-        <nav style={{ flex:1, padding:"12px 10px" }}>
+        <nav style={{ flex:1, padding:"12px 10px", overflowY:"auto" }}>
           {NAV.map(({ href, icon: Icon, label }) => {
-            const active = pathname === href;
+            const active = pathname === href || pathname.startsWith(href + "/");
             return (
               <Link key={href} href={href} style={{ textDecoration:"none" }}>
                 <div style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 12px", borderRadius:10, marginBottom:2, background:active?"rgba(99,102,241,0.2)":"transparent", color:active?"#a5b4fc":"rgba(255,255,255,0.5)", transition:"all 0.15s" }}

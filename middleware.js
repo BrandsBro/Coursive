@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 
-const PUBLIC_ROUTES = ["/login", "/signup", "/confirm", "/auth"];
+const PUBLIC_ROUTES = ["/login", "/signup", "/confirm", "/auth", "/quiz"];
 const ADMIN_ROUTES = ["/admin"];
 
 export async function middleware(req) {
@@ -28,19 +28,16 @@ export async function middleware(req) {
   const isPublic = PUBLIC_ROUTES.some(r => pathname.startsWith(r));
   const isAdmin = ADMIN_ROUTES.some(r => pathname.startsWith(r));
 
-  // Not logged in → redirect to login
   if (!session && !isPublic) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("from", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Logged in but trying to access auth pages → go home
-  if (session && isPublic) {
+  if (session && isPublic && pathname !== "/quiz") {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  // Admin routes → check is_admin in profiles
   if (session && isAdmin) {
     const { data: profile } = await supabase
       .from("profiles")
