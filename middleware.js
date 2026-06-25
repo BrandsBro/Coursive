@@ -34,8 +34,9 @@ export async function middleware(req) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (session && isPublic && pathname !== "/quiz") {
-    return NextResponse.redirect(new URL("/", req.url));
+  // Logged in users trying to access login/signup → send to courses
+  if (session && (pathname === "/login" || pathname === "/signup")) {
+    return NextResponse.redirect(new URL("/home", req.url));
   }
 
   if (session && isAdmin) {
@@ -46,7 +47,7 @@ export async function middleware(req) {
       .maybeSingle();
 
     if (!profile?.is_admin) {
-      return NextResponse.redirect(new URL("/", req.url));
+      return NextResponse.redirect(new URL("/home", req.url));
     }
   }
 

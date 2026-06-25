@@ -9,7 +9,7 @@ export default function WeeklyStreaks() {
   const { streak, weeklyActivity, loaded } = useStreak();
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5 h-full">
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-5">
       <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-1">
         Weekly Streaks
       </p>

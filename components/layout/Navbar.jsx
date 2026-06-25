@@ -12,7 +12,7 @@ import NotificationBell from "@/components/layout/NotificationBell";
 import { useStreak } from "@/hooks/useStreak";
 
 const NAV_LINKS = [
-  { label:"Home",       href:"/",           icon:Home     },
+  { label:"Home",       href:"/home",           icon:Home     },
   { label:"Courses",    href:"/courses",     icon:BookOpen },
   { label:"Challenges", href:"/challenges",  icon:Trophy   },
 ];

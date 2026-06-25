@@ -303,7 +303,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
       });
 
       // Redirect to courses
-      router.push("/courses");
+      router.push("/home");
     } catch(e) {
       alert("Something went wrong: " + e.message);
     }
