@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { ChevronRight, Check, ArrowLeft } from "lucide-react";
 
 const FIXED_REVIEWS = [
@@ -33,6 +34,10 @@ export default function QuizFlow({ blocks }) {
     : (currentIdx / (visibleBlocks.length + END_SEQUENCE.length)) * 100;
 
   const goNext = () => {
+    if (isInEndSequence && endStep === "signup") {
+      if (!name.trim()) { alert("Please enter your full name"); return; }
+      if (!email.trim() || !email.includes("@")) { alert("Please enter a valid email address"); return; }
+    }
     if (!isInEndSequence) {
       if (currentIdx < visibleBlocks.length - 1) {
         setCurrentIdx(i => i + 1);
@@ -45,8 +50,8 @@ export default function QuizFlow({ blocks }) {
       if (idx < END_SEQUENCE.length - 1) {
         setEndStep(END_SEQUENCE[idx + 1]);
       } else {
-        // Done — go to signup
-        router.push(`/signup?email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`);
+        // Done — all finished
+        router.push("/");
       }
     }
   };
@@ -244,6 +249,66 @@ function BulletItem({ text }) {
 
 function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, blocks }) {
   const [selectedPlan, setSelectedPlan] = useState("4-Week Plan");
+  const [signingUp, setSigningUp] = useState(false);
+
+  const handleGetPlan = async () => {
+    if (!name || !email) {
+      alert("Please go back and fill in your name and email");
+      return;
+    }
+    setSigningUp(true);
+    try {
+      // Generate random password
+      const tempPassword = Math.random().toString(36).slice(2,10) + Math.random().toString(36).slice(2,10).toUpperCase() + "!1";
+
+      // Create account
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password: tempPassword,
+        options: { data: { full_name: name } },
+      });
+
+      if (error) throw error;
+
+      // Send welcome + password email
+      await fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: email,
+          subject: "Welcome to Coursiv! Here are your login details 🎉",
+          html: `
+            <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#0a081e;color:#fff;border-radius:16px;overflow:hidden">
+              <div style="background:linear-gradient(135deg,#5B4EFF,#8B5CF6);padding:40px 32px;text-align:center">
+                <h1 style="margin:0;font-size:28px;font-weight:900">✦ Coursiv</h1>
+                <p style="margin:8px 0 0;opacity:0.8">Welcome aboard!</p>
+              </div>
+              <div style="padding:32px">
+                <h2 style="font-size:22px;margin:0 0 12px">Hi ${name}! 👋</h2>
+                <p style="color:rgba(255,255,255,0.7);line-height:1.7">Your account has been created. Here are your login details:</p>
+                <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:20px;margin:20px 0">
+                  <p style="margin:0 0 8px;color:rgba(255,255,255,0.5);font-size:12px">EMAIL</p>
+                  <p style="margin:0 0 16px;font-weight:700;font-size:16px">${email}</p>
+                  <p style="margin:0 0 8px;color:rgba(255,255,255,0.5);font-size:12px">TEMPORARY PASSWORD</p>
+                  <p style="margin:0;font-weight:700;font-size:16px;color:#a78bfa">${tempPassword}</p>
+                </div>
+                <p style="color:rgba(255,255,255,0.5);font-size:13px">You can change your password anytime from your profile settings.</p>
+                <a href="https://coursiv-six.vercel.app/login" style="display:inline-block;margin-top:20px;padding:14px 28px;background:linear-gradient(135deg,#5B4EFF,#8B5CF6);color:#fff;text-decoration:none;border-radius:10px;font-weight:700">
+                  Start Learning →
+                </a>
+              </div>
+            </div>
+          `
+        }),
+      });
+
+      // Redirect to courses
+      router.push("/courses");
+    } catch(e) {
+      alert("Something went wrong: " + e.message);
+    }
+    setSigningUp(false);
+  };
   const [timeLeft, setTimeLeft] = useState(10 * 60);
 
   useEffect(() => {
@@ -374,22 +439,49 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
 
   if (step === "signup") {
     return (
-      <div style={{ width:"100%", textAlign:"center" }}>
-        <h1 style={{ fontSize:26, fontWeight:900, color:"#0f172a", margin:"0 0 8px", lineHeight:1.2 }}>Your Personalized A.I. Certificate Program is Ready!</h1>
-        <p style={{ fontSize:15, color:"#64748B", margin:"0 0 32px" }}>Enter your details to get started</p>
-        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-          <div style={{ textAlign:"left" }}>
-            <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:6 }}>Full Name</label>
-            <input value={name} onChange={e=>setName(e.target.value)} placeholder="e.g. John Smith"
-              style={{ width:"100%", padding:"16px 20px", borderRadius:14, border:"2px solid #E2E8F0", fontSize:16, outline:"none", boxSizing:"border-box" }}
-              onFocus={e=>e.target.style.borderColor="#5B4EFF"} onBlur={e=>e.target.style.borderColor="#E2E8F0"}/>
+      <div style={{ width:"100%", maxWidth:480, margin:"0 auto" }}>
+        {/* Header */}
+        <div style={{ textAlign:"center", marginBottom:32 }}>
+          <div style={{ width:64, height:64, borderRadius:20, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 16px", fontSize:28 }}>🎓</div>
+          <h1 style={{ fontSize:26, fontWeight:900, color:"#0f172a", margin:"0 0 8px", lineHeight:1.2 }}>Your A.I. Program is Ready!</h1>
+          <p style={{ fontSize:15, color:"#64748B", margin:0 }}>Create your free account to get started</p>
+        </div>
+
+        {/* Trust badges */}
+        <div style={{ display:"flex", justifyContent:"center", gap:20, marginBottom:28 }}>
+          {["🔒 Secure","✅ Free to start","🚀 Instant access"].map((b,i) => (
+            <span key={i} style={{ fontSize:12, fontWeight:600, color:"#64748B" }}>{b}</span>
+          ))}
+        </div>
+
+        {/* Form */}
+        <div style={{ background:"#fff", borderRadius:20, border:"1.5px solid #E2E8F0", padding:"28px 24px", boxShadow:"0 8px 32px rgba(0,0,0,0.06)" }}>
+          <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+            <div>
+              <label style={{ display:"block", fontSize:12, fontWeight:700, color:"#374151", marginBottom:6, textTransform:"uppercase", letterSpacing:0.5 }}>Full Name</label>
+              <input value={name} onChange={e=>setName(e.target.value)} placeholder="e.g. John Smith"
+                style={{ width:"100%", padding:"14px 16px", borderRadius:12, border:"2px solid #E2E8F0", fontSize:15, outline:"none", boxSizing:"border-box", transition:"border-color 0.2s" }}
+                onFocus={e=>e.target.style.borderColor="#5B4EFF"} onBlur={e=>e.target.style.borderColor="#E2E8F0"}/>
+            </div>
+            <div>
+              <label style={{ display:"block", fontSize:12, fontWeight:700, color:"#374151", marginBottom:6, textTransform:"uppercase", letterSpacing:0.5 }}>Email Address</label>
+              <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="e.g. john@gmail.com" type="email"
+                style={{ width:"100%", padding:"14px 16px", borderRadius:12, border:"2px solid #E2E8F0", fontSize:15, outline:"none", boxSizing:"border-box", transition:"border-color 0.2s" }}
+                onFocus={e=>e.target.style.borderColor="#5B4EFF"} onBlur={e=>e.target.style.borderColor="#E2E8F0"}/>
+            </div>
+
           </div>
-          <div style={{ textAlign:"left" }}>
-            <label style={{ display:"block", fontSize:13, fontWeight:700, color:"#374151", marginBottom:6 }}>Email Address</label>
-            <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="e.g. john@gmail.com" type="email"
-              style={{ width:"100%", padding:"16px 20px", borderRadius:14, border:"2px solid #E2E8F0", fontSize:16, outline:"none", boxSizing:"border-box" }}
-              onFocus={e=>e.target.style.borderColor="#5B4EFF"} onBlur={e=>e.target.style.borderColor="#E2E8F0"}/>
+          <p style={{ fontSize:11, color:"#94A3B8", margin:"16px 0 0", textAlign:"center" }}>By continuing you agree to our Terms of Service and Privacy Policy</p>
+        </div>
+
+        {/* Social proof */}
+        <div style={{ display:"flex", alignItems:"center", gap:8, justifyContent:"center", marginTop:20 }}>
+          <div style={{ display:"flex" }}>
+            {["👩","👨","👩🏽","👨🏿","👩🏻"].map((e,i) => (
+              <div key={i} style={{ width:28, height:28, borderRadius:"50%", background:"#E2E8F0", border:"2px solid #fff", marginLeft:i>0?-8:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>{e}</div>
+            ))}
           </div>
+          <p style={{ fontSize:12, color:"#64748B", margin:0 }}>Join <strong>2,000,000+</strong> AI learners</p>
         </div>
       </div>
     );
@@ -429,6 +521,9 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
           ))}
         </div>
         <p style={{ fontSize:13, color:"#64748B", margin:"0 0 20px" }}>People using plan for 3 months achieve twice as many results as for 1 month</p>
+        <button onClick={handleGetPlan} disabled={signingUp} style={{ width:"100%", padding:"18px", borderRadius:16, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, cursor:"pointer", boxShadow:"0 8px 24px rgba(91,78,255,0.4)", marginBottom:12 }}>
+          {signingUp ? "Creating your account..." : "GET MY PLAN →"}
+        </button>
         <div style={{ background:"#F0FDF4", border:"1.5px solid #BBF7D0", borderRadius:12, padding:"12px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20 }}>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <Check size={16} color="#22c55e"/>
