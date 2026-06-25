@@ -1,51 +1,37 @@
-import CertificateBanner from "@/components/home/CertificateBanner";
-import CurrentCourseWidget from "@/components/home/CurrentCourseWidget";
-import WeeklyStreaks from "@/components/home/WeeklyStreaks";
-import ChallengesSection from "@/components/home/ChallengesSection";
-import BrowseCourses from "@/components/home/BrowseCourses";
-import { getAllCourses, getAllChallenges } from "@/lib/db";
+import HomeNav from "@/components/home/HomeNav";
+import HeroSection from "@/components/home/HeroSection";
+import TrustedSection from "@/components/home/TrustedSection";
+import StatsSection from "@/components/home/StatsSection";
+import WhyCoursiv from "@/components/home/WhyCoursiv";
+import HowItWorks from "@/components/home/HowItWorks";
+import InAction from "@/components/home/InAction";
+import AITools from "@/components/home/AITools";
+import AIIsATool from "@/components/home/AIIsATool";
+import Testimonials from "@/components/home/Testimonials";
+import AboutSection from "@/components/home/AboutSection";
+import SupportSection from "@/components/home/SupportSection";
+import CTASection from "@/components/home/CTASection";
+import FAQSection from "@/components/home/FAQSection";
+import HomeFooter from "@/components/home/HomeFooter";
 
-export const revalidate = 60;
-
-export default async function HomePage() {
-  const [courses, challenges] = await Promise.all([
-    getAllCourses(),
-    getAllChallenges(),
-  ]);
-
+export default function HomePage() {
   return (
-    <>
-      <style>{`
-        .home-grid {
-          display: grid;
-          grid-template-columns: 1fr 300px;
-          gap: 20px;
-        }
-        .home-stack {
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-        }
-        @media (max-width: 768px) {
-          .home-grid {
-            grid-template-columns: 1fr;
-            gap: 16px;
-          }
-          .home-stack {
-            gap: 16px;
-          }
-        }
-      `}</style>
-
-      <div className="home-stack">
-        <CertificateBanner courses={courses} />
-        <div className="home-grid">
-          <CurrentCourseWidget courses={courses} />
-          <WeeklyStreaks />
-        </div>
-                        <BrowseCourses courses={courses} />
-        <ChallengesSection challenges={challenges} />
-      </div>
-    </>
+    <div style={{ background:"#0a081e", minHeight:"100vh", color:"#fff" }}>
+      <HomeNav/>
+      <HeroSection/>
+      <TrustedSection/>
+      <StatsSection/>
+      <WhyCoursiv/>
+      <HowItWorks/>
+      <InAction/>
+      <AITools/>
+      <AIIsATool/>
+      <Testimonials/>
+      <AboutSection/>
+      <SupportSection/>
+      <CTASection/>
+      <FAQSection/>
+      <HomeFooter/>
+    </div>
   );
 }

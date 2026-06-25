@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Plus, Trash2, GripVertical, Save, Check, Loader, Eye } from "lucide-react";
+import { Plus, Trash2, GripVertical, Save, Check, Loader, Eye, Upload, Link2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import {
   DndContext, closestCenter, PointerSensor, useSensor, useSensors
@@ -13,15 +13,8 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 
 const BLOCK_TYPES = [
-  { type:"question_choice",  icon:"❓", label:"Choice Question",   desc:"Single or multi choice",  color:"#6366f1", bg:"#EEF2FF" },
-  { type:"question_text",    icon:"✍️", label:"Text Question",     desc:"Open text answer",         color:"#0891b2", bg:"#ECFEFF" },
-  { type:"image_section",    icon:"🖼️", label:"Image Section",     desc:"Image with text",          color:"#059669", bg:"#ECFDF5" },
-  { type:"insight",          icon:"📊", label:"Insight Screen",    desc:"Stats/report screen",      color:"#d97706", bg:"#FFFBEB" },
-  { type:"comparison",       icon:"⚖️", label:"Comparison",        desc:"With/without comparison",  color:"#dc2626", bg:"#FEF2F2" },
-  { type:"review",           icon:"⭐", label:"Review Screen",     desc:"Trustpilot style review",  color:"#7c3aed", bg:"#F5F3FF" },
-  { type:"loading",          icon:"⏳", label:"Loading Screen",    desc:"Analysis loading screen",  color:"#0369a1", bg:"#F0F9FF" },
-  { type:"signup",           icon:"👤", label:"Name + Email",      desc:"Capture user details",     color:"#15803d", bg:"#F0FDF4" },
-  { type:"sales",            icon:"💰", label:"Sales Page",        desc:"Plan selection screen",    color:"#b45309", bg:"#FFFBEB" },
+  { type:"question_choice", icon:"❓", label:"Choice Question", desc:"Single choice with options", color:"#6366f1", bg:"#EEF2FF" },
+  { type:"image_section",   icon:"🖼️", label:"Image Section",   desc:"Image with text & bullets", color:"#059669", bg:"#ECFDF5" },
 ];
 
 export default function AdminQuizBuilder() {
@@ -39,16 +32,12 @@ export default function AdminQuizBuilder() {
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase
-      .from("quiz_blocks")
-      .select("*")
-      .order("order_index");
+    const { data } = await supabase.from("quiz_blocks").select("*").order("order_index");
     setBlocks((data || []).map(b => ({ ...b, content: b.content || {} })));
     setLoading(false);
   };
 
   const addBlock = (type) => {
-    const def = BLOCK_TYPES.find(b => b.type === type);
     const block = {
       id: `new-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,
       type,
@@ -118,7 +107,7 @@ export default function AdminQuizBuilder() {
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div>
             <h1 style={{ fontSize:24, fontWeight:900, color:"#0f172a", margin:0 }}>Quiz Flow Builder</h1>
-            <p style={{ color:"#64748B", fontSize:14, marginTop:4 }}>{blocks.length} blocks · drag to reorder</p>
+            <p style={{ color:"#64748B", fontSize:14, marginTop:4 }}>{blocks.length} blocks · end sequence is automatic</p>
           </div>
           <div style={{ display:"flex", gap:10 }}>
             <a href="/quiz" target="_blank" style={{ display:"flex", alignItems:"center", gap:6, padding:"10px 18px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", color:"#374151", fontSize:13, fontWeight:600, textDecoration:"none" }}>
@@ -130,11 +119,21 @@ export default function AdminQuizBuilder() {
           </div>
         </div>
 
+        {/* Fixed end sequence info */}
+        <div style={{ background:"#F0F9FF", borderRadius:16, border:"1.5px solid #BAE6FD", padding:"14px 18px" }}>
+          <p style={{ fontSize:13, fontWeight:700, color:"#0369a1", margin:"0 0 6px" }}>⚡ Auto End Sequence (always runs after your blocks)</p>
+          <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+            {["⏳ Analysis Loading","📊 Personal Summary","⚖️ With vs Without","👤 Name + Email","💰 Sales Page"].map((s,i) => (
+              <span key={i} style={{ fontSize:12, fontWeight:600, color:"#0369a1", background:"#E0F2FE", borderRadius:999, padding:"3px 10px" }}>{s}</span>
+            ))}
+          </div>
+        </div>
+
         {/* Builder */}
         {loading ? (
           <div style={{ padding:60, textAlign:"center" }}><Loader size={28} color="#94A3B8" className="bspin"/></div>
         ) : (
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 380px", gap:24 }}>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 300px", gap:24 }}>
 
             {/* Left - blocks */}
             <div>
@@ -161,8 +160,8 @@ export default function AdminQuizBuilder() {
               {blocks.length === 0 && (
                 <div style={{ textAlign:"center", padding:"48px 20px", background:"#fff", borderRadius:20, border:"2px dashed #CBD5E1" }}>
                   <div style={{ fontSize:48, marginBottom:12 }}>🧩</div>
-                  <h3 style={{ fontSize:17, fontWeight:800, color:"#0f172a", margin:"0 0 6px" }}>Build your quiz flow</h3>
-                  <p style={{ fontSize:13, color:"#94A3B8", margin:"0 0 20px" }}>Add questions, images, insights and more</p>
+                  <h3 style={{ fontSize:17, fontWeight:800, color:"#0f172a", margin:"0 0 6px" }}>Build your quiz</h3>
+                  <p style={{ fontSize:13, color:"#94A3B8", margin:"0 0 20px" }}>Add questions and image sections</p>
                   <button onClick={() => { setInsertIdx(0); setShowPicker(true); }} style={{ padding:"11px 26px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
                     + Add First Block
                   </button>
@@ -171,26 +170,31 @@ export default function AdminQuizBuilder() {
             </div>
 
             {/* Right - flow map */}
-            <div style={{ background:"#fff", borderRadius:20, border:"1.5px solid #F1F5F9", padding:20, height:"fit-content", position:"sticky", top:24 }}>
-              <h3 style={{ fontSize:14, fontWeight:800, color:"#0f172a", margin:"0 0 16px" }}>Flow Map</h3>
-              <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
-                {blocks.map((b, i) => {
-                  const def = BLOCK_TYPES.find(x => x.type === b.type);
-                  return (
-                    <div key={b.id} onClick={() => setActiveId(b.id)} style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 12px", borderRadius:10, background:activeId===b.id?"#EEF2FF":"#F8FAFC", cursor:"pointer", border:`1px solid ${activeId===b.id?"#C7D2FE":"#F1F5F9"}` }}>
-                      <span style={{ fontSize:14 }}>{def?.icon}</span>
-                      <div style={{ flex:1, minWidth:0 }}>
-                        <p style={{ fontSize:12, fontWeight:700, color:"#0f172a", margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
-                          {i+1}. {def?.label}
-                        </p>
-                        <p style={{ fontSize:10, color:"#94A3B8", margin:0 }}>
-                          {b.path !== "all" ? `Path: ${b.path}` : "All users"}
+            <div style={{ position:"sticky", top:24, height:"fit-content" }}>
+              <div style={{ background:"#fff", borderRadius:20, border:"1.5px solid #F1F5F9", padding:20, marginBottom:12 }}>
+                <h3 style={{ fontSize:13, fontWeight:800, color:"#0f172a", margin:"0 0 12px" }}>Your Blocks</h3>
+                <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+                  {blocks.map((b, i) => {
+                    const def = BLOCK_TYPES.find(x => x.type === b.type);
+                    return (
+                      <div key={b.id} onClick={() => setActiveId(b.id)} style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 10px", borderRadius:10, background:activeId===b.id?"#EEF2FF":"#F8FAFC", cursor:"pointer", border:`1px solid ${activeId===b.id?"#C7D2FE":"#F1F5F9"}` }}>
+                        <span style={{ fontSize:14 }}>{def?.icon}</span>
+                        <p style={{ fontSize:12, fontWeight:700, color:"#0f172a", margin:0, flex:1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+                          {i+1}. {b.content?.question || b.content?.heading || def?.label}
                         </p>
                       </div>
-                    </div>
-                  );
-                })}
-                {blocks.length === 0 && <p style={{ fontSize:13, color:"#94A3B8", textAlign:"center", padding:20 }}>No blocks yet</p>}
+                    );
+                  })}
+                  {blocks.length === 0 && <p style={{ fontSize:12, color:"#94A3B8", textAlign:"center", padding:12 }}>No blocks yet</p>}
+                </div>
+              </div>
+              <div style={{ background:"#F0F9FF", borderRadius:16, border:"1.5px solid #BAE6FD", padding:16 }}>
+                <h3 style={{ fontSize:12, fontWeight:800, color:"#0369a1", margin:"0 0 10px" }}>Auto End Sequence</h3>
+                {["⏳ Loading","📊 Summary","⚖️ Comparison","👤 Signup","💰 Sales"].map((s,i) => (
+                  <div key={i} style={{ display:"flex", alignItems:"center", gap:8, padding:"6px 0", borderBottom:i<4?"1px solid #E0F2FE":"none" }}>
+                    <span style={{ fontSize:12, color:"#0369a1", fontWeight:600 }}>{s}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -200,18 +204,18 @@ export default function AdminQuizBuilder() {
       {/* Block picker */}
       {showPicker && (
         <div onClick={() => setShowPicker(false)} style={{ position:"fixed", inset:0, zIndex:300, display:"flex", alignItems:"center", justifyContent:"center", padding:20, background:"rgba(15,23,42,0.6)", backdropFilter:"blur(4px)" }}>
-          <div onClick={e => e.stopPropagation()} style={{ background:"#fff", borderRadius:24, padding:24, width:"100%", maxWidth:620, boxShadow:"0 32px 80px rgba(0,0,0,0.3)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ background:"#fff", borderRadius:24, padding:24, width:"100%", maxWidth:480, boxShadow:"0 32px 80px rgba(0,0,0,0.3)" }}>
             <h3 style={{ fontSize:17, fontWeight:800, color:"#0f172a", margin:"0 0 4px" }}>Add a block</h3>
-            <p style={{ fontSize:13, color:"#94A3B8", margin:"0 0 20px" }}>Choose what to add to your quiz flow</p>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10 }}>
+            <p style={{ fontSize:13, color:"#94A3B8", margin:"0 0 20px" }}>Questions and image sections only — end sequence is automatic</p>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
               {BLOCK_TYPES.map(def => (
                 <button key={def.type} onClick={() => addBlock(def.type)}
-                  style={{ padding:"16px 12px", borderRadius:14, border:`1.5px solid ${def.color}25`, background:def.bg, cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:6, transition:"all 0.15s" }}
+                  style={{ padding:"20px 16px", borderRadius:14, border:`1.5px solid ${def.color}25`, background:def.bg, cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:8, transition:"all 0.15s" }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor=def.color; e.currentTarget.style.transform="translateY(-2px)"; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor=`${def.color}25`; e.currentTarget.style.transform="translateY(0)"; }}>
-                  <span style={{ fontSize:26 }}>{def.icon}</span>
-                  <span style={{ fontSize:12, fontWeight:700, color:def.color }}>{def.label}</span>
-                  <span style={{ fontSize:10, color:"#94A3B8", textAlign:"center", lineHeight:1.3 }}>{def.desc}</span>
+                  <span style={{ fontSize:32 }}>{def.icon}</span>
+                  <span style={{ fontSize:14, fontWeight:700, color:def.color }}>{def.label}</span>
+                  <span style={{ fontSize:12, color:"#94A3B8", textAlign:"center" }}>{def.desc}</span>
                 </button>
               ))}
             </div>
@@ -231,32 +235,28 @@ function SortableBlock({ block, idx, isActive, onToggle, onChange, onPathChange,
 
   return (
     <div ref={setNodeRef} style={{ ...style, background:"#fff", borderRadius:16, border:`1.5px solid ${isActive?def.color+"60":"#E2E8F0"}`, overflow:"hidden", marginBottom:2, boxShadow:isActive?`0 4px 20px ${def.color}15`:"0 1px 3px rgba(0,0,0,0.04)" }}>
-      {/* Header */}
-      <div style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 12px", background:isActive?def.bg:"#fff" }}>
+      <div style={{ display:"flex", alignItems:"center", gap:10, padding:"12px 14px", background:isActive?def.bg:"#fff" }}>
         <button {...attributes} {...listeners} style={{ cursor:"grab", border:"none", background:"none", padding:2, display:"flex", touchAction:"none" }}>
           <GripVertical size={16} color="#CBD5E1"/>
         </button>
         <span style={{ fontSize:18 }}>{def.icon}</span>
         <div style={{ flex:1, minWidth:0, cursor:"pointer" }} onClick={onToggle}>
           <p style={{ fontSize:13, fontWeight:700, color:def.color, margin:0 }}>{idx+1}. {def.label}</p>
-          <p style={{ fontSize:11, color:"#94A3B8", margin:0 }}>
-            {block.content?.question || block.content?.title || block.content?.heading || def.label}
+          <p style={{ fontSize:11, color:"#94A3B8", margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+            {block.content?.question || block.content?.heading || "Click to edit"}
           </p>
         </div>
-        {/* Path selector */}
-        <select value={block.path || "all"} onChange={e => onPathChange(e.target.value)}
-          style={{ padding:"4px 8px", borderRadius:8, border:"1.5px solid #E2E8F0", fontSize:11, fontWeight:600, color:"#64748B", cursor:"pointer", background:"#fff" }}
-          onClick={e => e.stopPropagation()}>
+        <select value={block.path||"all"} onChange={e => onPathChange(e.target.value)}
+          onClick={e => e.stopPropagation()}
+          style={{ padding:"4px 8px", borderRadius:8, border:"1.5px solid #E2E8F0", fontSize:11, fontWeight:600, color:"#64748B", background:"#fff" }}>
           <option value="all">All users</option>
           <option value="company">Company only</option>
           <option value="myself">Myself only</option>
         </select>
-        <button onClick={onDelete} style={{ width:26, height:26, borderRadius:7, border:"1.5px solid #FEE2E2", background:"#fff", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", color:"#EF4444" }}>
-          <Trash2 size={12}/>
+        <button onClick={onDelete} style={{ width:28, height:28, borderRadius:8, border:"1.5px solid #FEE2E2", background:"#fff", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", color:"#EF4444" }}>
+          <Trash2 size={13}/>
         </button>
       </div>
-
-      {/* Editor */}
       {isActive && (
         <div style={{ padding:"12px 16px 16px", borderTop:`1px solid ${def.color}20` }}>
           <BlockEditor type={block.type} content={block.content} onChange={onChange} />
@@ -268,104 +268,156 @@ function SortableBlock({ block, idx, isActive, onToggle, onChange, onPathChange,
 
 function BlockEditor({ type, content, onChange }) {
   const u = (k, v) => onChange({ ...content, [k]: v });
+  const fileRef = useRef();
+  const [uploading, setUploading] = useState(false);
+  const [imgMode, setImgMode] = useState("url");
 
-  switch(type) {
-    case "question_choice":
-      return (
-        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-          <Field label="Question"><input value={content.question||""} onChange={e=>u("question",e.target.value)} placeholder="How would you describe yourself?" style={inp()}/></Field>
-          <Field label="Options (one per line)">
-            <textarea value={(content.options||[]).join("\n")} onChange={e=>u("options",e.target.value.split("\n"))} placeholder={"I work for a company\nI work for myself"} style={{ ...inp(), minHeight:100, resize:"vertical" }}/>
-          </Field>
-          <Field label="Allow multiple?">
-            <select value={content.multi||"no"} onChange={e=>u("multi",e.target.value)} style={inp()}>
-              <option value="no">Single choice</option>
-              <option value="yes">Multiple choice</option>
-            </select>
-          </Field>
-          <Field label="Show images for options?" hint="optional">
-            <input value={content.optionImages||""} onChange={e=>u("optionImages",e.target.value)} placeholder="Comma separated image URLs" style={inp()}/>
-          </Field>
-          <Field label="This is the path splitter?">
-            <select value={content.isSplit||"no"} onChange={e=>u("isSplit",e.target.value)} style={inp()}>
-              <option value="no">No</option>
-              <option value="yes">Yes — first option = company, second = myself</option>
-            </select>
-          </Field>
-        </div>
-      );
-    case "question_text":
-      return (
-        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-          <Field label="Question"><input value={content.question||""} onChange={e=>u("question",e.target.value)} placeholder="What is your name?" style={inp()}/></Field>
-          <Field label="Placeholder"><input value={content.placeholder||""} onChange={e=>u("placeholder",e.target.value)} placeholder="Type your answer..." style={inp()}/></Field>
-        </div>
-      );
-    case "image_section":
-      return (
-        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-          <Field label="Heading"><input value={content.heading||""} onChange={e=>u("heading",e.target.value)} placeholder="AI is Easier Than You Think" style={inp()}/></Field>
-          <Field label="Subtext"><textarea value={content.subtext||""} onChange={e=>u("subtext",e.target.value)} style={{ ...inp(), minHeight:70, resize:"vertical" }}/></Field>
-          <Field label="Image URL"><input value={content.imageUrl||""} onChange={e=>u("imageUrl",e.target.value)} placeholder="https://..." style={inp()}/></Field>
-          <Field label="Bullet points (one per line)"><textarea value={(content.bullets||[]).join("\n")} onChange={e=>u("bullets",e.target.value.split("\n"))} style={{ ...inp(), minHeight:80, resize:"vertical" }}/></Field>
-        </div>
-      );
-    case "insight":
-      return (
-        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-          <Field label="Title"><input value={content.title||""} onChange={e=>u("title",e.target.value)} placeholder="Your Personal Summary" style={inp()}/></Field>
-          <Field label="Subtitle"><input value={content.subtitle||""} onChange={e=>u("subtitle",e.target.value)} placeholder="The quiz indicates that..." style={inp()}/></Field>
-          <Field label="Stat label (e.g. AI Skills)"><input value={content.statLabel||""} onChange={e=>u("statLabel",e.target.value)} placeholder="AI Skills" style={inp()}/></Field>
-          <Field label="Insight items (label|value, one per line)">
-            <textarea value={(content.items||[]).join("\n")} onChange={e=>u("items",e.target.value.split("\n"))} placeholder={"Your focus|Future-proofing your role\nYour pace|20 min a day"} style={{ ...inp(), minHeight:100, resize:"vertical" }}/>
-          </Field>
-        </div>
-      );
-    case "comparison":
-      return (
-        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-          <Field label="Title"><input value={content.title||""} onChange={e=>u("title",e.target.value)} placeholder="Your Personalized AI Certificate Program" style={inp()}/></Field>
-          <Field label="Without Coursiv (one per line)"><textarea value={(content.without||[]).join("\n")} onChange={e=>u("without",e.target.value.split("\n"))} style={{ ...inp(), minHeight:80, resize:"vertical" }} placeholder={"No time to get started\nNo recognized credential"}/></Field>
-          <Field label="With Coursiv (one per line)"><textarea value={(content.with||[]).join("\n")} onChange={e=>u("with",e.target.value.split("\n"))} style={{ ...inp(), minHeight:80, resize:"vertical" }} placeholder={"Clear, step-by-step path\nShareable AI credential"}/></Field>
-          <Field label="Target date label"><input value={content.dateLabel||""} onChange={e=>u("dateLabel",e.target.value)} placeholder="by July 22, 2026" style={inp()}/></Field>
-        </div>
-      );
-    case "review":
-      return (
-        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-          <Field label="Stat (e.g. 2,000,000+ people)"><input value={content.stat||""} onChange={e=>u("stat",e.target.value)} placeholder="2,000,000+ people" style={inp()}/></Field>
-          <Field label="Stat subtext"><input value={content.statSub||""} onChange={e=>u("statSub",e.target.value)} placeholder="have chosen Coursiv" style={inp()}/></Field>
-          <Field label="Review title"><input value={content.reviewTitle||""} onChange={e=>u("reviewTitle",e.target.value)} placeholder="Amazing to upgrade skills" style={inp()}/></Field>
-          <Field label="Review text"><textarea value={content.reviewText||""} onChange={e=>u("reviewText",e.target.value)} style={{ ...inp(), minHeight:70, resize:"vertical" }}/></Field>
-          <Field label="Reviewer name"><input value={content.reviewer||""} onChange={e=>u("reviewer",e.target.value)} placeholder="Jeremy" style={inp()}/></Field>
-        </div>
-      );
-    case "loading":
-      return (
-        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-          <Field label="Loading text"><input value={content.text||""} onChange={e=>u("text",e.target.value)} placeholder="Analyzing answers to personalize your AI Certificate Program..." style={inp()}/></Field>
-          <Field label="Duration (seconds)"><input type="number" value={content.duration||3} onChange={e=>u("duration",parseInt(e.target.value))} style={inp()}/></Field>
-        </div>
-      );
-    case "signup":
-      return (
-        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-          <Field label="Heading"><input value={content.heading||""} onChange={e=>u("heading",e.target.value)} placeholder="Your Personalized AI Certificate Program is Ready!" style={inp()}/></Field>
-          <Field label="Subtext"><input value={content.subtext||""} onChange={e=>u("subtext",e.target.value)} placeholder="Enter your details to get started" style={inp()}/></Field>
-        </div>
-      );
-    case "sales":
-      return (
-        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-          <Field label="Heading"><input value={content.heading||""} onChange={e=>u("heading",e.target.value)} placeholder="Choose the best plan for you" style={inp()}/></Field>
-          <Field label="Discount %"><input type="number" value={content.discount||50} onChange={e=>u("discount",parseInt(e.target.value))} style={inp()}/></Field>
-          <Field label="Plans (name|price|originalPrice, one per line)">
-            <textarea value={(content.plans||[]).join("\n")} onChange={e=>u("plans",e.target.value.split("\n"))} placeholder={"1-Week Plan|6.93|13.86\n4-Week Plan|19.99|39.99\n12-Week Plan|39.99|79.99"} style={{ ...inp(), minHeight:80, resize:"vertical" }}/>
-          </Field>
-        </div>
-      );
-    default: return <p style={{ fontSize:13, color:"#94A3B8" }}>No editor for this block type yet.</p>;
+  const handleImageUpload = async (file) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const path = `quiz/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g,"_")}`;
+      const { error } = await supabase.storage.from("lesson-media").upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data } = supabase.storage.from("lesson-media").getPublicUrl(path);
+      u("imageUrl", data.publicUrl);
+    } catch(e) { alert("Upload failed: " + e.message); }
+    setUploading(false);
+  };
+
+  const handleOptionImageUpload = async (file, idx) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const path = `quiz/opt-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g,"_")}`;
+      const { error } = await supabase.storage.from("lesson-media").upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data } = supabase.storage.from("lesson-media").getPublicUrl(path);
+      const imgs = [...(content.optionImages||[])];
+      imgs[idx] = data.publicUrl;
+      u("optionImages", imgs);
+    } catch(e) { alert("Upload failed: " + e.message); }
+    setUploading(false);
+  };
+
+  if (type === "question_choice") {
+    const options = content.options || ["", ""];
+    const optionImages = content.optionImages || [];
+
+    const setOpt = (i, v) => {
+      const a = [...options]; a[i] = v; u("options", a);
+    };
+    const setOptImg = (i, v) => {
+      const a = [...optionImages]; a[i] = v; u("optionImages", a);
+    };
+
+    return (
+      <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+        <Field label="Question">
+          <input value={content.question||""} onChange={e=>u("question",e.target.value)} placeholder="How would you describe yourself?" style={inp()}/>
+        </Field>
+        <Field label="Subtitle" hint="optional">
+          <input value={content.subtitle||""} onChange={e=>u("subtitle",e.target.value)} placeholder="We will personalize your path based on your answers" style={inp()}/>
+        </Field>
+        <Field label="This splits the path?">
+          <select value={content.isSplit||"no"} onChange={e=>u("isSplit",e.target.value)} style={inp()}>
+            <option value="no">No — show to all users</option>
+            <option value="yes">Yes — 1st option = company path, 2nd = myself path</option>
+          </select>
+        </Field>
+        <Field label="Options">
+          <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+            {options.map((opt, i) => (
+              <div key={i} style={{ background:"#F8FAFC", borderRadius:12, padding:12, border:"1.5px solid #E2E8F0" }}>
+                <div style={{ display:"flex", gap:8, alignItems:"center", marginBottom:8 }}>
+                  <div style={{ width:24, height:24, borderRadius:"50%", background:"#EEF2FF", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:"#6366f1", flexShrink:0 }}>{i+1}</div>
+                  <input value={opt} onChange={e=>setOpt(i,e.target.value)} placeholder={`Option ${i+1}`} style={{ ...inp(), flex:1 }}/>
+                  {options.length > 2 && (
+                    <button onClick={() => { const a=[...options]; a.splice(i,1); u("options",a); }} style={{ width:28, height:28, borderRadius:7, border:"1.5px solid #FEE2E2", background:"#fff", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", color:"#EF4444", flexShrink:0 }}>
+                      <Trash2 size={12}/>
+                    </button>
+                  )}
+                </div>
+                {/* Option image */}
+                <div>
+                  <p style={{ fontSize:10, fontWeight:700, color:"#94A3B8", margin:"0 0 6px", textTransform:"uppercase" }}>Option image · optional</p>
+                  <div style={{ display:"flex", gap:6 }}>
+                    <button onClick={() => { const inp = document.createElement("input"); inp.type="file"; inp.accept="image/*"; inp.onchange=e=>handleOptionImageUpload(e.target.files[0],i); inp.click(); }}
+                      style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 10px", borderRadius:8, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:11, fontWeight:600, color:"#374151", cursor:"pointer" }}>
+                      <Upload size={12}/> Upload
+                    </button>
+                    <input value={optionImages[i]||""} onChange={e=>setOptImg(i,e.target.value)} placeholder="or paste image URL..." style={{ ...inp(), flex:1, fontSize:11 }}/>
+                  </div>
+                  {optionImages[i] && (
+                    <div style={{ marginTop:6, borderRadius:8, overflow:"hidden", height:80 }}>
+                      <img src={optionImages[i]} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+            <button onClick={() => u("options",[...options,""])} style={{ padding:"8px", borderRadius:9, border:"1.5px dashed #E2E8F0", background:"#F8FAFC", color:"#94A3B8", fontSize:12, fontWeight:600, cursor:"pointer" }}>
+              + Add option
+            </button>
+          </div>
+        </Field>
+      </div>
+    );
   }
+
+  if (type === "image_section") {
+    return (
+      <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+        <Field label="Heading">
+          <input value={content.heading||""} onChange={e=>u("heading",e.target.value)} placeholder="AI is Easier Than You Think" style={inp()}/>
+        </Field>
+        <Field label="Subtext" hint="optional">
+          <textarea value={content.subtext||""} onChange={e=>u("subtext",e.target.value)} style={{ ...inp(), minHeight:70, resize:"vertical" }} placeholder="Our certificate program is designed to make a difference..."/>
+        </Field>
+        <Field label="Image">
+          <div style={{ display:"flex", gap:6, marginBottom:8 }}>
+            <button onClick={() => setImgMode("upload")} style={{ flex:1, padding:"7px", borderRadius:8, border:`1.5px solid ${imgMode==="upload"?"#6366f1":"#E2E8F0"}`, background:imgMode==="upload"?"#EEF2FF":"#fff", fontSize:12, fontWeight:600, color:imgMode==="upload"?"#6366f1":"#64748B", cursor:"pointer" }}>
+              <Upload size={12} style={{ marginRight:4 }}/>Upload
+            </button>
+            <button onClick={() => setImgMode("url")} style={{ flex:1, padding:"7px", borderRadius:8, border:`1.5px solid ${imgMode==="url"?"#6366f1":"#E2E8F0"}`, background:imgMode==="url"?"#EEF2FF":"#fff", fontSize:12, fontWeight:600, color:imgMode==="url"?"#6366f1":"#64748B", cursor:"pointer" }}>
+              <Link2 size={12} style={{ marginRight:4 }}/>URL
+            </button>
+          </div>
+          {imgMode==="upload" ? (
+            <div>
+              <input ref={fileRef} type="file" accept="image/*" style={{ display:"none" }} onChange={e=>handleImageUpload(e.target.files[0])}/>
+              <button onClick={() => fileRef.current?.click()} disabled={uploading}
+                style={{ width:"100%", padding:"12px", borderRadius:10, border:"2px dashed #6366f1", background:"#EEF2FF", color:"#6366f1", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                {uploading ? "Uploading..." : content.imageUrl ? "Change image" : "Click to upload image"}
+              </button>
+            </div>
+          ) : (
+            <input value={content.imageUrl||""} onChange={e=>u("imageUrl",e.target.value)} placeholder="https://..." style={inp()}/>
+          )}
+          {content.imageUrl && (
+            <div style={{ marginTop:8, borderRadius:12, overflow:"hidden", height:120 }}>
+              <img src={content.imageUrl} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
+            </div>
+          )}
+        </Field>
+        <Field label="Bullet points" hint="one per line">
+          <textarea value={(content.bullets||[]).join("\n")} onChange={e=>u("bullets",e.target.value.split("\n"))}
+            placeholder={"No prior AI knowledge required\nWork at your own pace\nNo university degree needed"}
+            style={{ ...inp(), minHeight:90, resize:"vertical" }}/>
+        </Field>
+        <Field label="Layout">
+          <select value={content.layout||"image-right"} onChange={e=>u("layout",e.target.value)} style={inp()}>
+            <option value="image-right">Text left, Image right</option>
+            <option value="image-left">Image left, Text right</option>
+            <option value="image-top">Image top, Text below</option>
+            <option value="fullwidth">Full width image with text overlay</option>
+          </select>
+        </Field>
+      </div>
+    );
+  }
+
+  return null;
 }
 
 function InsertLine({ onClick }) {
@@ -396,15 +448,8 @@ function Field({ label, hint, children }) {
 
 function getDefaultContent(type) {
   switch(type) {
-    case "question_choice": return { question:"", options:["Option 1","Option 2"], multi:"no", isSplit:"no" };
-    case "question_text":   return { question:"", placeholder:"Type your answer..." };
-    case "image_section":   return { heading:"", subtext:"", imageUrl:"", bullets:[] };
-    case "insight":         return { title:"Your Personal Summary", subtitle:"", statLabel:"AI Skills", items:[] };
-    case "comparison":      return { title:"", without:[], with:[], dateLabel:"" };
-    case "review":          return { stat:"2,000,000+", statSub:"have chosen Coursiv", reviewTitle:"", reviewText:"", reviewer:"" };
-    case "loading":         return { text:"Analyzing your answers...", duration:3 };
-    case "signup":          return { heading:"Your Personalized AI Certificate Program is Ready!", subtext:"" };
-    case "sales":           return { heading:"Choose the best plan for you", discount:50, plans:["1-Week Plan|6.93|13.86","4-Week Plan|19.99|39.99","12-Week Plan|39.99|79.99"] };
+    case "question_choice": return { question:"", subtitle:"", options:["Option 1","Option 2"], optionImages:[], isSplit:"no" };
+    case "image_section":   return { heading:"", subtext:"", imageUrl:"", bullets:[], layout:"image-right" };
     default: return {};
   }
 }

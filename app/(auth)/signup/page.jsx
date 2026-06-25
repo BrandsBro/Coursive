@@ -1,5 +1,5 @@
-import AuthPage from "@/components/auth/AuthPage";
-export const metadata = { title: "Sign Up - Coursiv" };
+import { redirect } from "next/navigation";
+
 export default function SignupPage() {
-  return <AuthPage mode="signup" />;
+  redirect("/quiz");
 }

@@ -161,8 +161,8 @@ export default function AuthPage({ mode }) {
 
       <p style={{ textAlign:"center", color:"rgba(255,255,255,0.3)", fontSize:12, margin:"14px 0 0" }}>
         {isLogin ? "No account? " : "Have an account? "}
-        <Link href={isLogin ? "/signup" : "/login"} style={{ color:"#a78bfa", fontWeight:700, textDecoration:"none" }}>
-          {isLogin ? "Sign up free" : "Sign in"}
+        <Link href={isLogin ? "/quiz" : "/login"} style={{ color:"#a78bfa", fontWeight:700, textDecoration:"none" }}>
+          {isLogin ? "Start for free →" : "Sign in"}
         </Link>
       </p>
 
