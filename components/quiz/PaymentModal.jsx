@@ -45,7 +45,15 @@ function CheckoutForm({ plan, email, name, onSuccess, onClose }) {
       });
 
       if (stripeError) throw new Error(stripeError.message);
-      if (paymentIntent.status === "succeeded") onSuccess();
+      if (paymentIntent.status === "succeeded") {
+        // Create account and send email
+        await fetch("/api/stripe/create-account", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, name, plan }),
+        });
+        onSuccess();
+      }
     } catch (e) {
       setError(e.message);
     }
