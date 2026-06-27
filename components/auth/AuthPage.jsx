@@ -31,6 +31,7 @@ export default function AuthPage({ mode }) {
   useEffect(() => {
     const emailParam = searchParams.get("email");
     const nameParam = searchParams.get("name");
+    const welcomeParam = searchParams.get("welcome");
     if (emailParam) setEmail(decodeURIComponent(emailParam));
     if (nameParam) setName(decodeURIComponent(nameParam));
   }, [searchParams]);

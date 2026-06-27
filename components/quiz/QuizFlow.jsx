@@ -70,9 +70,7 @@ export default function QuizFlow({ blocks }) {
       if (!name.trim()) { setToast("Please enter your full name"); return; }
       if (!email.trim() || !email.includes("@")) { setToast("Please enter a valid email address"); return; }
     }
-    if (!isInEndSequence && currentBlock?.type === "question_choice") {
-      if (!answers[currentBlock.id]) { setToast("Please select an option to continue"); return; }
-    }
+
     if (!isInEndSequence) {
       if (currentIdx < visibleBlocks.length - 1) {
         setCurrentIdx(i => i + 1);
@@ -271,7 +269,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
   const handlePaymentSuccess = () => {
     setShowPayment(false);
     sessionStorage.clear();
-    router.push("/login?welcome=1");
+    router.push("/payment-success");
   };
 
   if (step === "loading") {
