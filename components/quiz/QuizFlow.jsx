@@ -145,7 +145,7 @@ export default function QuizFlow({ blocks }) {
       </div>
 
       {/* Content */}
-      <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", padding:"32px 20px 120px", maxWidth:600, margin:"0 auto", width:"100%" }}>
+      <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"32px 20px 120px", maxWidth:900, margin:"0 auto", width:"100%" }}>
         {showResume && (
           <div style={{ width:"100%", background:"#EEF2FF", border:"1.5px solid #C7D2FE", borderRadius:16, padding:"16px 20px", marginBottom:24, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <div>
@@ -192,17 +192,17 @@ function QuizBlock({ block, answers, onChoice, onNext }) {
       <div style={{ width:"100%", textAlign:"center" }}>
         <h1 style={{ fontSize:28, fontWeight:900, color:"#0f172a", margin:"0 0 8px", lineHeight:1.2 }}>{c.question || "Question"}</h1>
         {c.subtitle && <p style={{ fontSize:15, color:"#64748B", margin:"0 0 32px" }}>{c.subtitle}</p>}
-        <div style={{ display:"grid", gridTemplateColumns: hasImages && options.length === 2 ? "1fr 1fr" : "1fr", gap:12 }}>
+        <div style={{ display:"grid", gridTemplateColumns: hasImages && options.length === 2 ? "1fr 1fr" : "1fr", gap:12, alignItems:"stretch" }}>
           {options.map((opt, i) => (
             <button key={i}
               onClick={() => { onChoice(block.id, opt, c.isSplit, i); setTimeout(onNext, 250); }}
-              style={{ padding: optionImages[i] ? "0" : "18px 24px", borderRadius:16, border:`2px solid ${selected===opt?"#5B4EFF":"#E2E8F0"}`, background: selected===opt?"#EEF2FF":"#F8FAFC", cursor:"pointer", overflow:"hidden", transition:"all 0.15s", textAlign:"left", boxShadow: selected===opt?"0 4px 14px rgba(91,78,255,0.2)":"none" }}
+              style={{ padding: optionImages[i] ? "0" : "18px 24px", borderRadius:16, border:`2px solid ${selected===opt?"#5B4EFF":"#E2E8F0"}`, background: selected===opt?"#EEF2FF":"#F8FAFC", cursor:"pointer", overflow:"hidden", transition:"all 0.15s", textAlign:"left", boxShadow: selected===opt?"0 4px 14px rgba(91,78,255,0.2)":"none", display:"flex", flexDirection:"column" }}
               onMouseEnter={e => { e.currentTarget.style.borderColor="#5B4EFF"; e.currentTarget.style.background="#EEF2FF"; }}
               onMouseLeave={e => { if (selected!==opt) { e.currentTarget.style.borderColor="#E2E8F0"; e.currentTarget.style.background="#F8FAFC"; } }}
             >
               {optionImages[i] && (
-                <div style={{ height:150, overflow:"hidden" }}>
-                  <img src={optionImages[i]} alt={opt} style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
+                <div style={{ overflow:"hidden", flexShrink:0 }}>
+                  <img src={optionImages[i]} alt={opt} style={{ width:"100%", display:"block", objectFit:"cover" }}/>
                 </div>
               )}
               <div style={{ padding: optionImages[i] ? "14px 16px" : "0", display:"flex", alignItems:"center", justifyContent:"space-between", gap:10 }}>
@@ -218,15 +218,39 @@ function QuizBlock({ block, answers, onChoice, onNext }) {
     );
   }
 
+  if (block.type === "question_icon") {
+    const options = (c.options || []);
+    const selected = answers[block.id];
+    return (
+      <div style={{ width:"100%" }}>
+        <h1 style={{ fontSize:28, fontWeight:900, color:"#0f172a", margin:"0 0 8px", lineHeight:1.2, textAlign:"center" }}>{c.question || "Question"}</h1>
+        {c.subtitle && <p style={{ fontSize:15, color:"#64748B", margin:"0 0 32px", textAlign:"center" }}>{c.subtitle}</p>}
+        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+          {options.map((opt, i) => (
+            <button key={i}
+              onClick={() => { onChoice(block.id, opt.label, c.isSplit, i); setTimeout(onNext, 250); }}
+              style={{ display:"flex", alignItems:"center", gap:16, padding:"18px 24px", borderRadius:16, border:`2px solid ${selected===opt.label?"#5B4EFF":"#E2E8F0"}`, background: selected===opt.label?"#EEF2FF":"#F8FAFC", cursor:"pointer", transition:"all 0.15s", textAlign:"left", boxShadow: selected===opt.label?"0 4px 14px rgba(91,78,255,0.2)":"none" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor="#5B4EFF"; e.currentTarget.style.background="#EEF2FF"; }}
+              onMouseLeave={e => { if (selected!==opt.label) { e.currentTarget.style.borderColor="#E2E8F0"; e.currentTarget.style.background="#F8FAFC"; } }}
+            >
+              <span style={{ fontSize:32, width:48, textAlign:"center", flexShrink:0 }}>{opt.emoji||"•"}</span>
+              <span style={{ fontSize:16, fontWeight:700, color:selected===opt.label?"#5B4EFF":"#0f172a" }}>{opt.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (block.type === "image_section") {
     const c2 = block.content || {};
     const layout = c2.layout || "image-right";
-    const bullets = (c2.bullets || []).filter(Boolean);
-    return (
-      <div style={{ width:"100%" }}>
-        <h1 style={{ fontSize:26, fontWeight:900, color:"#0f172a", margin:"0 0 8px" }}>{c2.heading}</h1>
-        {c2.subtext && <p style={{ fontSize:15, color:"#64748B", margin:"0 0 20px", lineHeight:1.6 }}>{c2.subtext}</p>}
-        {c2.imageUrl && <div style={{ borderRadius:20, overflow:"hidden", marginBottom:20 }}><img src={c2.imageUrl} alt="" style={{ width:"100%", display:"block" }}/></div>}
+    const bullets = (c2.bullets || []).filter(b => b && b.trim());
+
+    const textContent = (
+      <div style={{ flex:1, display:"flex", flexDirection:"column", justifyContent:"center" }}>
+        <h1 style={{ fontSize:32, fontWeight:900, color:"#5B4EFF", margin:"0 0 8px", lineHeight:1.2 }}>{c2.heading}</h1>
+        {c2.subtext && <p style={{ fontSize:16, color:"#374151", margin:"0 0 20px", lineHeight:1.7 }}>{c2.subtext}</p>}
         {bullets.map((b,i) => (
           <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 16px", background:"#F8FAFC", borderRadius:12, marginBottom:8 }}>
             <div style={{ width:28, height:28, borderRadius:"50%", background:"#5B4EFF", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
@@ -235,6 +259,38 @@ function QuizBlock({ block, answers, onChoice, onNext }) {
             <span style={{ fontSize:15, color:"#0f172a", fontWeight:500 }}>{b}</span>
           </div>
         ))}
+      </div>
+    );
+
+    const imageContent = c2.imageUrl ? (
+      <div style={{ flex:1, borderRadius:20, overflow:"hidden", minHeight:300 }}>
+        <img src={c2.imageUrl} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", borderRadius:20 }}/>
+      </div>
+    ) : null;
+
+    if (layout === "image-top") {
+      return (
+        <div style={{ width:"100%" }}>
+          {imageContent && <div style={{ marginBottom: bullets.length > 0 ? 24 : 0 }}>{imageContent}</div>}
+          {bullets.length > 0 && textContent}
+          {bullets.length === 0 && <div style={{ flex:1 }}><h1 style={{ fontSize:26, fontWeight:900, color:"#0f172a", margin:"0 0 8px", lineHeight:1.2 }}>{c2.heading}</h1>{c2.subtext && <p style={{ fontSize:15, color:"#64748B", margin:0, lineHeight:1.6 }}>{c2.subtext}</p>}</div>}
+        </div>
+      );
+    }
+
+    if (layout === "fullwidth") {
+      return (
+        <div style={{ width:"100%", position:"relative" }}>
+          {c2.imageUrl && <div style={{ borderRadius:20, overflow:"hidden", marginBottom:20 }}><img src={c2.imageUrl} alt="" style={{ width:"100%", display:"block" }}/></div>}
+          {textContent}
+        </div>
+      );
+    }
+
+    // image-left or image-right
+    return (
+      <div style={{ width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, alignItems:"center" }}>
+        {layout === "image-left" ? <>{imageContent}{textContent}</> : <>{textContent}{imageContent}</>}
       </div>
     );
   }
