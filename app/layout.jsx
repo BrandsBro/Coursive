@@ -1,7 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/AuthContext";
-import OnboardingWrapper from "@/components/onboarding/OnboardingWrapper";
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,9 +15,9 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
         <AuthProvider>
-          <OnboardingWrapper>
+          
             {children}
-          </OnboardingWrapper>
+          
         </AuthProvider>
       </body>
     </html>

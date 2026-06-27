@@ -62,7 +62,7 @@ export default function AuthPage({ mode }) {
         else setError(err.message);
         return;
       }
-      router.push("/");
+      router.push("/home");
       router.refresh();
     } else {
       const { data, error: err } = await supabase.auth.signUp({
@@ -79,7 +79,7 @@ export default function AuthPage({ mode }) {
   async function handleGoogle() {
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin + "/" },
+      options: { redirectTo: window.location.origin + "/home" },
     });
   }
 

@@ -62,8 +62,7 @@ export default function Navbar() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.push("/login");
-    router.refresh();
+    window.location.href = "/login";
   };
 
   // Close mobile nav on route change

@@ -43,7 +43,7 @@ export async function POST(req) {
 
     // Send welcome email
     await resend.emails.send({
-      from: "Coursiv <onboarding@resend.dev>",
+      from: "Coursiv <noreply@kingbrandsbro.pro>",
       to: email,
       subject: "🎉 Welcome to Coursiv! Your login details inside",
       html: `
