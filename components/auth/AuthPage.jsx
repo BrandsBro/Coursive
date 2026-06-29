@@ -206,38 +206,58 @@ export default function AuthPage({ mode }) {
 
       {/* Forgot Password Modal */}
       {showForgot && (
-        <div style={{ position:"fixed", inset:0, zIndex:999, background:"rgba(15,23,42,0.7)", backdropFilter:"blur(8px)", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
-          <div style={{ background:"#fff", borderRadius:24, padding:"32px 28px", width:"100%", maxWidth:420, boxShadow:"0 32px 80px rgba(0,0,0,0.3)" }}>
+        <div style={{ position:"fixed", inset:0, zIndex:999, background:"rgba(10,8,30,0.85)", backdropFilter:"blur(12px)", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
+          <div style={{ background:"#fff", borderRadius:28, width:"100%", maxWidth:400, boxShadow:"0 40px 100px rgba(0,0,0,0.4)", overflow:"hidden" }}>
             {!forgotSent ? (
               <>
-                <div style={{ textAlign:"center", marginBottom:24 }}>
-                  <div style={{ fontSize:48, marginBottom:12 }}>🔑</div>
-                  <h2 style={{ fontSize:22, fontWeight:900, color:"#0f172a", margin:"0 0 8px" }}>Forgot Password?</h2>
-                  <p style={{ fontSize:14, color:"#64748B", margin:0 }}>Enter your email and we will send you a temporary password</p>
+                {/* Header */}
+                <div style={{ background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", padding:"32px 28px", textAlign:"center", position:"relative" }}>
+                  <button onClick={() => { setShowForgot(false); setForgotEmail(""); setForgotError(""); }}
+                    style={{ position:"absolute", top:14, right:14, width:30, height:30, borderRadius:"50%", border:"none", background:"rgba(255,255,255,0.15)", color:"#fff", cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+                  <div style={{ width:60, height:60, borderRadius:20, background:"rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 14px", fontSize:28 }}>🔑</div>
+                  <h2 style={{ fontSize:22, fontWeight:900, color:"#fff", margin:"0 0 6px" }}>Forgot Password?</h2>
+                  <p style={{ fontSize:13, color:"rgba(255,255,255,0.75)", margin:0 }}>We will send a temporary password to your email</p>
                 </div>
-                <input value={forgotEmail} onChange={e=>setForgotEmail(e.target.value)} placeholder="your@email.com" type="email"
-                  style={{ width:"100%", padding:"14px 16px", borderRadius:12, border:"2px solid #E2E8F0", fontSize:15, outline:"none", boxSizing:"border-box", marginBottom:12 }}
-                  onFocus={e=>e.target.style.borderColor="#5B4EFF"} onBlur={e=>e.target.style.borderColor="#E2E8F0"}/>
-                {forgotError && <p style={{ fontSize:13, color:"#ef4444", margin:"0 0 12px" }}>{forgotError}</p>}
-                <button onClick={handleForgot} disabled={forgotLoading}
-                  style={{ width:"100%", padding:"14px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", marginBottom:12, opacity:forgotLoading?0.7:1 }}>
-                  {forgotLoading ? "Sending..." : "Send Temporary Password"}
-                </button>
-                <button onClick={() => { setShowForgot(false); setForgotEmail(""); setForgotError(""); }}
-                  style={{ width:"100%", padding:"12px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:14, fontWeight:600, cursor:"pointer", color:"#64748B" }}>
-                  Cancel
-                </button>
+                {/* Body */}
+                <div style={{ padding:"24px 28px" }}>
+                  <label style={{ fontSize:11, fontWeight:700, color:"#374151", display:"block", marginBottom:8, textTransform:"uppercase", letterSpacing:0.5 }}>Email Address</label>
+                  <input value={forgotEmail} onChange={e=>setForgotEmail(e.target.value)} placeholder="your@email.com" type="email"
+                    style={{ width:"100%", padding:"13px 16px", borderRadius:12, border:"2px solid #E2E8F0", fontSize:14, outline:"none", boxSizing:"border-box", marginBottom:8, transition:"border-color 0.2s" }}
+                    onFocus={e=>e.target.style.borderColor="#5B4EFF"} onBlur={e=>e.target.style.borderColor="#E2E8F0"}/>
+                  {forgotError && (
+                    <div style={{ background:"#FEF2F2", border:"1px solid #FECACA", borderRadius:10, padding:"10px 14px", marginBottom:12 }}>
+                      <p style={{ fontSize:13, color:"#991B1B", margin:0 }}>⚠️ {forgotError}</p>
+                    </div>
+                  )}
+                  <button onClick={handleForgot} disabled={forgotLoading}
+                    style={{ width:"100%", padding:"14px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:14, fontWeight:700, cursor:forgotLoading?"not-allowed":"pointer", marginBottom:10, opacity:forgotLoading?0.7:1, boxShadow:"0 4px 14px rgba(91,78,255,0.4)" }}>
+                    {forgotLoading ? "⏳ Sending..." : "Send Reset Link →"}
+                  </button>
+                  <button onClick={() => { setShowForgot(false); setForgotEmail(""); setForgotError(""); }}
+                    style={{ width:"100%", padding:"12px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#F8FAFC", fontSize:13, fontWeight:600, cursor:"pointer", color:"#64748B" }}>
+                    Cancel
+                  </button>
+                </div>
               </>
             ) : (
-              <div style={{ textAlign:"center" }}>
-                <div style={{ fontSize:64, marginBottom:16 }}>📧</div>
-                <h2 style={{ fontSize:22, fontWeight:900, color:"#0f172a", margin:"0 0 8px" }}>Email Sent!</h2>
-                <p style={{ fontSize:14, color:"#64748B", margin:"0 0 24px", lineHeight:1.7 }}>We sent a temporary password to <strong>{forgotEmail}</strong>. Check your inbox and spam folder.</p>
-                <button onClick={() => { setShowForgot(false); setForgotSent(false); setForgotEmail(""); }}
-                  style={{ width:"100%", padding:"14px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer" }}>
-                  Back to Login
-                </button>
-              </div>
+              <>
+                <div style={{ background:"linear-gradient(135deg,#22c55e,#16a34a)", padding:"32px 28px", textAlign:"center" }}>
+                  <div style={{ width:60, height:60, borderRadius:20, background:"rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 14px", fontSize:28 }}>📧</div>
+                  <h2 style={{ fontSize:22, fontWeight:900, color:"#fff", margin:"0 0 6px" }}>Email Sent!</h2>
+                  <p style={{ fontSize:13, color:"rgba(255,255,255,0.8)", margin:0 }}>Check your inbox and spam folder</p>
+                </div>
+                <div style={{ padding:"24px 28px" }}>
+                  <div style={{ background:"#F0FDF4", border:"1px solid #BBF7D0", borderRadius:12, padding:"14px 16px", marginBottom:16 }}>
+                    <p style={{ fontSize:13, color:"#166534", margin:0, lineHeight:1.6 }}>
+                      We sent a secure reset link to <strong>{forgotEmail}</strong>. Click the link in your email to set a new password. The link expires in 1 hour.
+                    </p>
+                  </div>
+                  <button onClick={() => { setShowForgot(false); setForgotSent(false); setForgotEmail(""); }}
+                    style={{ width:"100%", padding:"14px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(91,78,255,0.4)" }}>
+                    Back to Login →
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>
