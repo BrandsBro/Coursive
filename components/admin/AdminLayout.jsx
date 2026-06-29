@@ -36,7 +36,7 @@ export default function AdminLayout({ children }) {
       <div style={{ width:240, background:"#0f172a", display:"flex", flexDirection:"column", position:"fixed", top:0, left:0, height:"100vh", zIndex:50 }}>
         {/* Logo */}
         <div style={{ padding:"24px 20px", borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
-          <Link href="/" style={{ textDecoration:"none" }}>
+          <Link href="/home" style={{ textDecoration:"none" }}>
             <span style={{ fontSize:20, fontWeight:900, color:"#fff", fontStyle:"italic" }}>✦ Coursiv</span>
           </Link>
           <div style={{ marginTop:4, background:"rgba(99,102,241,0.25)", borderRadius:6, padding:"2px 8px", display:"inline-block" }}>
@@ -64,7 +64,7 @@ export default function AdminLayout({ children }) {
 
         {/* Bottom */}
         <div style={{ padding:"12px 10px", borderTop:"1px solid rgba(255,255,255,0.08)" }}>
-          <Link href="/" style={{ textDecoration:"none" }}>
+          <Link href="/home" style={{ textDecoration:"none" }}>
             <div style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 12px", borderRadius:10, color:"rgba(255,255,255,0.4)", marginBottom:2 }}>
               <Settings size={15} />
               <span style={{ fontSize:13, fontWeight:600 }}>View Site</span>

@@ -74,7 +74,7 @@ export default function Navbar() {
         <div style={{ maxWidth:1152, margin:"0 auto", padding:"0 16px", height:60, display:"flex", alignItems:"center", justifyContent:"space-between", gap:12 }}>
 
           {/* Logo */}
-          <Link href="/" style={{ textDecoration:"none", flexShrink:0 }}>
+          <Link href="/home" style={{ textDecoration:"none", flexShrink:0 }}>
             <span style={{ fontSize:22, fontWeight:900, color:"#7c3aed", fontStyle:"italic" }}>✦ Coursiv</span>
           </Link>
 
