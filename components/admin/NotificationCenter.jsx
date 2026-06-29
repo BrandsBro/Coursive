@@ -1,7 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Plus, Trash2, Send, Eye, Bell, Loader, Check, Users, Search } from "lucide-react";
+import { Plus, Trash2, Eye, Bell, Loader, Check } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 const TYPES = [
@@ -25,23 +26,8 @@ export default function NotificationCenter() {
   const [notifications, setNotifications] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showBuilder, setShowBuilder] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
+  const router = useRouter();
   const [preview, setPreview] = useState(null);
-
-  // Builder state
-  const [title, setTitle] = useState("");
-  const [message, setMessage] = useState("");
-  const [type, setType] = useState("info");
-  const [target, setTarget] = useState("all");
-  const [targetPlan, setTargetPlan] = useState("4-Week Plan");
-  const [selectedUsers, setSelectedUsers] = useState([]);
-  const [link, setLink] = useState("");
-  const [linkText, setLinkText] = useState("");
-  const [icon, setIcon] = useState("🔔");
-  const [expiresIn, setExpiresIn] = useState("never");
-  const [userSearch, setUserSearch] = useState("");
 
   useEffect(() => { load(); }, []);
 
@@ -112,7 +98,7 @@ export default function NotificationCenter() {
             <h1 style={{ fontSize:24, fontWeight:900, color:"#0f172a", margin:0 }}>Notifications</h1>
             <p style={{ color:"#64748B", fontSize:14, margin:"4px 0 0" }}>{notifications.length} notifications sent</p>
           </div>
-          <button onClick={() => setShowBuilder(true)}
+          <button onClick={() => router.push("/admin/notifications/create")}
             style={{ display:"flex", alignItems:"center", gap:7, padding:"10px 20px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
             <Plus size={16}/> Create Notification
           </button>
@@ -183,162 +169,6 @@ export default function NotificationCenter() {
           })}
         </div>
       </div>
-
-      {/* Builder Modal */}
-      {showBuilder && (
-        <div style={{ position:"fixed", inset:0, zIndex:200, background:"rgba(15,23,42,0.6)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
-          <div style={{ background:"#fff", borderRadius:24, width:"100%", maxWidth:700, maxHeight:"90vh", overflow:"hidden", display:"flex", flexDirection:"column", boxShadow:"0 32px 80px rgba(0,0,0,0.3)" }}>
-            {/* Modal header */}
-            <div style={{ padding:"20px 24px", borderBottom:"1px solid #F1F5F9", display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0 }}>
-              <h2 style={{ fontSize:18, fontWeight:900, color:"#0f172a", margin:0 }}>Create Notification</h2>
-              <button onClick={() => { setShowBuilder(false); resetForm(); }} style={{ width:32, height:32, borderRadius:"50%", border:"none", background:"#F1F5F9", cursor:"pointer", fontSize:16 }}>✕</button>
-            </div>
-
-            <div style={{ flex:1, overflow:"auto", padding:24, display:"grid", gridTemplateColumns:"1fr 1fr", gap:24 }}>
-              {/* Left - form */}
-              <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-
-                {/* Type */}
-                <div>
-                  <label style={lbl()}>Notification Type</label>
-                  <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:8 }}>
-                    {TYPES.map(t => (
-                      <button key={t.value} onClick={() => { setType(t.value); setIcon(t.icon); }}
-                        style={{ padding:"10px 8px", borderRadius:10, border:`1.5px solid ${type===t.value?t.color:"#E2E8F0"}`, background:type===t.value?t.bg:"#F8FAFC", cursor:"pointer", display:"flex", flexDirection:"column", alignItems:"center", gap:4 }}>
-                        <span style={{ fontSize:20 }}>{t.icon}</span>
-                        <span style={{ fontSize:11, fontWeight:700, color:type===t.value?t.color:"#64748B" }}>{t.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Icon */}
-                <div>
-                  <label style={lbl()}>Custom Icon (emoji)</label>
-                  <input value={icon} onChange={e=>setIcon(e.target.value)} placeholder="🔔" style={{ ...inp(), fontSize:20, textAlign:"center", width:70 }}/>
-                </div>
-
-                {/* Title */}
-                <div>
-                  <label style={lbl()}>Title</label>
-                  <input value={title} onChange={e=>setTitle(e.target.value)} placeholder="e.g. Your subscription is expiring soon!" style={inp()}/>
-                </div>
-
-                {/* Message */}
-                <div>
-                  <label style={lbl()}>Message</label>
-                  <textarea value={message} onChange={e=>setMessage(e.target.value)} placeholder="Write your notification message here..." rows={4} style={{ ...inp(), resize:"vertical" }}/>
-                </div>
-
-                {/* Link */}
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10 }}>
-                  <div>
-                    <label style={lbl()}>Link URL <span style={{ color:"#94A3B8", fontWeight:400 }}>· optional</span></label>
-                    <input value={link} onChange={e=>setLink(e.target.value)} placeholder="/quiz" style={inp()}/>
-                  </div>
-                  <div>
-                    <label style={lbl()}>Link Text</label>
-                    <input value={linkText} onChange={e=>setLinkText(e.target.value)} placeholder="Renew now →" style={inp()}/>
-                  </div>
-                </div>
-
-                {/* Expires */}
-                <div>
-                  <label style={lbl()}>Expires After</label>
-                  <select value={expiresIn} onChange={e=>setExpiresIn(e.target.value)} style={inp()}>
-                    <option value="never">Never expires</option>
-                    <option value="1">1 day</option>
-                    <option value="3">3 days</option>
-                    <option value="7">1 week</option>
-                    <option value="14">2 weeks</option>
-                    <option value="30">1 month</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Right - target + preview */}
-              <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
-                {/* Target */}
-                <div>
-                  <label style={lbl()}>Send To</label>
-                  <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-                    {TARGETS.map(t => (
-                      <button key={t.value} onClick={() => setTarget(t.value)}
-                        style={{ padding:"12px 14px", borderRadius:12, border:`1.5px solid ${target===t.value?"#5B4EFF":"#E2E8F0"}`, background:target===t.value?"#EEF2FF":"#F8FAFC", cursor:"pointer", display:"flex", alignItems:"center", gap:10, textAlign:"left" }}>
-                        <span style={{ fontSize:20 }}>{t.icon}</span>
-                        <div>
-                          <p style={{ fontSize:13, fontWeight:700, color:target===t.value?"#5B4EFF":"#0f172a", margin:0 }}>{t.label}</p>
-                          <p style={{ fontSize:11, color:"#94A3B8", margin:0 }}>{t.desc}</p>
-                        </div>
-                        {target===t.value && <Check size={16} color="#5B4EFF" style={{ marginLeft:"auto" }}/>}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Plan picker */}
-                {target === "plan" && (
-                  <div>
-                    <label style={lbl()}>Select Plan</label>
-                    <select value={targetPlan} onChange={e=>setTargetPlan(e.target.value)} style={inp()}>
-                      <option>1-Week Plan</option>
-                      <option>4-Week Plan</option>
-                      <option>12-Week Plan</option>
-                    </select>
-                  </div>
-                )}
-
-                {/* User picker */}
-                {target === "specific" && (
-                  <div>
-                    <label style={lbl()}>Select Users ({selectedUsers.length} selected)</label>
-                    <div style={{ position:"relative", marginBottom:8 }}>
-                      <Search size={13} style={{ position:"absolute", left:10, top:"50%", transform:"translateY(-50%)", color:"#94A3B8" }}/>
-                      <input value={userSearch} onChange={e=>setUserSearch(e.target.value)} placeholder="Search users..." style={{ ...inp(), paddingLeft:30 }}/>
-                    </div>
-                    <div style={{ maxHeight:200, overflow:"auto", border:"1.5px solid #E2E8F0", borderRadius:10 }}>
-                      {filteredUsers.map(u => (
-                        <div key={u.id} onClick={() => toggleUser(u.id)}
-                          style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 12px", cursor:"pointer", background:selectedUsers.includes(u.id)?"#EEF2FF":"#fff", borderBottom:"1px solid #F8FAFC" }}>
-                          <div style={{ width:20, height:20, borderRadius:6, border:`1.5px solid ${selectedUsers.includes(u.id)?"#5B4EFF":"#E2E8F0"}`, background:selectedUsers.includes(u.id)?"#5B4EFF":"#fff", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                            {selectedUsers.includes(u.id) && <Check size={11} color="#fff"/>}
-                          </div>
-                          <div>
-                            <p style={{ fontSize:12, fontWeight:700, color:"#0f172a", margin:0 }}>{u.full_name||"Unknown"}</p>
-                            <p style={{ fontSize:11, color:"#94A3B8", margin:0 }}>{u.email}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Preview */}
-                <div>
-                  <label style={lbl()}>Preview</label>
-                  <NotificationPreview icon={icon||typeDef?.icon} title={title||"Notification title"} message={message||"Your notification message will appear here."} type={type} link={link} linkText={linkText}/>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div style={{ padding:"16px 24px", borderTop:"1px solid #F1F5F9", display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0, background:"#FAFBFC" }}>
-              <p style={{ fontSize:13, color:"#94A3B8", margin:0 }}>
-                {target==="all" ? `Sending to all ${users.length} users` :
-                 target==="specific" ? `Sending to ${selectedUsers.length} selected users` :
-                 `Sending to ${target} users`}
-              </p>
-              <div style={{ display:"flex", gap:10 }}>
-                <button onClick={() => { setShowBuilder(false); resetForm(); }} style={{ padding:"10px 18px", borderRadius:10, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:13, fontWeight:600, cursor:"pointer", color:"#374151" }}>Cancel</button>
-                <button onClick={sendNotification} disabled={sending||!title||!message}
-                  style={{ display:"flex", alignItems:"center", gap:7, padding:"10px 20px", borderRadius:10, border:"none", background:sent?"#22c55e":"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", opacity:(!title||!message)?0.6:1 }}>
-                  {sending?<><Loader size={14} className="bspin"/> Sending...</>:sent?<><Check size={14}/> Sent!</>:<><Send size={14}/> Send Notification</>}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Preview Modal */}
       {preview && (
