@@ -1,4 +1,5 @@
 import CertificateBanner from "@/components/home/CertificateBanner";
+import SubscriptionGuard from "@/components/home/SubscriptionGuard";
 import CurrentCourseWidget from "@/components/home/CurrentCourseWidget";
 import WeeklyStreaks from "@/components/home/WeeklyStreaks";
 import ChallengesSection from "@/components/home/ChallengesSection";
@@ -13,6 +14,7 @@ export default async function DashboardPage() {
     getAllChallenges(),
   ]);
   return (
+    <SubscriptionGuard>
     <div style={{ minHeight:"100vh", background:"#F8FAFC" }}>
       <style>{`
         .top-grid {
@@ -36,5 +38,7 @@ export default async function DashboardPage() {
         </div>
       </div>
     </div>
+    </div>
+    </SubscriptionGuard>
   );
 }
