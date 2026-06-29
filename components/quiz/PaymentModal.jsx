@@ -3,24 +3,28 @@ import { useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, { betas: ["link_default_integration_beta_1"] });
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 const CARD_STYLE = {
   style: {
-    base: {
-      fontSize: "16px",
-      color: "#0f172a",
-      fontFamily: "sans-serif",
-      "::placeholder": { color: "#94A3B8" },
-    },
+    base: { fontSize:"16px", color:"#0f172a", fontFamily:"sans-serif", "::placeholder":{ color:"#94A3B8" } },
   },
 };
 
-function CheckoutForm({ plan, email, name, onSuccess, onClose }) {
+const PLANS = {
+  "1-Week Plan":  { price:"$6.93",  recurringPrice:"$5.99",  label:"1-Week AI Program",  weeks:1  },
+  "4-Week Plan":  { price:"$19.99", recurringPrice:"$16.99", label:"4-Week AI Program",  weeks:4  },
+  "12-Week Plan": { price:"$39.99", recurringPrice:"$32.99", label:"12-Week AI Program", weeks:12 },
+};
+
+function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose }) {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const planInfo = PLANS[plan] || PLANS["4-Week Plan"];
+  const displayPrice = paymentType === "recurring" ? planInfo.recurringPrice : planInfo.price;
 
   const handlePay = async () => {
     if (!stripe || !elements) return;
@@ -28,11 +32,10 @@ function CheckoutForm({ plan, email, name, onSuccess, onClose }) {
     setError("");
 
     try {
-      // Create payment intent
       const res = await fetch("/api/stripe/payment-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, email, name }),
+        body: JSON.stringify({ plan, email, name, paymentType }),
       });
       const { clientSecret, error: apiError } = await res.json();
       if (apiError) throw new Error(apiError);
@@ -45,13 +48,15 @@ function CheckoutForm({ plan, email, name, onSuccess, onClose }) {
       });
 
       if (stripeError) throw new Error(stripeError.message);
+
       if (paymentIntent.status === "succeeded") {
-        // Create account and send email
-        await fetch("/api/stripe/create-account", {
+        const res2 = await fetch("/api/stripe/create-account", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, name, plan }),
+          body: JSON.stringify({ email, name, plan, paymentType, paymentIntentId: paymentIntent.id }),
         });
+        const result = await res2.json();
+        if (result.error) throw new Error(result.error);
         onSuccess();
       }
     } catch (e) {
@@ -60,25 +65,27 @@ function CheckoutForm({ plan, email, name, onSuccess, onClose }) {
     setLoading(false);
   };
 
-  const PLANS = {
-    "1-Week Plan":  { price: "$6.93",  label: "1-Week AI Program" },
-    "4-Week Plan":  { price: "$19.99", label: "4-Week AI Program" },
-    "12-Week Plan": { price: "$39.99", label: "12-Week AI Program" },
-  };
-  const planInfo = PLANS[plan] || PLANS["4-Week Plan"];
-
   return (
     <div>
       {/* Order summary */}
       <div style={{ background:"#F8FAFC", borderRadius:12, padding:"16px 18px", marginBottom:20 }}>
         <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
           <span style={{ fontSize:14, color:"#374151" }}>{planInfo.label}</span>
-          <span style={{ fontSize:14, fontWeight:700, color:"#0f172a" }}>{planInfo.price}</span>
+          <span style={{ fontSize:14, fontWeight:700, color:"#0f172a" }}>{displayPrice}</span>
         </div>
+        {paymentType === "recurring" && (
+          <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
+            <span style={{ fontSize:12, color:"#22c55e", fontWeight:600 }}>🔄 Auto-renew discount</span>
+            <span style={{ fontSize:12, color:"#22c55e", fontWeight:700 }}>-15%</span>
+          </div>
+        )}
         <div style={{ borderTop:"1px solid #E2E8F0", paddingTop:8, display:"flex", justifyContent:"space-between" }}>
           <span style={{ fontSize:15, fontWeight:800, color:"#0f172a" }}>Total</span>
-          <span style={{ fontSize:15, fontWeight:800, color:"#5B4EFF" }}>{planInfo.price}</span>
+          <span style={{ fontSize:15, fontWeight:800, color:"#5B4EFF" }}>{displayPrice}</span>
         </div>
+        {paymentType === "recurring" && (
+          <p style={{ fontSize:11, color:"#94A3B8", margin:"8px 0 0" }}>Billed every {planInfo.weeks} week{planInfo.weeks>1?"s":""} · Cancel anytime</p>
+        )}
       </div>
 
       {/* Card fields */}
@@ -113,7 +120,7 @@ function CheckoutForm({ plan, email, name, onSuccess, onClose }) {
 
       <button onClick={handlePay} disabled={loading || !stripe}
         style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, cursor:loading?"not-allowed":"pointer", opacity:loading?0.7:1, marginBottom:12 }}>
-        {loading ? "Processing..." : `🔒 Confirm Payment ${planInfo.price}`}
+        {loading ? "Processing..." : `🔒 Confirm Payment ${displayPrice}`}
       </button>
 
       <div style={{ textAlign:"center" }}>
@@ -128,17 +135,19 @@ function CheckoutForm({ plan, email, name, onSuccess, onClose }) {
   );
 }
 
-export default function PaymentModal({ plan, email, name, onClose, onSuccess }) {
+export default function PaymentModal({ plan, paymentType, email, name, onClose, onSuccess }) {
   return (
     <div style={{ position:"fixed", inset:0, zIndex:200, background:"rgba(15,23,42,0.6)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
       <div style={{ background:"#fff", borderRadius:24, padding:"28px 24px", width:"100%", maxWidth:440, boxShadow:"0 32px 80px rgba(0,0,0,0.3)", position:"relative", maxHeight:"90vh", overflowY:"auto" }}>
-        <button onClick={onClose} style={{ position:"absolute", top:16, right:16, width:32, height:32, borderRadius:"50%", border:"none", background:"#F1F5F9", cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+        <button onClick={onClose} style={{ position:"absolute", top:16, right:16, width:32, height:32, borderRadius:"50%", border:"none", background:"#F1F5F9", cursor:"pointer", fontSize:16 }}>✕</button>
         <div style={{ textAlign:"center", marginBottom:20 }}>
           <h2 style={{ fontSize:20, fontWeight:900, color:"#0f172a", margin:"0 0 4px" }}>Complete your order</h2>
-          <p style={{ fontSize:13, color:"#64748B", margin:0 }}>Join 2,000,000+ AI learners on Coursiv</p>
+          <p style={{ fontSize:13, color:"#64748B", margin:0 }}>
+            {paymentType==="recurring" ? "🔄 Auto-renew — Cancel anytime" : "One-time payment"}
+          </p>
         </div>
-        <Elements stripe={stripePromise} options={{ appearance: { theme: "stripe" }, link: { enabled: false } }}>
-          <CheckoutForm plan={plan} email={email} name={name} onSuccess={onSuccess} onClose={onClose}/>
+        <Elements stripe={stripePromise} options={{ appearance:{ theme:"stripe" } }}>
+          <CheckoutForm plan={plan} paymentType={paymentType} email={email} name={name} onSuccess={onSuccess} onClose={onClose}/>
         </Elements>
       </div>
     </div>

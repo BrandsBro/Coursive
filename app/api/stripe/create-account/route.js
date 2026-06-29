@@ -8,24 +8,83 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+const PLAN_WEEKS = {
+  "1-Week Plan": 1,
+  "4-Week Plan": 4,
+  "12-Week Plan": 12,
+};
+
+const PLAN_PRICES = {
+  "1-Week Plan":  { one_time: 6.93,  recurring: 5.99  },
+  "4-Week Plan":  { one_time: 19.99, recurring: 16.99 },
+  "12-Week Plan": { one_time: 39.99, recurring: 32.99 },
+};
+
 export async function POST(req) {
   try {
-    const { email, name, plan } = await req.json();
-    console.log("Creating account for:", email, name);
+    const { email, name, plan, paymentType, paymentIntentId } = await req.json();
+    console.log("Creating account for:", email, name, plan, paymentType);
 
     const tempPassword = Math.random().toString(36).slice(2,10) + "A1!";
 
-    const { error: userError } = await supabase.auth.admin.createUser({
+    // Create or get user
+    const { data: userData, error: userError } = await supabase.auth.admin.createUser({
       email,
       password: tempPassword,
       email_confirm: true,
       user_metadata: { full_name: name },
     });
 
-    if (userError && !userError.message.includes("already registered")) {
-      console.error("Supabase error:", userError);
+    let userId = userData?.user?.id;
+
+    if (userError) {
+      console.error("Create user error:", userError);
+      if (userError.message.includes("already registered")) {
+        // Get existing user
+        const { data: existingUsers } = await supabase.auth.admin.listUsers();
+        const existing = existingUsers?.users?.find(u => u.email === email);
+        userId = existing?.id;
+      } else {
+        throw userError;
+      }
     }
 
+    if (!userId) throw new Error("Could not get user ID");
+
+    // Calculate expiry
+    const weeks = PLAN_WEEKS[plan] || 4;
+    const amount = PLAN_PRICES[plan]?.[paymentType] || 19.99;
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + weeks * 7 * 24 * 60 * 60 * 1000);
+    const nextBillingAt = paymentType === "recurring" ? expiresAt : null;
+
+    // Save subscription
+    const { data: sub, error: subError } = await supabase.from("subscriptions").insert({
+      user_id: userId,
+      plan,
+      type: paymentType,
+      status: "active",
+      amount_paid: amount,
+      stripe_payment_intent_id: paymentIntentId,
+      started_at: now.toISOString(),
+      expires_at: expiresAt.toISOString(),
+      next_billing_at: nextBillingAt?.toISOString(),
+    }).select().single();
+
+    if (subError) console.error("Subscription error:", subError);
+
+    // Save payment history
+    await supabase.from("payment_history").insert({
+      user_id: userId,
+      subscription_id: sub?.id,
+      amount,
+      status: "succeeded",
+      stripe_payment_id: paymentIntentId,
+      plan,
+      type: paymentType,
+    });
+
+    // Send welcome email
     const { error: emailError } = await resend.emails.send({
       from: "Coursiv <noreply@kingbrandsbro.pro>",
       to: email,
@@ -37,15 +96,17 @@ export async function POST(req) {
             <p style="margin:8px 0 0;opacity:0.8">Welcome aboard!</p>
           </div>
           <div style="padding:32px">
-            <h2 style="font-size:22px;margin:0 0 12px">Congratulations, ${name}! 🎉</h2>
+            <h2 style="font-size:22px;margin:0 0 12px;color:#5B4EFF">Congratulations, ${name}! 🎉</h2>
             <p style="color:rgba(255,255,255,0.7);line-height:1.7;margin:0 0 20px">Your payment was successful! Use the details below to log in:</p>
             <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:24px;margin:0 0 20px;border:1px solid rgba(255,255,255,0.1)">
+              <p style="margin:0 0 4px;color:rgba(255,255,255,0.5);font-size:11px;text-transform:uppercase;letter-spacing:1px">Plan</p>
+              <p style="margin:0 0 16px;font-weight:700;font-size:15px;color:#a78bfa">${plan} · ${paymentType === "recurring" ? "Auto-renew" : "One-time"}</p>
               <p style="margin:0 0 4px;color:rgba(255,255,255,0.5);font-size:11px;text-transform:uppercase;letter-spacing:1px">Email</p>
-              <p style="margin:0 0 20px;font-weight:700;font-size:16px;color:#a78bfa">${email}</p>
+              <p style="margin:0 0 16px;font-weight:700;font-size:16px">${email}</p>
               <p style="margin:0 0 4px;color:rgba(255,255,255,0.5);font-size:11px;text-transform:uppercase;letter-spacing:1px">Temporary Password</p>
-              <p style="margin:0;font-weight:900;font-size:22px;color:#fff;letter-spacing:2px;background:rgba(91,78,255,0.2);padding:12px;border-radius:8px;text-align:center">${tempPassword}</p>
+              <p style="margin:0;font-weight:900;font-size:22px;color:#fff;letter-spacing:2px;background:rgba(91,78,255,0.2);padding:12px;border-radius:8px;text-align:center;font-family:monospace">${tempPassword}</p>
             </div>
-            <p style="color:rgba(255,255,255,0.5);font-size:13px;margin:0 0 24px">You can change your password anytime from profile settings.</p>
+            <p style="color:rgba(255,255,255,0.5);font-size:13px;margin:0 0 24px">Access expires: ${expiresAt.toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}</p>
             <a href="${process.env.NEXT_PUBLIC_SITE_URL}/login?email=${encodeURIComponent(email)}" style="display:block;text-align:center;padding:16px 28px;background:linear-gradient(135deg,#5B4EFF,#8B5CF6);color:#fff;text-decoration:none;border-radius:12px;font-weight:700;font-size:16px">
               Log In to Coursiv →
             </a>
@@ -62,7 +123,7 @@ export async function POST(req) {
 
     return NextResponse.json({ success: true });
   } catch (e) {
-    console.error("Error:", e);
+    console.error("Create account error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
