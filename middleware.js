@@ -9,6 +9,7 @@ const PUBLIC_ROUTES = [
   "/quiz",
   "/",
   "/payment-success",
+  "/reset-password",
 ];
 
 const ADMIN_ROUTES = ["/admin"];
