@@ -380,10 +380,6 @@ function Row({ label, children }) {
   );
 }
 
-const STATUS_COLORS = {
-  active:    { bg:"#F0FDF4", color:"#166534", border:"#BBF7D0" },
-  expired:   { bg:"#FEF2F2", color:"#991B1B", border:"#FECACA" },
-  cancelled: { bg:"#F8FAFC", color:"#64748B", border:"#E2E8F0" },
-};
+
 
 const inp = () => ({ width:"100%", padding:"9px 12px", borderRadius:9, border:"1.5px solid #E2E8F0", fontSize:13, outline:"none", boxSizing:"border-box" });
