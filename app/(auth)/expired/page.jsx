@@ -62,7 +62,7 @@ export default function ExpiredPage() {
           )}
 
           <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-            <Link href="/quiz" style={{ display:"block", padding:"16px", borderRadius:14, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, textDecoration:"none", boxShadow:"0 8px 24px rgba(91,78,255,0.4)" }}>
+            <Link href="/renew" style={{ display:"block", padding:"16px", borderRadius:14, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, textDecoration:"none", boxShadow:"0 8px 24px rgba(91,78,255,0.4)" }}>
               🚀 Renew My Access
             </Link>
             <button onClick={handleSignOut} style={{ padding:"12px", borderRadius:14, border:"1px solid rgba(255,255,255,0.15)", background:"transparent", color:"rgba(255,255,255,0.6)", fontSize:14, fontWeight:600, cursor:"pointer" }}>

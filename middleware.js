@@ -10,6 +10,7 @@ const PUBLIC_ROUTES = [
   "/",
   "/payment-success",
   "/reset-password",
+  "/renew",
 ];
 
 const ADMIN_ROUTES = ["/admin"];

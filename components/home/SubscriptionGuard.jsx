@@ -27,7 +27,7 @@ export default function SubscriptionGuard({ children }) {
         .limit(1)
         .single();
 
-      if (!sub) { router.push("/expired"); return; }
+      if (!sub) { window.location.href = "/expired"; return; }
 
       const now = new Date();
       const expires = new Date(sub.expires_at);
@@ -36,7 +36,7 @@ export default function SubscriptionGuard({ children }) {
 
       if (diff <= 0) {
         await supabase.from("subscriptions").update({ status:"expired" }).eq("id", sub.id);
-        router.push("/expired");
+        window.location.href = "/expired";
         return;
       }
 
