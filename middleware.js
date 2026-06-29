@@ -1,12 +1,20 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 
-const PUBLIC_ROUTES = ["/login", "/signup", "/confirm", "/auth", "/quiz", "/", "/payment-success", "/expired"];
+const PUBLIC_ROUTES = [
+  "/login",
+  "/signup", 
+  "/confirm",
+  "/auth",
+  "/quiz",
+  "/",
+  "/payment-success",
+];
+
 const ADMIN_ROUTES = ["/admin"];
 
 export async function middleware(req) {
   let res = NextResponse.next({ request: { headers: req.headers } });
-
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -25,30 +33,36 @@ export async function middleware(req) {
   const { data: { session } } = await supabase.auth.getSession();
   const { pathname } = req.nextUrl;
 
-  const isPublic = PUBLIC_ROUTES.some(r => pathname.startsWith(r));
+  const isPublic = PUBLIC_ROUTES.some(r => pathname === r || pathname.startsWith(r + "/"));
   const isAdmin = ADMIN_ROUTES.some(r => pathname.startsWith(r));
 
+  // 1. No session + not public → redirect to login
   if (!session && !isPublic) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("from", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Logged in users trying to access login/signup → send to courses
+  // 2. Logged in + login/signup → redirect to home
   if (session && (pathname === "/login" || pathname === "/signup")) {
     return NextResponse.redirect(new URL("/home", req.url));
   }
 
+  // 3. Admin routes — check is_admin
   if (session && isAdmin) {
     const { data: profile } = await supabase
       .from("profiles")
       .select("is_admin")
       .eq("id", session.user.id)
       .maybeSingle();
-
     if (!profile?.is_admin) {
       return NextResponse.redirect(new URL("/home", req.url));
     }
+  }
+
+  // 4. Expired page — must be logged in
+  if (!session && pathname === "/expired") {
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
   return res;
