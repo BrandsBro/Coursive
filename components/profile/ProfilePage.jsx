@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { courses } from "@/data/courses";
 import { challenges } from "@/data/challenges";
 import CertificateGenerator from "@/components/courses/CertificateGenerator";
+import ChangePassword from "@/components/profile/ChangePassword";
 
 const COURSE_STYLES = {
   "canva-ai":             { g:"linear-gradient(135deg,#ec4899,#8b5cf6)", e:"🎨", a:"#8b5cf6" },
@@ -21,7 +22,7 @@ const COURSE_STYLES = {
 };
 
 const DAYS = ["M","T","W","T","F","S","S"];
-const TABS = ["Overview","Certificates","Courses","Challenges","Subscription"];
+const TABS = ["Overview","Certificates","Courses","Challenges","Subscription","Security"];
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -394,6 +395,10 @@ export default function ProfilePage() {
             </div>
           )}
         </div>
+      )}
+
+      {tab === "Security" && (
+        <ChangePassword/>
       )}
 
       {certCourse && (

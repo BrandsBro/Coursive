@@ -1,4 +1,5 @@
 import EmailTemplateEditor from "@/components/admin/EmailTemplateEditor";
-export default function EmailEditorPage({ params }) {
-  return <EmailTemplateEditor templateId={params.id} />;
+export default async function EmailEditorPage({ params }) {
+  const { id } = await params;
+  return <EmailTemplateEditor templateId={id} />;
 }
