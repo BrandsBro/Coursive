@@ -123,23 +123,23 @@ export default function CourseReviews({ courseId, courseName }) {
 
       {/* Aggregate */}
       {total > 0 && (
-        <div style={{ background:"#0f172a", borderRadius:20, padding:"24px 28px", display:"flex", gap:28, alignItems:"center" }}>
+        <div style={{ background:"#fff", borderRadius:20, padding:"24px 28px", display:"flex", gap:28, alignItems:"center", border:"1.5px solid #E2E8F0", boxShadow:"0 2px 12px rgba(0,0,0,0.05)" }}>
           <div style={{ textAlign:"center", flexShrink:0 }}>
-            <p style={{ fontSize:52, fontWeight:900, color:"#fff", margin:0, lineHeight:1 }}>{avg.toFixed(1)}</p>
+            <p style={{ fontSize:52, fontWeight:900, color:"#0f172a", margin:0, lineHeight:1 }}>{avg.toFixed(1)}</p>
             <div style={{ margin:"8px 0 6px" }}><Stars value={Math.round(avg)} size={16} readonly/></div>
-            <p style={{ fontSize:12, color:"rgba(255,255,255,0.4)", margin:0 }}>{total} review{total!==1?"s":""}</p>
+            <p style={{ fontSize:12, color:"#94A3B8", margin:0, fontWeight:600 }}>{total} review{total!==1?"s":""}</p>
           </div>
           <div style={{ flex:1, display:"flex", flexDirection:"column", gap:6 }}>
             {dist.map(({star,count,pct}) => (
               <div key={star} style={{ display:"flex", alignItems:"center", gap:8 }}>
-                <span style={{ fontSize:11, color:"rgba(255,255,255,0.4)", width:8 }}>{star}</span>
+                <span style={{ fontSize:11, color:"#94A3B8", width:8, fontWeight:600 }}>{star}</span>
                 <svg width={12} height={12} viewBox="0 0 24 24" style={{flexShrink:0}}>
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#f59e0b"/>
                 </svg>
-                <div style={{ flex:1, height:6, background:"rgba(255,255,255,0.08)", borderRadius:999, overflow:"hidden" }}>
+                <div style={{ flex:1, height:6, background:"#F1F5F9", borderRadius:999, overflow:"hidden" }}>
                   <div style={{ height:"100%", borderRadius:999, background:"linear-gradient(to right,#f59e0b,#fbbf24)", width:pct+"%", transition:"width 0.5s" }}/>
                 </div>
-                <span style={{ fontSize:11, color:"rgba(255,255,255,0.3)", width:16, textAlign:"right" }}>{count}</span>
+                <span style={{ fontSize:11, color:"#94A3B8", width:16, textAlign:"right", fontWeight:600 }}>{count}</span>
               </div>
             ))}
           </div>
@@ -148,20 +148,27 @@ export default function CourseReviews({ courseId, courseName }) {
 
       {/* Your submitted review */}
       {user && myReview && (
-        <div style={{ background:"#FFFBEB", borderRadius:18, border:"1.5px solid #FDE68A", padding:"18px 20px" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:10 }}>
-            <div style={{ width:38,height:38,borderRadius:"50%",background:"linear-gradient(135deg,#f59e0b,#d97706)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:14,fontWeight:800,flexShrink:0 }}>
+        <div style={{ background:"#fff", borderRadius:18, border:"1.5px solid #E2E8F0", padding:"20px 22px", boxShadow:"0 2px 12px rgba(0,0,0,0.05)" }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
+            <p style={{ fontSize:12, fontWeight:800, color:"#64748B", margin:0, textTransform:"uppercase", letterSpacing:0.8 }}>Your Review</p>
+            <span style={{ fontSize:11, fontWeight:700, padding:"3px 10px", borderRadius:999, background:"#F0FDF4", color:"#16a34a", border:"1px solid #BBF7D0" }}>✓ Submitted</span>
+          </div>
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            <div style={{ width:44, height:44, borderRadius:14, background:"linear-gradient(135deg,#7c3aed,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontSize:15, fontWeight:800, flexShrink:0 }}>
               {inits(user?.user_metadata?.full_name || user?.email)}
             </div>
-            <div>
-              <p style={{ fontSize:12,fontWeight:700,color:"#92400E",margin:"0 0 4px" }}>Your review</p>
-              <Stars value={myReview.rating} size={15} readonly/>
+            <div style={{ flex:1 }}>
+              <p style={{ fontSize:14, fontWeight:800, color:"#0f172a", margin:"0 0 4px" }}>{user?.user_metadata?.full_name || "You"}</p>
+              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                <Stars value={myReview.rating} size={16} readonly/>
+                <span style={{ fontSize:12, fontWeight:700, color:LABEL_COLORS[myReview.rating] }}>{LABELS[myReview.rating]}</span>
+              </div>
             </div>
           </div>
           {myReview.review && (
-            <p style={{ fontSize:14,color:"#374151",margin:0,lineHeight:1.65,paddingTop:10,borderTop:"1px solid #FDE68A" }}>
-              "{myReview.review}"
-            </p>
+            <div style={{ marginTop:14, paddingTop:14, borderTop:"1px solid #F1F5F9" }}>
+              <p style={{ fontSize:14, color:"#374151", margin:0, lineHeight:1.7, fontStyle:"italic" }}>"{myReview.review}"</p>
+            </div>
           )}
         </div>
       )}
