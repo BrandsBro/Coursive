@@ -1,4 +1,4 @@
-import EmailBuilder from "@/components/admin/EmailBuilder";
+import EmailManager from "@/components/admin/EmailManager";
 export default function EmailsPage() {
-  return <EmailBuilder />;
+  return <EmailManager />;
 }

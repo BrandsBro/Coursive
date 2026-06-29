@@ -18,8 +18,6 @@ export default function NotificationBell() {
       const { data } = await supabase
         .from("notifications")
         .select("*")
-        .or(`target.eq.all,target_user_ids.cs.{${user.id}}`)
-        .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`)
         .order("created_at", { ascending: false });
 
       // Also get active/expired based subscriptions
