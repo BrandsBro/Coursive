@@ -632,7 +632,7 @@ function PreviewBlock({ block }) {
       );
     case "fillblank":
       return (
-        <div style={{ background:"#FDF2F8", borderRadius:16, padding:20, border:"1.5px solid #FBCFE8" }}>
+        <div style={{ borderRadius:16, padding:"16px 0" }}>
           <p style={{ fontSize:13, fontWeight:700, color:"#9d174d", margin:"0 0 10px" }}>✏️ Fill in the blank</p>
           <p style={{ fontSize:15, color:"#0f172a" }}>{c.prompt?.replace("___","______")}</p>
           {c.hint && <p style={{ fontSize:12, color:"#94A3B8", margin:"8px 0 0" }}>💡 Hint: {c.hint}</p>}

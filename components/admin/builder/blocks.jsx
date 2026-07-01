@@ -71,7 +71,7 @@ export function BlockPreview({ block }) {
     }
     case "audio":
       return c.src ? (
-        <div style={{ background:"linear-gradient(135deg,#ecfeff,#cffafe)", borderRadius:16, padding:"16px 18px", border:"1.5px solid #a5f3fc" }}>
+        <div style={{ borderRadius:16, padding:"14px 0" }}>
           <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:c.src?10:0 }}>
             <div style={{ width:42, height:42, borderRadius:12, background:"linear-gradient(135deg,#0891b2,#06b6d4)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
               <Music size={20} color="#fff"/>
@@ -86,7 +86,7 @@ export function BlockPreview({ block }) {
       ) : <Placeholder icon="🎧" text="Audio"/>;
     case "quiz":
       return (
-        <div style={{ background:"#FFFBEB", borderRadius:16, padding:20, border:"1.5px solid #FDE68A" }}>
+        <div style={{ background:"transparent", borderRadius:16, padding:20, border:"none" }}>
           <p style={{ fontSize:12, fontWeight:700, color:"#92400E", margin:"0 0 10px" }}>🎯 QUIZ</p>
           <p style={{ fontSize:15, fontWeight:700, color:"#0f172a", margin:"0 0 12px" }}>{c.question||"Question..."}</p>
           {(c.options||[]).filter(Boolean).map((o,i) => (
@@ -99,7 +99,7 @@ export function BlockPreview({ block }) {
       );
     case "fillblank":
       return (
-        <div style={{ background:"#FDF2F8", borderRadius:16, padding:20, border:"1.5px solid #FBCFE8" }}>
+        <div style={{ background:"transparent", borderRadius:16, padding:20, border:"none" }}>
           <p style={{ fontSize:12, fontWeight:700, color:"#9d174d", margin:"0 0 10px" }}>✏️ FILL IN THE BLANK</p>
           <p style={{ fontSize:15, color:"#0f172a", lineHeight:1.6 }}>{(c.prompt||"Prompt with ___").split("___").map((part,i,arr) => <span key={i}>{part}{i<arr.length-1 && <span style={{ display:"inline-block", minWidth:60, borderBottom:"2px solid #db2777", margin:"0 4px" }}/>}</span>)}</p>
           {c.hint && <p style={{ fontSize:12, color:"#be185d", margin:"10px 0 0" }}>💡 {c.hint}</p>}
@@ -107,7 +107,7 @@ export function BlockPreview({ block }) {
       );
     case "keypoints":
       return (
-        <div style={{ background:"#F0FDFA", borderRadius:16, padding:20, border:"1.5px solid #99f6e4" }}>
+        <div style={{ background:"transparent", borderRadius:16, padding:20, border:"none" }}>
           <p style={{ fontSize:14, fontWeight:800, color:"#0f766e", margin:"0 0 12px" }}>⭐ {c.title||"Key Takeaways"}</p>
           {(c.points||[]).filter(Boolean).map((p,i) => (
             <div key={i} style={{ display:"flex", gap:10, marginBottom:8 }}>
