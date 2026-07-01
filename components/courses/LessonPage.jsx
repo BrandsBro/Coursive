@@ -143,7 +143,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   };
 
   return (
-    <div style={{ minHeight:"100vh", background:"#F8FAFC" }}>
+    <div style={{ minHeight:"100vh", background:"#fff" }}>
 
       <div style={{ background:"#fff", borderBottom:"1px solid #F1F5F9", height:58, position:"sticky", top:0, zIndex:50 }}>
       <div style={{ maxWidth:720, margin:"0 auto", padding:"0 20px", height:"100%", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
@@ -299,14 +299,14 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
     }
     case "audio":
       return c.src ? (
-        <div style={{ background:"linear-gradient(135deg,#ecfeff,#cffafe)", borderRadius:20, padding:"20px 22px", border:"1.5px solid #a5f3fc" }}>
+        <div style={{ borderRadius:16, padding:"16px 0" }}>
           <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:14 }}>
-            <div style={{ width:48, height:48, borderRadius:14, background:"linear-gradient(135deg,#0891b2,#06b6d4)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-              <Music size={22} color="#fff"/>
+            <div style={{ width:44, height:44, borderRadius:12, background:"#F1F5F9", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+              <Music size={20} color="#374151"/>
             </div>
             <div>
-              <p style={{ fontSize:15, fontWeight:700, color:"#0e7490", margin:"0 0 2px" }}>{c.title||"Audio"}</p>
-              {c.caption && <p style={{ fontSize:13, color:"#0891b2", margin:0 }}>{c.caption}</p>}
+              <p style={{ fontSize:15, fontWeight:700, color:"#0f172a", margin:"0 0 2px" }}>{c.title||"Audio"}</p>
+              {c.caption && <p style={{ fontSize:13, color:"#64748B", margin:0 }}>{c.caption}</p>}
             </div>
           </div>
           <audio src={c.src} controls style={{ width:"100%", height:42 }}/>
@@ -317,8 +317,8 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       const isChecked = checked[idx];
       const isCorrect = sel === c.correct;
       return (
-        <div style={{ background:"#FFFBEB", borderRadius:20, padding:24, border:"1.5px solid #FDE68A" }}>
-          <p style={{ fontSize:12, fontWeight:700, color:"#92400E", margin:"0 0 12px", letterSpacing:0.5 }}>🎯 QUIZ</p>
+        <div style={{ borderRadius:16, padding:"20px 0" }}>
+          <p style={{ fontSize:12, fontWeight:700, color:"#6366f1", margin:"0 0 12px", letterSpacing:0.5, textTransform:"uppercase" }}>🎯 Quiz</p>
           <p style={{ fontSize:16, fontWeight:700, color:"#0f172a", margin:"0 0 16px", lineHeight:1.4 }}>{c.question}</p>
           <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
             {(c.options||[]).map((opt, i) => {
@@ -357,8 +357,8 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       const isCorrect = val.trim().toLowerCase() === (c.answer||"").trim().toLowerCase();
       const showAnswer = fillShowAnswer?.[idx];
       return (
-        <div style={{ background:"#FDF2F8", borderRadius:20, padding:24, border:"1.5px solid #FBCFE8" }}>
-          <p style={{ fontSize:12, fontWeight:700, color:"#9d174d", margin:"0 0 12px", letterSpacing:0.5 }}>✏️ FILL IN THE BLANK</p>
+        <div style={{ borderRadius:16, padding:"20px 0" }}>
+          <p style={{ fontSize:12, fontWeight:700, color:"#6366f1", margin:"0 0 12px", letterSpacing:0.5, textTransform:"uppercase" }}>✏️ Fill in the blank</p>
           <p style={{ fontSize:16, color:"#0f172a", margin:"0 0 16px", lineHeight:1.6 }}>
             {(c.prompt||"").split("___").map((part, i, arr) => (
               <span key={i}>{part}{i < arr.length-1 && (
@@ -473,12 +473,12 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
     }
     case "keypoints":
       return (
-        <div style={{ background:"#F0FDFA", borderRadius:20, padding:24, border:"1.5px solid #99f6e4" }}>
-          <p style={{ fontSize:14, fontWeight:800, color:"#0f766e", margin:"0 0 16px" }}>⭐ {c.title||"Key Takeaways"}</p>
+        <div style={{ borderRadius:16, padding:"20px 0" }}>
+          <p style={{ fontSize:14, fontWeight:800, color:"#0f172a", margin:"0 0 16px" }}>⭐ {c.title||"Key Takeaways"}</p>
           <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
             {(c.points||[]).filter(Boolean).map((pt, i) => (
               <div key={i} style={{ display:"flex", gap:12, alignItems:"flex-start" }}>
-                <div style={{ width:24, height:24, borderRadius:"50%", background:"linear-gradient(135deg,#0d9488,#0891b2)", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, flexShrink:0 }}>{i+1}</div>
+                <div style={{ width:24, height:24, borderRadius:"50%", background:"#6366f1", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, flexShrink:0 }}>{i+1}</div>
                 <p style={{ fontSize:14, color:"#374151", margin:0, lineHeight:1.6 }}>{pt}</p>
               </div>
             ))}
@@ -488,7 +488,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
     case "callout": {
       const map = { info:["💡","#0891b2","#ECFEFF","#a5f3fc"], warning:["⚠️","#d97706","#FFFBEB","#fde68a"], success:["✅","#059669","#ECFDF5","#a7f3d0"], error:["❌","#dc2626","#FEF2F2","#fecaca"] };
       const [emoji, color, bg, border] = map[c.style||"info"];
-      return <div style={{ padding:"16px 20px", borderRadius:16, background:bg, border:"1.5px solid "+border, display:"flex", gap:12 }}><span style={{ fontSize:18, flexShrink:0 }}>{emoji}</span><p style={{ fontSize:14, color, margin:0, lineHeight:1.65, fontWeight:500 }}>{c.text}</p></div>;
+      return <div style={{ padding:"14px 18px", borderRadius:12, background:"#F8FAFC", borderLeft:"4px solid "+color, display:"flex", gap:12 }}><span style={{ fontSize:18, flexShrink:0 }}>{emoji}</span><p style={{ fontSize:14, color:"#374151", margin:0, lineHeight:1.65 }}>{c.text}</p></div>;
     }
     case "divider":
       return c.style==="dots"?<div style={{ textAlign:"center", color:"#CBD5E1", fontSize:18, letterSpacing:10, padding:"8px 0" }}>• • •</div>:c.style==="space"?<div style={{ height:24 }}/>:<hr style={{ border:"none", borderTop:"2px solid #F1F5F9", margin:0 }}/>;
