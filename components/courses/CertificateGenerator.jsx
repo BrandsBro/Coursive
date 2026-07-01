@@ -92,7 +92,7 @@ export default function CertificateGenerator({ course, userName, completedDate, 
             </div>
 
             {/* 1Course branding */}
-            <p style={{ fontSize:13, color:"#94A3B8", margin:"0 0 4px", letterSpacing:3, fontFamily:"system-ui", fontWeight:700 }}>COURSIV</p>
+            <p style={{ fontSize:13, color:"#94A3B8", margin:"0 0 4px", letterSpacing:3, fontFamily:"system-ui", fontWeight:700 }}>1COURSE</p>
 
             {/* Main text */}
             <p style={{ fontSize:14, color:"#64748B", margin:"0 0 12px", fontStyle:"italic", fontFamily:"Georgia,serif" }}>This certifies that</p>
@@ -137,7 +137,7 @@ export default function CertificateGenerator({ course, userName, completedDate, 
 
             {/* Bottom */}
             <p style={{ fontSize:10, color:"#CBD5E1", marginTop:16, letterSpacing:1, fontFamily:"system-ui" }}>
-              COURSIV.APP · AI LEARNING PLATFORM · {new Date().getFullYear()}
+              1COURSE.APP · AI LEARNING PLATFORM · {new Date().getFullYear()}
             </p>
           </div>
         </div>
