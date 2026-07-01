@@ -75,7 +75,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/home" style={{ textDecoration:"none", flexShrink:0 }}>
-            <span style={{ fontSize:22, fontWeight:900, color:"#7c3aed", fontStyle:"italic" }}>✦ 1Course</span>
+            <img src="https://i.postimg.cc/7Pd7vVJs/1course-Logo-Black-Version.png" alt="1Course" style={{ height:32, objectFit:"contain" }}/>
           </Link>
 
           {/* Desktop nav links */}

@@ -141,7 +141,7 @@ export default function QuizFlow({ blocks }) {
             )}
           </div>
           {/* Logo center */}
-          <span style={{ fontSize:22, fontWeight:900, color:"#5B4EFF", fontFamily:"Georgia, serif", fontStyle:"italic" }}>1Course</span>
+          <img src="https://i.postimg.cc/7Pd7vVJs/1course-Logo-Black-Version.png" alt="1Course" style={{ height:28, objectFit:"contain" }}/>
           {/* Step counter */}
           <div style={{ width:80, textAlign:"right" }}>
             {endStep !== "sales" && (
