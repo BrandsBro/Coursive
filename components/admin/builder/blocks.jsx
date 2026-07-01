@@ -87,7 +87,7 @@ export function BlockPreview({ block }) {
     case "quiz":
       return (
         <div style={{ background:"transparent", borderRadius:16, padding:20, border:"none" }}>
-          <p style={{ fontSize:12, fontWeight:700, color:"#92400E", margin:"0 0 10px" }}>🎯 QUIZ</p>
+
           <p style={{ fontSize:15, fontWeight:700, color:"#0f172a", margin:"0 0 12px" }}>{c.question||"Question..."}</p>
           {(c.options||[]).filter(Boolean).map((o,i) => (
             <div key={i} style={{ padding:"10px 14px", borderRadius:10, border:`1.5px solid ${i===c.correct?"#86efac":"#E2E8F0"}`, background:i===c.correct?"#F0FDF4":"#fff", marginBottom:6, fontSize:13, color:"#374151", display:"flex", alignItems:"center", gap:8 }}>
@@ -100,7 +100,7 @@ export function BlockPreview({ block }) {
     case "fillblank":
       return (
         <div style={{ background:"transparent", borderRadius:16, padding:20, border:"none" }}>
-          <p style={{ fontSize:12, fontWeight:700, color:"#9d174d", margin:"0 0 10px" }}>✏️ FILL IN THE BLANK</p>
+
           <p style={{ fontSize:15, color:"#0f172a", lineHeight:1.6 }}>{(c.prompt||"Prompt with ___").split("___").map((part,i,arr) => <span key={i}>{part}{i<arr.length-1 && <span style={{ display:"inline-block", minWidth:60, borderBottom:"2px solid #db2777", margin:"0 4px" }}/>}</span>)}</p>
           {c.hint && <p style={{ fontSize:12, color:"#be185d", margin:"10px 0 0" }}>💡 {c.hint}</p>}
         </div>
@@ -127,7 +127,7 @@ export function BlockPreview({ block }) {
       const marked = c.markedWords || [];
       return (
         <div style={{ background:"#F0F9FF", borderRadius:14, padding:"14px 16px", border:"1.5px solid #BAE6FD" }}>
-          <p style={{ fontSize:11, fontWeight:700, color:"#0369a1", margin:"0 0 8px" }}>✏️ FILL IN THE BLANK</p>
+
           <p style={{ fontSize:15, color:"#0f172a", margin:"0 0 10px", lineHeight:1.8 }}>
             {words.map((w,i) => (
               <span key={i}>

@@ -301,21 +301,63 @@ function BlockForm({ block, onChange }) {
 function HeadingForm({ content, onChange }) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:10, paddingTop:12 }}>
-      <div style={{ display:"flex", gap:8 }}>
-        {["h1","h2","h3"].map(l => (
-          <button key={l} onClick={() => onChange({ ...content, level:l })} style={{ padding:"6px 14px", borderRadius:8, border:`1.5px solid ${content.level===l?"#7c3aed":"#E2E8F0"}`, background:content.level===l?"#F5F3FF":"#fff", color:content.level===l?"#7c3aed":"#64748B", fontSize:12, fontWeight:700, cursor:"pointer" }}>
-            {l.toUpperCase()}
-          </button>
-        ))}
+      <div style={{ display:"flex", gap:8, alignItems:"center", flexWrap:"wrap" }}>
+        <div style={{ display:"flex", gap:6 }}>
+          {["h1","h2","h3"].map(l => (
+            <button key={l} onClick={() => onChange({ ...content, level:l })} style={{ padding:"6px 14px", borderRadius:8, border:`1.5px solid ${content.level===l?"#7c3aed":"#E2E8F0"}`, background:content.level===l?"#F5F3FF":"#fff", color:content.level===l?"#7c3aed":"#64748B", fontSize:12, fontWeight:700, cursor:"pointer" }}>
+              {l.toUpperCase()}
+            </button>
+          ))}
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:6, marginLeft:"auto" }}>
+          <span style={{ fontSize:11, color:"#94A3B8", fontWeight:600 }}>Size</span>
+          <input type="number" min={14} max={60} value={content.fontSize || (content.level==="h1"?32:content.level==="h2"?24:18)}
+            onChange={e => onChange({ ...content, fontSize:parseInt(e.target.value) })}
+            style={{ width:60, padding:"5px 8px", borderRadius:8, border:"1.5px solid #E2E8F0", fontSize:12, outline:"none", textAlign:"center" }}/>
+          <span style={{ fontSize:11, color:"#94A3B8" }}>px</span>
+        </div>
+        <div style={{ display:"flex", gap:4 }}>
+          {["left","center","right"].map(a => (
+            <button key={a} onClick={() => onChange({ ...content, align:a })}
+              style={{ width:28, height:28, borderRadius:7, border:`1.5px solid ${(content.align||"left")===a?"#7c3aed":"#E2E8F0"}`, background:(content.align||"left")===a?"#F5F3FF":"#fff", cursor:"pointer", fontSize:12 }}>
+              {a==="left"?"⬅":a==="center"?"⬆":"➡"}
+            </button>
+          ))}
+        </div>
       </div>
-      <input value={content.text||""} onChange={e => onChange({ ...content, text:e.target.value })} placeholder="Section heading..." style={{ ...iSt(), fontSize:content.level==="h1"?20:content.level==="h2"?17:15, fontWeight:800 }} />
+      <input value={content.text||""} onChange={e => onChange({ ...content, text:e.target.value })} placeholder="Section heading..." style={{ ...iSt(), fontSize:content.fontSize||(content.level==="h1"?20:content.level==="h2"?17:15), fontWeight:800, textAlign:content.align||"left" }} />
     </div>
   );
 }
 
 function TextForm({ content, onChange }) {
   return (
-    <div style={{ paddingTop:12 }}>
+    <div style={{ paddingTop:12, display:"flex", flexDirection:"column", gap:10 }}>
+      <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+        <div style={{ display:"flex", gap:4 }}>
+          {[["B","bold"],["I","italic"]].map(([l,k]) => (
+            <button key={k} onClick={() => onChange({ ...content, [k]:!content[k] })}
+              style={{ width:28, height:28, borderRadius:7, border:`1.5px solid ${content[k]?"#7c3aed":"#E2E8F0"}`, background:content[k]?"#F5F3FF":"#fff", cursor:"pointer", fontSize:12, fontWeight:700, color:content[k]?"#7c3aed":"#64748B" }}>
+              {l}
+            </button>
+          ))}
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+          <span style={{ fontSize:11, color:"#94A3B8", fontWeight:600 }}>Size</span>
+          <input type="number" min={10} max={40} value={content.fontSize||15}
+            onChange={e => onChange({ ...content, fontSize:parseInt(e.target.value) })}
+            style={{ width:56, padding:"5px 8px", borderRadius:8, border:"1.5px solid #E2E8F0", fontSize:12, outline:"none", textAlign:"center" }}/>
+          <span style={{ fontSize:11, color:"#94A3B8" }}>px</span>
+        </div>
+        <div style={{ display:"flex", gap:4, marginLeft:"auto" }}>
+          {["left","center","right"].map(a => (
+            <button key={a} onClick={() => onChange({ ...content, align:a })}
+              style={{ width:28, height:28, borderRadius:7, border:`1.5px solid ${(content.align||"left")===a?"#7c3aed":"#E2E8F0"}`, background:(content.align||"left")===a?"#F5F3FF":"#fff", cursor:"pointer", fontSize:12 }}>
+              {a==="left"?"⬅":a==="center"?"⬆":"➡"}
+            </button>
+          ))}
+        </div>
+      </div>
       <textarea value={content.text||""} onChange={e => onChange({ ...content, text:e.target.value })} placeholder="Write your lesson content here...
 
 You can write multiple paragraphs, explain concepts, share examples, and guide students through the topic." style={{ ...iSt(), minHeight:160, resize:"vertical", lineHeight:1.7 }} />

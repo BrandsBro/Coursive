@@ -266,10 +266,10 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
   switch (block.type) {
     case "heading": {
       const sz = c.level==="h1"?28:c.level==="h2"?22:18;
-      return <div style={{ fontSize:sz, fontWeight:900, color:"#0f172a", lineHeight:1.25 }}>{c.text}</div>;
+      return <div style={{ fontSize:c.fontSize||sz, fontWeight:900, color:"#0f172a", lineHeight:1.25, textAlign:c.align||"left" }}>{c.text}</div>;
     }
     case "text":
-      return <p style={{ fontSize:15, lineHeight:1.8, color:"#374151", margin:0, whiteSpace:"pre-wrap" }}>{c.text}</p>;
+      return <p style={{ fontSize:c.fontSize||15, lineHeight:1.8, color:"#374151", margin:0, whiteSpace:"pre-wrap", fontWeight:c.bold?"700":"400", fontStyle:c.italic?"italic":"normal", textAlign:c.align||"left" }}>{c.text}</p>;
     case "image":
       return c.src ? (
         <figure style={{ margin:0 }}>
@@ -318,7 +318,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       const isCorrect = sel === c.correct;
       return (
         <div style={{ borderRadius:16, padding:"20px 0" }}>
-          <p style={{ fontSize:12, fontWeight:700, color:"#6366f1", margin:"0 0 12px", letterSpacing:0.5, textTransform:"uppercase" }}>🎯 Quiz</p>
+
           <p style={{ fontSize:16, fontWeight:700, color:"#0f172a", margin:"0 0 16px", lineHeight:1.4 }}>{c.question}</p>
           <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
             {(c.options||[]).map((opt, i) => {
@@ -358,7 +358,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       const showAnswer = fillShowAnswer?.[idx];
       return (
         <div style={{ borderRadius:16, padding:"20px 0" }}>
-          <p style={{ fontSize:12, fontWeight:700, color:"#6366f1", margin:"0 0 12px", letterSpacing:0.5, textTransform:"uppercase" }}>✏️ Fill in the blank</p>
+
           <p style={{ fontSize:16, color:"#0f172a", margin:"0 0 16px", lineHeight:1.6 }}>
             {(c.prompt||"").split("___").map((part, i, arr) => (
               <span key={i}>{part}{i < arr.length-1 && (
