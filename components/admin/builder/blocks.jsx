@@ -307,8 +307,8 @@ function FillE({ content, onChange }) {
         <p style={{ fontSize:10, color:"#94A3B8", margin:"4px 0 0" }}>Use ___ where the blank should appear</p>
       </div>
       <div>
-        <p style={lbl()}>Answer</p>
-        <input value={content.answer||""} onChange={e => onChange({ ...content, answer:e.target.value })} placeholder="Correct answer" style={inp()}/>
+        <FC label="Answer Style" style={content.answerStyle||{fontSize:15}} setStyle={v => onChange({ ...content, answerStyle:v })}/>
+        <input value={content.answer||""} onChange={e => onChange({ ...content, answer:e.target.value })} placeholder="Correct answer" style={{ ...inp(), ...styled(content.answerStyle||{fontSize:15}) }}/>
       </div>
       <div>
         <FC label="Hint Style" style={hs} setStyle={v => onChange({ ...content, hintStyle:v })}/>
