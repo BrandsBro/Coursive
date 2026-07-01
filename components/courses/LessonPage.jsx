@@ -317,7 +317,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       const isChecked = checked[idx];
       const isCorrect = sel === c.correct;
       return (
-        <div style={{ borderRadius:16, padding:"20px 0" }}>
+        <div style={{ background:"#fff", borderRadius:20, padding:24, border:"1.5px solid #E2E8F0" }}>
 
           <p style={{ fontSize:16, fontWeight:700, color:"#0f172a", margin:"0 0 16px", lineHeight:1.4 }}>{c.question}</p>
           <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
@@ -356,18 +356,19 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       const isChecked = fillChecked[idx];
       const isCorrect = val.trim().toLowerCase() === (c.answer||"").trim().toLowerCase();
       const showAnswer = fillShowAnswer?.[idx];
+      const ps = c.promptStyle||{};
       return (
-        <div style={{ borderRadius:16, padding:"20px 0" }}>
+        <div style={{ borderRadius:20, padding:"24px", border:"1.5px solid #E2E8F0", background:"#fff" }}>
 
           <p style={{ fontSize:16, color:"#0f172a", margin:"0 0 16px", lineHeight:1.6 }}>
             {(c.prompt||"").split("___").map((part, i, arr) => (
               <span key={i}>{part}{i < arr.length-1 && (
-                <input value={val} onChange={e => !isChecked && setFillInputs(p => ({...p,[idx]:e.target.value}))} onKeyDown={e => e.key==="Enter" && val && !isChecked && setFillChecked(p=>({...p,[idx]:true}))} placeholder="type answer..." disabled={isChecked} style={{ display:"inline-block", width:160, border:"none", borderBottom:"2px solid "+(isChecked?isCorrect?"#22c55e":"#ef4444":"#db2777"), outline:"none", fontSize:16, fontWeight:700, color:isChecked?isCorrect?"#166534":"#991B1B":"#db2777", textAlign:"center", background:"transparent", padding:"2px 4px" }}/>
+                <input value={val} onChange={e => !isChecked && setFillInputs(p => ({...p,[idx]:e.target.value}))} onKeyDown={e => e.key==="Enter" && val && !isChecked && setFillChecked(p=>({...p,[idx]:true}))} placeholder="..." disabled={isChecked} style={{ display:"none" }}/>
               )}</span>
             ))}
           </p>
           {c.hint && !isChecked && <p style={{ fontSize:13, color:"#be185d", margin:"0 0 14px" }}>💡 Hint: {c.hint}</p>}
-          {!isChecked && val && <button onClick={() => setFillChecked(p=>({...p,[idx]:true}))} style={{ padding:"10px 20px", borderRadius:10, border:"none", background:"linear-gradient(135deg,#db2777,#9d174d)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>Check</button>}
+          {!isChecked && val && <button onClick={() => setFillChecked(p=>({...p,[idx]:true}))} style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(91,78,255,0.3)" }}>Check →</button>}
           {isChecked && (
             <div>
               {isCorrect ? (
