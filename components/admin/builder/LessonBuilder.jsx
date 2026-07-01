@@ -272,7 +272,7 @@ function SortableBlock({ block, isActive, onToggle, onChange, onDelete, onDuplic
   };
 
   return (
-    <div ref={setNodeRef} style={{ ...style, background:"#fff", borderRadius:16, border:`1.5px solid ${isOpen?def.color+"40":"#E2E8F0"}`, overflow:"hidden", boxShadow:isActive?`0 4px 20px ${def.color}15`:"0 1px 3px rgba(0,0,0,0.04)", marginBottom:2 }}>
+    <div ref={setNodeRef} style={{ ...style, background:"#fff", borderRadius:16, border:`1.5px solid ${isActive?def.color+"40":"#E2E8F0"}`, overflow:"hidden", boxShadow:isActive?`0 4px 20px ${def.color}15`:"0 1px 3px rgba(0,0,0,0.04)", marginBottom:2 }}>
       <div style={{ display:"flex", alignItems:"center", gap:10, padding:"11px 12px", background:"#fff" }}>
         <button {...attributes} {...listeners} style={{ cursor:"grab", border:"none", background:"none", padding:2, display:"flex", touchAction:"none" }}>
           <GripVertical size={16} color="#CBD5E1"/>
