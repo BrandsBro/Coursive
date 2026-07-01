@@ -50,13 +50,13 @@ export function BlockPreview({ block }) {
   const c = block.content || {};
   switch (block.type) {
     case "heading":
-      return <div style={{ fontSize:c.level==="h1"?28:c.level==="h2"?22:18, fontWeight:900, color:"#0f172a", lineHeight:1.25 }}>{c.text||"Heading"}</div>;
+      return <div style={{ fontSize:c.fontSize||(c.level==="h1"?28:c.level==="h2"?22:18), fontWeight:c.bold?"900":"900", fontStyle:c.italic?"italic":"normal", color:"#0f172a", lineHeight:1.25, textAlign:c.align||"left" }}>{c.text||"Heading"}</div>;
     case "text":
-      return <p style={{ fontSize:15, lineHeight:1.75, color:"#374151", margin:0, whiteSpace:"pre-wrap" }}>{c.text||"Text content..."}</p>;
+      return <p style={{ fontSize:c.fontSize||15, lineHeight:1.75, color:"#374151", margin:0, whiteSpace:"pre-wrap", fontWeight:c.bold?"700":"400", fontStyle:c.italic?"italic":"normal", textAlign:c.align||"left" }}>{c.text||"Text content..."}</p>;
     case "image":
       return c.src ? (
         <figure style={{ margin:0 }}>
-          <img src={c.src} alt={c.alt||""} style={{ width:"100%", borderRadius:16, display:"block" }}
+          <img src={c.src} alt={c.alt||""} style={{ width:c.size==="small"?"50%":c.size==="medium"?"75%":"100%", borderRadius:16, display:"block", margin:c.align==="center"?"0 auto":c.align==="right"?"0 0 0 auto":"0" }}
             onError={e => { e.target.style.display="none"; }}
           />
           {c.caption && <figcaption style={{ fontSize:12, color:"#94A3B8", textAlign:"center", marginTop:8, fontStyle:"italic" }}>{c.caption}</figcaption>}
@@ -88,7 +88,7 @@ export function BlockPreview({ block }) {
       return (
         <div style={{ background:"transparent", borderRadius:16, padding:20, border:"none" }}>
 
-          <p style={{ fontSize:15, fontWeight:700, color:"#0f172a", margin:"0 0 12px" }}>{c.question||"Question..."}</p>
+          <p style={{ fontSize:c.fontSize||15, fontWeight:700, color:"#0f172a", margin:"0 0 12px", textAlign:c.align||"left" }}>{c.question||"Question..."}</p>
           {(c.options||[]).filter(Boolean).map((o,i) => (
             <div key={i} style={{ padding:"10px 14px", borderRadius:10, border:`1.5px solid ${i===c.correct?"#86efac":"#E2E8F0"}`, background:i===c.correct?"#F0FDF4":"#fff", marginBottom:6, fontSize:13, color:"#374151", display:"flex", alignItems:"center", gap:8 }}>
               {i===c.correct && <Check size={14} color="#22c55e"/>}
@@ -101,18 +101,18 @@ export function BlockPreview({ block }) {
       return (
         <div style={{ background:"transparent", borderRadius:16, padding:20, border:"none" }}>
 
-          <p style={{ fontSize:15, color:"#0f172a", lineHeight:1.6 }}>{(c.prompt||"Prompt with ___").split("___").map((part,i,arr) => <span key={i}>{part}{i<arr.length-1 && <span style={{ display:"inline-block", minWidth:60, borderBottom:"2px solid #db2777", margin:"0 4px" }}/>}</span>)}</p>
+          <p style={{ fontSize:c.fontSize||15, color:"#0f172a", lineHeight:1.6, fontWeight:c.bold?"700":"400", fontStyle:c.italic?"italic":"normal", textAlign:c.align||"left" }}>{(c.prompt||"Prompt with ___").split("___").map((part,i,arr) => <span key={i}>{part}{i<arr.length-1 && <span style={{ display:"inline-block", minWidth:60, borderBottom:"2px solid #db2777", margin:"0 4px" }}/>}</span>)}</p>
           {c.hint && <p style={{ fontSize:12, color:"#be185d", margin:"10px 0 0" }}>💡 {c.hint}</p>}
         </div>
       );
     case "keypoints":
       return (
         <div style={{ background:"transparent", borderRadius:16, padding:20, border:"none" }}>
-          <p style={{ fontSize:14, fontWeight:800, color:"#0f766e", margin:"0 0 12px" }}>⭐ {c.title||"Key Takeaways"}</p>
+          <p style={{ fontSize:(c.fontSize||14)+2, fontWeight:800, color:"#0f172a", margin:"0 0 12px", textAlign:c.align||"left" }}>⭐ {c.title||"Key Takeaways"}</p>
           {(c.points||[]).filter(Boolean).map((p,i) => (
             <div key={i} style={{ display:"flex", gap:10, marginBottom:8 }}>
               <div style={{ width:20, height:20, borderRadius:"50%", background:"#0d9488", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:700, flexShrink:0 }}>{i+1}</div>
-              <p style={{ fontSize:14, color:"#374151", margin:0, lineHeight:1.5 }}>{p}</p>
+              <p style={{ fontSize:c.fontSize||14, color:"#374151", margin:0, lineHeight:1.5, textAlign:c.align||"left" }}>{p}</p>
             </div>
           ))}
         </div>
@@ -120,7 +120,7 @@ export function BlockPreview({ block }) {
     case "callout": {
       const map = { info:["💡","#0891b2","#ECFEFF","#a5f3fc"], warning:["⚠️","#d97706","#FFFBEB","#fde68a"], success:["✅","#059669","#ECFDF5","#a7f3d0"], error:["❌","#dc2626","#FEF2F2","#fecaca"] };
       const [emoji,color,bg,border] = map[c.style||"info"];
-      return <div style={{ padding:"14px 18px", borderRadius:14, background:bg, border:`1.5px solid ${border}` }}><p style={{ fontSize:14, color, margin:0, lineHeight:1.6 }}>{emoji} {c.text||"Callout text"}</p></div>;
+      return <div style={{ padding:"14px 18px", borderRadius:14, background:bg, border:`1.5px solid ${border}` }}><p style={{ fontSize:c.fontSize||14, color, margin:0, lineHeight:1.6, fontWeight:c.bold?"700":"400", fontStyle:c.italic?"italic":"normal", textAlign:c.align||"left" }}>{emoji} {c.text||"Callout text"}</p></div>;
     }
     case "blankoptions": {
       const words = (c.sentence||"").split(" ").filter(Boolean);
@@ -265,21 +265,25 @@ function ImageE({ content, onChange }) {
           </button>
         ))}
       </div>
-      <div style={{ display:"flex", gap:8 }}>
-        {[["small","Small"],["medium","Medium"],["full","Full"]].map(([v,l]) => (
-          <button key={v} onClick={() => onChange({ ...content, size:v })}
-            style={{ flex:1, padding:"6px", borderRadius:8, border:`1.5px solid ${(content.size||"full")===v?"#059669":"#E2E8F0"}`, background:(content.size||"full")===v?"#ECFDF5":"#fff", fontSize:11, fontWeight:700, color:(content.size||"full")===v?"#059669":"#64748B", cursor:"pointer" }}>
-            {l}
-          </button>
-        ))}
-      </div>
-      <div style={{ display:"flex", gap:6 }}>
-        {[["left","⬅"],["center","⬆"],["right","➡"]].map(([a,icon]) => (
-          <button key={a} onClick={() => onChange({ ...content, align:a })}
-            style={{ flex:1, padding:"6px", borderRadius:8, border:`1.5px solid ${(content.align||"center")===a?"#059669":"#E2E8F0"}`, background:(content.align||"center")===a?"#ECFDF5":"#fff", fontSize:12, cursor:"pointer" }}>
-            {icon} {a}
-          </button>
-        ))}
+      <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+        <label style={lbl()}>Size</label>
+        <div style={{ display:"flex", gap:6 }}>
+          {[["small","Small 50%"],["medium","Medium 75%"],["full","Full 100%"]].map(([v,l]) => (
+            <button key={v} onClick={() => onChange({ ...content, size:v })}
+              style={{ flex:1, padding:"6px 4px", borderRadius:8, border:`1.5px solid ${(content.size||"full")===v?"#059669":"#E2E8F0"}`, background:(content.size||"full")===v?"#ECFDF5":"#fff", fontSize:11, fontWeight:700, color:(content.size||"full")===v?"#059669":"#64748B", cursor:"pointer" }}>
+              {l}
+            </button>
+          ))}
+        </div>
+        <label style={lbl()}>Alignment</label>
+        <div style={{ display:"flex", gap:6 }}>
+          {[["left","⬅ Left"],["center","⬆ Center"],["right","➡ Right"]].map(([a,l]) => (
+            <button key={a} onClick={() => onChange({ ...content, align:a })}
+              style={{ flex:1, padding:"6px 4px", borderRadius:8, border:`1.5px solid ${(content.align||"center")===a?"#059669":"#E2E8F0"}`, background:(content.align||"center")===a?"#ECFDF5":"#fff", fontSize:11, fontWeight:700, color:(content.align||"center")===a?"#059669":"#64748B", cursor:"pointer" }}>
+              {l}
+            </button>
+          ))}
+        </div>
       </div>
       <input value={content.alt||""} onChange={e => onChange({ ...content, alt:e.target.value })} placeholder="Alt text (accessibility)" style={inp()}/>
       <input value={content.caption||""} onChange={e => onChange({ ...content, caption:e.target.value })} placeholder="Caption (optional)" style={inp()}/>
