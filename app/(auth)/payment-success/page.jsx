@@ -12,7 +12,7 @@ export default function PaymentSuccessPage() {
       setCount(c => {
         if (c <= 1) {
           clearInterval(t);
-          router.push("/login");
+          router.push("/home");
           return 0;
         }
         return c - 1;
@@ -29,15 +29,15 @@ export default function PaymentSuccessPage() {
           <div style={{ width:72, height:72, borderRadius:"50%", background:"linear-gradient(135deg,#22c55e,#16a34a)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 20px", fontSize:36 }}>✓</div>
           <h1 style={{ fontSize:32, fontWeight:900, color:"#fff", margin:"0 0 12px" }}>Payment Successful!</h1>
           <p style={{ fontSize:16, color:"rgba(255,255,255,0.7)", margin:"0 0 24px", lineHeight:1.7 }}>
-            Congratulations! 🎊 Your 1Course account has been created. Check your email for login credentials.
+            Congratulations! 🎊 Your payment was successful. Check your email for confirmation.
           </p>
           <div style={{ background:"rgba(34,197,94,0.1)", border:"1px solid rgba(34,197,94,0.3)", borderRadius:14, padding:"16px 20px", marginBottom:24 }}>
             <p style={{ fontSize:14, color:"#86efac", margin:0, fontWeight:600 }}>
-              📧 Check your email for your login credentials
+              📧 Check your email for confirmation details
             </p>
           </div>
-          <Link href="/login" style={{ display:"block", padding:"16px", borderRadius:14, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:700, textDecoration:"none" }}>
-            Log In to 1Course →
+          <Link href="/home" style={{ display:"block", padding:"16px", borderRadius:14, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:700, textDecoration:"none" }}>
+            Go to Dashboard →
           </Link>
           <p style={{ fontSize:13, color:"rgba(255,255,255,0.4)", marginTop:16 }}>
             Redirecting in {count} seconds...
