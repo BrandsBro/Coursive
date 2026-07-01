@@ -27,26 +27,30 @@ export async function POST(req) {
 
     const tempPassword = Math.random().toString(36).slice(2,10) + "A1!";
 
-    // Create or get user
-    const { data: userData, error: userError } = await supabase.auth.admin.createUser({
-      email,
-      password: tempPassword,
-      email_confirm: true,
-      user_metadata: { full_name: name },
-    });
+    // Check if user already exists
+    let userId = null;
+    const { data: existingProfile } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("email", email)
+      .single();
 
-    let userId = userData?.user?.id;
-
-    if (userError) {
-      console.error("Create user error:", userError);
-      if (userError.message.includes("already registered")) {
-        // Get existing user
-        const { data: existingUsers } = await supabase.auth.admin.listUsers();
-        const existing = existingUsers?.users?.find(u => u.email === email);
-        userId = existing?.id;
-      } else {
+    if (existingProfile) {
+      // Existing user — just update subscription, no new account needed
+      userId = existingProfile.id;
+    } else {
+      // New user — create account
+      const { data: userData, error: userError } = await supabase.auth.admin.createUser({
+        email,
+        password: tempPassword,
+        email_confirm: true,
+        user_metadata: { full_name: name },
+      });
+      if (userError) {
+        console.error("Create user error:", userError);
         throw userError;
       }
+      userId = userData?.user?.id;
     }
 
     if (!userId) throw new Error("Could not get user ID");
@@ -84,11 +88,13 @@ export async function POST(req) {
       type: paymentType,
     });
 
-    // Send welcome email
+    // Send email - welcome for new users, renewal confirmation for existing
+    const isExistingUser = !!existingProfile;
+    const emailSubject = isExistingUser ? "🎉 Your 1Course access has been renewed!" : "🎉 Welcome to 1Course! Your login details inside";
     const { error: emailError } = await resend.emails.send({
       from: "1Course <noreply@kingbrandsbro.pro>",
       to: email,
-      subject: "🎉 Welcome to 1Course! Your login details inside",
+      subject: emailSubject,
       html: `
         <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#0a081e;color:#fff;border-radius:16px;overflow:hidden">
           <div style="background:linear-gradient(135deg,#5B4EFF,#8B5CF6);padding:40px 32px;text-align:center">
