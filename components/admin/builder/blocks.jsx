@@ -166,18 +166,53 @@ function ytId(url) {
   return url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/)?.[1] || null;
 }
 
+
+// ─────────────────────────────────────────────
+// FONT CONTROLS
+// ─────────────────────────────────────────────
+function FontControls({ content, onChange, showBold=true, showItalic=true }) {
+  return (
+    <div style={{ display:"flex", gap:8, alignItems:"center", flexWrap:"wrap", padding:"8px 0 10px", borderBottom:"1px solid #F1F5F9", marginBottom:10 }}>
+      <div style={{ display:"flex", alignItems:"center", gap:5 }}>
+        <span style={{ fontSize:11, color:"#94A3B8", fontWeight:600 }}>Size</span>
+        <input type="number" min={10} max={60} value={content.fontSize||15}
+          onChange={e => onChange({ ...content, fontSize:parseInt(e.target.value)||15 })}
+          style={{ width:52, padding:"4px 6px", borderRadius:7, border:"1.5px solid #E2E8F0", fontSize:12, outline:"none", textAlign:"center" }}/>
+        <span style={{ fontSize:11, color:"#94A3B8" }}>px</span>
+      </div>
+      {showBold && (
+        <button onClick={() => onChange({ ...content, bold:!content.bold })}
+          style={{ width:28, height:28, borderRadius:7, border:`1.5px solid ${content.bold?"#7c3aed":"#E2E8F0"}`, background:content.bold?"#F5F3FF":"#fff", cursor:"pointer", fontSize:13, fontWeight:900, color:content.bold?"#7c3aed":"#64748B" }}>B</button>
+      )}
+      {showItalic && (
+        <button onClick={() => onChange({ ...content, italic:!content.italic })}
+          style={{ width:28, height:28, borderRadius:7, border:`1.5px solid ${content.italic?"#7c3aed":"#E2E8F0"}`, background:content.italic?"#F5F3FF":"#fff", cursor:"pointer", fontSize:13, fontStyle:"italic", fontWeight:700, color:content.italic?"#7c3aed":"#64748B" }}>I</button>
+      )}
+      <div style={{ display:"flex", gap:4, marginLeft:"auto" }}>
+        {[["left","⬅"],["center","⬆"],["right","➡"]].map(([a,icon]) => (
+          <button key={a} onClick={() => onChange({ ...content, align:a })}
+            style={{ width:28, height:28, borderRadius:7, border:`1.5px solid ${(content.align||"left")===a?"#7c3aed":"#E2E8F0"}`, background:(content.align||"left")===a?"#F5F3FF":"#fff", cursor:"pointer", fontSize:12 }}>
+            {icon}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─────────────────────────────────────────────
 // EDITORS
 // ─────────────────────────────────────────────
 function HeadingE({ content, onChange }) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:10, paddingTop:12 }}>
-      <div style={{ display:"flex", gap:6 }}>
+      <div style={{ display:"flex", gap:6, marginBottom:4 }}>
         {["h1","h2","h3"].map(l => (
           <button key={l} onClick={() => onChange({ ...content, level:l })} style={pill(content.level===l, "#7c3aed")}>{l.toUpperCase()}</button>
         ))}
       </div>
-      <input value={content.text||""} onChange={e => onChange({ ...content, text:e.target.value })} placeholder="Heading text..." style={{ ...inp(), fontWeight:800, fontSize:16 }}/>
+      <FontControls content={content} onChange={onChange}/>
+      <input value={content.text||""} onChange={e => onChange({ ...content, text:e.target.value })} placeholder="Heading text..." style={{ ...inp(), fontWeight:800, fontSize:content.fontSize||16, textAlign:content.align||"left" }}/>
     </div>
   );
 }
@@ -185,7 +220,8 @@ function HeadingE({ content, onChange }) {
 function TextE({ content, onChange }) {
   return (
     <div style={{ paddingTop:12 }}>
-      <textarea value={content.text||""} onChange={e => onChange({ ...content, text:e.target.value })} placeholder="Write your content... Line breaks are preserved." style={{ ...inp(), minHeight:150, resize:"vertical", lineHeight:1.7 }}/>
+      <FontControls content={content} onChange={onChange}/>
+      <textarea value={content.text||""} onChange={e => onChange({ ...content, text:e.target.value })} placeholder="Write your content... Line breaks are preserved." style={{ ...inp(), minHeight:150, resize:"vertical", lineHeight:1.7, fontSize:content.fontSize||15, fontWeight:content.bold?"700":"400", fontStyle:content.italic?"italic":"normal", textAlign:content.align||"left" }}/>
       <p style={{ fontSize:11, color:"#94A3B8", margin:"6px 0 0" }}>{(content.text||"").length} chars</p>
     </div>
   );
@@ -213,6 +249,38 @@ function ImageE({ content, onChange }) {
           </div>
         </div>
       )}
+      <div style={{ display:"flex", gap:8 }}>
+        {[["small","Small"],["medium","Medium"],["full","Full"]].map(([v,l]) => (
+          <button key={v} onClick={() => onChange({ ...content, size:v })}
+            style={{ flex:1, padding:"6px", borderRadius:8, border:`1.5px solid ${(content.size||"full")===v?"#059669":"#E2E8F0"}`, background:(content.size||"full")===v?"#ECFDF5":"#fff", fontSize:11, fontWeight:700, color:(content.size||"full")===v?"#059669":"#64748B", cursor:"pointer" }}>
+            {l}
+          </button>
+        ))}
+      </div>
+      <div style={{ display:"flex", gap:6 }}>
+        {[["left","⬅"],["center","⬆"],["right","➡"]].map(([a,icon]) => (
+          <button key={a} onClick={() => onChange({ ...content, align:a })}
+            style={{ flex:1, padding:"6px", borderRadius:8, border:`1.5px solid ${(content.align||"center")===a?"#059669":"#E2E8F0"}`, background:(content.align||"center")===a?"#ECFDF5":"#fff", fontSize:12, cursor:"pointer" }}>
+            {icon} {a}
+          </button>
+        ))}
+      </div>
+      <div style={{ display:"flex", gap:8 }}>
+        {[["small","Small"],["medium","Medium"],["full","Full"]].map(([v,l]) => (
+          <button key={v} onClick={() => onChange({ ...content, size:v })}
+            style={{ flex:1, padding:"6px", borderRadius:8, border:`1.5px solid ${(content.size||"full")===v?"#059669":"#E2E8F0"}`, background:(content.size||"full")===v?"#ECFDF5":"#fff", fontSize:11, fontWeight:700, color:(content.size||"full")===v?"#059669":"#64748B", cursor:"pointer" }}>
+            {l}
+          </button>
+        ))}
+      </div>
+      <div style={{ display:"flex", gap:6 }}>
+        {[["left","⬅"],["center","⬆"],["right","➡"]].map(([a,icon]) => (
+          <button key={a} onClick={() => onChange({ ...content, align:a })}
+            style={{ flex:1, padding:"6px", borderRadius:8, border:`1.5px solid ${(content.align||"center")===a?"#059669":"#E2E8F0"}`, background:(content.align||"center")===a?"#ECFDF5":"#fff", fontSize:12, cursor:"pointer" }}>
+            {icon} {a}
+          </button>
+        ))}
+      </div>
       <input value={content.alt||""} onChange={e => onChange({ ...content, alt:e.target.value })} placeholder="Alt text (accessibility)" style={inp()}/>
       <input value={content.caption||""} onChange={e => onChange({ ...content, caption:e.target.value })} placeholder="Caption (optional)" style={inp()}/>
       {lib && <MediaLibrary accept="image" onSelect={m => { console.log("Selected media:", m); onChange({ ...content, src:m.url, alt:content.alt||m.filename }); }} onClose={() => setLib(false)}/>}
@@ -265,6 +333,7 @@ function QuizE({ content, onChange }) {
   const setOpt = (i,v) => { const a=[...opts]; a[i]=v; onChange({ ...content, options:a }); };
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:12, paddingTop:12 }}>
+      <FontControls content={content} onChange={onChange} showBold={false} showItalic={false}/>
       <div><label style={lbl()}>Question</label><textarea value={content.question||""} onChange={e => onChange({ ...content, question:e.target.value })} placeholder="Your question..." style={{ ...inp(), minHeight:70, resize:"vertical" }}/></div>
       <div>
         <label style={lbl()}>Options <span style={{ color:"#94A3B8", fontWeight:400 }}>· click ✓ for correct</span></label>
@@ -452,6 +521,7 @@ function BlankOptionsE({ content, onChange }) {
 function FillE({ content, onChange }) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:12, paddingTop:12 }}>
+      <FontControls content={content} onChange={onChange}/>
       <div><label style={lbl()}>Prompt <span style={{ color:"#94A3B8", fontWeight:400 }}>· use ___ for blank</span></label><input value={content.prompt||""} onChange={e => onChange({ ...content, prompt:e.target.value })} placeholder="The capital of France is ___" style={inp()}/></div>
       <div><label style={lbl()}>Answer</label><input value={content.answer||""} onChange={e => onChange({ ...content, answer:e.target.value })} placeholder="Paris" style={inp()}/></div>
       <div><label style={lbl()}>Hint <span style={{ color:"#94A3B8", fontWeight:400 }}>· optional</span></label><input value={content.hint||""} onChange={e => onChange({ ...content, hint:e.target.value })} placeholder="A European city..." style={inp()}/></div>
@@ -464,6 +534,7 @@ function KeyE({ content, onChange }) {
   const setPt = (i,v) => { const a=[...pts]; a[i]=v; onChange({ ...content, points:a }); };
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:12, paddingTop:12 }}>
+      <FontControls content={content} onChange={onChange} showBold={false} showItalic={false}/>
       <div><label style={lbl()}>Title</label><input value={content.title||""} onChange={e => onChange({ ...content, title:e.target.value })} placeholder="Key Takeaways" style={inp()}/></div>
       <div>
         <label style={lbl()}>Points</label>
@@ -486,6 +557,7 @@ function CalloutE({ content, onChange }) {
   const styles = [["info","💡 Info","#0891b2"],["warning","⚠️ Warning","#d97706"],["success","✅ Tip","#059669"],["error","❌ Note","#dc2626"]];
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:12, paddingTop:12 }}>
+      <FontControls content={content} onChange={onChange}/>
       <div style={{ display:"flex", gap:6 }}>
         {styles.map(([v,l,col]) => <button key={v} onClick={() => onChange({ ...content, style:v })} style={{ ...pill(content.style===v,col), flex:1, fontSize:11 }}>{l}</button>)}
       </div>

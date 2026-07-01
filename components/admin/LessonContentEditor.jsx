@@ -298,6 +298,76 @@ function BlockForm({ block, onChange }) {
   }
 }
 
+
+function FontControls({ content, onChange, showBold=true, showItalic=true }) {
+  return (
+    <div style={{ display:"flex", gap:8, alignItems:"center", flexWrap:"wrap", padding:"8px 0", borderBottom:"1px solid #F1F5F9", marginBottom:10 }}>
+      <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+        <span style={{ fontSize:11, color:"#94A3B8", fontWeight:600 }}>Size</span>
+        <input type="number" min={10} max={60} value={content.fontSize||15}
+          onChange={e => onChange({ ...content, fontSize:parseInt(e.target.value)||15 })}
+          style={{ width:56, padding:"4px 8px", borderRadius:8, border:"1.5px solid #E2E8F0", fontSize:12, outline:"none", textAlign:"center" }}/>
+        <span style={{ fontSize:11, color:"#94A3B8" }}>px</span>
+      </div>
+      {showBold && (
+        <button onClick={() => onChange({ ...content, bold:!content.bold })}
+          style={{ width:28, height:28, borderRadius:7, border:`1.5px solid ${content.bold?"#7c3aed":"#E2E8F0"}`, background:content.bold?"#F5F3FF":"#fff", cursor:"pointer", fontSize:13, fontWeight:900, color:content.bold?"#7c3aed":"#64748B" }}>
+          B
+        </button>
+      )}
+      {showItalic && (
+        <button onClick={() => onChange({ ...content, italic:!content.italic })}
+          style={{ width:28, height:28, borderRadius:7, border:`1.5px solid ${content.italic?"#7c3aed":"#E2E8F0"}`, background:content.italic?"#F5F3FF":"#fff", cursor:"pointer", fontSize:13, fontStyle:"italic", fontWeight:700, color:content.italic?"#7c3aed":"#64748B" }}>
+          I
+        </button>
+      )}
+      <div style={{ display:"flex", gap:4, marginLeft:"auto" }}>
+        {[["left","⬅"],["center","⬆"],["right","➡"]].map(([a,icon]) => (
+          <button key={a} onClick={() => onChange({ ...content, align:a })}
+            style={{ width:28, height:28, borderRadius:7, border:`1.5px solid ${(content.align||"left")===a?"#7c3aed":"#E2E8F0"}`, background:(content.align||"left")===a?"#F5F3FF":"#fff", cursor:"pointer", fontSize:12 }}>
+            {icon}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
+function FontControls({ content, onChange, showBold=true, showItalic=true }) {
+  return (
+    <div style={{ display:"flex", gap:8, alignItems:"center", flexWrap:"wrap", padding:"8px 0", borderBottom:"1px solid #F1F5F9", marginBottom:10 }}>
+      <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+        <span style={{ fontSize:11, color:"#94A3B8", fontWeight:600 }}>Size</span>
+        <input type="number" min={10} max={60} value={content.fontSize||15}
+          onChange={e => onChange({ ...content, fontSize:parseInt(e.target.value)||15 })}
+          style={{ width:56, padding:"4px 8px", borderRadius:8, border:"1.5px solid #E2E8F0", fontSize:12, outline:"none", textAlign:"center" }}/>
+        <span style={{ fontSize:11, color:"#94A3B8" }}>px</span>
+      </div>
+      {showBold && (
+        <button onClick={() => onChange({ ...content, bold:!content.bold })}
+          style={{ width:28, height:28, borderRadius:7, border:`1.5px solid ${content.bold?"#7c3aed":"#E2E8F0"}`, background:content.bold?"#F5F3FF":"#fff", cursor:"pointer", fontSize:13, fontWeight:900, color:content.bold?"#7c3aed":"#64748B" }}>
+          B
+        </button>
+      )}
+      {showItalic && (
+        <button onClick={() => onChange({ ...content, italic:!content.italic })}
+          style={{ width:28, height:28, borderRadius:7, border:`1.5px solid ${content.italic?"#7c3aed":"#E2E8F0"}`, background:content.italic?"#F5F3FF":"#fff", cursor:"pointer", fontSize:13, fontStyle:"italic", fontWeight:700, color:content.italic?"#7c3aed":"#64748B" }}>
+          I
+        </button>
+      )}
+      <div style={{ display:"flex", gap:4, marginLeft:"auto" }}>
+        {[["left","⬅"],["center","⬆"],["right","➡"]].map(([a,icon]) => (
+          <button key={a} onClick={() => onChange({ ...content, align:a })}
+            style={{ width:28, height:28, borderRadius:7, border:`1.5px solid ${(content.align||"left")===a?"#7c3aed":"#E2E8F0"}`, background:(content.align||"left")===a?"#F5F3FF":"#fff", cursor:"pointer", fontSize:12 }}>
+            {icon}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function HeadingForm({ content, onChange }) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:10, paddingTop:12 }}>
