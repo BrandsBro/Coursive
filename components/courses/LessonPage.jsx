@@ -8,7 +8,7 @@ import { useStreak } from "@/hooks/useStreak";
 import { useNotifications } from "@/hooks/useNotifications";
 import CertificateGenerator from "@/components/courses/CertificateGenerator";
 
-export default function LessonPage({ course, lesson, content, mode, challengeId, challengeDay, firstJoin }) {
+export default function LessonPage({ course, lesson, content, mode, challengeId, challengeDay }) {
   const router = useRouter();
   const { markLessonComplete, getCompletedLessons, markChallengeDay } = useProgress();
   const { updateStreak } = useStreak();
@@ -53,7 +53,11 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   const doListen = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/tts", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ text:extractText(safeContent) }) });
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: extractText(safeContent) }),
+      });
       if (!res.ok) throw new Error("TTS failed");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -64,27 +68,42 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
       audio.onerror = () => setIsReading(false);
       await audio.play();
       setIsReading(true);
-    } catch(e) { console.error("TTS error:", e); alert("Could not load audio."); }
-    finally { setIsLoading(false); }
+    } catch (e) {
+      console.error("TTS error:", e);
+      alert("Could not load audio.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleListen = async () => {
-    if (isReading) { if (audioRef.current) { audioRef.current.pause(); audioRef.current.src = ""; } setIsReading(false); return; }
+    if (isReading) {
+      if (audioRef.current) { audioRef.current.pause(); audioRef.current.src = ""; }
+      setIsReading(false);
+      return;
+    }
     await doListen();
   };
 
   useEffect(() => {
-    if (mode === "listen" && hasContent && !autoStartedRef.current) { autoStartedRef.current = true; doListen(); }
+    if (mode === "listen" && hasContent && !autoStartedRef.current) {
+      autoStartedRef.current = true;
+      doListen();
+    }
   }, [mode, hasContent]);
 
   const handleComplete = async () => {
     await updateStreak();
     await markLessonComplete(course?.id, lesson?.id);
     if (challengeId && challengeDay) await markChallengeDay(challengeId, challengeDay);
-    await sendNotification("lesson", "Lesson complete! 📚", 'You finished "' + (lesson?.title||"") + '"', "📚", "/courses/" + course?.id);
+    await sendNotification("lesson", "Lesson complete! 📚", 'You finished "' + (lesson?.title || "") + '"', "📚", "/courses/" + course?.id);
     const isLast = !allLessons[currentIdx + 1];
-    if (isLast) { await sendNotification("certificate", "Certificate earned! 🏆", 'You completed "' + (course?.title||"") + '"', "🏆", "/profile"); setTimeout(() => setShowCert(true), 2200); }
-    setCompleted(true); setShowComplete(true);
+    if (isLast) {
+      await sendNotification("certificate", "Certificate earned! 🏆", 'You completed "' + (course?.title || "") + '"', "🏆", "/profile");
+      setTimeout(() => setShowCert(true), 2200);
+    }
+    setCompleted(true);
+    setShowComplete(true);
   };
 
   const handleNext = () => {
@@ -104,24 +123,28 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
 
   return (
     <div style={{ minHeight:"100vh", background:"#fff" }}>
-      {/* Nav */}
+      {/* Top nav */}
       <div style={{ background:"#fff", borderBottom:"1px solid #F1F5F9", height:58, position:"sticky", top:0, zIndex:50 }}>
         <div style={{ maxWidth:720, margin:"0 auto", padding:"0 20px", height:"100%", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <Link href={challengeId ? "/challenges/"+challengeId : "/courses/"+(course?.id||"")} style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:6, color:"#64748B", fontSize:13, fontWeight:600 }}>
-            <ChevronLeft size={16}/> {challengeId ? "Back to Challenge" : course?.title}
+            <ChevronLeft size={16}/>{challengeId ? "Back to Challenge" : course?.title}
           </Link>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <span style={{ fontSize:12, color:"#94A3B8" }}>{lesson?.duration} min read</span>
-            <button onClick={handleListen} disabled={!hasContent||isLoading}
+            <button onClick={handleListen} disabled={!hasContent || isLoading}
               style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 14px", borderRadius:10, border:"1.5px solid #E2E8F0", background:isReading?"#0891b2":isLoading?"#e0f2fe":"#fff", color:isReading?"#fff":"#0891b2", fontSize:12, fontWeight:700, cursor:hasContent&&!isLoading?"pointer":"not-allowed", opacity:hasContent?1:0.5 }}>
               {isLoading ? "⏳ Loading..." : isReading ? "⏹ Stop" : "🎧 Listen"}
             </button>
-            {isComplete && <span style={{ display:"flex", alignItems:"center", gap:4, background:"#F0FDF4", color:"#16A34A", fontSize:12, fontWeight:700, padding:"4px 10px", borderRadius:999 }}><Check size={12}/> Complete</span>}
+            {isComplete && (
+              <span style={{ display:"flex", alignItems:"center", gap:4, background:"#F0FDF4", color:"#16A34A", fontSize:12, fontWeight:700, padding:"4px 10px", borderRadius:999 }}>
+                <Check size={12}/> Complete
+              </span>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Content */}
+      {/* Main content */}
       <div style={{ maxWidth:720, margin:"0 auto", padding:"32px 24px 80px" }}>
         <div style={{ marginBottom:32 }}>
           <p style={{ fontSize:11, fontWeight:700, color:"#94A3B8", letterSpacing:1, margin:"0 0 8px" }}>{(course?.title||"").toUpperCase()}</p>
@@ -152,7 +175,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
           ))}
         </div>
 
-        {/* Bottom nav */}
+        {/* Bottom navigation */}
         <div style={{ marginTop:48, paddingTop:32, borderTop:"1px solid #F1F5F9", display:"flex", gap:12, alignItems:"center", justifyContent:"space-between" }}>
           {prevLesson ? (
             <Link href={challengeId ? "/challenges/"+challengeId+"/day/"+(parseInt(lesson?.id?.split("_day_").pop())-1) : "/courses/"+course.id+"/lessons/"+prevLesson.id+"?mode="+mode}
@@ -162,9 +185,13 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
           ) : <div/>}
           {!isComplete && !completed ? (
             hasContent ? (
-              <button onClick={handleComplete} style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(124,58,237,0.4)" }}>✓ Mark Complete</button>
+              <button onClick={handleComplete} style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(124,58,237,0.4)" }}>
+                ✓ Mark Complete
+              </button>
             ) : (
-              <button disabled style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"#E2E8F0", color:"#94A3B8", fontSize:14, fontWeight:700, cursor:"not-allowed" }}>Content not ready yet</button>
+              <button disabled style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"#E2E8F0", color:"#94A3B8", fontSize:14, fontWeight:700, cursor:"not-allowed" }}>
+                Content not ready yet
+              </button>
             )
           ) : (
             <button onClick={handleNext} style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#22c55e,#16a34a)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7 }}>
@@ -183,7 +210,9 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
             <p style={{ fontSize:14, color:"#64748B", margin:"0 0 28px" }}>{nextLesson ? 'Up next: "'+nextLesson.title+'"' : "You've finished this course!"}</p>
             <div style={{ display:"flex", gap:10 }}>
               <button onClick={() => setShowComplete(false)} style={{ flex:1, padding:"12px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:13, fontWeight:600, color:"#374151", cursor:"pointer" }}>Stay here</button>
-              <button onClick={() => { setShowComplete(false); handleNext(); }} style={{ flex:2, padding:"12px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>{nextLesson ? "Next lesson →" : "Back to course"}</button>
+              <button onClick={() => { setShowComplete(false); handleNext(); }} style={{ flex:2, padding:"12px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                {nextLesson ? "Next lesson →" : "Back to course"}
+              </button>
             </div>
           </div>
         </div>
@@ -197,66 +226,103 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
   const c = block.content || block;
 
   switch (block.type) {
+
+    // ── HEADING ──
     case "heading": {
-      const ts = c.textStyle||{};
+      const ts = c.textStyle || {};
       const sz = c.level==="h1"?28:c.level==="h2"?22:18;
-      return <div style={{ fontSize:ts.fontSize||sz, fontWeight:ts.bold?"900":"800", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#0f172a", lineHeight:1.25 }}>{c.text}</div>;
+      return (
+        <div style={{ fontSize:ts.fontSize||sz, fontWeight:ts.bold?"900":"800", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#0f172a", lineHeight:1.25 }}>
+          {c.text}
+        </div>
+      );
     }
+
+    // ── TEXT ──
     case "text": {
-      const ts = c.textStyle||{};
-      return <p style={{ fontSize:ts.fontSize||15, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", lineHeight:1.8, color:"#374151", margin:0, whiteSpace:"pre-wrap" }}>{c.text}</p>;
+      const ts = c.textStyle || {};
+      return (
+        <p style={{ fontSize:ts.fontSize||15, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", lineHeight:1.8, color:"#374151", margin:0, whiteSpace:"pre-wrap" }}>
+          {c.text}
+        </p>
+      );
     }
+
+    // ── IMAGE ──
     case "image":
-      return c.src ? (
+      if (!c.src) return null;
+      return (
         <figure style={{ margin:0, textAlign:c.align||"center" }}>
           <img src={c.src} alt={c.alt||""} style={{ width:c.size==="small"?"50%":c.size==="medium"?"75%":"100%", borderRadius:20, display:"inline-block", boxShadow:"0 4px 20px rgba(0,0,0,0.08)" }}/>
-          {c.caption && (()=>{ const cs=c.captionStyle||{}; return <figcaption style={{ textAlign:cs.align||"center", fontSize:cs.fontSize||13, fontStyle:cs.italic?"italic":"italic", color:"#94A3B8", marginTop:10 }}>{c.caption}</figcaption>; })()}
+          {c.caption && (
+            <figcaption style={{ textAlign:(c.captionStyle||{}).align||"center", fontSize:(c.captionStyle||{}).fontSize||13, color:"#94A3B8", marginTop:10, fontStyle:"italic" }}>
+              {c.caption}
+            </figcaption>
+          )}
         </figure>
-      ) : null;
+      );
+
+    // ── VIDEO ──
     case "video": {
-      const src = c.src||"";
+      const src = c.src || "";
       let ytId = null;
-      if (src.includes("youtube.com")||src.includes("youtu.be")) { const m=src.split("v=")[1]||src.split("youtu.be/")[1]; ytId=m?m.split("&")[0].split("?")[0]:null; }
+      if (src.includes("youtube.com") || src.includes("youtu.be")) {
+        const m = src.split("v=")[1] || src.split("youtu.be/")[1];
+        ytId = m ? m.split("&")[0].split("?")[0] : null;
+      }
       return (
         <div>
           <div style={{ borderRadius:20, overflow:"hidden", aspectRatio:"16/9", background:"#000" }}>
-            {ytId ? <iframe width="100%" height="100%" src={"https://www.youtube.com/embed/"+ytId} style={{ border:"none", display:"block" }} allowFullScreen/> : c.src ? <video src={c.src} controls style={{ width:"100%", height:"100%" }}/> : null}
+            {ytId ? <iframe width="100%" height="100%" src={"https://www.youtube.com/embed/"+ytId} style={{ border:"none", display:"block" }} allowFullScreen/>
+              : c.src ? <video src={c.src} controls style={{ width:"100%", height:"100%" }}/> : null}
           </div>
           {c.caption && <p style={{ textAlign:"center", fontSize:13, color:"#94A3B8", marginTop:10, fontStyle:"italic" }}>{c.caption}</p>}
         </div>
       );
     }
-    case "audio":
+
+    // ── AUDIO ──
+    case "audio": {
       if (!c.src) return null;
-      const tts=c.titleStyle||{}; const cts=c.captionStyle||{};
+      const ts = c.titleStyle || {};
       return (
         <div style={{ padding:"16px 0" }}>
           <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:14 }}>
-            <div style={{ width:44, height:44, borderRadius:12, background:"#F1F5F9", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}><Music size={20} color="#374151"/></div>
+            <div style={{ width:44, height:44, borderRadius:12, background:"#F1F5F9", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+              <Music size={20} color="#374151"/>
+            </div>
             <div>
-              <p style={{ fontSize:tts.fontSize||15, fontWeight:tts.bold?"700":"700", fontStyle:tts.italic?"italic":"normal", color:"#0f172a", margin:"0 0 2px" }}>{c.title||"Audio"}</p>
-              {c.caption && <p style={{ fontSize:cts.fontSize||13, color:"#64748B", margin:0 }}>{c.caption}</p>}
+              <p style={{ fontSize:ts.fontSize||15, fontWeight:ts.bold?"700":"700", fontStyle:ts.italic?"italic":"normal", color:"#0f172a", margin:"0 0 2px" }}>{c.title||"Audio"}</p>
+              {c.caption && <p style={{ fontSize:13, color:"#64748B", margin:0 }}>{c.caption}</p>}
             </div>
           </div>
           <audio src={c.src} controls style={{ width:"100%", height:42 }}/>
         </div>
       );
+    }
+
+    // ── QUIZ ──
     case "quiz": {
       const sel = answers[idx];
       const isChecked = checked[idx];
       const isCorrect = sel === c.correct;
-      const qs = c.questionStyle||{}; const os = c.optionStyle||{};
+      const qs = c.questionStyle || {};
+      const os = c.optionStyle || {};
       return (
-        <div style={{ borderRadius:20, padding:"20px 0" }}>
-          <p style={{ fontSize:qs.fontSize||16, fontWeight:qs.bold?"700":"700", fontStyle:qs.italic?"italic":"normal", textAlign:qs.align||"left", color:"#0f172a", margin:"0 0 16px", lineHeight:1.4 }}>{c.question}</p>
+        <div style={{ padding:"20px 0" }}>
+          <p style={{ fontSize:qs.fontSize||16, fontWeight:qs.bold?"700":"700", fontStyle:qs.italic?"italic":"normal", textAlign:qs.align||"left", color:"#0f172a", margin:"0 0 16px", lineHeight:1.4 }}>
+            {c.question}
+          </p>
           <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
-            {(c.options||[]).map((opt,i) => {
-              let bg="#fff", border="#E2E8F0", color="#374151";
-              if (isChecked) { if (i===c.correct) { bg="#F0FDF4"; border="#86efac"; color="#166534"; } else if (i===sel) { bg="#FEF2F2"; border="#fca5a5"; color="#991B1B"; } }
-              else if (sel===i) { bg="#F9FAFB"; border="#111827"; color="#111827"; }
+            {(c.options||[]).map((opt, i) => {
+              let bg = "#fff", border = "#E2E8F0", color = "#374151", shadow = "0 2px 0 #D1D5DB";
+              if (isChecked) {
+                if (i === c.correct) { bg="#F0FDF4"; border="#22c55e"; color="#166534"; shadow="none"; }
+                else if (i === sel) { bg="#FEF2F2"; border="#ef4444"; color="#991B1B"; shadow="none"; }
+              } else if (sel === i) { border="#111827"; shadow="0 2px 0 #111827"; }
               return (
-                <button key={i} onClick={() => !isChecked && setAnswers(p=>({...p,[idx]:i}))}
-                  style={{ padding:"12px 16px", borderRadius:12, border:"2px solid "+border, background:bg, color, fontSize:os.fontSize||14, textAlign:os.align||"left", cursor:isChecked?"default":"pointer", display:"flex", alignItems:"center", gap:10, fontWeight:600, boxShadow:(!isChecked&&sel===i)?"0 2px 0 #111827":"none" }}>
+                <button key={i} onClick={() => !isChecked && setAnswers(p => ({...p,[idx]:i}))}
+                  style={{ padding:"12px 16px", borderRadius:12, border:"2px solid "+border, background:bg, color, fontSize:os.fontSize||14, textAlign:os.align||"left", cursor:isChecked?"default":"pointer", display:"flex", alignItems:"center", gap:10, fontWeight:600, boxShadow:shadow }}>
                   <span style={{ width:26, height:26, borderRadius:"50%", border:"2px solid "+border, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, fontSize:11, fontWeight:700, background:isChecked&&i===c.correct?"#22c55e":isChecked&&i===sel&&!isCorrect?"#ef4444":"transparent", color:isChecked&&(i===c.correct||i===sel)?"#fff":color }}>
                     {isChecked&&i===c.correct?"✓":isChecked&&i===sel&&!isCorrect?"✕":String.fromCharCode(65+i)}
                   </span>
@@ -265,8 +331,11 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
               );
             })}
           </div>
-          {!isChecked && sel!==undefined && (
-            <button onClick={() => setChecked(p=>({...p,[idx]:true}))} style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>Check</button>
+          {!isChecked && sel !== undefined && (
+            <button onClick={() => setChecked(p => ({...p,[idx]:true}))}
+              style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>
+              Check
+            </button>
           )}
           {isChecked && (
             <div style={{ padding:"14px 16px", borderRadius:12, background:isCorrect?"#F0FDF4":"#FEF2F2", border:"1.5px solid "+(isCorrect?"#BBF7D0":"#FECACA") }}>
@@ -277,45 +346,69 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
         </div>
       );
     }
+
+    // ── FILL IN THE BLANK ──
     case "fillblank": {
-      const val = fillInputs[idx]||"";
+      const val = fillInputs[idx] || "";
       const isChecked = fillChecked[idx];
       const isCorrect = val.trim().toLowerCase() === (c.answer||"").trim().toLowerCase();
       const showAnswer = fillShowAnswer?.[idx];
-      const ps = c.promptStyle||{};
+      const ps = c.promptStyle || {};
+      const hs = c.hintStyle || {};
       return (
         <div style={{ padding:"20px 0" }}>
           <p style={{ fontSize:ps.fontSize||16, fontWeight:ps.bold?"700":"400", fontStyle:ps.italic?"italic":"normal", textAlign:ps.align||"left", color:"#0f172a", margin:"0 0 16px", lineHeight:1.6 }}>
-            {(c.prompt||"").split("___").map((part,i,arr) => (
-              <span key={i}>{part}{i < arr.length-1 && <span style={{ display:"inline-block", minWidth:80, borderBottom:"2.5px solid #6366f1", margin:"0 6px", verticalAlign:"bottom", paddingBottom:2, fontWeight:700, color:"#6366f1", minHeight:24 }}>{val||" "}</span>}</span>
+            {(c.prompt||"").split("___").map((part, i, arr) => (
+              <span key={i}>
+                {part}
+                {i < arr.length - 1 && (
+                  <span style={{ display:"inline-block", minWidth:80, borderBottom:"2.5px solid #6366f1", margin:"0 6px", verticalAlign:"bottom", paddingBottom:2, fontWeight:700, color:"#6366f1", minHeight:24 }}>
+                    {val || " "}
+                  </span>
+                )}
+              </span>
             ))}
           </p>
-          <input value={val} onChange={e => !isChecked && setFillInputs(p=>({...p,[idx]:e.target.value}))}
-            onKeyDown={e => e.key==="Enter" && val && !isChecked && setFillChecked(p=>({...p,[idx]:true}))}
-            placeholder="Type your answer..." disabled={isChecked}
-            style={{ width:"100%", padding:"14px 18px", borderRadius:14, border:`2px solid ${isChecked?isCorrect?"#22c55e":"#ef4444":"#E2E8F0"}`, fontSize:15, fontWeight:500, outline:"none", boxSizing:"border-box", background:isChecked?isCorrect?"#F0FDF4":"#FEF2F2":"#F9FAFB", color:isChecked?isCorrect?"#166534":"#991B1B":"#0f172a", marginBottom:12 }}/>
-          {c.hint && !isChecked && <p style={{ fontSize:13, color:"#64748B", margin:"0 0 12px" }}>💡 {c.hint}</p>}
-          {!isChecked && val && (
-            <button onClick={() => setFillChecked(p=>({...p,[idx]:true}))} style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>Check</button>
+          <input
+            value={val}
+            onChange={e => !isChecked && setFillInputs(p => ({...p,[idx]:e.target.value}))}
+            onKeyDown={e => e.key==="Enter" && val && !isChecked && setFillChecked(p => ({...p,[idx]:true}))}
+            placeholder="Type your answer..."
+            disabled={isChecked}
+            style={{ width:"100%", padding:"14px 18px", borderRadius:14, border:"2px solid "+(isChecked?isCorrect?"#22c55e":"#ef4444":"#E2E8F0"), fontSize:15, fontWeight:500, outline:"none", boxSizing:"border-box", background:isChecked?isCorrect?"#F0FDF4":"#FEF2F2":"#F9FAFB", color:isChecked?isCorrect?"#166534":"#991B1B":"#0f172a", marginBottom:12 }}
+          />
+          {c.hint && !isChecked && (
+            <p style={{ fontSize:hs.fontSize||13, fontStyle:"italic", color:"#64748B", margin:"0 0 12px" }}>💡 {c.hint}</p>
           )}
-          {isChecked && (
+          {!isChecked && val && (
+            <button onClick={() => setFillChecked(p => ({...p,[idx]:true}))}
+              style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>
+              Check
+            </button>
+          )}
+          {isChecked && isCorrect && (
+            <div style={{ padding:"14px 16px", borderRadius:12, background:"#F0FDF4", border:"1.5px solid #BBF7D0" }}>
+              <p style={{ fontSize:15, fontWeight:700, color:"#166534", margin:0 }}>🎉 Correct!</p>
+            </div>
+          )}
+          {isChecked && !isCorrect && (
             <div>
-              {isCorrect ? (
-                <div style={{ padding:"14px 16px", borderRadius:12, background:"#F0FDF4", border:"1.5px solid #BBF7D0" }}>
-                  <p style={{ fontSize:15, fontWeight:700, color:"#166534", margin:0 }}>🎉 Correct!</p>
-                </div>
-              ) : (
-                <div>
-                  <div style={{ padding:"14px 16px", borderRadius:12, background:"#FEF2F2", border:"1.5px solid #FECACA", marginBottom:10 }}>
-                    <p style={{ fontSize:15, fontWeight:700, color:"#DC2626", margin:0 }}>❌ Not quite!</p>
-                  </div>
-                  <div style={{ display:"flex", gap:10 }}>
-                    <button onClick={() => { setFillChecked(p=>({...p,[idx]:false})); setFillInputs(p=>({...p,[idx]:""})); }}
-                      style={{ flex:1, padding:"11px", borderRadius:11, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:13, fontWeight:600, color:"#374151", cursor:"pointer" }}>Try Again</button>
-                    <button onClick={() => setFillShowAnswer(p=>({...p,[idx]:true}))}
-                      style={{ flex:1, padding:"11px", borderRadius:11, border:"none", background:"#111827", color:"#fff", fontSize:13, fontWeight:600, cursor:"pointer" }}>See Answer</button>
-                  </div>
-                  {showAnswer && <div style={{ marginTop:10, padding:"12px 16px", borderRadius:10, background:"#F9FAFB", border:"1.5px solid #E5E7EB" }}><p style={{ fontSize:13, color:"#374151", margin:0 }}>Answer: <strong style={{ color:"#111827" }}>{c.answer}</strong></p></div>}
+              <div style={{ padding:"14px 16px", borderRadius:12, background:"#FEF2F2", border:"1.5px solid #FECACA", marginBottom:10 }}>
+                <p style={{ fontSize:15, fontWeight:700, color:"#DC2626", margin:0 }}>❌ Not quite!</p>
+              </div>
+              <div style={{ display:"flex", gap:10 }}>
+                <button onClick={() => { setFillChecked(p => ({...p,[idx]:false})); setFillInputs(p => ({...p,[idx]:""})); }}
+                  style={{ flex:1, padding:"11px", borderRadius:11, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:13, fontWeight:600, color:"#374151", cursor:"pointer" }}>
+                  Try Again
+                </button>
+                <button onClick={() => setFillShowAnswer(p => ({...p,[idx]:true}))}
+                  style={{ flex:1, padding:"11px", borderRadius:11, border:"none", background:"#111827", color:"#fff", fontSize:13, fontWeight:600, cursor:"pointer" }}>
+                  See Answer
+                </button>
+              </div>
+              {showAnswer && (
+                <div style={{ marginTop:10, padding:"12px 16px", borderRadius:10, background:"#F9FAFB", border:"1.5px solid #E5E7EB" }}>
+                  <p style={{ fontSize:13, color:"#374151", margin:0 }}>Answer: <strong style={{ color:"#111827" }}>{c.answer}</strong></p>
                 </div>
               )}
             </div>
@@ -323,51 +416,68 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
         </div>
       );
     }
+
+    // ── BLANK + OPTIONS ──
     case "blankoptions": {
-      const sentence = c.sentence||"";
-      const markedWords = c.markedWords||[];
-      const blanks = c.blanks||[];
+      const sentence = c.sentence || "";
+      const markedWords = c.markedWords || [];
+      const blanks = c.blanks || [];
       const words = sentence.split(" ").filter(Boolean);
       const blankCount = markedWords.length;
-      const selectedMap = answers["bo_"+idx]||{};
+      const selectedMap = answers["bo_"+idx] || {};
       const isChecked = checked["bo_"+idx];
       const showAns = fillShowAnswer?.["bo_"+idx];
-      const allFilled = Object.keys(selectedMap).filter(k=>selectedMap[k]!==undefined&&selectedMap[k]!==null&&selectedMap[k]!=="").length === blankCount;
-      const allCorrect = blanks.length>0 && blanks.every((b,i) => selectedMap[i]===b.correct||selectedMap[String(i)]===b.correct);
-      const getOptions = (i) => { const b=blanks[i]; if(!b) return []; return [b.correct,b.w1,b.w2,b.w3].filter(Boolean).sort(()=>Math.sin(idx*100+i*37)-0.5); };
+      const allFilled = Object.keys(selectedMap).filter(k => selectedMap[k]!==undefined && selectedMap[k]!==null && selectedMap[k]!=="").length === blankCount;
+      const allCorrect = blanks.length > 0 && blanks.every((b,i) => selectedMap[i]===b.correct || selectedMap[String(i)]===b.correct);
+      const getOptions = (i) => {
+        const b = blanks[i];
+        if (!b) return [];
+        return [b.correct, b.w1, b.w2, b.w3].filter(Boolean).sort(() => Math.sin(idx*100+i*37) - 0.5);
+      };
       const sentenceParts = [];
-      words.forEach((word,wi) => { if(markedWords.includes(wi)) sentenceParts.push({ type:"blank", blankIdx:markedWords.indexOf(wi) }); else sentenceParts.push({ type:"word", text:word }); });
-      const ss = c.sentenceStyle||{};
+      words.forEach((word, wi) => {
+        if (markedWords.includes(wi)) sentenceParts.push({ type:"blank", blankIdx:markedWords.indexOf(wi) });
+        else sentenceParts.push({ type:"word", text:word });
+      });
+      const ss = c.sentenceStyle || {};
+
       return (
         <div style={{ padding:"20px 0" }}>
-          {/* Sentence with blanks */}
+          {/* Sentence with blank slots */}
           <p style={{ fontSize:ss.fontSize||18, fontWeight:ss.bold?"700":"500", textAlign:ss.align||"left", color:"#0f172a", margin:"0 0 28px", lineHeight:2.6 }}>
-            {sentenceParts.map((part,i) => {
-              if (part.type==="word") return <span key={i}>{part.text} </span>;
-              const bi=part.blankIdx;
-              const sel=selectedMap[bi]||selectedMap[String(bi)];
-              const ok=isChecked&&sel===blanks[bi]?.correct;
-              const wrong=isChecked&&sel!==blanks[bi]?.correct;
+            {sentenceParts.map((part, i) => {
+              if (part.type === "word") return <span key={i}>{part.text} </span>;
+              const bi = part.blankIdx;
+              const sel = selectedMap[bi] || selectedMap[String(bi)];
+              const correct = blanks[bi]?.correct;
+              const ok = isChecked && sel === correct;
+              const wrong = isChecked && sel !== correct;
               return (
-                <span key={i} style={{ display:"inline-block", minWidth:80, padding:"4px 16px", margin:"0 4px", borderRadius:10, border:`2px solid ${ok?"#22c55e":wrong?"#ef4444":sel?"#111827":"#D1D5DB"}`, background:"#fff", color:ok?"#166534":wrong?"#991B1B":sel?"#111827":"#9CA3AF", fontWeight:700, fontSize:16, textAlign:"center", verticalAlign:"middle", boxShadow:ok||wrong?"none":sel?"0 2px 0 #111827":"0 2px 0 #D1D5DB" }}>
-                  {sel||"_____"}
+                <span key={i} style={{ display:"inline-block", minWidth:80, padding:"4px 16px", margin:"0 4px", borderRadius:10, border:"2px solid "+(ok?"#22c55e":wrong?"#ef4444":sel?"#111827":"#D1D5DB"), background:"#fff", color:ok?"#166534":wrong?"#991B1B":sel?"#111827":"#9CA3AF", fontWeight:700, fontSize:16, textAlign:"center", verticalAlign:"middle", boxShadow:ok||wrong?"none":sel?"0 2px 0 #111827":"0 2px 0 #D1D5DB" }}>
+                  {sel || "_____"}
                 </span>
               );
             })}
           </p>
-          {/* Option buttons per blank */}
+
+          {/* Options per blank */}
           {!isChecked && (
             <div style={{ display:"flex", flexDirection:"column", gap:20, marginBottom:16 }}>
-              {Array.from({ length:blankCount },(_,i) => (
+              {Array.from({ length: blankCount }, (_, i) => (
                 <div key={i}>
-                  {blankCount>1 && <p style={{ fontSize:11, fontWeight:700, color:"#6B7280", margin:"0 0 8px", textTransform:"uppercase", letterSpacing:0.5 }}>Blank {i+1}</p>}
+                  {blankCount > 1 && (
+                    <p style={{ fontSize:11, fontWeight:700, color:"#6B7280", margin:"0 0 8px", textTransform:"uppercase", letterSpacing:0.5 }}>
+                      Blank {i+1}
+                    </p>
+                  )}
                   <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-                    {getOptions(i).map((opt,j) => {
-                      const sel=selectedMap[String(i)]||selectedMap[i];
-                      const isSel=sel===opt;
+                    {getOptions(i).map((opt, j) => {
+                      const sel = selectedMap[String(i)] || selectedMap[i];
+                      const isSel = sel === opt;
                       return (
-                        <button key={j} onClick={() => setAnswers(p=>({...p,["bo_"+idx]:{...selectedMap,[String(i)]:sel===opt?undefined:opt}}))}
-                          style={{ padding:"10px 22px", borderRadius:12, border:`2px solid ${isSel?"#111827":"#E5E7EB"}`, background:"#fff", color:"#111827", fontSize:15, fontWeight:600, cursor:"pointer", boxShadow:isSel?"0 2px 0 #111827":"0 2px 0 #D1D5DB" }}>
+                        <button key={j}
+                          onClick={() => setAnswers(p => ({...p, ["bo_"+idx]: {...selectedMap, [String(i)]: sel===opt ? undefined : opt}}))}
+                          style={{ padding:"10px 22px", borderRadius:12, border:"2px solid "+(isSel?"#111827":"#E5E7EB"), background:"#fff", color:"#111827", fontSize:15, fontWeight:600, cursor:"pointer", boxShadow:isSel?"0 2px 0 #111827":"0 2px 0 #D1D5DB" }}>
                           {opt}
                         </button>
                       );
@@ -377,32 +487,49 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
               ))}
             </div>
           )}
+
           {!isChecked && allFilled && (
-            <button onClick={() => setChecked(p=>({...p,["bo_"+idx]:true}))} style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>Check</button>
+            <button onClick={() => setChecked(p => ({...p, ["bo_"+idx]: true}))}
+              style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>
+              Check
+            </button>
           )}
-          {isChecked && (
+
+          {isChecked && allCorrect && (
+            <div style={{ padding:"16px 18px", borderRadius:14, background:"#F0FDF4", border:"1.5px solid #BBF7D0" }}>
+              <p style={{ fontSize:15, fontWeight:700, color:"#166534", margin:0 }}>
+                🎉 {blankCount > 1 ? "All correct!" : "Correct!"}
+              </p>
+              {c.explanation && <p style={{ fontSize:13, color:"#166534", margin:"4px 0 0" }}>{c.explanation}</p>}
+            </div>
+          )}
+
+          {isChecked && !allCorrect && (
             <div>
-              {allCorrect ? (
-                <div style={{ padding:"16px 18px", borderRadius:14, background:"#F0FDF4", border:"1.5px solid #BBF7D0" }}>
-                  <p style={{ fontSize:15, fontWeight:700, color:"#166534", margin:0 }}>🎉 {blankCount>1?"All correct!":"Correct!"}</p>
-                  {c.explanation && <p style={{ fontSize:13, color:"#166534", margin:"4px 0 0" }}>{c.explanation}</p>}
-                </div>
-              ) : (
-                <div>
-                  <div style={{ padding:"14px 18px", borderRadius:14, background:"#FEF2F2", border:"1.5px solid #FECACA", marginBottom:10 }}>
-                    <p style={{ fontSize:15, fontWeight:700, color:"#DC2626", margin:0 }}>❌ Not quite — try again!</p>
-                  </div>
-                  <div style={{ display:"flex", gap:10, marginBottom:10 }}>
-                    <button onClick={() => { setChecked(p=>({...p,["bo_"+idx]:false})); setAnswers(p=>({...p,["bo_"+idx]:{}}})); }}
-                      style={{ flex:1, padding:"12px", borderRadius:12, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:14, fontWeight:600, color:"#374151", cursor:"pointer" }}>Try Again</button>
-                    <button onClick={() => setFillShowAnswer(p=>({...p,["bo_"+idx]:true}))}
-                      style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"#111827", color:"#fff", fontSize:14, fontWeight:600, cursor:"pointer" }}>See Answers</button>
-                  </div>
-                  {showAns && (
-                    <div style={{ padding:"14px 16px", borderRadius:12, background:"#F9FAFB", border:"1.5px solid #E5E7EB" }}>
-                      {blanks.map((b,i) => <p key={i} style={{ fontSize:14, color:"#374151", margin:"0 0 4px", fontWeight:600 }}>Blank {i+1}: <strong style={{ color:"#111827" }}>{b.correct}</strong></p>)}
-                    </div>
-                  )}
+              <div style={{ padding:"14px 18px", borderRadius:14, background:"#FEF2F2", border:"1.5px solid #FECACA", marginBottom:10 }}>
+                <p style={{ fontSize:15, fontWeight:700, color:"#DC2626", margin:0 }}>❌ Not quite — try again!</p>
+              </div>
+              <div style={{ display:"flex", gap:10, marginBottom:10 }}>
+                <button
+                  onClick={() => {
+                    setChecked(p => ({...p, ["bo_"+idx]: false}));
+                    setAnswers(p => ({...p, ["bo_"+idx]: {}}));
+                  }}
+                  style={{ flex:1, padding:"12px", borderRadius:12, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:14, fontWeight:600, color:"#374151", cursor:"pointer" }}>
+                  Try Again
+                </button>
+                <button onClick={() => setFillShowAnswer(p => ({...p, ["bo_"+idx]: true}))}
+                  style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"#111827", color:"#fff", fontSize:14, fontWeight:600, cursor:"pointer" }}>
+                  See Answers
+                </button>
+              </div>
+              {showAns && (
+                <div style={{ padding:"14px 16px", borderRadius:12, background:"#F9FAFB", border:"1.5px solid #E5E7EB" }}>
+                  {blanks.map((b, i) => (
+                    <p key={i} style={{ fontSize:14, color:"#374151", margin:"0 0 4px", fontWeight:600 }}>
+                      Blank {i+1}: <strong style={{ color:"#111827" }}>{b.correct}</strong>
+                    </p>
+                  ))}
                 </div>
               )}
             </div>
@@ -410,30 +537,60 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
         </div>
       );
     }
+
+    // ── KEY POINTS ──
     case "keypoints": {
-      const ts = c.titleStyle||{}; const ps = c.pointStyle||{};
+      const ts = c.titleStyle || {};
+      const ps = c.pointStyle || {};
       return (
         <div style={{ padding:"20px 0" }}>
-          <p style={{ fontSize:ts.fontSize||16, fontWeight:ts.bold?"900":"800", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#0f172a", margin:"0 0 16px" }}>⭐ {c.title||"Key Takeaways"}</p>
+          <p style={{ fontSize:ts.fontSize||16, fontWeight:ts.bold?"900":"800", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#0f172a", margin:"0 0 16px" }}>
+            ⭐ {c.title||"Key Takeaways"}
+          </p>
           <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-            {(c.points||[]).filter(Boolean).map((pt,i) => (
+            {(c.points||[]).filter(Boolean).map((pt, i) => (
               <div key={i} style={{ display:"flex", gap:12, alignItems:"flex-start" }}>
-                <div style={{ width:24, height:24, borderRadius:"50%", background:"#6366f1", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, flexShrink:0 }}>{i+1}</div>
-                <p style={{ fontSize:ps.fontSize||14, fontWeight:ps.bold?"700":"400", fontStyle:ps.italic?"italic":"normal", textAlign:ps.align||"left", color:"#374151", margin:0, lineHeight:1.6 }}>{pt}</p>
+                <div style={{ width:24, height:24, borderRadius:"50%", background:"#6366f1", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, flexShrink:0 }}>
+                  {i+1}
+                </div>
+                <p style={{ fontSize:ps.fontSize||14, fontWeight:ps.bold?"700":"400", fontStyle:ps.italic?"italic":"normal", textAlign:ps.align||"left", color:"#374151", margin:0, lineHeight:1.6 }}>
+                  {pt}
+                </p>
               </div>
             ))}
           </div>
         </div>
       );
     }
+
+    // ── CALLOUT ──
     case "callout": {
-      const map={ info:["💡","#0891b2"], warning:["⚠️","#d97706"], success:["✅","#059669"], error:["❌","#dc2626"] };
-      const [emoji,color]=map[c.style||"info"];
-      const ts=c.textStyle||{};
-      return <div style={{ padding:"14px 18px", borderRadius:12, background:"#F8FAFC", borderLeft:`4px solid ${color}`, display:"flex", gap:12 }}><span style={{ fontSize:18, flexShrink:0 }}>{emoji}</span><p style={{ fontSize:ts.fontSize||14, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#374151", margin:0, lineHeight:1.65 }}>{c.text}</p></div>;
+      const map = {
+        info:    ["💡","#0891b2"],
+        warning: ["⚠️","#d97706"],
+        success: ["✅","#059669"],
+        error:   ["❌","#dc2626"],
+      };
+      const [emoji, color] = map[c.style||"info"];
+      const ts = c.textStyle || {};
+      return (
+        <div style={{ padding:"14px 18px", borderRadius:12, background:"#F8FAFC", borderLeft:"4px solid "+color, display:"flex", gap:12 }}>
+          <span style={{ fontSize:18, flexShrink:0 }}>{emoji}</span>
+          <p style={{ fontSize:ts.fontSize||14, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#374151", margin:0, lineHeight:1.65 }}>
+            {c.text}
+          </p>
+        </div>
+      );
     }
+
+    // ── DIVIDER ──
     case "divider":
-      return c.style==="dots"?<div style={{ textAlign:"center", color:"#CBD5E1", fontSize:18, letterSpacing:10, padding:"8px 0" }}>• • •</div>:c.style==="space"?<div style={{ height:24 }}/>:<hr style={{ border:"none", borderTop:"2px solid #F1F5F9", margin:0 }}/>;
+      return c.style==="dots"
+        ? <div style={{ textAlign:"center", color:"#CBD5E1", fontSize:18, letterSpacing:10, padding:"8px 0" }}>• • •</div>
+        : c.style==="space"
+        ? <div style={{ height:24 }}/>
+        : <hr style={{ border:"none", borderTop:"2px solid #F1F5F9", margin:0 }}/>;
+
     default:
       if (c.text) return <p style={{ fontSize:15, lineHeight:1.8, color:"#374151", margin:0 }}>{c.text}</p>;
       return null;
