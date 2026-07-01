@@ -5,8 +5,8 @@ import { Save, Check, Loader, Send } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const DEFAULT = {
-  subject: "🎉 Welcome to Coursiv! Your login details inside",
-  logoText: "✦ Coursiv",
+  subject: "🎉 Welcome to 1Course! Your login details inside",
+  logoText: "✦ 1Course",
   logoAlign: "center",
   headerText: "Welcome aboard!",
   headerAlign: "center",
@@ -16,17 +16,17 @@ const DEFAULT = {
   bodyText: "Your payment was successful! Use the details below to log in:",
   bodyAlign: "left",
   bodyTextColor: "rgba(255,255,255,0.7)",
-  buttonText: "Log In to Coursiv →",
+  buttonText: "Log In to 1Course →",
   buttonAlign: "center",
   buttonColor: "#5B4EFF",
   buttonTextColor: "#ffffff",
-  footerText: "© 2026 Coursiv. All rights reserved.",
+  footerText: "© 2026 1Course. All rights reserved.",
   footerAlign: "center",
   bgColor: "#0a081e",
   headerGradientStart: "#5B4EFF",
   headerGradientEnd: "#8B5CF6",
   cardBg: "#1a1830",
-  fromName: "Coursiv",
+  fromName: "1Course",
   fromEmail: "noreply@kingbrandsbro.pro",
 };
 
@@ -214,7 +214,7 @@ function generateHtml(t, name, email, password) {
   return `
     <div style="font-family:sans-serif;background:${t.bgColor};color:#fff;padding:0;margin:0">
       <div style="background:linear-gradient(135deg,${t.headerGradientStart},${t.headerGradientEnd});padding:40px 32px;text-align:${t.logoAlign||'center'}">
-        <h1 style="margin:0;font-size:28px;font-weight:900;color:#fff;text-align:${t.logoAlign||'center'}">${t.logoText||'✦ Coursiv'}</h1>
+        <h1 style="margin:0;font-size:28px;font-weight:900;color:#fff;text-align:${t.logoAlign||'center'}">${t.logoText||'✦ 1Course'}</h1>
         <p style="margin:8px 0 0;opacity:0.85;color:#fff;font-size:15px;text-align:${t.headerAlign||'center'}">${t.headerText}</p>
       </div>
       <div style="padding:32px">

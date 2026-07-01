@@ -9,7 +9,7 @@ import QuizToast from "@/components/quiz/QuizToast";
 
 const FIXED_REVIEWS = [
   { name:"Jeremy", stars:4, title:"Amazing to upgrade skills", text:"It is always amazing to upgrade skills and learn new things. Learning made simple, I am just wowed by the content." },
-  { name:"Sarah M.", stars:5, title:"Best AI course platform", text:"I went from knowing nothing about AI to using it daily in my work. Coursiv made it so easy and fun!" },
+  { name:"Sarah M.", stars:5, title:"Best AI course platform", text:"I went from knowing nothing about AI to using it daily in my work. 1Course made it so easy and fun!" },
   { name:"Ahmed K.", stars:5, title:"Changed my career", text:"Within 2 weeks I was using AI tools at work and my manager noticed. Highly recommend to everyone." },
 ];
 
@@ -141,7 +141,7 @@ export default function QuizFlow({ blocks }) {
             )}
           </div>
           {/* Logo center */}
-          <span style={{ fontSize:22, fontWeight:900, color:"#5B4EFF", fontFamily:"Georgia, serif", fontStyle:"italic" }}>Coursiv</span>
+          <span style={{ fontSize:22, fontWeight:900, color:"#5B4EFF", fontFamily:"Georgia, serif", fontStyle:"italic" }}>1Course</span>
           {/* Step counter */}
           <div style={{ width:80, textAlign:"right" }}>
             {endStep !== "sales" && (
@@ -368,7 +368,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
         <p style={{ fontSize:15, color:"#64748B", margin:"0 0 40px" }}>Analyzing answers to personalize your A.I. Certificate Program...</p>
         <hr style={{ border:"none", borderTop:"1px solid #F1F5F9", margin:"0 0 32px" }}/>
         <p style={{ fontSize:28, fontWeight:900, color:"#5B4EFF", margin:"0 0 4px" }}>2,000,000+ people</p>
-        <p style={{ fontSize:18, fontWeight:700, color:"#0f172a", margin:"0 0 24px" }}>have chosen Coursiv</p>
+        <p style={{ fontSize:18, fontWeight:700, color:"#0f172a", margin:"0 0 24px" }}>have chosen 1Course</p>
         <div style={{ background:"#fff", borderRadius:16, border:"1.5px solid #F1F5F9", padding:"20px 24px", textAlign:"left", boxShadow:"0 4px 20px rgba(0,0,0,0.06)" }}>
           <div style={{ display:"flex", gap:2, marginBottom:8 }}>
             {[1,2,3,4,5].map(s => <span key={s} style={{ fontSize:22, color:s<=review.stars?"#22c55e":"#E2E8F0" }}>★</span>)}
@@ -433,7 +433,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
           <div style={{ borderRadius:16, border:"2px solid #FEE2E2", overflow:"hidden" }}>
             <div style={{ padding:"12px 16px", background:"#FEF2F2", borderBottom:"1px solid #FEE2E2", textAlign:"center" }}>
               <p style={{ fontSize:13, color:"#64748B", margin:"0 0 2px" }}>You without</p>
-              <p style={{ fontSize:14, fontWeight:800, color:"#991B1B", margin:0 }}>Coursiv</p>
+              <p style={{ fontSize:14, fontWeight:800, color:"#991B1B", margin:0 }}>1Course</p>
             </div>
             <div style={{ padding:"16px" }}>
               {withoutItems.map((item, i) => (
@@ -447,7 +447,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
           <div style={{ borderRadius:16, border:"2px solid #BBF7D0", overflow:"hidden" }}>
             <div style={{ padding:"12px 16px", background:"#F0FDF4", borderBottom:"1px solid #BBF7D0", textAlign:"center" }}>
               <p style={{ fontSize:13, color:"#64748B", margin:"0 0 2px" }}>You with</p>
-              <p style={{ fontSize:14, fontWeight:800, color:"#166534", margin:0 }}>Coursiv:</p>
+              <p style={{ fontSize:14, fontWeight:800, color:"#166534", margin:0 }}>1Course:</p>
             </div>
             <div style={{ padding:"16px" }}>
               {withItems.map((item, i) => (

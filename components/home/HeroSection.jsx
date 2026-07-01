@@ -24,7 +24,7 @@ export default function HeroSection() {
           <div style={{ marginTop:32, display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
             {[
               { icon:"🏆", title:"Get your AI certificate", desc:"Earn your personal learning goal and get a custom learning plan" },
-              { icon:"📅", title:"Join the 28-Day Challenge", desc:"Join Coursiv in 28 days on your path to AI mastery" },
+              { icon:"📅", title:"Join the 28-Day Challenge", desc:"Join 1Course in 28 days on your path to AI mastery" },
             ].map((c,i) => (
               <div key={i} style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:14, padding:"14px 16px", textAlign:"left" }}>
                 <span style={{ fontSize:22 }}>{c.icon}</span>

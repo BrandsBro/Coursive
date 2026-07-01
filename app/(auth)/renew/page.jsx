@@ -46,7 +46,7 @@ export default function RenewPage() {
         {/* Header */}
         <div style={{ textAlign:"center", marginBottom:32 }}>
           <Link href="/" style={{ textDecoration:"none" }}>
-            <h1 style={{ fontSize:28, fontWeight:900, color:"#fff", fontStyle:"italic", margin:"0 0 20px" }}>✦ Coursiv</h1>
+            <h1 style={{ fontSize:28, fontWeight:900, color:"#fff", fontStyle:"italic", margin:"0 0 20px" }}>✦ 1Course</h1>
           </Link>
           <div style={{ width:64, height:64, borderRadius:20, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 16px", fontSize:28 }}>🚀</div>
           <h2 style={{ fontSize:26, fontWeight:900, color:"#fff", margin:"0 0 8px" }}>Renew Your Access</h2>

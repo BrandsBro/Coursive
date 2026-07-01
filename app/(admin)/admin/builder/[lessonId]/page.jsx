@@ -1,6 +1,6 @@
 import LessonBuilder from "@/components/admin/builder/LessonBuilder";
 
-export const metadata = { title: "Lesson Builder - Coursiv" };
+export const metadata = { title: "Lesson Builder - 1Course" };
 
 export default async function BuilderPage({ params, searchParams }) {
   const { lessonId } = await params;

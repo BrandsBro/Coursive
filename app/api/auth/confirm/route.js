@@ -23,7 +23,7 @@ export async function GET(req) {
       const email = data.user.email;
       const { subject, html } = welcomeEmail(name);
       await resend.emails.send({
-        from: "Coursiv <noreply@kingbrandsbro.pro>",
+        from: "1Course <noreply@kingbrandsbro.pro>",
         to: email,
         subject,
         html,

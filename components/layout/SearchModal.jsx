@@ -15,7 +15,7 @@ export default function SearchModal({ onClose }) {
 
   useEffect(() => {
     inputRef.current?.focus();
-    const saved = JSON.parse(localStorage.getItem("coursiv_search_recent") || "[]");
+    const saved = JSON.parse(localStorage.getItem("1course_search_recent") || "[]");
     setRecent(saved);
   }, []);
 
@@ -37,9 +37,9 @@ export default function SearchModal({ onClose }) {
   };
 
   const saveRecent = (item) => {
-    const saved = JSON.parse(localStorage.getItem("coursiv_search_recent") || "[]");
+    const saved = JSON.parse(localStorage.getItem("1course_search_recent") || "[]");
     const next = [item, ...saved.filter(r => r.url !== item.url)].slice(0, 5);
-    localStorage.setItem("coursiv_search_recent", JSON.stringify(next));
+    localStorage.setItem("1course_search_recent", JSON.stringify(next));
   };
 
   const navigate = (url, label) => {
@@ -91,7 +91,7 @@ export default function SearchModal({ onClose }) {
           {!q && recent.length === 0 && (
             <div style={{ padding:"40px 20px", textAlign:"center" }}>
               <div style={{ fontSize:40, marginBottom:12 }}>🔍</div>
-              <p style={{ fontSize:14, fontWeight:700, color:"#0f172a", margin:"0 0 4px" }}>Search Coursiv</p>
+              <p style={{ fontSize:14, fontWeight:700, color:"#0f172a", margin:"0 0 4px" }}>Search 1Course</p>
               <p style={{ fontSize:13, color:"#94A3B8", margin:0 }}>Find courses, lessons and challenges</p>
             </div>
           )}

@@ -3,7 +3,7 @@ import useIsMobile from "@/hooks/useIsMobile";
 export default function Testimonials() {
   const isMobile = useIsMobile();
   const reviews = [
-    { name:"Sarah M.", stars:5, text:"I went from knowing nothing about AI to using it daily at work. Coursiv made it so easy and fun!", role:"Marketing Manager" },
+    { name:"Sarah M.", stars:5, text:"I went from knowing nothing about AI to using it daily at work. 1Course made it so easy and fun!", role:"Marketing Manager" },
     { name:"Ahmed K.", stars:5, text:"Within 2 weeks I was using AI tools at work and my manager noticed. Highly recommend!", role:"Sales Executive" },
     { name:"Lisa T.", stars:5, text:"The 28-day challenge kept me accountable. I earned my certificate and got a promotion!", role:"Content Creator" },
   ];

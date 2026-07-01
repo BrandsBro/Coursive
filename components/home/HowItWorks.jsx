@@ -11,7 +11,7 @@ export default function HowItWorks() {
     <section style={{ padding: isMobile ? "48px 20px" : "80px 32px" }}>
       <div style={{ maxWidth:1100, margin:"0 auto" }}>
         <p style={{ textAlign:"center", fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.3)", letterSpacing:1, marginBottom:8 }}>HOW IT WORKS</p>
-        <h2 style={{ textAlign:"center", fontSize: isMobile ? 28 : 36, fontWeight:900, color:"#fff", margin:"0 0 8px" }}>How <span style={{ color:"#5B4EFF" }}>Coursiv</span> works</h2>
+        <h2 style={{ textAlign:"center", fontSize: isMobile ? 28 : 36, fontWeight:900, color:"#fff", margin:"0 0 8px" }}>How <span style={{ color:"#5B4EFF" }}>1Course</span> works</h2>
         <p style={{ textAlign:"center", fontSize:15, color:"rgba(255,255,255,0.4)", margin:"0 0 48px" }}>Three steps from curious to mastery.</p>
         <div style={{ display:"flex", flexDirection:"column", gap:32 }}>
           {steps.map((s,i) => (

@@ -51,7 +51,7 @@ export default function ConfirmPage() {
             </div>
             <h2 style={{ color:"#fff", fontSize:28, fontWeight:900, margin:"0 0 10px" }}>Email confirmed!</h2>
             <p style={{ color:"rgba(255,255,255,0.55)", fontSize:15, margin:"0 0 28px", lineHeight:1.6 }}>
-              Your account is ready. Welcome to Coursiv!
+              Your account is ready. Welcome to 1Course!
             </p>
             <div style={{ background:"rgba(255,255,255,0.06)", borderRadius:16, padding:"16px 20px", marginBottom:20, border:"1px solid rgba(255,255,255,0.1)" }}>
               <p style={{ color:"rgba(255,255,255,0.5)", fontSize:13, margin:"0 0 4px" }}>Redirecting in</p>

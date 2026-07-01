@@ -3,6 +3,6 @@ export default function robots() {
     rules: [
       { userAgent: "*", allow: "/", disallow: ["/admin", "/api"] },
     ],
-    sitemap: "https://coursiv-six.vercel.app/sitemap.xml",
+    sitemap: "https://1course-six.vercel.app/sitemap.xml",
   };
 }

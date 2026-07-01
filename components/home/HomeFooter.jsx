@@ -7,7 +7,7 @@ export default function HomeFooter() {
       <div style={{ maxWidth:1100, margin:"0 auto" }}>
         <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "2fr 1fr 1fr 1fr", gap: isMobile ? 24 : 40, marginBottom:40 }}>
           <div style={{ gridColumn: isMobile ? "1/-1" : "auto" }}>
-            <span style={{ fontSize:20, fontWeight:900, color:"#fff", fontStyle:"italic" }}>✦ Coursiv</span>
+            <span style={{ fontSize:20, fontWeight:900, color:"#fff", fontStyle:"italic" }}>✦ 1Course</span>
             <p style={{ fontSize:13, color:"rgba(255,255,255,0.35)", marginTop:10, lineHeight:1.7, maxWidth:240 }}>The fastest way to master AI tools and earn your certificate.</p>
             <div style={{ display:"flex", gap:12, marginTop:14 }}>
               {["𝕏","in","📘","📸"].map((s,i) => (
@@ -30,7 +30,7 @@ export default function HomeFooter() {
           ))}
         </div>
         <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", paddingTop:20, display:"flex", flexDirection: isMobile ? "column" : "row", justifyContent:"space-between", alignItems: isMobile ? "center" : "center", gap:8, textAlign:"center" }}>
-          <p style={{ fontSize:12, color:"rgba(255,255,255,0.2)", margin:0 }}>© 2026 Coursiv. All rights reserved.</p>
+          <p style={{ fontSize:12, color:"rgba(255,255,255,0.2)", margin:0 }}>© 2026 1Course. All rights reserved.</p>
           <p style={{ fontSize:12, color:"rgba(255,255,255,0.2)", margin:0 }}>Made with ❤️ for AI learners worldwide</p>
         </div>
       </div>

@@ -2,7 +2,7 @@ import HomeNav from "@/components/home/HomeNav";
 import HeroSection from "@/components/home/HeroSection";
 import TrustedSection from "@/components/home/TrustedSection";
 import StatsSection from "@/components/home/StatsSection";
-import WhyCoursiv from "@/components/home/WhyCoursiv";
+import Why1Course from "@/components/home/Why1Course";
 import HowItWorks from "@/components/home/HowItWorks";
 import InAction from "@/components/home/InAction";
 import AITools from "@/components/home/AITools";
@@ -21,7 +21,7 @@ export default function HomePage() {
       <HeroSection/>
       <TrustedSection/>
       <StatsSection/>
-      <WhyCoursiv/>
+      <Why1Course/>
       <HowItWorks/>
       <InAction/>
       <AITools/>

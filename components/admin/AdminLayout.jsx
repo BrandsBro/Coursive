@@ -37,7 +37,7 @@ export default function AdminLayout({ children }) {
         {/* Logo */}
         <div style={{ padding:"24px 20px", borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
           <Link href="/home" style={{ textDecoration:"none" }}>
-            <span style={{ fontSize:20, fontWeight:900, color:"#fff", fontStyle:"italic" }}>✦ Coursiv</span>
+            <span style={{ fontSize:20, fontWeight:900, color:"#fff", fontStyle:"italic" }}>✦ 1Course</span>
           </Link>
           <div style={{ marginTop:4, background:"rgba(99,102,241,0.25)", borderRadius:6, padding:"2px 8px", display:"inline-block" }}>
             <span style={{ color:"#a5b4fc", fontSize:10, fontWeight:700, letterSpacing:1 }}>ADMIN</span>

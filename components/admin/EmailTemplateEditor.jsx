@@ -113,7 +113,7 @@ export default function EmailTemplateEditor({ templateId }) {
             {tab === "content" && (
               <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
                 <TextBlock label="Subject Line" value={template.subject} onChange={v=>u("subject",v)}/>
-                <TextBlock label="Logo Text" value={c.logoText||"✦ Coursiv"} onChange={v=>uc("logoText",v)} align={c.logoAlign||"center"} onAlign={v=>uc("logoAlign",v)}/>
+                <TextBlock label="Logo Text" value={c.logoText||"✦ 1Course"} onChange={v=>uc("logoText",v)} align={c.logoAlign||"center"} onAlign={v=>uc("logoAlign",v)}/>
                 <TextBlock label="Header Subtitle" value={c.headerText} onChange={v=>uc("headerText",v)} align={c.headerAlign||"center"} onAlign={v=>uc("headerAlign",v)}/>
                 <TextBlock label="Greeting" value={c.greetingText||"Congratulations, {name}! 🎉"} onChange={v=>uc("greetingText",v)} hint="Use {name} for customer name" align={c.greetingAlign||"left"} onAlign={v=>uc("greetingAlign",v)}/>
                 <TextBlock label="Body Text" value={c.bodyText} onChange={v=>uc("bodyText",v)} multiline align={c.bodyAlign||"left"} onAlign={v=>uc("bodyAlign",v)}/>
@@ -169,7 +169,7 @@ export default function EmailTemplateEditor({ templateId }) {
             <div style={{ width:"100%", maxWidth:600 }}>
               <div style={{ background:"#fff", borderRadius:8, overflow:"hidden", boxShadow:"0 8px 32px rgba(0,0,0,0.12)" }}>
                 <div style={{ background:"#F8FAFC", padding:"12px 16px", borderBottom:"1px solid #E2E8F0" }}>
-                  <p style={{ fontSize:12, color:"#64748B", margin:"0 0 2px" }}>From: <strong>Coursiv</strong> &lt;noreply@kingbrandsbro.pro&gt;</p>
+                  <p style={{ fontSize:12, color:"#64748B", margin:"0 0 2px" }}>From: <strong>1Course</strong> &lt;noreply@kingbrandsbro.pro&gt;</p>
                   <p style={{ fontSize:12, color:"#0f172a", margin:0 }}>Subject: <strong>{template.subject}</strong></p>
                 </div>
                 <div dangerouslySetInnerHTML={{ __html: generateHtml(c,"John Smith","john@example.com","testPass123!") }}/>
@@ -225,7 +225,7 @@ function generateHtml(c, name, email, password) {
   return `
     <div style="font-family:sans-serif;background:${c.bgColor||"#0a081e"};color:#fff;padding:0;margin:0">
       <div style="background:linear-gradient(135deg,${c.headerGradientStart||"#5B4EFF"},${c.headerGradientEnd||"#8B5CF6"});padding:40px 32px;text-align:${c.logoAlign||"center"}">
-        <h1 style="margin:0;font-size:28px;font-weight:900;color:#fff">${c.logoText||"✦ Coursiv"}</h1>
+        <h1 style="margin:0;font-size:28px;font-weight:900;color:#fff">${c.logoText||"✦ 1Course"}</h1>
         <p style="margin:8px 0 0;opacity:0.85;color:#fff;text-align:${c.headerAlign||"center"}">${c.headerText||""}</p>
       </div>
       <div style="padding:32px">
@@ -238,7 +238,7 @@ function generateHtml(c, name, email, password) {
           <p style="margin:0;font-weight:900;font-size:20px;color:#fff;background:rgba(91,78,255,0.2);padding:12px;border-radius:8px;text-align:center;font-family:monospace">${password}</p>
         </div>
         <div style="text-align:${c.buttonAlign||"center"}">
-          <a href="#" style="display:inline-block;padding:16px 28px;background:${c.buttonColor||"#5B4EFF"};color:${c.buttonTextColor||"#fff"};text-decoration:none;border-radius:12px;font-weight:700;font-size:16px">${c.buttonText||"Visit Coursiv →"}</a>
+          <a href="#" style="display:inline-block;padding:16px 28px;background:${c.buttonColor||"#5B4EFF"};color:${c.buttonTextColor||"#fff"};text-decoration:none;border-radius:12px;font-weight:700;font-size:16px">${c.buttonText||"Visit 1Course →"}</a>
         </div>
       </div>
       <div style="padding:20px 32px;border-top:1px solid rgba(255,255,255,0.08);text-align:${c.footerAlign||"center"}">

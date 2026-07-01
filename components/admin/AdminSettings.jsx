@@ -5,8 +5,8 @@ import { Save, Check, Loader, Globe, Shield, Bell, CreditCard, Mail } from "luci
 import { supabase } from "@/lib/supabase";
 
 const DEFAULTS = {
-  site_name: "Coursiv",
-  site_url: "https://coursiv-six.vercel.app",
+  site_name: "1Course",
+  site_url: "https://1course-six.vercel.app",
   support_email: "support@kingbrandsbro.pro",
   maintenance_mode: false,
   allow_signups: true,

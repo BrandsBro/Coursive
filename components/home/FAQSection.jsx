@@ -3,10 +3,10 @@ import { useState } from "react";
 import useIsMobile from "@/hooks/useIsMobile";
 
 const FAQS = [
-  { q:"What is Coursiv?", a:"Coursiv is an AI learning platform that teaches you practical AI tools through short, engaging lessons — like Duolingo but for AI skills." },
-  { q:"How to download and use Coursiv?", a:"Coursiv works on web and mobile. Just sign up at coursiv.io and start learning instantly — no download required." },
-  { q:"How to log in to Coursiv?", a:"Visit coursiv.io and click Log In. You can sign in with your email or Google account." },
-  { q:"How to cancel Coursiv subscription?", a:"You can cancel anytime from your account settings. No questions asked." },
+  { q:"What is 1Course?", a:"1Course is an AI learning platform that teaches you practical AI tools through short, engaging lessons — like Duolingo but for AI skills." },
+  { q:"How to download and use 1Course?", a:"1Course works on web and mobile. Just sign up at 1course.io and start learning instantly — no download required." },
+  { q:"How to log in to 1Course?", a:"Visit 1course.io and click Log In. You can sign in with your email or Google account." },
+  { q:"How to cancel 1Course subscription?", a:"You can cancel anytime from your account settings. No questions asked." },
   { q:"Which payment methods are accepted?", a:"We accept all major credit cards, PayPal, and Apple Pay." },
   { q:"Can I use my account on multiple devices?", a:"Yes! Your progress syncs across all devices automatically." },
   { q:"What should I do if the app is crashing?", a:"Try refreshing the page or clearing your cache. If the issue persists, contact our support team." },
@@ -24,7 +24,7 @@ export default function FAQSection() {
       <div style={{ maxWidth:1100, margin:"0 auto" }}>
         <p style={{ textAlign:"center", fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.3)", letterSpacing:1, marginBottom:8 }}>FAQ</p>
         <h2 style={{ textAlign:"center", fontSize: isMobile ? 26 : 36, fontWeight:900, color:"#fff", margin:"0 0 8px" }}>Frequently asked questions</h2>
-        <p style={{ textAlign:"center", fontSize:15, color:"rgba(255,255,255,0.4)", margin:"0 0 40px" }}>Find answers to common questions about Coursiv</p>
+        <p style={{ textAlign:"center", fontSize:15, color:"rgba(255,255,255,0.4)", margin:"0 0 40px" }}>Find answers to common questions about 1Course</p>
         <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap:12 }}>
           {cols.map((col, ci) => (
             <div key={ci} style={{ display:"flex", flexDirection:"column", gap:10 }}>

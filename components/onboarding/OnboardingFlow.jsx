@@ -87,7 +87,7 @@ export default function OnboardingFlow({ onComplete }) {
             <div style={{ width:80, height:80, borderRadius:24, background:"linear-gradient(135deg,#7c3aed,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 24px", fontSize:40, boxShadow:"0 12px 40px rgba(124,58,237,0.5)" }}>✦</div>
             <h1 style={{ fontSize:34, fontWeight:900, color:"#fff", margin:"0 0 12px", lineHeight:1.15 }}>
               Welcome to{" "}
-              <span style={{ background:"linear-gradient(135deg,#a78bfa,#06b6d4)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>Coursiv</span>
+              <span style={{ background:"linear-gradient(135deg,#a78bfa,#06b6d4)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>1Course</span>
             </h1>
             <p style={{ fontSize:15, color:"rgba(255,255,255,0.55)", margin:"0 0 28px", lineHeight:1.6 }}>
               The fastest way to master AI tools.<br/>Let's personalise your path.

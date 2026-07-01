@@ -41,7 +41,7 @@ export default function ExpiredPage() {
         <div style={{ background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:24, padding:"40px 32px", backdropFilter:"blur(20px)" }}>
           <h1 style={{ fontSize:28, fontWeight:900, color:"#fff", margin:"0 0 12px" }}>Your Access Has Expired</h1>
           <p style={{ fontSize:15, color:"rgba(255,255,255,0.6)", margin:"0 0 24px", lineHeight:1.7 }}>
-            Your Coursiv subscription has ended. Renew now to continue learning and keep your progress.
+            Your 1Course subscription has ended. Renew now to continue learning and keep your progress.
           </p>
 
           {!loading && sub && (

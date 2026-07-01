@@ -14,7 +14,7 @@ const BLOCK_TYPES = [
   { type:"image_section",   icon:"🖼️", label:"Image Section",    desc:"Image with text & bullets",     color:"#059669", bg:"#ECFDF5" },
   { type:"loading",         icon:"⏳", label:"Loading Screen",   desc:"Analysis loading with reviews", color:"#0369a1", bg:"#F0F9FF" },
   { type:"summary",         icon:"📊", label:"Personal Summary", desc:"AI skills meter & insights",    color:"#d97706", bg:"#FFFBEB" },
-  { type:"comparison",      icon:"⚖️", label:"Comparison",       desc:"With vs without Coursiv",       color:"#dc2626", bg:"#FEF2F2" },
+  { type:"comparison",      icon:"⚖️", label:"Comparison",       desc:"With vs without 1Course",       color:"#dc2626", bg:"#FEF2F2" },
   { type:"signup",          icon:"👤", label:"Name + Email",     desc:"Capture user details",          color:"#15803d", bg:"#F0FDF4" },
   { type:"sales",           icon:"💰", label:"Sales Page",       desc:"Plan selection & payment",      color:"#b45309", bg:"#FFFBEB" },
 ];
@@ -348,11 +348,11 @@ function BlockPreview({ block, idx, isActive, onClick }) {
             <h3 style={{ fontSize:13, fontWeight:800, color:"#0f172a", margin:"0 0 10px" }}>{c.title||"Comparison"}</h3>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
               <div style={{ borderRadius:10, border:"1.5px solid #FEE2E2", overflow:"hidden" }}>
-                <div style={{ padding:"6px 10px", background:"#FEF2F2" }}><p style={{ fontSize:11, fontWeight:700, color:"#991B1B", margin:0 }}>Without Coursiv</p></div>
+                <div style={{ padding:"6px 10px", background:"#FEF2F2" }}><p style={{ fontSize:11, fontWeight:700, color:"#991B1B", margin:0 }}>Without 1Course</p></div>
                 <div style={{ padding:8 }}>{(c.without||[]).filter(Boolean).slice(0,3).map((item,i) => <p key={i} style={{ fontSize:10, color:"#374151", margin:"0 0 4px" }}>• {item}</p>)}</div>
               </div>
               <div style={{ borderRadius:10, border:"1.5px solid #BBF7D0", overflow:"hidden" }}>
-                <div style={{ padding:"6px 10px", background:"#F0FDF4" }}><p style={{ fontSize:11, fontWeight:700, color:"#166534", margin:0 }}>With Coursiv</p></div>
+                <div style={{ padding:"6px 10px", background:"#F0FDF4" }}><p style={{ fontSize:11, fontWeight:700, color:"#166534", margin:0 }}>With 1Course</p></div>
                 <div style={{ padding:8 }}>{(c.with||[]).filter(Boolean).slice(0,3).map((item,i) => <p key={i} style={{ fontSize:10, color:"#374151", margin:"0 0 4px" }}>✓ {item}</p>)}</div>
               </div>
             </div>
@@ -582,10 +582,10 @@ function BlockEditor({ type, content, onChange }) {
     return (
       <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
         <Field label="Title"><input value={content.title||""} onChange={e=>u("title",e.target.value)} placeholder="Your Personalized A.I. Certificate Program" style={inp()}/></Field>
-        <Field label="Without Coursiv (one per line)">
+        <Field label="Without 1Course (one per line)">
           <textarea value={(content.without||[]).join("\n")} onChange={e=>u("without",e.target.value.split("\n"))} placeholder={"No time to get started\nNo recognized credential"} style={{ ...inp(), minHeight:80, resize:"vertical" }}/>
         </Field>
-        <Field label="With Coursiv (one per line)">
+        <Field label="With 1Course (one per line)">
           <textarea value={(content.with||[]).join("\n")} onChange={e=>u("with",e.target.value.split("\n"))} placeholder={"Clear, step-by-step path\nShareable AI credential"} style={{ ...inp(), minHeight:80, resize:"vertical" }}/>
         </Field>
       </div>

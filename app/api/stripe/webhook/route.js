@@ -43,13 +43,13 @@ export async function POST(req) {
 
     // Send welcome email
     await resend.emails.send({
-      from: "Coursiv <noreply@kingbrandsbro.pro>",
+      from: "1Course <noreply@kingbrandsbro.pro>",
       to: email,
-      subject: "🎉 Welcome to Coursiv! Your login details inside",
+      subject: "🎉 Welcome to 1Course! Your login details inside",
       html: `
         <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:#0a081e;color:#fff;border-radius:16px;overflow:hidden">
           <div style="background:linear-gradient(135deg,#5B4EFF,#8B5CF6);padding:40px 32px;text-align:center">
-            <h1 style="margin:0;font-size:28px;font-weight:900">✦ Coursiv</h1>
+            <h1 style="margin:0;font-size:28px;font-weight:900">✦ 1Course</h1>
             <p style="margin:8px 0 0;opacity:0.8">Welcome aboard!</p>
           </div>
           <div style="padding:32px">
@@ -67,7 +67,7 @@ export async function POST(req) {
             </a>
           </div>
           <div style="padding:20px 32px;border-top:1px solid rgba(255,255,255,0.08);text-align:center">
-            <p style="color:rgba(255,255,255,0.3);font-size:12px;margin:0">© 2026 Coursiv. All rights reserved.</p>
+            <p style="color:rgba(255,255,255,0.3);font-size:12px;margin:0">© 2026 1Course. All rights reserved.</p>
           </div>
         </div>
       `,

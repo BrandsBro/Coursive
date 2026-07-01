@@ -6,8 +6,8 @@ import { AuthProvider } from "@/lib/AuthContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Coursiv - AI Learning Platform",
-  description: "Master AI tools and skills with Coursiv",
+  title: "1Course - AI Learning Platform",
+  description: "Master AI tools and skills with 1Course",
 };
 
 export default function RootLayout({ children }) {

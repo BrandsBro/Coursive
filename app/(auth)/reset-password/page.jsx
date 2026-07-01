@@ -47,7 +47,7 @@ function ResetPasswordForm() {
       <div style={{ width:"100%", maxWidth:420, borderRadius:28, overflow:"hidden", boxShadow:"0 32px 80px rgba(0,0,0,0.4)" }}>
         <div style={{ background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", padding:"32px 28px", textAlign:"center" }}>
           <Link href="/" style={{ textDecoration:"none" }}>
-            <h1 style={{ fontSize:24, fontWeight:900, color:"#fff", margin:"0 0 16px", fontStyle:"italic" }}>✦ Coursiv</h1>
+            <h1 style={{ fontSize:24, fontWeight:900, color:"#fff", margin:"0 0 16px", fontStyle:"italic" }}>✦ 1Course</h1>
           </Link>
           <div style={{ width:60, height:60, borderRadius:20, background:"rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 14px", fontSize:28 }}>🔐</div>
           <h2 style={{ fontSize:20, fontWeight:900, color:"#fff", margin:"0 0 6px" }}>Set New Password</h2>

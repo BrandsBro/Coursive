@@ -1,13 +1,13 @@
 "use client";
 import useIsMobile from "@/hooks/useIsMobile";
-export default function WhyCoursiv() {
+export default function Why1Course() {
   const isMobile = useIsMobile();
   return (
     <section id="why" style={{ padding: isMobile ? "48px 20px" : "80px 32px" }}>
       <div style={{ maxWidth:1100, margin:"0 auto" }}>
         <p style={{ textAlign:"center", fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.3)", letterSpacing:1, marginBottom:8 }}>WHY USERS CHOOSE</p>
-        <h2 style={{ textAlign:"center", fontSize: isMobile ? 28 : 36, fontWeight:900, color:"#fff", margin:"0 0 12px" }}>Why users choose <span style={{ color:"#5B4EFF" }}>Coursiv</span></h2>
-        <p style={{ textAlign:"center", fontSize:15, color:"rgba(255,255,255,0.45)", margin:"0 0 40px" }}>Thousands of users trust Coursiv to learn AI.</p>
+        <h2 style={{ textAlign:"center", fontSize: isMobile ? 28 : 36, fontWeight:900, color:"#fff", margin:"0 0 12px" }}>Why users choose <span style={{ color:"#5B4EFF" }}>1Course</span></h2>
+        <p style={{ textAlign:"center", fontSize:15, color:"rgba(255,255,255,0.45)", margin:"0 0 40px" }}>Thousands of users trust 1Course to learn AI.</p>
         <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "1.2fr 1fr", gap:20 }}>
           <div style={{ background:"linear-gradient(135deg,#1e1b4b,#2d2a5e)", border:"1px solid rgba(91,78,255,0.3)", borderRadius:24, padding:24, display:"flex", flexDirection:"column", gap:16 }}>
             <div style={{ background:"rgba(91,78,255,0.2)", borderRadius:14, padding:"10px 14px", width:"fit-content" }}>

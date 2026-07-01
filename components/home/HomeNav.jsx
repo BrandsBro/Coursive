@@ -28,7 +28,7 @@ export default function HomeNav() {
     <>
       <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:100, padding:"0 20px", height:60, display:"flex", alignItems:"center", justifyContent:"space-between", background:"rgba(10,8,30,0.95)", backdropFilter:"blur(12px)", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
         <Link href="/" style={{ textDecoration:"none" }}>
-          <span style={{ fontSize:20, fontWeight:900, color:"#fff", fontStyle:"italic" }}>✦ Coursiv</span>
+          <span style={{ fontSize:20, fontWeight:900, color:"#fff", fontStyle:"italic" }}>✦ 1Course</span>
         </Link>
 
         {isMobile ? (

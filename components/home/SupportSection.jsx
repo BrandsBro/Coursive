@@ -23,7 +23,7 @@ export default function SupportSection() {
         <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap:32 }}>
           <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
             {[
-              { icon:"📧", title:"Email Support", desc:"Get a response within 24 hours", action:"support@coursiv.io" },
+              { icon:"📧", title:"Email Support", desc:"Get a response within 24 hours", action:"support@1course.io" },
               { icon:"💬", title:"Live Chat", desc:"Chat with us in real time", action:"Available 9am - 6pm EST" },
               { icon:"📖", title:"Help Center", desc:"Browse our knowledge base", action:"Browse articles →" },
               { icon:"🎥", title:"Video Tutorials", desc:"Watch step-by-step guides", action:"Watch now →" },

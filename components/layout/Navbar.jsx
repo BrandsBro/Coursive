@@ -75,7 +75,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/home" style={{ textDecoration:"none", flexShrink:0 }}>
-            <span style={{ fontSize:22, fontWeight:900, color:"#7c3aed", fontStyle:"italic" }}>✦ Coursiv</span>
+            <span style={{ fontSize:22, fontWeight:900, color:"#7c3aed", fontStyle:"italic" }}>✦ 1Course</span>
           </Link>
 
           {/* Desktop nav links */}

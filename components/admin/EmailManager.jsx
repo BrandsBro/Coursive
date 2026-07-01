@@ -20,15 +20,15 @@ const DEFAULT_TEMPLATES = [
   {
     id:"welcome",
     name:"Welcome Email",
-    subject:"🎉 Welcome to Coursiv! Your login details inside",
+    subject:"🎉 Welcome to 1Course! Your login details inside",
     trigger:"after_payment",
     active:true,
     description:"Sent after payment with login credentials",
     content:{
       headerText:"Welcome aboard!",
       bodyText:"Your payment was successful! Use the details below to log in:",
-      buttonText:"Log In to Coursiv →",
-      footerText:"© 2026 Coursiv. All rights reserved.",
+      buttonText:"Log In to 1Course →",
+      footerText:"© 2026 1Course. All rights reserved.",
       bgColor:"#0a081e",
       headerGradientStart:"#5B4EFF",
       headerGradientEnd:"#8B5CF6",
@@ -37,21 +37,21 @@ const DEFAULT_TEMPLATES = [
       bodyTextColor:"rgba(255,255,255,0.7)",
       buttonColor:"#5B4EFF",
       buttonTextColor:"#ffffff",
-      logoText:"✦ Coursiv",
+      logoText:"✦ 1Course",
     }
   },
   {
     id:"expiry_warning",
     name:"Expiry Warning",
-    subject:"⚠️ Your Coursiv access expires in 3 days",
+    subject:"⚠️ Your 1Course access expires in 3 days",
     trigger:"expiry_warning_3",
     active:true,
     description:"Reminds users to renew before expiry",
     content:{
       headerText:"Your access is expiring soon!",
-      bodyText:"Your Coursiv subscription expires in 3 days. Renew now to keep your progress and access.",
+      bodyText:"Your 1Course subscription expires in 3 days. Renew now to keep your progress and access.",
       buttonText:"Renew My Access →",
-      footerText:"© 2026 Coursiv. All rights reserved.",
+      footerText:"© 2026 1Course. All rights reserved.",
       bgColor:"#0a081e",
       headerGradientStart:"#f59e0b",
       headerGradientEnd:"#ef4444",
@@ -60,21 +60,21 @@ const DEFAULT_TEMPLATES = [
       bodyTextColor:"rgba(255,255,255,0.7)",
       buttonColor:"#f59e0b",
       buttonTextColor:"#ffffff",
-      logoText:"✦ Coursiv",
+      logoText:"✦ 1Course",
     }
   },
   {
     id:"expired",
     name:"Subscription Expired",
-    subject:"🔒 Your Coursiv access has ended",
+    subject:"🔒 Your 1Course access has ended",
     trigger:"after_expiry",
     active:true,
     description:"Sent when subscription expires",
     content:{
       headerText:"Your access has expired",
-      bodyText:"Your Coursiv subscription has ended. Renew today to regain access to all your courses and progress.",
+      bodyText:"Your 1Course subscription has ended. Renew today to regain access to all your courses and progress.",
       buttonText:"Renew Access →",
-      footerText:"© 2026 Coursiv. All rights reserved.",
+      footerText:"© 2026 1Course. All rights reserved.",
       bgColor:"#0a081e",
       headerGradientStart:"#ef4444",
       headerGradientEnd:"#dc2626",
@@ -83,7 +83,7 @@ const DEFAULT_TEMPLATES = [
       bodyTextColor:"rgba(255,255,255,0.7)",
       buttonColor:"#ef4444",
       buttonTextColor:"#ffffff",
-      logoText:"✦ Coursiv",
+      logoText:"✦ 1Course",
     }
   },
 ];
@@ -137,10 +137,10 @@ export default function EmailManager() {
       active:false,
       description:"Custom email template",
       content:{
-        headerText:"Hello from Coursiv!",
+        headerText:"Hello from 1Course!",
         bodyText:"Your message here.",
-        buttonText:"Visit Coursiv →",
-        footerText:"© 2026 Coursiv. All rights reserved.",
+        buttonText:"Visit 1Course →",
+        footerText:"© 2026 1Course. All rights reserved.",
         bgColor:"#0a081e",
         headerGradientStart:"#5B4EFF",
         headerGradientEnd:"#8B5CF6",
@@ -149,7 +149,7 @@ export default function EmailManager() {
         bodyTextColor:"rgba(255,255,255,0.7)",
         buttonColor:"#5B4EFF",
         buttonTextColor:"#ffffff",
-        logoText:"✦ Coursiv",
+        logoText:"✦ 1Course",
       }
     };
     const updated = [...templates, newT];
@@ -395,7 +395,7 @@ function generatePreviewHtml(c, name, email, password) {
   return `
     <div style="font-family:sans-serif;background:${c.bgColor};color:#fff;border-radius:12px;overflow:hidden">
       <div style="background:linear-gradient(135deg,${c.headerGradientStart},${c.headerGradientEnd});padding:32px;text-align:center">
-        <h1 style="margin:0;font-size:24px;font-weight:900">${c.logoText||"✦ Coursiv"}</h1>
+        <h1 style="margin:0;font-size:24px;font-weight:900">${c.logoText||"✦ 1Course"}</h1>
         <p style="margin:8px 0 0;opacity:0.85">${c.headerText}</p>
       </div>
       <div style="padding:28px">

@@ -29,7 +29,7 @@ export default function CertificateGenerator({ course, userName, completedDate, 
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Coursiv-Certificate-${course?.title?.replace(/\s+/g,"-")}.pdf`);
+      pdf.save(`1Course-Certificate-${course?.title?.replace(/\s+/g,"-")}.pdf`);
     } catch (e) {
       alert("Download failed: " + e.message);
     }
@@ -91,7 +91,7 @@ export default function CertificateGenerator({ course, userName, completedDate, 
               <div style={{ width:1, height:24, background:`linear-gradient(to bottom,transparent,${grad1},transparent)` }}/>
             </div>
 
-            {/* Coursiv branding */}
+            {/* 1Course branding */}
             <p style={{ fontSize:13, color:"#94A3B8", margin:"0 0 4px", letterSpacing:3, fontFamily:"system-ui", fontWeight:700 }}>COURSIV</p>
 
             {/* Main text */}
@@ -129,7 +129,7 @@ export default function CertificateGenerator({ course, userName, completedDate, 
               </div>
 
               <div style={{ textAlign:"center" }}>
-                <p style={{ fontSize:13, fontWeight:700, color:"#0f172a", margin:"0 0 4px", fontStyle:"italic", fontFamily:"Georgia,serif" }}>Coursiv Platform</p>
+                <p style={{ fontSize:13, fontWeight:700, color:"#0f172a", margin:"0 0 4px", fontStyle:"italic", fontFamily:"Georgia,serif" }}>1Course Platform</p>
                 <div style={{ height:1, background:"#E2E8F0", marginBottom:4 }}/>
                 <p style={{ fontSize:10, color:"#94A3B8", margin:0, letterSpacing:1, fontFamily:"system-ui" }}>AUTHORIZED BY</p>
               </div>

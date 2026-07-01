@@ -68,8 +68,8 @@ export default function CertificateModal({ course, onClose }) {
       pdf.setFontSize(9);
       pdf.setTextColor(156, 163, 175);
       pdf.setFont("helvetica", "normal");
-      pdf.text("This certificate was issued by Coursiv — AI Learning Platform", pdfWidth / 2, pdfHeight - 18, { align: "center" });
-      pdf.text(`coursiv.io • ${date}`, pdfWidth / 2, pdfHeight - 13, { align: "center" });
+      pdf.text("This certificate was issued by 1Course — AI Learning Platform", pdfWidth / 2, pdfHeight - 18, { align: "center" });
+      pdf.text(`1course.io • ${date}`, pdfWidth / 2, pdfHeight - 13, { align: "center" });
 
       pdf.save(`${course.title.replace(/\s+/g, "_")}_Certificate.pdf`);
     } catch (err) {
@@ -84,15 +84,15 @@ export default function CertificateModal({ course, onClose }) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `I completed ${course.title} on Coursiv!`,
-          text: `I just earned my certificate for completing ${course.title} on Coursiv — the AI learning platform!`,
+          title: `I completed ${course.title} on 1Course!`,
+          text: `I just earned my certificate for completing ${course.title} on 1Course — the AI learning platform!`,
           url: window.location.origin,
         });
       } catch (err) {}
     } else {
       // Fallback: copy to clipboard
       navigator.clipboard?.writeText(
-        `I just earned my certificate for completing ${course.title} on Coursiv! 🎉 Check it out at coursiv.io`
+        `I just earned my certificate for completing ${course.title} on 1Course! 🎉 Check it out at 1course.io`
       );
       alert("Link copied to clipboard!");
     }
@@ -215,7 +215,7 @@ export default function CertificateModal({ course, onClose }) {
                 <p style={{ fontSize: 11, color: "#9CA3AF", margin: 0 }}>Learner</p>
               </div>
               <div style={{ textAlign: "center" }}>
-                <p style={{ fontSize: 15, fontWeight: 800, color: "#5B4EFF", margin: "0 0 2px" }}>✦ Coursiv</p>
+                <p style={{ fontSize: 15, fontWeight: 800, color: "#5B4EFF", margin: "0 0 2px" }}>✦ 1Course</p>
                 <p style={{ fontSize: 10, color: "#9CA3AF", margin: 0 }}>AI Learning Platform</p>
               </div>
               <div style={{ textAlign: "right" }}>
