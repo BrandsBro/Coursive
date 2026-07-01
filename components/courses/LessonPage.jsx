@@ -447,13 +447,12 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
                 </div>
               ) : (
                 <div>
-                  <div style={{ padding:"14px 18px", borderRadius:14, background:"#FEF2F2", border:"2px solid #fca5a5", marginBottom:14 }}>
-                    <p style={{ fontSize:16, fontWeight:800, color:"#991B1B", margin:"0 0 2px" }}>❌ Not quite!</p>
-                    <p style={{ fontSize:13, color:"#991B1B", margin:0 }}>Try again!</p>
+                  <div style={{ padding:"14px 18px", borderRadius:14, background:"#FEF2F2", border:"1.5px solid #FECACA", marginBottom:14 }}>
+                    <p style={{ fontSize:15, fontWeight:700, color:"#DC2626", margin:0 }}>❌ Not quite — try again!</p>
                   </div>
                   <div style={{ display:"flex", gap:10 }}>
-                    <button onClick={() => { setChecked(p=>({...p,["bo_"+idx]:false})); setAnswers(p=>({...p,["bo_"+idx]:{}})); }} style={{ flex:1, padding:"12px", borderRadius:12, border:"2px solid #BAE6FD", background:"#fff", fontSize:14, fontWeight:700, color:"#0891b2", cursor:"pointer" }}>🔄 Try Again</button>
-                    <button onClick={() => setFillShowAnswer(p=>({...p,["bo_"+idx]:true}))} style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"#1f2937", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>👁 See Answers</button>
+                    <button onClick={() => { setChecked(p=>({...p,["bo_"+idx]:false})); setAnswers(p=>({...p,["bo_"+idx]:{}})); }} style={{ flex:1, padding:"12px", borderRadius:12, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:14, fontWeight:600, color:"#374151", cursor:"pointer" }}>Try Again</button>
+                    <button onClick={() => setFillShowAnswer(p=>({...p,["bo_"+idx]:true}))} style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"#111827", color:"#fff", fontSize:14, fontWeight:600, cursor:"pointer" }}>See Answers</button>
                   </div>
                   {showAns && (
                     <div style={{ marginTop:12 }}>
