@@ -5,7 +5,7 @@ export default function InAction() {
   return (
     <section style={{ padding: isMobile ? "48px 20px" : "80px 32px" }}>
       <div style={{ maxWidth:1100, margin:"0 auto", textAlign:"center" }}>
-        <p style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.3)", letterSpacing:1, marginBottom:8 }}>COURSIV IN ACTION</p>
+        <p style={{ fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.3)", letterSpacing:1, marginBottom:8 }}>1COURSE IN ACTION</p>
         <h2 style={{ fontSize: isMobile ? 28 : 36, fontWeight:900, color:"#fff", margin:"0 0 8px" }}>1Course <span style={{ color:"#5B4EFF" }}>in action</span></h2>
         <p style={{ fontSize:15, color:"rgba(255,255,255,0.4)", margin:"0 0 40px" }}>Real skills, real numbers. Real career growth.</p>
         <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap:16 }}>
