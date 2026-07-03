@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Check, Trophy, Music } from "lucide-react";
@@ -35,14 +35,19 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   const prevLesson = allLessons[currentIdx - 1];
   const isComplete = (getCompletedLessons(course?.id) || []).includes(lesson?.id);
 
-  const extractText = (blocks) => {
-    if (!Array.isArray(blocks) || blocks.length === 0) return "";
-    blocks = blocks.filter((b, i) => i < visibleUntil && b.type !== "continueblock");
-    return blocks.map(b => {
+  const extractText = (allBlocks) => {
+    if (!Array.isArray(allBlocks) || allBlocks.length === 0) return "";
+    const visibleBlocks = allBlocks.filter((b, i) => i < visibleUntil && b.type !== "continueblock");
+    const ttsBlocks = visibleBlocks.filter(b => b.content?.ttsEnabled === true);
+    // If admin enabled TTS on specific blocks, only read those. Else read text+heading.
+    const blocksToRead = ttsBlocks.length > 0
+      ? ttsBlocks
+      : visibleBlocks.filter(b => b.type === "text" || b.type === "heading");
+    return blocksToRead.map(b => {
       const c = b.content || b;
       switch (b.type) {
         case "heading":      return c.text || "";
-        case "text":         return c.text || "";
+        case "text":         return c.html ? c.html.replace(/<[^>]+>/g,"") : (c.text || "");
         case "quiz":         return (c.question || "") + ". Options: " + (c.options||[]).join(", ");
         case "fillblank":    return (c.prompt || "").replace("___", "blank");
         case "keypoints":    return (c.title || "Key points") + ": " + (c.points||[]).filter(Boolean).join(". ");
@@ -243,6 +248,201 @@ function renderInline(text) {
     if (part.startsWith("_") && part.endsWith("_")) return <em key={i}>{part.slice(1,-1)}</em>;
     return <span key={i}>{part}</span>;
   });
+}
+
+
+function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFillShowAnswer }) {
+  const blanks = c.blanks || [];
+  const markedWords = c.markedWords || [];
+  const blankCount = markedWords.length;
+  const sentence = c.sentence || "";
+  const words = sentence.split(" ").filter(Boolean);
+  const ss = c.sentenceStyle || {};
+
+  // All words from all blanks mixed into one pool
+  const allWords = useMemo(() => {
+    const pool = blanks.flatMap(b => [b.correct, b.w1, b.w2, b.w3].filter(Boolean));
+    return [...pool].sort(() => Math.sin(idx * 100 + pool.length * 37) - 0.5);
+  }, [blanks.length, idx]);
+
+  const [bankWords, setBankWords] = useState(allWords);
+  const [filled, setFilled] = useState(Array(blankCount).fill(null));
+  const [taskDone, setTaskDone] = useState(false);
+
+  const isChecked = checked["bo_"+idx];
+  const allFilled = filled.every(f => f !== null);
+  const allCorrect = isChecked && blanks.every((b, i) => filled[i] === b.correct);
+  const showAns = fillShowAnswer?.["bo_"+idx];
+
+  const pickWord = (word, wordIdx) => {
+    if (isChecked) return;
+    const nextEmpty = filled.findIndex(f => f === null);
+    if (nextEmpty === -1) return;
+    const newFilled = [...filled];
+    newFilled[nextEmpty] = word;
+    setFilled(newFilled);
+    setBankWords(prev => [...prev.slice(0, wordIdx), ...prev.slice(wordIdx + 1)]);
+  };
+
+  const unpickBlank = (bi) => {
+    if (isChecked) return;
+    const word = filled[bi];
+    if (!word) return;
+    const newFilled = [...filled];
+    newFilled[bi] = null;
+    setFilled(newFilled);
+    setBankWords(prev => [...prev, word]);
+  };
+
+  const undoLast = () => {
+    const lastIdx = [...filled].map((f,i)=>({f,i})).filter(x=>x.f!==null).pop()?.i;
+    if (lastIdx === undefined) return;
+    unpickBlank(lastIdx);
+  };
+
+  const handleCheck = () => setChecked(p => ({...p, ["bo_"+idx]: true}));
+
+  const handleRepeat = () => {
+    setFilled(Array(blankCount).fill(null));
+    setBankWords(allWords);
+    setChecked(p => ({...p, ["bo_"+idx]: false}));
+    setFillShowAnswer(p => ({...p, ["bo_"+idx]: false}));
+    setTaskDone(false);
+  };
+
+  // Task completed screen
+  if (taskDone) {
+    return (
+      <div style={{ borderRadius:16, border:"1.5px solid #E2E8F0", overflow:"hidden" }}>
+        <div style={{ padding:"12px 20px", background:"#F0FDF4", display:"flex", alignItems:"center", gap:8 }}>
+          <Check size={16} color="#22c55e"/>
+          <span style={{ fontSize:14, fontWeight:700, color:"#166534" }}>Task completed</span>
+        </div>
+        <div style={{ padding:"18px 20px" }}>
+          {c.taskTitle && <h3 style={{ fontSize:16, fontWeight:800, color:"#0f172a", margin:"0 0 14px" }}>{c.taskTitle}</h3>}
+          <button onClick={handleRepeat}
+            style={{ width:"100%", padding:"13px 16px", borderRadius:12, border:"none", background:"#EEF2FF", color:"#5B4EFF", fontSize:14, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+            🔁 Repeat task
+          </button>
+        </div>
+        {c.successText && <p style={{ fontSize:14, color:"#374151", padding:"0 20px 16px", margin:0, lineHeight:1.65 }}>{c.successText}</p>}
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding:"20px 0" }}>
+      {/* Sentence with blank slots */}
+      <p style={{ fontSize:ss.fontSize||18, fontWeight:ss.bold?"700":"500", color:"#0f172a", margin:"0 0 24px", lineHeight:2.8 }}>
+        {words.map((word, wi) => {
+          if (markedWords.includes(wi)) {
+            const bi = markedWords.indexOf(wi);
+            const filledWord = filled[bi];
+            const ok = isChecked && filledWord === blanks[bi]?.correct;
+            const wrong = isChecked && filledWord !== blanks[bi]?.correct;
+            return (
+              <span key={wi}>
+                <span
+                  onClick={() => !isChecked && filledWord && unpickBlank(bi)}
+                  style={{ display:"inline-block", minWidth:100, padding:"4px 16px", margin:"0 4px", borderRadius:8, border:`2px ${filledWord?"solid":"dashed"} ${ok?"#22c55e":wrong?"#ef4444":filledWord?"#374151":"#D1D5DB"}`, background:"#fff", color:ok?"#166534":wrong?"#991B1B":filledWord?"#111827":"#94A3B8", fontWeight:700, fontSize:16, textAlign:"center", verticalAlign:"middle", cursor:!isChecked&&filledWord?"pointer":"default", boxShadow:!isChecked&&filledWord?"0 2px 0 #374151":"none" }}>
+                  {filledWord || "       "}
+                </span>{" "}
+              </span>
+            );
+          }
+          return <span key={wi}>{word} </span>;
+        })}
+      </p>
+
+      {/* Word bank */}
+      {!isChecked && (
+        <div style={{ background:"#F9FAFB", borderRadius:14, border:"1.5px solid #E5E7EB", padding:"16px 20px", marginBottom:12 }}>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
+            {bankWords.length === 0 && (
+              <p style={{ fontSize:13, color:"#94A3B8", margin:0 }}>All words placed ✓</p>
+            )}
+            {bankWords.map((word, i) => (
+              <button key={i} onClick={() => pickWord(word, i)}
+                style={{ padding:"10px 20px", borderRadius:12, border:"2px solid #E5E7EB", background:"#fff", color:"#111827", fontSize:15, fontWeight:600, cursor:"pointer", boxShadow:"0 2px 0 #D1D5DB" }}>
+                {word}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Undo last + Check */}
+      {!isChecked && (
+        <div style={{ display:"flex", gap:10, marginBottom:4 }}>
+          {filled.some(f => f !== null) && (
+            <button onClick={undoLast}
+              style={{ padding:"10px 18px", borderRadius:12, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:14, color:"#374151", cursor:"pointer", fontWeight:600 }}>
+              ⌫
+            </button>
+          )}
+          {allFilled && (
+            <button onClick={handleCheck}
+              style={{ flex:1, padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>
+              Check
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Correct */}
+      {isChecked && allCorrect && (
+        <div>
+          {(c.successImages||[]).filter(Boolean).map((url, i) => (
+            <img key={i} src={url} alt="" style={{ width:"100%", borderRadius:14, display:"block", marginBottom:12 }}/>
+          ))}
+          {c.successText && <p style={{ fontSize:14, color:"#374151", margin:"0 0 12px", lineHeight:1.65 }}>{c.successText}</p>}
+          <div style={{ padding:"14px 18px", borderRadius:14, background:"#F0FDF4", border:"1.5px solid #BBF7D0", marginBottom:14 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+              <Check size={16} color="#22c55e"/>
+              <span style={{ fontSize:15, fontWeight:700, color:"#166534" }}>All correct!</span>
+            </div>
+            {c.explanation && <p style={{ fontSize:13, color:"#166534", margin:"6px 0 0" }}>{c.explanation}</p>}
+          </div>
+          <button onClick={() => setTaskDone(true)}
+            style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(91,78,255,0.3)" }}>
+            Continue →
+          </button>
+        </div>
+      )}
+
+      {/* Almost right */}
+      {isChecked && !allCorrect && (
+        <div>
+          <div style={{ padding:"16px 18px", borderRadius:14, border:"2px solid #f59e0b", background:"#FFFBEB", marginBottom:12 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:4 }}>
+              <span style={{ fontSize:20 }}>⚠️</span>
+              <span style={{ fontSize:15, fontWeight:700, color:"#92400e" }}>Almost right</span>
+            </div>
+            <p style={{ fontSize:13, color:"#92400e", margin:0 }}>Review the steps and try again</p>
+          </div>
+          <div style={{ display:"flex", gap:10 }}>
+            <button onClick={() => setFillShowAnswer(p => ({...p, ["bo_"+idx]: true}))}
+              style={{ flex:1, padding:"12px", borderRadius:12, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:14, fontWeight:600, color:"#374151", cursor:"pointer" }}>
+              See answer
+            </button>
+            <button onClick={handleRepeat}
+              style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"#5B4EFF", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+              🔄 Try again
+            </button>
+          </div>
+          {showAns && (
+            <div style={{ marginTop:10, padding:"14px 16px", borderRadius:12, background:"#F9FAFB", border:"1.5px solid #E5E7EB" }}>
+              {blanks.map((b, i) => (
+                <p key={i} style={{ fontSize:14, color:"#374151", margin:"0 0 4px", fontWeight:600 }}>
+                  Blank {i+1}: <strong style={{ color:"#111827" }}>{b.correct}</strong>
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fillInputs, setFillInputs, fillChecked, setFillChecked, fillShowAnswer, setFillShowAnswer }) {
@@ -449,7 +649,9 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
     }
 
     // ── BLANK + OPTIONS ──
-    case "blankoptions": {
+    case "blankoptions":
+      return <BlankOptionsBlock c={c} idx={idx} checked={checked} setChecked={setChecked} fillShowAnswer={fillShowAnswer} setFillShowAnswer={setFillShowAnswer}/>;
+    case "blankoptions_OLD": {
       const sentence = c.sentence || "";
       const markedWords = c.markedWords || [];
       const blanks = c.blanks || [];
