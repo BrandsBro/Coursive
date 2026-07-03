@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ImagePlus, Check, Music, Film, Link2, Image as ImageIcon } from "lucide-react";
 import MediaLibrary from "@/components/admin/builder/MediaLibrary";
 
