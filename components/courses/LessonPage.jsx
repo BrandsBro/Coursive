@@ -267,10 +267,10 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
 
   // Split sentence by ___ to get parts and blank count
   const parts = sentence.split(/\(\s*[^)]*\s*\)/);
-  const blankMatches = sentence.match(/\(\s*[^)]+\s*\)/g) || [];
+  const blankMatches = (sentence.match(/\(([^)]+)\)/g) || []);
   const blankCount = parts.length - 1;
   // Extract correct answers from () if blanks not set
-  const derivedBlanks = blankMatches.map((m, i) => blanks[i]?.correct ? blanks[i] : { correct: m.replace(/^\(\s*|\s*\)$/g,'').trim() });
+  const derivedBlanks = blankMatches.map((m, i) => { const correct = m.replace(/^\(/, '').replace(/\)$/, '').trim(); return blanks[i]?.correct ? blanks[i] : { correct }; });
 
   // Shuffle correct answers as options
   const options = useMemo(() => {
