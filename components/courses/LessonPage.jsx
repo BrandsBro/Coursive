@@ -235,6 +235,16 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   );
 }
 
+function renderInline(text) {
+  if (!text) return null;
+  const parts = text.split(/(\*\*[^*]+\*\*|_[^_]+_)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) return <strong key={i}>{part.slice(2,-2)}</strong>;
+    if (part.startsWith("_") && part.endsWith("_")) return <em key={i}>{part.slice(1,-1)}</em>;
+    return <span key={i}>{part}</span>;
+  });
+}
+
 function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fillInputs, setFillInputs, fillChecked, setFillChecked, fillShowAnswer, setFillShowAnswer }) {
   const c = block.content || block;
 
@@ -255,8 +265,10 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
     case "text": {
       const ts = c.textStyle || {};
       return (
-        <p style={{ fontSize:ts.fontSize||15, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", lineHeight:1.8, color:"#374151", margin:0, whiteSpace:"pre-wrap" }}>
-          {c.text}
+        <p style={{ fontSize:ts.fontSize||15, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", lineHeight:1.8, color:"#374151", margin:0 }}>
+          {c.text?.split("\n").map((line, i, arr) => (
+            <span key={i}>{renderInline(line)}{i < arr.length-1 && <br/>}</span>
+          ))}
         </p>
       );
     }
