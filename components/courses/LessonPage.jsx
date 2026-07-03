@@ -54,7 +54,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
         case "fillblank":    return (c.prompt || "").replace("___", "blank");
         case "keypoints":    return (c.title || "Key points") + ": " + (c.points||[]).filter(Boolean).join(". ");
         case "callout":      return c.text || "";
-        case "blankoptions": return (c.sentence||"").replace(/\([^)]*\)/g, "blank");
+        case "blankoptions": return (c.sentence||"").replace(/\(\s*[^)]*\s*\)/g, "blank");
         default: return "";
       }
     }).filter(Boolean).join(". ");
@@ -266,11 +266,11 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
   const sentence = c.sentence || "";
 
   // Split sentence by ___ to get parts and blank count
-  const parts = sentence.split(/\([^)]*\)/);
-  const blankMatches = sentence.match(/\([^)]*\)/g) || [];
+  const parts = sentence.split(/\(\s*[^)]*\s*\)/);
+  const blankMatches = sentence.match(/\(\s*[^)]+\s*\)/g) || [];
   const blankCount = parts.length - 1;
   // Extract correct answers from () if blanks not set
-  const derivedBlanks = blankMatches.map((m, i) => blanks[i]?.correct ? blanks[i] : { correct: m.slice(1,-1).trim() });
+  const derivedBlanks = blankMatches.map((m, i) => blanks[i]?.correct ? blanks[i] : { correct: m.replace(/^\(\s*|\s*\)$/g,'').trim() });
 
   // Shuffle correct answers as options
   const options = useMemo(() => {
@@ -279,7 +279,7 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
   }, [idx, blanks.length]);
 
   const [filled, setFilled] = useState(Array(blankCount).fill(null));
-  const [activeBlank, setActiveBlank] = useState(null);
+  const [activeBlank, setActiveBlank] = useState(0);
   const [taskDone, setTaskDone] = useState(false);
 
   const isChecked = checked["bo_"+idx];
