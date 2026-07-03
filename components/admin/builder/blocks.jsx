@@ -48,6 +48,7 @@ export function BlockPreview({ block }) {
     }
     case "text": {
       const ts = c.textStyle||{};
+      if (c.html) return <div style={{ fontSize:ts.fontSize||15, textAlign:ts.align||"left", color:"#374151", lineHeight:1.75 }} dangerouslySetInnerHTML={{ __html:c.html }}/>;
       return <p style={{ fontSize:ts.fontSize||15, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#374151", lineHeight:1.75, margin:0, whiteSpace:"pre-wrap" }}>{c.text||"Text content..."}</p>;
     }
     case "image":
