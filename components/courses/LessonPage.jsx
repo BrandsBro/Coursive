@@ -263,35 +263,35 @@ function renderInline(text) {
 
 function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFillShowAnswer }) {
   const blanks = c.blanks || [];
-  const markedWords = c.markedWords || [];
-  const blankCount = markedWords.length;
   const sentence = c.sentence || "";
-  const words = sentence.split(" ").filter(Boolean);
+
+  // Split sentence by ___ to get parts and blank count
+  const parts = sentence.split("___");
+  const blankCount = parts.length - 1;
+
+  // Shuffle correct answers as options
+  const options = useMemo(() => {
+    return blanks.map(b => b.correct).filter(Boolean)
+      .sort(() => Math.sin(idx * 99 + blanks.length * 31) - 0.5);
+  }, [idx, blanks.length]);
 
   const [filled, setFilled] = useState(Array(blankCount).fill(null));
-  const [activeBlank, setActiveBlank] = useState(null); // which blank is selected
+  const [activeBlank, setActiveBlank] = useState(null);
   const [taskDone, setTaskDone] = useState(false);
 
   const isChecked = checked["bo_"+idx];
   const allFilled = filled.every(f => f !== null);
-  const allCorrect = isChecked && blanks.every((b, i) => filled[i] === b.correct);
+  const allCorrect = isChecked && blanks.every((b,i) => filled[i] === b.correct);
   const showAns = fillShowAnswer?.["bo_"+idx];
-
-  // Get shuffled options for a blank
-  const getOptions = (bi) => {
-    const b = blanks[bi];
-    if (!b) return [];
-    return [b.correct, b.w1, b.w2, b.w3].filter(Boolean)
-      .sort(() => Math.sin(idx * 99 + bi * 31) - 0.5);
-  };
 
   const pickOption = (opt) => {
     if (activeBlank === null) return;
-    const nf = [...filled];
+    // Remove option from other blanks if already used
+    const nf = filled.map((f, i) => f === opt && i !== activeBlank ? null : f);
     nf[activeBlank] = opt;
     setFilled(nf);
-    // Auto-move to next empty blank
-    const nextEmpty = nf.findIndex((f, i) => f === null && i !== activeBlank);
+    // Move to next empty blank
+    const nextEmpty = nf.findIndex((f, i) => f === null);
     setActiveBlank(nextEmpty === -1 ? null : nextEmpty);
   };
 
@@ -309,7 +309,6 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
     setTaskDone(false);
   };
 
-  // Task completed card
   if (taskDone) {
     return (
       <div style={{ borderRadius:16, border:"1.5px solid #E2E8F0", overflow:"hidden" }}>
@@ -328,7 +327,6 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
     );
   }
 
-  // Fullscreen
   return (
     <div style={{ position:"fixed", inset:0, background:"#fff", zIndex:200, display:"flex", flexDirection:"column" }}>
       {/* Header */}
@@ -336,59 +334,63 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
         <button onClick={() => setTaskDone(true)} style={{ width:32, height:32, borderRadius:"50%", border:"1.5px solid #E2E8F0", background:"#fff", cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
       </div>
 
-      {/* Content */}
+      {/* Scrollable area */}
       <div style={{ flex:1, overflowY:"auto" }}>
         <div style={{ maxWidth:680, margin:"0 auto", padding:"28px 24px" }}>
           {c.taskTitle && <h2 style={{ fontSize:22, fontWeight:800, color:"#0f172a", margin:"0 0 8px" }}>{c.taskTitle}</h2>}
-          {c.taskDesc && <p style={{ fontSize:15, color:"#374151", margin:"0 0 28px", lineHeight:1.65 }}>{c.taskDesc}</p>}
+          {c.taskDesc && <p style={{ fontSize:15, color:"#374151", margin:"0 0 24px", lineHeight:1.65 }}>{c.taskDesc}</p>}
 
-          {/* Sentence */}
-          <p style={{ fontSize:18, fontWeight:500, color:"#0f172a", margin:"0 0 28px", lineHeight:3.2 }}>
-            {words.map((word, wi) => {
-              if (!markedWords.includes(wi)) return <span key={wi}>{word} </span>;
-              const bi = markedWords.indexOf(wi);
-              const val = filled[bi];
-              const isActive = activeBlank === bi && !isChecked;
-              const ok = isChecked && val === blanks[bi]?.correct;
-              const wrong = isChecked && val !== blanks[bi]?.correct;
-              return (
-                <span key={wi}>
-                  <span
-                    onClick={() => { if (!isChecked) { if (val) clearBlank(bi); else setActiveBlank(bi); } }}
-                    style={{ display:"inline-block", minWidth:120, padding:"5px 16px", margin:"0 4px", borderRadius:10, border:`2px solid ${isActive?"#5B4EFF":ok?"#22c55e":wrong?"#ef4444":val?"#374151":"#D1D5DB"}`, background:isActive?"#EEF2FF":ok?"#F0FDF4":wrong?"#FEF2F2":val?"#F9FAFB":"#F9FAFB", color:isActive?"#5B4EFF":ok?"#166534":wrong?"#991B1B":val?"#111827":"#9CA3AF", fontWeight:700, fontSize:16, textAlign:"center", verticalAlign:"middle", cursor:isChecked?"default":"pointer", transition:"all 0.15s", boxShadow:isActive?"0 0 0 3px rgba(91,78,255,0.15)":"none" }}>
-                    {val || (isActive ? "..." : "　　　")}
-                  </span>{" "}
+          {/* Sentence with blanks */}
+          {!allCorrect && (
+            <div style={{ fontSize:18, fontWeight:500, color:"#0f172a", lineHeight:3, marginBottom:20 }}>
+              {parts.map((part, i) => (
+                <span key={i}>
+                  {part}
+                  {i < blankCount && (() => {
+                    const val = filled[i];
+                    const isActive = activeBlank === i && !isChecked;
+                    return (
+                      <span
+                        onClick={() => { if (!isChecked) { val ? clearBlank(i) : setActiveBlank(i); } }}
+                        style={{ display:"inline-block", minWidth:120, padding:"4px 16px", margin:"0 4px", borderRadius:10, border:`2px solid ${isActive?"#5B4EFF":val?"#374151":"#D1D5DB"}`, background:isActive?"#EEF2FF":val?"#F9FAFB":"#F9FAFB", color:isActive?"#5B4EFF":val?"#111827":"#9CA3AF", fontWeight:700, fontSize:16, textAlign:"center", verticalAlign:"middle", cursor:"pointer", boxShadow:isActive?"0 0 0 3px rgba(91,78,255,0.15)":"none", transition:"all 0.15s" }}>
+                        {val || (isActive ? "..." : "　　　")}
+                      </span>
+                    );
+                  })()}
                 </span>
-              );
-            })}
-          </p>
+              ))}
+            </div>
+          )}
 
-          {/* Options for active blank */}
+          {/* Options */}
           {!isChecked && activeBlank !== null && (
             <div style={{ marginBottom:20 }}>
               <p style={{ fontSize:11, fontWeight:700, color:"#6B7280", margin:"0 0 10px", textTransform:"uppercase", letterSpacing:0.5 }}>
-                Choose answer for blank {activeBlank + 1}
+                Choose for blank {activeBlank + 1}
               </p>
               <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-                {getOptions(activeBlank).map((opt, i) => (
-                  <button key={i} onClick={() => pickOption(opt)}
-                    style={{ padding:"11px 22px", borderRadius:12, border:`2px solid ${filled[activeBlank]===opt?"#5B4EFF":"#E5E7EB"}`, background:filled[activeBlank]===opt?"#EEF2FF":"#fff", color:filled[activeBlank]===opt?"#5B4EFF":"#111827", fontSize:15, fontWeight:600, cursor:"pointer", boxShadow:"0 2px 0 #D1D5DB", transition:"all 0.15s" }}>
-                    {opt}
-                  </button>
-                ))}
+                {options.map((opt, i) => {
+                  const isUsed = filled.some((f, fi) => f === opt && fi !== activeBlank);
+                  return (
+                    <button key={i} onClick={() => !isUsed && pickOption(opt)}
+                      style={{ padding:"11px 22px", borderRadius:12, border:`2px solid ${filled[activeBlank]===opt?"#5B4EFF":isUsed?"#E5E7EB":"#E5E7EB"}`, background:filled[activeBlank]===opt?"#EEF2FF":"#fff", color:isUsed?"#CBD5E1":"#111827", fontSize:15, fontWeight:600, cursor:isUsed?"not-allowed":"pointer", boxShadow:"0 2px 0 #D1D5DB", opacity:isUsed?0.5:1 }}>
+                      {opt}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
 
           {!isChecked && activeBlank === null && !allFilled && (
-            <p style={{ fontSize:14, color:"#94A3B8", margin:"0 0 20px" }}>← Tap a blank to fill it in</p>
+            <p style={{ fontSize:14, color:"#94A3B8" }}>← Tap a blank to choose an answer</p>
           )}
 
-          {/* Correct result */}
+          {/* Correct */}
           {isChecked && allCorrect && (
             <div>
               <div style={{ padding:"16px 20px", borderRadius:14, background:"#F8FAFC", border:"1.5px solid #E2E8F0", marginBottom:20 }}>
-                <p style={{ fontSize:18, fontWeight:500, color:"#0f172a", margin:0, lineHeight:1.8 }}>{sentence}</p>
+                <p style={{ fontSize:18, fontWeight:500, color:"#0f172a", margin:0, lineHeight:1.8 }}>{sentence.replace(/___/g, (_, i) => filled[i] || "___")}</p>
               </div>
               {(c.successImages||[]).filter(Boolean).map((url,i) => (
                 <img key={i} src={url} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:16 }}/>
@@ -409,7 +411,7 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
             <div>
               <div style={{ padding:"14px 18px", borderRadius:14, border:"2px solid #f59e0b", background:"#FFFBEB", marginBottom:12 }}>
                 <p style={{ fontSize:15, fontWeight:700, color:"#92400e", margin:"0 0 2px" }}>⚠️ Almost right</p>
-                <p style={{ fontSize:13, color:"#92400e", margin:0 }}>Review the steps and try again</p>
+                <p style={{ fontSize:13, color:"#92400e", margin:0 }}>Review and try again</p>
               </div>
               <div style={{ display:"flex", gap:10 }}>
                 <button onClick={() => setFillShowAnswer(p => ({...p, ["bo_"+idx]: true}))}
@@ -417,7 +419,7 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
                   See answer
                 </button>
                 <button onClick={reset}
-                  style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"#5B4EFF", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                  style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"#5B4EFF", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
                   🔄 Try again
                 </button>
               </div>
@@ -431,7 +433,7 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
         </div>
       </div>
 
-      {/* Bottom check button */}
+      {/* Check button */}
       {!isChecked && allFilled && (
         <div style={{ borderTop:"1px solid #F1F5F9", padding:"16px 24px", background:"#fff" }}>
           <div style={{ maxWidth:680, margin:"0 auto" }}>

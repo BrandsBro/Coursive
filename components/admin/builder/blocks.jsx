@@ -432,23 +432,34 @@ function CalloutE({ content, onChange }) {
 
 function BlankOptionsE({ content, onChange }) {
   const [lib, setLib] = useState(false);
-  const [libFor, setLibFor] = useState("image");
-  const sentence=content.sentence||""; const blanks=content.blanks||[];
-  const successImages=content.successImages||[]; const successVideos=content.successVideos||[];
-  const words=sentence.split(" ").filter(Boolean); const markedBlanks=content.markedWords||[];
-  const preview=words.map((w,i) => markedBlanks.includes(i)?"___":w).join(" ");
-  const blankCount=markedBlanks.length;
-  const syncedBlanks=Array.from({ length:blankCount },(_,i) => blanks[i]||{ correct:words[markedBlanks[i]]||"", w1:"", w2:"", w3:"" });
-  const ss=content.sentenceStyle||{fontSize:15};
-  const toggleWord = (wordIdx) => {
-    let nm=[...markedBlanks];
-    nm=nm.includes(wordIdx)?nm.filter(i=>i!==wordIdx):[...nm,wordIdx].sort((a,b)=>a-b);
-    const nb=nm.map((wi,i) => ({ ...(blanks[i]||{}), correct:words[wi]||"", w1:blanks[i]?.w1||"", w2:blanks[i]?.w2||"", w3:blanks[i]?.w3||"" }));
-    onChange({ ...content, markedWords:nm, blanks:nb });
+  const successImages = content.successImages||[];
+  const sentence = content.sentence||"";
+
+  // Count blanks in sentence
+  const blankCount = (sentence.match(/___/g)||[]).length;
+
+  // Sync blanks array to match blank count
+  const blanks = Array.from({ length:blankCount }, (_,i) => content.blanks?.[i] || { correct:"" });
+
+  const updateBlank = (i, val) => {
+    const nb = [...blanks];
+    nb[i] = { correct: val };
+    onChange({ ...content, blanks: nb });
   };
-  const updateBlank=(i,key,val)=>{ const b=[...syncedBlanks]; b[i]={ ...b[i],[key]:val }; onChange({ ...content, blanks:b }); };
+
+  // Build preview replacing ___ with correct answers
+  const preview = () => {
+    let s = sentence;
+    blanks.forEach((b,i) => {
+      s = s.replace("___", `[${b.correct||"blank "+(i+1)}]`);
+    });
+    return s;
+  };
+
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:14, paddingTop:12 }}>
+
+      {/* Task info */}
       <div>
         <p style={lbl()}>Task Title</p>
         <input value={content.taskTitle||""} onChange={e => onChange({ ...content, taskTitle:e.target.value })} placeholder="e.g. Generate Your First Image" style={inp()}/>
@@ -457,59 +468,67 @@ function BlankOptionsE({ content, onChange }) {
         <p style={lbl()}>Task Description <span style={{ color:"#94A3B8", fontWeight:400 }}>· optional</span></p>
         <input value={content.taskDesc||""} onChange={e => onChange({ ...content, taskDesc:e.target.value })} placeholder="e.g. Ask Kling to generate an image of a horse." style={inp()}/>
       </div>
+
+      {/* Sentence */}
+      <div>
+        <p style={lbl()}>Sentence <span style={{ color:"#94A3B8", fontWeight:400 }}>· use ___ for each blank</span></p>
+        <textarea value={sentence} onChange={e => onChange({ ...content, sentence:e.target.value, blanks:[] })}
+          placeholder="e.g. A ___ in an ___, ___ lighting" style={{ ...inp(), minHeight:70, resize:"vertical" }}/>
+        <p style={{ fontSize:11, color:"#94A3B8", margin:"4px 0 0" }}>Found {blankCount} blank{blankCount!==1?"s":""} — type ___ for each blank</p>
+      </div>
+
+      {/* Correct answers per blank */}
+      {blankCount > 0 && (
+        <div>
+          <p style={lbl()}>Correct answers for each blank</p>
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            {Array.from({ length:blankCount }, (_,i) => (
+              <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", background:"#F8FAFC", borderRadius:10, border:"1.5px solid #E2E8F0" }}>
+                <span style={{ width:24, height:24, borderRadius:"50%", background:"#6366f1", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, flexShrink:0 }}>{i+1}</span>
+                <input value={blanks[i]?.correct||""} onChange={e => updateBlank(i, e.target.value)}
+                  placeholder={`Correct answer for blank ${i+1} (e.g. white horse)`}
+                  style={{ ...inp(), flex:1, margin:0 }}/>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Preview */}
+      {blankCount > 0 && blanks.some(b => b.correct) && (
+        <div style={{ padding:"12px 14px", borderRadius:10, background:"#EEF2FF", border:"1.5px solid #C7D2FE" }}>
+          <p style={{ fontSize:11, fontWeight:700, color:"#6366f1", margin:"0 0 4px" }}>PREVIEW</p>
+          <p style={{ fontSize:14, color:"#374151", margin:0 }}>{preview()}</p>
+        </div>
+      )}
+
+      {/* Success content */}
       <div>
         <p style={lbl()}>Success Text <span style={{ color:"#94A3B8", fontWeight:400 }}>· shown after correct</span></p>
-        <textarea value={content.successText||""} onChange={e => onChange({ ...content, successText:e.target.value })} placeholder="Great job! Here is what you generated..." style={{ ...inp(), minHeight:60, resize:"vertical" }}/>
+        <textarea value={content.successText||""} onChange={e => onChange({ ...content, successText:e.target.value })}
+          placeholder="Great job! Here is what you created..." style={{ ...inp(), minHeight:60, resize:"vertical" }}/>
       </div>
-      <FC label="Sentence Style" style={ss} setStyle={v => onChange({ ...content, sentenceStyle:v })}/>
-      <textarea value={sentence} onChange={e => onChange({ ...content, sentence:e.target.value, markedWords:[], blanks:[] })} placeholder="Write the full sentence here..." style={{ ...inp(), minHeight:70, resize:"vertical", ...styled(ss) }}/>
-      {words.length>0 && (
-        <div>
-          <p style={lbl()}>Click words to make them blank</p>
-          <div style={{ display:"flex", flexWrap:"wrap", gap:6, padding:12, background:"#F8FAFC", borderRadius:10, border:"1.5px solid #E2E8F0" }}>
-            {words.map((word,i) => { const isBlank=markedBlanks.includes(i); const num=markedBlanks.indexOf(i)+1; return (
-              <button key={i} onClick={() => toggleWord(i)} style={{ padding:"6px 12px", borderRadius:8, fontSize:14, fontWeight:isBlank?800:500, border:isBlank?"2px solid #6366f1":"1.5px solid #E2E8F0", background:isBlank?"#EEF2FF":"#fff", color:isBlank?"#6366f1":"#374151", cursor:"pointer", position:"relative" }}>
-                {isBlank?"___":word}
-                {isBlank && <span style={{ position:"absolute", top:-7, right:-5, background:"#6366f1", color:"#fff", borderRadius:"50%", width:15, height:15, fontSize:8, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center" }}>{num}</span>}
-              </button>
-            ); })}
-          </div>
-          {markedBlanks.length>0 && <div style={{ marginTop:6, padding:"8px 12px", borderRadius:8, background:"#EEF2FF" }}><p style={{ fontSize:12, color:"#6366f1", margin:0 }}>{preview}</p></div>}
-        </div>
-      )}
-      {blankCount>0 && (
-        <div>
-          <p style={lbl()}>Wrong options per blank</p>
-          {syncedBlanks.map((blank,i) => (
-            <div key={i} style={{ background:"#F8FAFC", borderRadius:10, padding:12, border:"1.5px solid #E2E8F0", marginBottom:8 }}>
-              <p style={{ fontSize:11, fontWeight:800, color:"#6366f1", margin:"0 0 8px" }}>BLANK {i+1} · Correct: <span style={{ color:"#22c55e" }}>{blank.correct}</span></p>
-              <p style={{ fontSize:11, color:"#94A3B8", margin:0 }}>Options shown = all correct answers shuffled</p>
-            </div>
-          ))}
-        </div>
-      )}
+
       <div>
-        <p style={lbl()}>Explanation <span style={{ color:"#94A3B8", fontWeight:400 }}>· optional</span></p>
-        <textarea value={content.explanation||""} onChange={e => onChange({ ...content, explanation:e.target.value })} placeholder="Why these are correct..." style={{ ...inp(), minHeight:50, resize:"vertical" }}/>
-      </div>
-      <div style={{ borderTop:"1px solid #F1F5F9", paddingTop:12 }}>
-        <p style={lbl()}>🎉 Success Images</p>
+        <p style={lbl()}>Success Images</p>
         {successImages.map((url,i) => (
           <div key={i} style={{ display:"flex", gap:6, marginBottom:6, alignItems:"center" }}>
-            <img src={url} alt="" style={{ width:40,height:40,borderRadius:6,objectFit:"cover" }}/>
+            <img src={url} alt="" style={{ width:40, height:40, borderRadius:6, objectFit:"cover" }}/>
             <input value={url} onChange={e => { const a=[...successImages]; a[i]=e.target.value; onChange({ ...content, successImages:a }); }} style={{ ...inp(), flex:1 }}/>
             <button onClick={() => onChange({ ...content, successImages:successImages.filter((_,x)=>x!==i) })} style={ctrlX()}>✕</button>
           </div>
         ))}
         <div style={{ display:"flex", gap:6 }}>
-          <button onClick={() => { setLibFor("image"); setLib(true); }} style={mediaBtn("#059669")}><ImageIcon size={13}/> Upload</button>
+          <button onClick={() => setLib(true)} style={mediaBtn("#059669")}><ImageIcon size={13}/> Upload</button>
           <button onClick={() => { const u=window.prompt("Image URL:"); if(u) onChange({ ...content, successImages:[...successImages,u] }); }} style={mediaBtn("#6366f1")}><Link2 size={13}/> URL</button>
         </div>
       </div>
-      {lib && <MediaLibrary accept={libFor} onSelect={m => { libFor==="image"?onChange({ ...content, successImages:[...successImages,m.url] }):onChange({ ...content, successVideos:[...successVideos,m.url] }); setLib(false); }} onClose={() => setLib(false)}/>}
+
+      {lib && <MediaLibrary accept="image" onSelect={m => { onChange({ ...content, successImages:[...successImages,m.url] }); setLib(false); }} onClose={() => setLib(false)}/>}
     </div>
   );
 }
+
 
 function ContinueE({ content, onChange }) {
   return (
