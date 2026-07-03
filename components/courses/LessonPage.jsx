@@ -274,9 +274,9 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
 
   // Shuffle correct answers as options
   const options = useMemo(() => {
-    return derivedBlanks.map(b => b.correct).filter(Boolean)
-      .sort(() => Math.sin(idx * 99 + blanks.length * 31) - 0.5);
-  }, [idx, blanks.length]);
+    return [...derivedBlanks.map(b => b.correct).filter(Boolean)]
+      .sort(() => Math.random() - 0.5);
+  }, []);
 
   const [filled, setFilled] = useState(Array(blankCount).fill(null));
   const [activeBlank, setActiveBlank] = useState(0);
