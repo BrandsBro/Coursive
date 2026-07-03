@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ImagePlus, Check, Music, Film, Link2, Image as ImageIcon } from "lucide-react";
 import MediaLibrary from "@/components/admin/builder/MediaLibrary";
 
@@ -199,41 +199,77 @@ function HeadingE({ content, onChange }) {
 
 function TextE({ content, onChange }) {
   const ts = content.textStyle||{fontSize:15};
-  const taRef = useRef(null);
+  const editorRef = useRef(null);
 
-  const wrap = (tag) => {
-    const ta = taRef.current;
-    if (!ta) return;
-    const start = ta.selectionStart;
-    const end = ta.selectionEnd;
-    if (start === end) return;
-    const val = ta.value;
-    const newText = val.slice(0, start) + tag + val.slice(start, end) + tag + val.slice(end);
-    onChange({ ...content, text: newText });
+  const execCmd = (cmd) => {
+    editorRef.current?.focus();
+    document.execCommand(cmd, false, null);
+    // Save HTML after command
     setTimeout(() => {
-      ta.focus();
-      ta.setSelectionRange(start + tag.length, end + tag.length);
-    }, 10);
+      if (editorRef.current) {
+        onChange({ ...content, html: editorRef.current.innerHTML, text: editorRef.current.innerText });
+      }
+    }, 0);
   };
+
+  // Sync content into editor on mount only
+  useEffect(() => {
+    if (editorRef.current && content.html !== undefined) {
+      if (editorRef.current.innerHTML !== content.html) {
+        editorRef.current.innerHTML = content.html || content.text || "";
+      }
+    } else if (editorRef.current && content.text) {
+      editorRef.current.innerHTML = content.text || "";
+    }
+  }, []);
+
+  const handleInput = () => {
+    if (editorRef.current) {
+      onChange({ ...content, html: editorRef.current.innerHTML, text: editorRef.current.innerText });
+    }
+  };
+
+  const toolBtn = (active, cmd, label, extraStyle) => (
+    <button onMouseDown={e => { e.preventDefault(); execCmd(cmd); }}
+      style={{ padding:"4px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:active?"#5B4EFF":"#fff", color:active?"#fff":"#374151", cursor:"pointer", fontSize:13, fontWeight:700, ...extraStyle }}>
+      {label}
+    </button>
+  );
 
   return (
     <div style={{ paddingTop:12 }}>
       <FC label="Text Style" style={ts} setStyle={v => onChange({ ...content, textStyle:v })} showBold={false} showItalic={false}/>
-      <div style={{ display:"flex", gap:6, alignItems:"center", marginBottom:6, padding:"5px 8px", background:"#F8FAFC", borderRadius:8, border:"1px solid #E2E8F0" }}>
-        <span style={{ fontSize:11, color:"#94A3B8", fontWeight:600 }}>Select a word then:</span>
-        <button onMouseDown={e => { e.preventDefault(); wrap("**"); }}
-          style={{ padding:"3px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:"#fff", fontWeight:900, fontSize:13, cursor:"pointer" }}>B</button>
-        <button onMouseDown={e => { e.preventDefault(); wrap("_"); }}
-          style={{ padding:"3px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:"#fff", fontStyle:"italic", fontWeight:700, fontSize:13, cursor:"pointer" }}>I</button>
+      {/* Toolbar */}
+      <div style={{ display:"flex", gap:6, alignItems:"center", padding:"6px 10px", background:"#F8FAFC", borderRadius:"8px 8px 0 0", border:"1.5px solid #E2E8F0", borderBottom:"none", flexWrap:"wrap" }}>
+        {toolBtn(false, "bold",          "B",  { fontWeight:900 })}
+        {toolBtn(false, "italic",        "I",  { fontStyle:"italic" })}
+        {toolBtn(false, "underline",     "U",  { textDecoration:"underline" })}
+        {toolBtn(false, "strikeThrough", "S",  { textDecoration:"line-through" })}
+        <div style={{ width:1, height:18, background:"#E2E8F0" }}/>
+        {toolBtn(false, "justifyLeft",   "⬅", {})}
+        {toolBtn(false, "justifyCenter", "↔", {})}
+        {toolBtn(false, "justifyRight",  "➡", {})}
+        <div style={{ width:1, height:18, background:"#E2E8F0" }}/>
+        {toolBtn(false, "insertUnorderedList", "• List", {})}
+        {toolBtn(false, "insertOrderedList",   "1. List", {})}
+        <span style={{ fontSize:10, color:"#94A3B8", marginLeft:"auto" }}>Select text to format</span>
       </div>
-      <textarea
-        ref={taRef}
-        value={content.text||""}
-        onChange={e => onChange({ ...content, text:e.target.value })}
-        placeholder="Write content... Select a word then click B or I above to bold/italic it."
-        style={{ ...inp(), minHeight:150, resize:"vertical", lineHeight:1.7, ...styled(ts) }}
+      {/* Editor */}
+      <div
+        ref={editorRef}
+        contentEditable
+        suppressContentEditableWarning
+        onInput={handleInput}
+        onPaste={e => {
+          e.preventDefault();
+          // Paste as rich text if available, else plain
+          const html = e.clipboardData.getData("text/html");
+          const text = e.clipboardData.getData("text/plain");
+          document.execCommand("insertHTML", false, html || text);
+        }}
+        style={{ ...inp(), minHeight:150, lineHeight:1.7, borderRadius:"0 0 9px 9px", outline:"none", cursor:"text", overflowY:"auto", ...styled(ts) }}
       />
-      <p style={{ fontSize:11, color:"#94A3B8", margin:"4px 0 0" }}>{(content.text||"").length} chars · **word** = bold · _word_ = italic</p>
+      <p style={{ fontSize:11, color:"#94A3B8", margin:"4px 0 0" }}>Tip: Select text → click B, I, U to format. Paste formatted text from Word/Google Docs works too.</p>
     </div>
   );
 }

@@ -264,6 +264,12 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
     // ── TEXT ──
     case "text": {
       const ts = c.textStyle || {};
+      if (c.html) {
+        return (
+          <div style={{ fontSize:ts.fontSize||15, textAlign:ts.align||"left", lineHeight:1.8, color:"#374151" }}
+            dangerouslySetInnerHTML={{ __html: c.html }}/>
+        );
+      }
       return (
         <p style={{ fontSize:ts.fontSize||15, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", lineHeight:1.8, color:"#374151", margin:0 }}>
           {c.text?.split("\n").map((line, i, arr) => (
