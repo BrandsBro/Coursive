@@ -15,7 +15,7 @@ export const BLOCK_DEFS = {
   callout:      { icon:"💡", label:"Callout",        desc:"Highlight box",          color:"#65a30d", bg:"#F7FEE7", default:{ text:"", style:"info", textStyle:{} },                                                                preview:c=>c.text||"Empty callout" },
   divider:      { icon:"➖", label:"Divider",        desc:"Visual break",           color:"#64748b", bg:"#F8FAFC", default:{ style:"line" },                                                                                       preview:()=>"Section divider" },
   continueblock: { icon:"▶️", label:"Continue",       desc:"Stop point — hides content below", color:"#5B4EFF", bg:"#EEF2FF", default:{ label:"Continue" },                                                                    preview:()=>"── Continue button ──" },
-  blankoptions: { icon:"🔤", label:"Blank + Options",desc:"Pick word from sentence",color:"#0891b2", bg:"#E0F2FE", default:{ sentence:"", markedWords:[], blanks:[], explanation:"", sentenceStyle:{} },                         preview:c=>c.sentence||"No sentence" },
+  blankoptions: { icon:"🔤", label:"Blank + Options",desc:"Pick word from sentence",color:"#0891b2", bg:"#E0F2FE", default:{ sentence:"", markedWords:[], blanks:[], explanation:"", taskTitle:"", taskDesc:"", successText:"", successImages:[], sentenceStyle:{} },                         preview:c=>c.sentence||"No sentence" },
 };
 
 export function BlockEditor({ block, onChange }) {
@@ -449,6 +449,18 @@ function BlankOptionsE({ content, onChange }) {
   const updateBlank=(i,key,val)=>{ const b=[...syncedBlanks]; b[i]={ ...b[i],[key]:val }; onChange({ ...content, blanks:b }); };
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:14, paddingTop:12 }}>
+      <div>
+        <p style={lbl()}>Task Title</p>
+        <input value={content.taskTitle||""} onChange={e => onChange({ ...content, taskTitle:e.target.value })} placeholder="e.g. Generate Your First Image" style={inp()}/>
+      </div>
+      <div>
+        <p style={lbl()}>Task Description <span style={{ color:"#94A3B8", fontWeight:400 }}>· optional</span></p>
+        <input value={content.taskDesc||""} onChange={e => onChange({ ...content, taskDesc:e.target.value })} placeholder="e.g. Ask Kling to generate an image of a horse." style={inp()}/>
+      </div>
+      <div>
+        <p style={lbl()}>Success Text <span style={{ color:"#94A3B8", fontWeight:400 }}>· shown after correct</span></p>
+        <textarea value={content.successText||""} onChange={e => onChange({ ...content, successText:e.target.value })} placeholder="Great job! Here is what you generated..." style={{ ...inp(), minHeight:60, resize:"vertical" }}/>
+      </div>
       <FC label="Sentence Style" style={ss} setStyle={v => onChange({ ...content, sentenceStyle:v })}/>
       <textarea value={sentence} onChange={e => onChange({ ...content, sentence:e.target.value, markedWords:[], blanks:[] })} placeholder="Write the full sentence here..." style={{ ...inp(), minHeight:70, resize:"vertical", ...styled(ss) }}/>
       {words.length>0 && (
