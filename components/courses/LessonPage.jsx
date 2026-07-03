@@ -54,7 +54,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
         case "fillblank":    return (c.prompt || "").replace("___", "blank");
         case "keypoints":    return (c.title || "Key points") + ": " + (c.points||[]).filter(Boolean).join(". ");
         case "callout":      return c.text || "";
-        case "blankoptions": return (c.sentence||"").replace(/\(\)/g, "blank");
+        case "blankoptions": return (c.sentence||"").replace(/\([^)]*\)/g, "blank");
         default: return "";
       }
     }).filter(Boolean).join(". ");
@@ -266,12 +266,15 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
   const sentence = c.sentence || "";
 
   // Split sentence by ___ to get parts and blank count
-  const parts = sentence.split("()");
+  const parts = sentence.split(/\([^)]*\)/);
+  const blankMatches = sentence.match(/\([^)]*\)/g) || [];
   const blankCount = parts.length - 1;
+  // Extract correct answers from () if blanks not set
+  const derivedBlanks = blankMatches.map((m, i) => blanks[i]?.correct ? blanks[i] : { correct: m.slice(1,-1).trim() });
 
   // Shuffle correct answers as options
   const options = useMemo(() => {
-    return blanks.map(b => b.correct).filter(Boolean)
+    return derivedBlanks.map(b => b.correct).filter(Boolean)
       .sort(() => Math.sin(idx * 99 + blanks.length * 31) - 0.5);
   }, [idx, blanks.length]);
 
@@ -281,7 +284,7 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
 
   const isChecked = checked["bo_"+idx];
   const allFilled = filled.every(f => f !== null);
-  const allCorrect = isChecked && blanks.every((b,i) => filled[i] === b.correct);
+  const allCorrect = isChecked && derivedBlanks.every((b,i) => filled[i] === b.correct);
   const showAns = fillShowAnswer?.["bo_"+idx];
 
   const pickOption = (opt) => {

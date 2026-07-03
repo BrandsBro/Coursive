@@ -450,13 +450,13 @@ function BlankOptionsE({ content, onChange }) {
   // Preview: replace ___ with answers
   const preview = () => {
     let s = sentence; let i = 0;
-    return s.replace(/\(\)/g, () => {
+    return s.replace(/\([^)]+\)/g, () => {
       const ans = blanks[i]?.correct || ("blank "+(i+1));
       i++; return "["+ans+"]";
     });
   };
 
-  const blankCountInSentence = (sentence.match(/\(\)/g)||[]).length;
+  const blankCountInSentence = (sentence.match(/\([^)]+\)/g)||[]).length;
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:14, paddingTop:12 }}>
