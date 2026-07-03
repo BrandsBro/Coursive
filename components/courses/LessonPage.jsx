@@ -257,15 +257,13 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
   const blankCount = markedWords.length;
   const sentence = c.sentence || "";
   const words = sentence.split(" ").filter(Boolean);
-  const ss = c.sentenceStyle || {};
 
-  // All words from all blanks mixed into one pool
-  const allWords = useMemo(() => {
+  const allOptions = useMemo(() => {
     const pool = blanks.flatMap(b => [b.correct, b.w1, b.w2, b.w3].filter(Boolean));
-    return [...pool].sort(() => Math.sin(idx * 100 + pool.length * 37) - 0.5);
-  }, [blanks.length, idx]);
+    return [...pool].sort(() => Math.sin(idx * 99 + pool.length * 31) - 0.5);
+  }, [idx]);
 
-  const [bankWords, setBankWords] = useState(allWords);
+  const [bank, setBank] = useState(allOptions);
   const [filled, setFilled] = useState(Array(blankCount).fill(null));
   const [taskDone, setTaskDone] = useState(false);
 
@@ -274,94 +272,72 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
   const allCorrect = isChecked && blanks.every((b, i) => filled[i] === b.correct);
   const showAns = fillShowAnswer?.["bo_"+idx];
 
-  const pickWord = (word, wordIdx) => {
+  const pickWord = (word, wi) => {
     if (isChecked) return;
-    const nextEmpty = filled.findIndex(f => f === null);
-    if (nextEmpty === -1) return;
-    const newFilled = [...filled];
-    newFilled[nextEmpty] = word;
-    setFilled(newFilled);
-    setBankWords(prev => [...prev.slice(0, wordIdx), ...prev.slice(wordIdx + 1)]);
+    const next = filled.findIndex(f => f === null);
+    if (next === -1) return;
+    const nf = [...filled]; nf[next] = word;
+    setFilled(nf);
+    setBank(prev => prev.filter((_, i) => i !== wi));
   };
 
-  const unpickBlank = (bi) => {
-    if (isChecked) return;
+  const unpick = (bi) => {
+    if (isChecked || !filled[bi]) return;
     const word = filled[bi];
-    if (!word) return;
-    const newFilled = [...filled];
-    newFilled[bi] = null;
-    setFilled(newFilled);
-    setBankWords(prev => [...prev, word]);
+    const nf = [...filled]; nf[bi] = null;
+    setFilled(nf);
+    setBank(prev => [...prev, word]);
   };
 
-  const undoLast = () => {
-    const lastIdx = [...filled].map((f,i)=>({f,i})).filter(x=>x.f!==null).pop()?.i;
-    if (lastIdx === undefined) return;
-    unpickBlank(lastIdx);
-  };
-
-  const handleCheck = () => setChecked(p => ({...p, ["bo_"+idx]: true}));
-
-  const handleRepeat = () => {
+  const reset = () => {
     setFilled(Array(blankCount).fill(null));
-    setBankWords(allWords);
+    setBank(allOptions);
     setChecked(p => ({...p, ["bo_"+idx]: false}));
     setFillShowAnswer(p => ({...p, ["bo_"+idx]: false}));
     setTaskDone(false);
   };
 
-  // Task completed screen
-  if (taskDone) {
-    return (
-      <div style={{ borderRadius:16, border:"1.5px solid #E2E8F0", overflow:"hidden" }}>
-        <div style={{ padding:"12px 20px", background:"#F0FDF4", display:"flex", alignItems:"center", gap:8 }}>
-          <Check size={16} color="#22c55e"/>
-          <span style={{ fontSize:14, fontWeight:700, color:"#166534" }}>Task completed</span>
-        </div>
-        <div style={{ padding:"18px 20px" }}>
-          {c.taskTitle && <h3 style={{ fontSize:16, fontWeight:800, color:"#0f172a", margin:"0 0 14px" }}>{c.taskTitle}</h3>}
-          <button onClick={handleRepeat}
-            style={{ width:"100%", padding:"13px 16px", borderRadius:12, border:"none", background:"#EEF2FF", color:"#5B4EFF", fontSize:14, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
-            🔁 Repeat task
-          </button>
-        </div>
-        {c.successText && <p style={{ fontSize:14, color:"#374151", padding:"0 20px 16px", margin:0, lineHeight:1.65 }}>{c.successText}</p>}
+  if (taskDone) return (
+    <div style={{ borderRadius:16, border:"1.5px solid #E2E8F0", overflow:"hidden" }}>
+      <div style={{ padding:"12px 20px", background:"#F0FDF4", display:"flex", alignItems:"center", gap:8 }}>
+        <Check size={16} color="#22c55e"/>
+        <span style={{ fontSize:14, fontWeight:700, color:"#166534" }}>Task completed</span>
       </div>
-    );
-  }
+      <div style={{ padding:"18px 20px" }}>
+        {c.taskTitle && <h3 style={{ fontSize:16, fontWeight:800, color:"#0f172a", margin:"0 0 16px" }}>{c.taskTitle}</h3>}
+        <button onClick={reset} style={{ width:"100%", padding:"13px", borderRadius:12, border:"none", background:"#EEF2FF", color:"#5B4EFF", fontSize:14, fontWeight:700, cursor:"pointer" }}>
+          🔁 Repeat task
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <div style={{ padding:"20px 0" }}>
       {/* Sentence with blank slots */}
-      <p style={{ fontSize:ss.fontSize||18, fontWeight:ss.bold?"700":"500", color:"#0f172a", margin:"0 0 24px", lineHeight:2.8 }}>
+      <p style={{ fontSize:18, fontWeight:500, color:"#0f172a", margin:"0 0 32px", lineHeight:2.8 }}>
         {words.map((word, wi) => {
-          if (markedWords.includes(wi)) {
-            const bi = markedWords.indexOf(wi);
-            const filledWord = filled[bi];
-            const ok = isChecked && filledWord === blanks[bi]?.correct;
-            const wrong = isChecked && filledWord !== blanks[bi]?.correct;
-            return (
-              <span key={wi}>
-                <span
-                  onClick={() => !isChecked && filledWord && unpickBlank(bi)}
-                  style={{ display:"inline-block", minWidth:100, padding:"4px 16px", margin:"0 4px", borderRadius:8, border:`2px ${filledWord?"solid":"dashed"} ${ok?"#22c55e":wrong?"#ef4444":filledWord?"#374151":"#D1D5DB"}`, background:"#fff", color:ok?"#166534":wrong?"#991B1B":filledWord?"#111827":"#94A3B8", fontWeight:700, fontSize:16, textAlign:"center", verticalAlign:"middle", cursor:!isChecked&&filledWord?"pointer":"default", boxShadow:!isChecked&&filledWord?"0 2px 0 #374151":"none" }}>
-                  {filledWord || "       "}
-                </span>{" "}
-              </span>
-            );
-          }
-          return <span key={wi}>{word} </span>;
+          if (!markedWords.includes(wi)) return <span key={wi}>{word} </span>;
+          const bi = markedWords.indexOf(wi);
+          const val = filled[bi];
+          const ok = isChecked && val === blanks[bi]?.correct;
+          const wrong = isChecked && val !== blanks[bi]?.correct;
+          return (
+            <span key={wi}>
+              <span onClick={() => unpick(bi)}
+                style={{ display:"inline-block", minWidth:110, padding:"2px 14px", margin:"0 4px", borderRadius:8, border:`2px ${val?"solid":"dashed"} ${ok?"#22c55e":wrong?"#ef4444":val?"#374151":"#9CA3AF"}`, background:"#fff", color:ok?"#166534":wrong?"#991B1B":val?"#111827":"#9CA3AF", fontWeight:700, fontSize:16, textAlign:"center", verticalAlign:"middle", cursor:val&&!isChecked?"pointer":"default" }}>
+                {val || " "}
+              </span>{" "}
+            </span>
+          );
         })}
       </p>
 
       {/* Word bank */}
       {!isChecked && (
-        <div style={{ background:"#F9FAFB", borderRadius:14, border:"1.5px solid #E5E7EB", padding:"16px 20px", marginBottom:12 }}>
-          <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-            {bankWords.length === 0 && (
-              <p style={{ fontSize:13, color:"#94A3B8", margin:0 }}>All words placed ✓</p>
-            )}
-            {bankWords.map((word, i) => (
+        <div style={{ marginBottom:16 }}>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:8, padding:"16px", background:"#F9FAFB", borderRadius:14, border:"1.5px solid #E5E7EB", minHeight:60, alignItems:"center" }}>
+            {bank.map((word, i) => (
               <button key={i} onClick={() => pickWord(word, i)}
                 style={{ padding:"10px 20px", borderRadius:12, border:"2px solid #E5E7EB", background:"#fff", color:"#111827", fontSize:15, fontWeight:600, cursor:"pointer", boxShadow:"0 2px 0 #D1D5DB" }}>
                 {word}
@@ -371,17 +347,17 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
         </div>
       )}
 
-      {/* Undo last + Check */}
+      {/* Actions */}
       {!isChecked && (
-        <div style={{ display:"flex", gap:10, marginBottom:4 }}>
-          {filled.some(f => f !== null) && (
-            <button onClick={undoLast}
-              style={{ padding:"10px 18px", borderRadius:12, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:14, color:"#374151", cursor:"pointer", fontWeight:600 }}>
-              ⌫
-            </button>
+        <div style={{ display:"flex", gap:10 }}>
+          {filled.some(f => f) && (
+            <button onClick={() => {
+              const last = [...filled].map((f,i)=>({f,i})).filter(x=>x.f).pop();
+              if (last) unpick(last.i);
+            }} style={{ padding:"12px 18px", borderRadius:12, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:16, cursor:"pointer" }}>⌫</button>
           )}
           {allFilled && (
-            <button onClick={handleCheck}
+            <button onClick={() => setChecked(p => ({...p, ["bo_"+idx]: true}))}
               style={{ flex:1, padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>
               Check
             </button>
@@ -392,19 +368,13 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
       {/* Correct */}
       {isChecked && allCorrect && (
         <div>
-          {(c.successImages||[]).filter(Boolean).map((url, i) => (
-            <img key={i} src={url} alt="" style={{ width:"100%", borderRadius:14, display:"block", marginBottom:12 }}/>
-          ))}
+          {(c.successImages||[]).filter(Boolean).map((url,i) => <img key={i} src={url} alt="" style={{ width:"100%", borderRadius:14, marginBottom:12 }}/>)}
           {c.successText && <p style={{ fontSize:14, color:"#374151", margin:"0 0 12px", lineHeight:1.65 }}>{c.successText}</p>}
           <div style={{ padding:"14px 18px", borderRadius:14, background:"#F0FDF4", border:"1.5px solid #BBF7D0", marginBottom:14 }}>
-            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-              <Check size={16} color="#22c55e"/>
-              <span style={{ fontSize:15, fontWeight:700, color:"#166534" }}>All correct!</span>
-            </div>
-            {c.explanation && <p style={{ fontSize:13, color:"#166534", margin:"6px 0 0" }}>{c.explanation}</p>}
+            <p style={{ fontSize:15, fontWeight:700, color:"#166534", margin:0 }}>🎉 Correct!</p>
           </div>
           <button onClick={() => setTaskDone(true)}
-            style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(91,78,255,0.3)" }}>
+            style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer" }}>
             Continue →
           </button>
         </div>
@@ -414,10 +384,7 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
       {isChecked && !allCorrect && (
         <div>
           <div style={{ padding:"16px 18px", borderRadius:14, border:"2px solid #f59e0b", background:"#FFFBEB", marginBottom:12 }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:4 }}>
-              <span style={{ fontSize:20 }}>⚠️</span>
-              <span style={{ fontSize:15, fontWeight:700, color:"#92400e" }}>Almost right</span>
-            </div>
+            <p style={{ fontSize:15, fontWeight:700, color:"#92400e", margin:"0 0 4px" }}>⚠️ Almost right</p>
             <p style={{ fontSize:13, color:"#92400e", margin:0 }}>Review the steps and try again</p>
           </div>
           <div style={{ display:"flex", gap:10 }}>
@@ -425,18 +392,14 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
               style={{ flex:1, padding:"12px", borderRadius:12, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:14, fontWeight:600, color:"#374151", cursor:"pointer" }}>
               See answer
             </button>
-            <button onClick={handleRepeat}
-              style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"#5B4EFF", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+            <button onClick={reset}
+              style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"#5B4EFF", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
               🔄 Try again
             </button>
           </div>
           {showAns && (
             <div style={{ marginTop:10, padding:"14px 16px", borderRadius:12, background:"#F9FAFB", border:"1.5px solid #E5E7EB" }}>
-              {blanks.map((b, i) => (
-                <p key={i} style={{ fontSize:14, color:"#374151", margin:"0 0 4px", fontWeight:600 }}>
-                  Blank {i+1}: <strong style={{ color:"#111827" }}>{b.correct}</strong>
-                </p>
-              ))}
+              {blanks.map((b,i) => <p key={i} style={{ fontSize:14, margin:"0 0 4px", fontWeight:600 }}>Blank {i+1}: <strong>{b.correct}</strong></p>)}
             </div>
           )}
         </div>
@@ -444,7 +407,6 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
     </div>
   );
 }
-
 
 
 function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fillInputs, setFillInputs, fillChecked, setFillChecked, fillShowAnswer, setFillShowAnswer }) {
