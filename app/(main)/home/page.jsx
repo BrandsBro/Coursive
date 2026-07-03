@@ -33,8 +33,8 @@ export default async function DashboardPage() {
           <WeeklyStreaks/>
         </div>
         <div style={{ marginTop:24, display:"flex", flexDirection:"column", gap:24 }}>
-          <ChallengesSection challenges={challenges}/>
           <BrowseCourses courses={courses}/>
+          <ChallengesSection challenges={challenges}/>
         </div>
       </div>
     </div>
