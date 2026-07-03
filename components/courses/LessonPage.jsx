@@ -146,15 +146,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
 
       {/* Main content */}
       <div style={{ maxWidth:720, margin:"0 auto", padding:"32px 24px 80px" }}>
-        <div style={{ marginBottom:32 }}>
-          <p style={{ fontSize:11, fontWeight:700, color:"#94A3B8", letterSpacing:1, margin:"0 0 8px" }}>{(course?.title||"").toUpperCase()}</p>
-          <h1 style={{ fontSize:30, fontWeight:900, color:"#0f172a", margin:"0 0 8px", lineHeight:1.2 }}>{lesson?.title}</h1>
-          <div style={{ display:"flex", gap:12 }}>
-            <span style={{ fontSize:12, color:"#94A3B8" }}>{lesson?.duration} min</span>
-            <span style={{ fontSize:12, color:"#94A3B8" }}>·</span>
-            <span style={{ fontSize:12, color:"#94A3B8", textTransform:"capitalize" }}>{lesson?.type||"lesson"}</span>
-          </div>
-        </div>
+
 
         <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
           {!hasContent && (
