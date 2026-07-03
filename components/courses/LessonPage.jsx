@@ -27,6 +27,8 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   const [isReading, setIsReading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showCert, setShowCert] = useState(false);
+  const [activeTask, setActiveTask] = useState(null); // idx of active blankoptions block
+  const [tasksDone, setTasksDone] = useState({});
   const audioRef = useRef(null);
   const autoStartedRef = useRef(false);
   const allLessons = (course?.units || []).flatMap(u => u.lessons || []);
@@ -156,6 +158,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
       <div style={{ maxWidth:720, margin:"0 auto", padding:"32px 24px 80px" }}>
 
 
+        {/* Check if any blankoptions block is currently active (visible and not done) */}
         <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
           {!hasContent && (
             <div style={{ textAlign:"center", padding:"60px 20px", background:"#fff", borderRadius:24, border:"2px dashed #E2E8F0" }}>
@@ -167,12 +170,10 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
           {safeContent.map((block, idx) => {
             if (idx > visibleUntil) return null;
             if (block.type === "continueblock") {
-              const isVisible = idx === visibleUntil;
-              if (!isVisible) return null;
+              if (idx !== visibleUntil) return null;
               return (
                 <button key={block.id||idx}
                   onClick={() => {
-                    // Find next continue block after this one
                     const nextStop = safeContent.findIndex((b, i) => i > idx && b.type === "continueblock");
                     setVisibleUntil(nextStop === -1 ? Infinity : nextStop);
                   }}
@@ -181,14 +182,23 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
                 </button>
               );
             }
+            if (block.type === "blankoptions") {
+              const c = block.content || {};
+              return (
+                <BlankOptionsBlock key={block.id||idx} c={c} idx={idx}
+                  checked={checked} setChecked={setChecked}
+                  fillShowAnswer={fillShowAnswer} setFillShowAnswer={setFillShowAnswer}
+                />
+              );
+            }
             return (
-            <ContentBlock key={block.id||idx} block={block} idx={idx}
-              answers={answers} setAnswers={setAnswers}
-              checked={checked} setChecked={setChecked}
-              fillInputs={fillInputs} setFillInputs={setFillInputs}
-              fillChecked={fillChecked} setFillChecked={setFillChecked}
-              fillShowAnswer={fillShowAnswer} setFillShowAnswer={setFillShowAnswer}
-            />
+              <ContentBlock key={block.id||idx} block={block} idx={idx}
+                answers={answers} setAnswers={setAnswers}
+                checked={checked} setChecked={setChecked}
+                fillInputs={fillInputs} setFillInputs={setFillInputs}
+                fillChecked={fillChecked} setFillChecked={setFillChecked}
+                fillShowAnswer={fillShowAnswer} setFillShowAnswer={setFillShowAnswer}
+              />
             );
           })}
         </div>
@@ -297,113 +307,128 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
     setTaskDone(false);
   };
 
-  if (taskDone) return (
-    <div style={{ borderRadius:16, border:"1.5px solid #E2E8F0", overflow:"hidden" }}>
-      <div style={{ padding:"12px 20px", background:"#F0FDF4", display:"flex", alignItems:"center", gap:8 }}>
-        <Check size={16} color="#22c55e"/>
-        <span style={{ fontSize:14, fontWeight:700, color:"#166534" }}>Task completed</span>
-      </div>
-      <div style={{ padding:"18px 20px" }}>
-        {c.taskTitle && <h3 style={{ fontSize:16, fontWeight:800, color:"#0f172a", margin:"0 0 16px" }}>{c.taskTitle}</h3>}
-        <button onClick={reset} style={{ width:"100%", padding:"13px", borderRadius:12, border:"none", background:"#EEF2FF", color:"#5B4EFF", fontSize:14, fontWeight:700, cursor:"pointer" }}>
-          🔁 Repeat task
-        </button>
-      </div>
-    </div>
-  );
-
-  return (
-    <div style={{ padding:"20px 0" }}>
-      {/* Sentence with blank slots */}
-      <p style={{ fontSize:18, fontWeight:500, color:"#0f172a", margin:"0 0 32px", lineHeight:2.8 }}>
-        {words.map((word, wi) => {
-          if (!markedWords.includes(wi)) return <span key={wi}>{word} </span>;
-          const bi = markedWords.indexOf(wi);
-          const val = filled[bi];
-          const ok = isChecked && val === blanks[bi]?.correct;
-          const wrong = isChecked && val !== blanks[bi]?.correct;
-          return (
-            <span key={wi}>
-              <span onClick={() => unpick(bi)}
-                style={{ display:"inline-block", minWidth:110, padding:"2px 14px", margin:"0 4px", borderRadius:8, border:`2px ${val?"solid":"dashed"} ${ok?"#22c55e":wrong?"#ef4444":val?"#374151":"#9CA3AF"}`, background:"#fff", color:ok?"#166534":wrong?"#991B1B":val?"#111827":"#9CA3AF", fontWeight:700, fontSize:16, textAlign:"center", verticalAlign:"middle", cursor:val&&!isChecked?"pointer":"default" }}>
-                {val || " "}
-              </span>{" "}
-            </span>
-          );
-        })}
-      </p>
-
-      {/* Word bank */}
-      {!isChecked && (
-        <div style={{ marginBottom:16 }}>
-          <div style={{ display:"flex", flexWrap:"wrap", gap:8, padding:"16px", background:"#F9FAFB", borderRadius:14, border:"1.5px solid #E5E7EB", minHeight:60, alignItems:"center" }}>
-            {bank.map((word, i) => (
-              <button key={i} onClick={() => pickWord(word, i)}
-                style={{ padding:"10px 20px", borderRadius:12, border:"2px solid #E5E7EB", background:"#fff", color:"#111827", fontSize:15, fontWeight:600, cursor:"pointer", boxShadow:"0 2px 0 #D1D5DB" }}>
-                {word}
-              </button>
-            ))}
-          </div>
+  // Completed state - shows inline
+  if (taskDone) {
+    return (
+      <div style={{ borderRadius:16, border:"1.5px solid #E2E8F0", overflow:"hidden" }}>
+        <div style={{ padding:"12px 20px", background:"#F0FDF4", display:"flex", alignItems:"center", gap:8 }}>
+          <Check size={16} color="#22c55e"/>
+          <span style={{ fontSize:14, fontWeight:700, color:"#166534" }}>Task completed</span>
         </div>
-      )}
-
-      {/* Actions */}
-      {!isChecked && (
-        <div style={{ display:"flex", gap:10 }}>
-          {filled.some(f => f) && (
-            <button onClick={() => {
-              const last = [...filled].map((f,i)=>({f,i})).filter(x=>x.f).pop();
-              if (last) unpick(last.i);
-            }} style={{ padding:"12px 18px", borderRadius:12, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:16, cursor:"pointer" }}>⌫</button>
-          )}
-          {allFilled && (
-            <button onClick={() => setChecked(p => ({...p, ["bo_"+idx]: true}))}
-              style={{ flex:1, padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>
-              Check
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Correct */}
-      {isChecked && allCorrect && (
-        <div>
-          {(c.successImages||[]).filter(Boolean).map((url,i) => <img key={i} src={url} alt="" style={{ width:"100%", borderRadius:14, marginBottom:12 }}/>)}
-          {c.successText && <p style={{ fontSize:14, color:"#374151", margin:"0 0 12px", lineHeight:1.65 }}>{c.successText}</p>}
-          <div style={{ padding:"14px 18px", borderRadius:14, background:"#F0FDF4", border:"1.5px solid #BBF7D0", marginBottom:14 }}>
-            <p style={{ fontSize:15, fontWeight:700, color:"#166534", margin:0 }}>🎉 Correct!</p>
-          </div>
-          <button onClick={() => setTaskDone(true)}
-            style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer" }}>
-            Continue →
+        <div style={{ padding:"18px 20px" }}>
+          {c.taskTitle && <h3 style={{ fontSize:16, fontWeight:800, color:"#0f172a", margin:"0 0 6px" }}>{c.taskTitle}</h3>}
+          {c.taskDesc && <p style={{ fontSize:13, color:"#64748B", margin:"0 0 16px" }}>{c.taskDesc}</p>}
+          <button onClick={reset} style={{ width:"100%", padding:"13px", borderRadius:12, border:"none", background:"#EEF2FF", color:"#5B4EFF", fontSize:14, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+            🔁 Repeat task
           </button>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      {/* Almost right */}
-      {isChecked && !allCorrect && (
-        <div>
-          <div style={{ padding:"16px 18px", borderRadius:14, border:"2px solid #f59e0b", background:"#FFFBEB", marginBottom:12 }}>
-            <p style={{ fontSize:15, fontWeight:700, color:"#92400e", margin:"0 0 4px" }}>⚠️ Almost right</p>
-            <p style={{ fontSize:13, color:"#92400e", margin:0 }}>Review the steps and try again</p>
-          </div>
-          <div style={{ display:"flex", gap:10 }}>
-            <button onClick={() => setFillShowAnswer(p => ({...p, ["bo_"+idx]: true}))}
-              style={{ flex:1, padding:"12px", borderRadius:12, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:14, fontWeight:600, color:"#374151", cursor:"pointer" }}>
-              See answer
-            </button>
-            <button onClick={reset}
-              style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"#5B4EFF", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
-              🔄 Try again
-            </button>
-          </div>
-          {showAns && (
-            <div style={{ marginTop:10, padding:"14px 16px", borderRadius:12, background:"#F9FAFB", border:"1.5px solid #E5E7EB" }}>
-              {blanks.map((b,i) => <p key={i} style={{ fontSize:14, margin:"0 0 4px", fontWeight:600 }}>Blank {i+1}: <strong>{b.correct}</strong></p>)}
+  // Full screen takeover
+  return (
+    <div style={{ position:"fixed", inset:0, background:"#fff", zIndex:200, display:"flex", flexDirection:"column", overflowY:"auto" }}>
+      {/* Header */}
+      <div style={{ padding:"16px 20px", borderBottom:"1px solid #F1F5F9", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+        <button onClick={() => setTaskDone(true)} style={{ width:32, height:32, borderRadius:"50%", border:"1.5px solid #E2E8F0", background:"#fff", cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+        <div style={{ flex:1 }}/>
+      </div>
+
+      {/* Task content */}
+      <div style={{ flex:1, maxWidth:680, margin:"0 auto", width:"100%", padding:"32px 24px" }}>
+        {c.taskTitle && <h2 style={{ fontSize:22, fontWeight:800, color:"#0f172a", margin:"0 0 8px" }}>{c.taskTitle}</h2>}
+        {c.taskDesc && <p style={{ fontSize:15, color:"#374151", margin:"0 0 28px", lineHeight:1.6 }}>{c.taskDesc}</p>}
+
+        {/* Sentence with blanks */}
+        <p style={{ fontSize:18, fontWeight:500, color:"#0f172a", margin:"0 0 12px", lineHeight:3 }}>
+          {words.map((word, wi) => {
+            if (!markedWords.includes(wi)) return <span key={wi}>{word} </span>;
+            const bi = markedWords.indexOf(wi);
+            const val = filled[bi];
+            const ok = isChecked && val === blanks[bi]?.correct;
+            const wrong = isChecked && val !== blanks[bi]?.correct;
+            return (
+              <span key={wi}>
+                <span onClick={() => unpick(bi)}
+                  style={{ display:"inline-block", minWidth:110, padding:"4px 16px", margin:"0 3px", borderRadius:8, border:`2px solid ${ok?"#22c55e":wrong?"#ef4444":val?"#374151":"#D1D5DB"}`, background:ok?"#F0FDF4":wrong?"#FEF2F2":val?"#F9FAFB":"#F9FAFB", color:ok?"#166534":wrong?"#991B1B":val?"#111827":"#94A3B8", fontWeight:700, fontSize:17, textAlign:"center", verticalAlign:"middle", cursor:val&&!isChecked?"pointer":"default", transition:"all 0.15s" }}>
+                  {val || " "}
+                </span>{" "}
+              </span>
+            );
+          })}
+        </p>
+      </div>
+
+      {/* Bottom - word bank + actions */}
+      <div style={{ borderTop:"1px solid #F1F5F9", padding:"16px 24px", background:"#fff" }}>
+        <div style={{ maxWidth:680, margin:"0 auto" }}>
+          {!isChecked && (
+            <>
+              {/* Word chips */}
+              <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginBottom:14, minHeight:48, alignItems:"center" }}>
+                {bank.map((word, i) => (
+                  <button key={i} onClick={() => pickWord(word, i)}
+                    style={{ padding:"10px 20px", borderRadius:12, border:"2px solid #E5E7EB", background:"#fff", color:"#111827", fontSize:15, fontWeight:600, cursor:"pointer", boxShadow:"0 2px 0 #D1D5DB" }}>
+                    {word}
+                  </button>
+                ))}
+              </div>
+              {/* Check + undo */}
+              <div style={{ display:"flex", gap:10 }}>
+                {filled.some(f => f) && (
+                  <button onClick={() => { const last=[...filled].map((f,i)=>({f,i})).filter(x=>x.f).pop(); if(last) unpick(last.i); }}
+                    style={{ padding:"13px 18px", borderRadius:12, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:18, cursor:"pointer" }}>⌫</button>
+                )}
+                <button onClick={() => allFilled && setChecked(p => ({...p, ["bo_"+idx]: true}))}
+                  style={{ flex:1, padding:"14px", borderRadius:14, border:"none", background:allFilled?"#22c55e":"#E5E7EB", color:allFilled?"#fff":"#9CA3AF", fontSize:15, fontWeight:700, cursor:allFilled?"pointer":"default", boxShadow:allFilled?"0 4px 0 #16a34a":"none", transition:"all 0.2s" }}>
+                  Check
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* Correct */}
+          {isChecked && allCorrect && (
+            <div>
+              {(c.successImages||[]).filter(Boolean).map((url,i) => <img key={i} src={url} alt="" style={{ width:"100%", borderRadius:14, marginBottom:12 }}/>)}
+              {c.successText && <p style={{ fontSize:14, color:"#374151", margin:"0 0 12px", lineHeight:1.65 }}>{c.successText}</p>}
+              <div style={{ padding:"14px 18px", borderRadius:14, background:"#F0FDF4", border:"1.5px solid #BBF7D0", marginBottom:14 }}>
+                <p style={{ fontSize:15, fontWeight:700, color:"#166534", margin:0 }}>🎉 Correct!</p>
+              </div>
+              <button onClick={() => setTaskDone(true)}
+                style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer" }}>
+                Continue →
+              </button>
+            </div>
+          )}
+
+          {/* Almost right */}
+          {isChecked && !allCorrect && (
+            <div>
+              <div style={{ padding:"14px 18px", borderRadius:14, border:"2px solid #f59e0b", background:"#FFFBEB", marginBottom:12 }}>
+                <p style={{ fontSize:15, fontWeight:700, color:"#92400e", margin:"0 0 2px" }}>⚠️ Almost right</p>
+                <p style={{ fontSize:13, color:"#92400e", margin:0 }}>Review the steps and try again</p>
+              </div>
+              <div style={{ display:"flex", gap:10 }}>
+                <button onClick={() => setFillShowAnswer(p => ({...p, ["bo_"+idx]: true}))}
+                  style={{ flex:1, padding:"12px", borderRadius:12, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:14, fontWeight:600, color:"#374151", cursor:"pointer" }}>
+                  See answer
+                </button>
+                <button onClick={reset}
+                  style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"#5B4EFF", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
+                  🔄 Try again
+                </button>
+              </div>
+              {showAns && (
+                <div style={{ marginTop:10, padding:"14px 16px", borderRadius:12, background:"#F9FAFB", border:"1.5px solid #E5E7EB" }}>
+                  {blanks.map((b,i) => <p key={i} style={{ fontSize:14, margin:"0 0 4px", fontWeight:600 }}>Blank {i+1}: <strong>{b.correct}</strong></p>)}
+                </div>
+              )}
             </div>
           )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
