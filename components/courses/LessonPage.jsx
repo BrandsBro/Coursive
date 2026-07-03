@@ -187,8 +187,8 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
           })}
         </div>
 
-        {/* Bottom navigation */}
-        <div style={{ marginTop:48, paddingTop:32, borderTop:"1px solid #F1F5F9", display:"flex", gap:12, alignItems:"center", justifyContent:"space-between" }}>
+        {/* Bottom navigation - only show when all content revealed */}
+        {visibleUntil === Infinity && <div style={{ marginTop:48, paddingTop:32, borderTop:"1px solid #F1F5F9", display:"flex", gap:12, alignItems:"center", justifyContent:"space-between" }}>
           {prevLesson ? (
             <Link href={challengeId ? "/challenges/"+challengeId+"/day/"+(parseInt(lesson?.id?.split("_day_").pop())-1) : "/courses/"+course.id+"/lessons/"+prevLesson.id+"?mode="+mode}
               style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:6, padding:"11px 18px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", color:"#374151", fontSize:13, fontWeight:600 }}>
@@ -210,7 +210,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
               {nextLesson ? <><span>Next Lesson</span><ChevronRight size={15}/></> : <><Trophy size={15}/><span>Finish Course</span></>}
             </button>
           )}
-        </div>
+        </div>}
       </div>
 
       {/* Complete modal */}
