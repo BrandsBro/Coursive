@@ -15,6 +15,8 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   const { send: sendNotification } = useNotifications();
   const safeContent = Array.isArray(content) && content.length > 0 ? content : [];
   const hasContent = safeContent.length > 0;
+  const firstStop = safeContent.findIndex(b => b.type === "continueblock");
+  const [visibleUntil, setVisibleUntil] = useState(firstStop === -1 ? Infinity : firstStop);
   const [answers, setAnswers] = useState({});
   const [checked, setChecked] = useState({});
   const [fillInputs, setFillInputs] = useState({});
@@ -156,7 +158,24 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
               <p style={{ fontSize:14, color:"#94A3B8", margin:0 }}>This lesson is being built. Check back soon!</p>
             </div>
           )}
-          {safeContent.map((block, idx) => (
+          {safeContent.map((block, idx) => {
+            if (idx > visibleUntil) return null;
+            if (block.type === "continueblock") {
+              const isVisible = idx === visibleUntil;
+              if (!isVisible) return null;
+              return (
+                <button key={block.id||idx}
+                  onClick={() => {
+                    // Find next continue block after this one
+                    const nextStop = safeContent.findIndex((b, i) => i > idx && b.type === "continueblock");
+                    setVisibleUntil(nextStop === -1 ? Infinity : nextStop);
+                  }}
+                  style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(91,78,255,0.3)" }}>
+                  {(block.content||{}).label||"Continue"} →
+                </button>
+              );
+            }
+            return (
             <ContentBlock key={block.id||idx} block={block} idx={idx}
               answers={answers} setAnswers={setAnswers}
               checked={checked} setChecked={setChecked}
@@ -164,7 +183,8 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
               fillChecked={fillChecked} setFillChecked={setFillChecked}
               fillShowAnswer={fillShowAnswer} setFillShowAnswer={setFillShowAnswer}
             />
-          ))}
+            );
+          })}
         </div>
 
         {/* Bottom navigation */}

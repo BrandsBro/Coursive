@@ -14,6 +14,7 @@ export const BLOCK_DEFS = {
   keypoints:    { icon:"⭐", label:"Key Points",     desc:"Bullet list",            color:"#0d9488", bg:"#F0FDFA", default:{ title:"Key Takeaways", points:["","",""], titleStyle:{}, pointStyle:{} },                            preview:c=>(c.points||[]).filter(Boolean).join(", ")||"No points" },
   callout:      { icon:"💡", label:"Callout",        desc:"Highlight box",          color:"#65a30d", bg:"#F7FEE7", default:{ text:"", style:"info", textStyle:{} },                                                                preview:c=>c.text||"Empty callout" },
   divider:      { icon:"➖", label:"Divider",        desc:"Visual break",           color:"#64748b", bg:"#F8FAFC", default:{ style:"line" },                                                                                       preview:()=>"Section divider" },
+  continueblock: { icon:"▶️", label:"Continue",       desc:"Stop point — hides content below", color:"#5B4EFF", bg:"#EEF2FF", default:{ label:"Continue" },                                                                    preview:()=>"── Continue button ──" },
   blankoptions: { icon:"🔤", label:"Blank + Options",desc:"Pick word from sentence",color:"#0891b2", bg:"#E0F2FE", default:{ sentence:"", markedWords:[], blanks:[], explanation:"", sentenceStyle:{} },                         preview:c=>c.sentence||"No sentence" },
 };
 
@@ -30,6 +31,7 @@ export function BlockEditor({ block, onChange }) {
     case "fillblank":    return <FillE {...p}/>;
     case "keypoints":    return <KeyE {...p}/>;
     case "callout":      return <CalloutE {...p}/>;
+    case "continueblock": return <ContinueE {...p}/>;
     case "blankoptions": return <BlankOptionsE {...p}/>;
     case "divider":      return <DividerE {...p}/>;
     default: return null;
@@ -122,6 +124,8 @@ export function BlockPreview({ block }) {
       const ts=c.textStyle||{};
       return <div style={{ padding:"14px 18px", borderRadius:12, background:bg, borderLeft:`4px solid ${color}`, display:"flex", gap:12 }}><span style={{ fontSize:18, flexShrink:0 }}>{emoji}</span><p style={{ fontSize:ts.fontSize||14, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#374151", margin:0, lineHeight:1.65 }}>{c.text||"Callout text"}</p></div>;
     }
+    case "continueblock":
+      return <div style={{ width:"100%", padding:"14px", borderRadius:14, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, textAlign:"center" }}>{c.label||"Continue"}</div>;
     case "blankoptions": {
       const words=(c.sentence||"").split(" ").filter(Boolean);
       const marked=c.markedWords||[];
@@ -424,6 +428,18 @@ function BlankOptionsE({ content, onChange }) {
         </div>
       </div>
       {lib && <MediaLibrary accept={libFor} onSelect={m => { libFor==="image"?onChange({ ...content, successImages:[...successImages,m.url] }):onChange({ ...content, successVideos:[...successVideos,m.url] }); setLib(false); }} onClose={() => setLib(false)}/>}
+    </div>
+  );
+}
+
+function ContinueE({ content, onChange }) {
+  return (
+    <div style={{ paddingTop:12 }}>
+      <p style={lbl()}>Button Label</p>
+      <input value={content.label||"Continue"} onChange={e => onChange({ ...content, label:e.target.value })} placeholder="Continue" style={inp()}/>
+      <div style={{ marginTop:12, width:"100%", padding:"14px", borderRadius:14, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, textAlign:"center" }}>
+        {content.label||"Continue"} →
+      </div>
     </div>
   );
 }
