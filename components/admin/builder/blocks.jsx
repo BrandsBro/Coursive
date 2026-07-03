@@ -450,13 +450,13 @@ function BlankOptionsE({ content, onChange }) {
   // Preview: replace ___ with answers
   const preview = () => {
     let s = sentence; let i = 0;
-    return s.replace(/___/g, () => {
+    return s.replace(/\(\)/g, () => {
       const ans = blanks[i]?.correct || ("blank "+(i+1));
       i++; return "["+ans+"]";
     });
   };
 
-  const blankCountInSentence = (sentence.match(/___/g)||[]).length;
+  const blankCountInSentence = (sentence.match(/\(\)/g)||[]).length;
 
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:14, paddingTop:12 }}>
@@ -498,12 +498,12 @@ function BlankOptionsE({ content, onChange }) {
       </div>
 
       <div>
-        <p style={lbl()}>Full sentence <span style={{ color:"#94A3B8", fontWeight:400 }}>· use ___ for each blank ({blankCount} needed)</span></p>
+        <p style={lbl()}>Full sentence <span style={{ color:"#94A3B8", fontWeight:400 }}>· use () for each blank ({blankCount} needed)</span></p>
         <textarea value={sentence} onChange={e => onChange({ ...content, sentence:e.target.value })}
-          placeholder={`e.g. A ___ in an ___, ___ lighting`}
+          placeholder={`e.g. A () in an open field, () lighting`}
           style={{ ...inp(), minHeight:70, resize:"vertical" }}/>
         <p style={{ fontSize:11, color:blankCountInSentence===blankCount?"#22c55e":"#f59e0b", margin:"4px 0 0", fontWeight:600 }}>
-          {blankCountInSentence===blankCount ? "✓ "+blankCount+" blank"+(blankCount>1?"s":"")+" found" : "⚠️ Found "+blankCountInSentence+" ___ but need "+blankCount}
+          {blankCountInSentence===blankCount ? "✓ "+blankCount+" blank"+(blankCount>1?"s":"")+" found" : "⚠️ Found "+blankCountInSentence+" () but need "+blankCount}
         </p>
       </div>
 

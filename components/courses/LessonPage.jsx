@@ -54,7 +54,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
         case "fillblank":    return (c.prompt || "").replace("___", "blank");
         case "keypoints":    return (c.title || "Key points") + ": " + (c.points||[]).filter(Boolean).join(". ");
         case "callout":      return c.text || "";
-        case "blankoptions": return c.sentence || "";
+        case "blankoptions": return (c.sentence||"").replace(/\(\)/g, "blank");
         default: return "";
       }
     }).filter(Boolean).join(". ");
@@ -266,7 +266,7 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
   const sentence = c.sentence || "";
 
   // Split sentence by ___ to get parts and blank count
-  const parts = sentence.split("___");
+  const parts = sentence.split("()");
   const blankCount = parts.length - 1;
 
   // Shuffle correct answers as options
@@ -390,7 +390,7 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
           {isChecked && allCorrect && (
             <div>
               <div style={{ padding:"16px 20px", borderRadius:14, background:"#F8FAFC", border:"1.5px solid #E2E8F0", marginBottom:20 }}>
-                <p style={{ fontSize:18, fontWeight:500, color:"#0f172a", margin:0, lineHeight:1.8 }}>{sentence.replace(/___/g, (_, i) => filled[i] || "___")}</p>
+                <p style={{ fontSize:18, fontWeight:500, color:"#0f172a", margin:0, lineHeight:1.8 }}>{sentence.replace(/\(\)/g, () => { const v=filled[fi++]; fi; return v||"()"; }).replace(/\(\)/g, (m,o,s) => { return filled[fi2++]||"()"; })}</p>
               </div>
               {(c.successImages||[]).filter(Boolean).map((url,i) => (
                 <img key={i} src={url} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:16 }}/>
