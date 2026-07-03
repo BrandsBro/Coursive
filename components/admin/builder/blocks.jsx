@@ -199,11 +199,41 @@ function HeadingE({ content, onChange }) {
 
 function TextE({ content, onChange }) {
   const ts = content.textStyle||{fontSize:15};
+  const taRef = useRef(null);
+
+  const wrap = (tag) => {
+    const ta = taRef.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    if (start === end) return;
+    const val = ta.value;
+    const newText = val.slice(0, start) + tag + val.slice(start, end) + tag + val.slice(end);
+    onChange({ ...content, text: newText });
+    setTimeout(() => {
+      ta.focus();
+      ta.setSelectionRange(start + tag.length, end + tag.length);
+    }, 10);
+  };
+
   return (
     <div style={{ paddingTop:12 }}>
       <FC label="Text Style" style={ts} setStyle={v => onChange({ ...content, textStyle:v })} showBold={false} showItalic={false}/>
-      <textarea value={content.text||""} onChange={e => onChange({ ...content, text:e.target.value })} placeholder="Write your content... Line breaks are preserved." style={{ ...inp(), minHeight:150, resize:"vertical", lineHeight:1.7, ...styled(ts) }}/>
-      <p style={{ fontSize:11, color:"#94A3B8", margin:"4px 0 0" }}>{(content.text||"").length} chars</p>
+      <div style={{ display:"flex", gap:6, alignItems:"center", marginBottom:6, padding:"5px 8px", background:"#F8FAFC", borderRadius:8, border:"1px solid #E2E8F0" }}>
+        <span style={{ fontSize:11, color:"#94A3B8", fontWeight:600 }}>Select a word then:</span>
+        <button onMouseDown={e => { e.preventDefault(); wrap("**"); }}
+          style={{ padding:"3px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:"#fff", fontWeight:900, fontSize:13, cursor:"pointer" }}>B</button>
+        <button onMouseDown={e => { e.preventDefault(); wrap("_"); }}
+          style={{ padding:"3px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:"#fff", fontStyle:"italic", fontWeight:700, fontSize:13, cursor:"pointer" }}>I</button>
+      </div>
+      <textarea
+        ref={taRef}
+        value={content.text||""}
+        onChange={e => onChange({ ...content, text:e.target.value })}
+        placeholder="Write content... Select a word then click B or I above to bold/italic it."
+        style={{ ...inp(), minHeight:150, resize:"vertical", lineHeight:1.7, ...styled(ts) }}
+      />
+      <p style={{ fontSize:11, color:"#94A3B8", margin:"4px 0 0" }}>{(content.text||"").length} chars · **word** = bold · _word_ = italic</p>
     </div>
   );
 }
