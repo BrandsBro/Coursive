@@ -201,7 +201,7 @@ function TextE({ content, onChange }) {
   const ts = content.textStyle||{fontSize:15};
   return (
     <div style={{ paddingTop:12 }}>
-      <FC label="Text Style" style={ts} setStyle={v => onChange({ ...content, textStyle:v })}/>
+      <FC label="Text Style" style={ts} setStyle={v => onChange({ ...content, textStyle:v })} showBold={false} showItalic={false}/>
       <textarea value={content.text||""} onChange={e => onChange({ ...content, text:e.target.value })} placeholder="Write your content... Line breaks are preserved." style={{ ...inp(), minHeight:150, resize:"vertical", lineHeight:1.7, ...styled(ts) }}/>
       <p style={{ fontSize:11, color:"#94A3B8", margin:"4px 0 0" }}>{(content.text||"").length} chars</p>
     </div>
