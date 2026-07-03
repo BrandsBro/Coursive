@@ -483,7 +483,7 @@ function BlankOptionsE({ content, onChange }) {
           {syncedBlanks.map((blank,i) => (
             <div key={i} style={{ background:"#F8FAFC", borderRadius:10, padding:12, border:"1.5px solid #E2E8F0", marginBottom:8 }}>
               <p style={{ fontSize:11, fontWeight:800, color:"#6366f1", margin:"0 0 8px" }}>BLANK {i+1} · Correct: <span style={{ color:"#22c55e" }}>{blank.correct}</span></p>
-              {["w1","w2","w3"].map((key,j) => <input key={key} value={blank[key]||""} onChange={e => updateBlank(i,key,e.target.value)} placeholder={`Wrong option ${j+1}`} style={{ ...inp(), marginBottom:4 }}/>)}
+              <p style={{ fontSize:11, color:"#94A3B8", margin:0 }}>Options shown = all correct answers shuffled</p>
             </div>
           ))}
         </div>
