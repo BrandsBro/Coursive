@@ -392,12 +392,21 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
           {/* Correct */}
           {isChecked && allCorrect && (
             <div>
+              {/* Full sentence with answers */}
               <div style={{ padding:"16px 20px", borderRadius:14, background:"#F8FAFC", border:"1.5px solid #E2E8F0", marginBottom:20 }}>
-                <p style={{ fontSize:18, fontWeight:500, color:"#0f172a", margin:0, lineHeight:1.8 }}>{sentence.replace(/\(\)/g, () => { const v=filled[fi++]; fi; return v||"()"; }).replace(/\(\)/g, (m,o,s) => { return filled[fi2++]||"()"; })}</p>
+                <p style={{ fontSize:18, fontWeight:500, color:"#0f172a", margin:0, lineHeight:1.8 }}>
+                  {(() => { let i=0; return sentence.replace(/\(\s*[^)]*\s*\)/g, () => filled[i++]||"?"); })()}
+                </p>
               </div>
-              {(c.successImages||[]).filter(Boolean).map((url,i) => (
-                <img key={i} src={url} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:16 }}/>
-              ))}
+              {/* Success images */}
+              {(c.successImages||[]).filter(Boolean).length > 0 && (
+                <div style={{ marginBottom:16 }}>
+                  {(c.successImages||[]).filter(Boolean).map((url,i) => (
+                    <img key={i} src={url} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12 }}/>
+                  ))}
+                </div>
+              )}
+              {/* Success text */}
               {c.successText && <p style={{ fontSize:14, color:"#374151", margin:"0 0 16px", lineHeight:1.65 }}>{c.successText}</p>}
               <div style={{ padding:"14px 18px", borderRadius:14, background:"#F0FDF4", border:"1.5px solid #BBF7D0", marginBottom:16 }}>
                 <p style={{ fontSize:15, fontWeight:700, color:"#166534", margin:0 }}>🎉 Correct!</p>
