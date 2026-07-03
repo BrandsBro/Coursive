@@ -37,6 +37,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
 
   const extractText = (blocks) => {
     if (!Array.isArray(blocks) || blocks.length === 0) return "";
+    blocks = blocks.filter((b, i) => i < visibleUntil && b.type !== "continueblock");
     return blocks.map(b => {
       const c = b.content || b;
       switch (b.type) {
