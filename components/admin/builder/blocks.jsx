@@ -14,6 +14,7 @@ export const BLOCK_DEFS = {
   keypoints:    { icon:"⭐", label:"Key Points",     desc:"Bullet list",            color:"#0d9488", bg:"#F0FDFA", default:{ title:"Key Takeaways", points:["","",""], titleStyle:{}, pointStyle:{} },                            preview:c=>(c.points||[]).filter(Boolean).join(", ")||"No points" },
   callout:      { icon:"💡", label:"Callout",        desc:"Highlight box",          color:"#65a30d", bg:"#F7FEE7", default:{ text:"", style:"info", textStyle:{} },                                                                preview:c=>c.text||"Empty callout" },
   divider:      { icon:"➖", label:"Divider",        desc:"Visual break",           color:"#64748b", bg:"#F8FAFC", default:{ style:"line" },                                                                                       preview:()=>"Section divider" },
+  multiplechoice: { icon:"🔘", label:"Multiple Choice", desc:"Radio style quiz with explanation", color:"#7c3aed", bg:"#F5F3FF", default:{ question:"", options:["","",""], correct:0, explanation:"", questionStyle:{}, optionStyle:{}, explanationStyle:{} }, preview:c=>c.question||"No question" },
   continueblock: { icon:"▶️", label:"Continue",       desc:"Stop point — hides content below", color:"#5B4EFF", bg:"#EEF2FF", default:{ label:"Continue" },                                                                    preview:()=>"── Continue button ──" },
   blankoptions: { icon:"🔤", label:"Blank + Options",desc:"Pick word from sentence",color:"#0891b2", bg:"#E0F2FE", default:{ sentence:"", markedWords:[], blanks:[], explanation:"", taskTitle:"", taskDesc:"", successText:"", successImages:[], sentenceStyle:{} },                         preview:c=>c.sentence||"No sentence" },
 };
@@ -31,6 +32,7 @@ export function BlockEditor({ block, onChange }) {
     case "fillblank":    return <FillE {...p}/>;
     case "keypoints":    return <KeyE {...p}/>;
     case "callout":      return <CalloutE {...p}/>;
+    case "multiplechoice": return <MultipleChoiceE {...p}/>;
     case "continueblock": return <ContinueE {...p}/>;
     case "blankoptions": return <BlankOptionsE {...p}/>;
     case "divider":      return <DividerE {...p}/>;
@@ -124,6 +126,22 @@ export function BlockPreview({ block }) {
       const [emoji,color,bg]=map[c.style||"info"];
       const ts=c.textStyle||{};
       return <div style={{ padding:"14px 18px", borderRadius:12, background:bg, borderLeft:`4px solid ${color}`, display:"flex", gap:12 }}><span style={{ fontSize:18, flexShrink:0 }}>{emoji}</span><p style={{ fontSize:ts.fontSize||14, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#374151", margin:0, lineHeight:1.65 }}>{c.text||"Callout text"}</p></div>;
+    }
+    case "multiplechoice": {
+      const qs = c.questionStyle||{};
+      return (
+        <div>
+          <p style={{ fontSize:qs.fontSize||15, fontWeight:"700", color:"#0f172a", margin:"0 0 12px", lineHeight:1.5 }}>{c.question||"Question..."}</p>
+          {(c.options||[]).filter(Boolean).map((o,i) => (
+            <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", borderRadius:10, border:`1.5px solid ${i===c.correct?"#22c55e":"#E2E8F0"}`, background:i===c.correct?"#F0FDF4":"#fff", marginBottom:6 }}>
+              <div style={{ width:18, height:18, borderRadius:"50%", border:`2px solid ${i===c.correct?"#22c55e":"#D1D5DB"}`, background:i===c.correct?"#22c55e":"#fff", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                {i===c.correct && <div style={{ width:8, height:8, borderRadius:"50%", background:"#fff" }}/>}
+              </div>
+              <span style={{ fontSize:13, color:"#374151" }}>{o}</span>
+            </div>
+          ))}
+        </div>
+      );
     }
     case "continueblock":
       return <div style={{ width:"100%", padding:"14px", borderRadius:14, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, textAlign:"center" }}>{c.label||"Continue"}</div>;
@@ -540,6 +558,47 @@ function BlankOptionsE({ content, onChange }) {
   );
 }
 
+
+function MultipleChoiceE({ content, onChange }) {
+  const opts = content.options||["","",""];
+  const setOpt = (i,v) => { const a=[...opts]; a[i]=v; onChange({ ...content, options:a }); };
+  const qs = content.questionStyle||{fontSize:16};
+  const os = content.optionStyle||{fontSize:14};
+  const es = content.explanationStyle||{fontSize:13};
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:14, paddingTop:12 }}>
+      <div>
+        <FC label="Question Style" style={qs} setStyle={v => onChange({ ...content, questionStyle:v })}/>
+        <textarea value={content.question||""} onChange={e => onChange({ ...content, question:e.target.value })}
+          placeholder="Your question..." style={{ ...inp(), minHeight:80, resize:"vertical", ...styled(qs) }}/>
+      </div>
+      <div>
+        <FC label="Options Style" style={os} setStyle={v => onChange({ ...content, optionStyle:v })}/>
+        <p style={{ fontSize:10, color:"#94A3B8", margin:"0 0 6px" }}>Click ✓ to mark correct answer</p>
+        <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+          {opts.map((o,i) => (
+            <div key={i} style={{ display:"flex", gap:8, alignItems:"center" }}>
+              <button onClick={() => onChange({ ...content, correct:i })}
+                style={{ width:28, height:28, borderRadius:"50%", border:`2px solid ${content.correct===i?"#22c55e":"#E2E8F0"}`, background:content.correct===i?"#22c55e":"#fff", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                {content.correct===i && <Check size={13} color="#fff"/>}
+              </button>
+              <input value={o} onChange={e => setOpt(i,e.target.value)} placeholder={`Option ${i+1}`}
+                style={{ ...inp(), flex:1, fontSize:os.fontSize||14, borderColor:content.correct===i?"#22c55e":"#E2E8F0" }}/>
+              {opts.length>2 && <button onClick={() => onChange({ ...content, options:opts.filter((_,x)=>x!==i), correct:Math.min(content.correct,opts.length-2) })} style={ctrlX()}>✕</button>}
+            </div>
+          ))}
+          {opts.length<6 && <button onClick={() => onChange({ ...content, options:[...opts,""] })} style={addX()}>+ Add option</button>}
+        </div>
+      </div>
+      <div>
+        <FC label="Explanation Style" style={es} setStyle={v => onChange({ ...content, explanationStyle:v })}/>
+        <p style={{ fontSize:11, color:"#94A3B8", margin:"0 0 4px" }}>Shown after answering</p>
+        <textarea value={content.explanation||""} onChange={e => onChange({ ...content, explanation:e.target.value })}
+          placeholder="Explain why this is correct..." style={{ ...inp(), minHeight:70, resize:"vertical", ...styled(es) }}/>
+      </div>
+    </div>
+  );
+}
 
 function ContinueE({ content, onChange }) {
   return (

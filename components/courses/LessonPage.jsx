@@ -787,6 +787,56 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       );
     }
 
+    // ── MULTIPLE CHOICE ──
+    case "multiplechoice": {
+      const sel = answers[idx];
+      const isChecked = checked[idx];
+      const isCorrect = sel === c.correct;
+      const qs = c.questionStyle||{};
+      const os = c.optionStyle||{};
+      const es = c.explanationStyle||{};
+      return (
+        <div style={{ padding:"20px 0" }}>
+          <p style={{ fontSize:qs.fontSize||16, fontWeight:"700", fontStyle:qs.italic?"italic":"normal", textAlign:qs.align||"left", color:"#0f172a", margin:"0 0 16px", lineHeight:1.5 }}>
+            {c.question}
+          </p>
+          <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
+            {(c.options||[]).map((opt,i) => {
+              const isSel = sel===i;
+              const isRight = i===c.correct;
+              let border="#E2E8F0", bg="#fff", radioColor="#D1D5DB";
+              if (isChecked) {
+                if (isRight) { border="#22c55e"; bg="#F0FDF4"; radioColor="#22c55e"; }
+                else if (isSel) { border="#ef4444"; bg="#FEF2F2"; radioColor="#ef4444"; }
+              } else if (isSel) { border="#7c3aed"; bg="#F5F3FF"; radioColor="#7c3aed"; }
+              return (
+                <button key={i} onClick={() => !isChecked && setAnswers(p=>({...p,[idx]:i}))}
+                  style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 16px", borderRadius:12, border:`1.5px solid ${border}`, background:bg, cursor:isChecked?"default":"pointer", textAlign:"left", transition:"all 0.15s" }}>
+                  <div style={{ width:20, height:20, borderRadius:"50%", border:`2px solid ${radioColor}`, background:isSel||isChecked&&isRight?radioColor:"#fff", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}>
+                    {(isSel || (isChecked && isRight)) && <div style={{ width:8, height:8, borderRadius:"50%", background:"#fff" }}/>}
+                  </div>
+                  <span style={{ fontSize:os.fontSize||14, color:"#374151", fontWeight:500, lineHeight:1.4 }}>{opt}</span>
+                </button>
+              );
+            })}
+          </div>
+          {!isChecked && sel!==undefined && (
+            <button onClick={() => setChecked(p=>({...p,[idx]:true}))}
+              style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>
+              Check
+            </button>
+          )}
+          {isChecked && (
+            <div style={{ padding:"16px 18px", borderRadius:14, background:isCorrect?"#F0FDF4":"#FEF2F2", border:`1.5px solid ${isCorrect?"#BBF7D0":"#FECACA"}` }}>
+              <p style={{ fontSize:14, fontWeight:700, color:isCorrect?"#166534":"#DC2626", margin:"0 0 6px" }}>
+                {isCorrect?"🎉 Exactly!":"❌ Not quite"}
+              </p>
+              {c.explanation && <p style={{ fontSize:es.fontSize||13, color:"#374151", margin:0, lineHeight:1.6 }}>{c.explanation}</p>}
+            </div>
+          )}
+        </div>
+      );
+    }
     // ── KEY POINTS ──
     case "keypoints": {
       const ts = c.titleStyle || {};
