@@ -46,13 +46,26 @@ export default function AdminCourses({ courses: initial }) {
   };
 
   const handleDelete = async (id) => {
-    await supabase.from("challenge_days").delete().eq("course_id", id);
-    await supabase.from("lessons").delete().eq("course_id", id);
-    await supabase.from("course_units").delete().eq("course_id", id);
-    const { error } = await supabase.from("courses").delete().eq("id", id);
-    if (error) { alert(error.message); return; }
-    setCourses(prev => prev.filter(c => c.id !== id));
-    setDeleteId(null);
+    try {
+      // Delete lesson content first
+      const { data: lessons } = await supabase.from("lessons").select("id").eq("course_id", id);
+      if (lessons?.length) {
+        for (const lesson of lessons) {
+          await supabase.from("lesson_content").delete().eq("lesson_id", lesson.id);
+        }
+      }
+      // Delete related data
+      await supabase.from("lessons").delete().eq("course_id", id);
+      await supabase.from("course_units").delete().eq("course_id", id);
+      await supabase.from("course_reviews").delete().eq("course_id", id);
+      // Delete course
+      const { error } = await supabase.from("courses").delete().eq("id", id);
+      if (error) { alert("Delete failed: " + error.message); return; }
+      setCourses(prev => prev.filter(c => c.id !== id));
+      setDeleteId(null);
+    } catch(e) {
+      alert("Error: " + e.message);
+    }
   };
 
   const previewGrad = `linear-gradient(135deg, ${form.gradient_from}, ${form.gradient_to})`;
