@@ -563,6 +563,34 @@ function BlankOptionsE({ content, onChange }) {
 }
 
 
+function ImageUploadField({ value, onChange, placeholder }) {
+  const [uploading, setUploading] = useState(false);
+  const upload = async (file) => {
+    if (!file) return;
+    setUploading(true);
+    const { supabase } = await import("@/lib/supabase");
+    const path = `blocks/${Date.now()}-${file.name}`;
+    const { error } = await supabase.storage.from("lesson-media").upload(path, file, { upsert:true });
+    if (!error) {
+      const { data } = supabase.storage.from("lesson-media").getPublicUrl(path);
+      onChange(data.publicUrl);
+    }
+    setUploading(false);
+  };
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+      <div style={{ display:"flex", gap:6 }}>
+        <input value={value||""} onChange={e => onChange(e.target.value)} placeholder={placeholder||"https://..."} style={{ ...inp(), flex:1, fontSize:12 }}/>
+        <label style={{ display:"flex", alignItems:"center", gap:4, padding:"6px 12px", borderRadius:8, border:"1.5px dashed #C7D2FE", background:"#EEF2FF", color:"#5B4EFF", fontSize:12, fontWeight:700, cursor:"pointer", flexShrink:0, whiteSpace:"nowrap" }}>
+          {uploading ? "⏳" : "⬆ Upload"}
+          <input type="file" accept="image/*" style={{ display:"none" }} onChange={e => upload(e.target.files[0])}/>
+        </label>
+      </div>
+      {value && <img src={value} alt="" style={{ width:"100%", borderRadius:8, maxHeight:100, objectFit:"cover" }}/>}
+    </div>
+  );
+}
+
 function MultipleChoiceE({ content, onChange }) {
   const opts = content.options||["","",""];
   const optImgs = content.optionImages||opts.map(()=>"");
@@ -597,8 +625,7 @@ function MultipleChoiceE({ content, onChange }) {
       {/* Header image */}
       <div>
         <p style={lbl()}>Header Image <span style={{ color:"#94A3B8", fontWeight:400 }}>· optional</span></p>
-        <input value={content.headerImage||""} onChange={e => onChange({ ...content, headerImage:e.target.value })} placeholder="https://... image URL" style={inp()}/>
-        {content.headerImage && <img src={content.headerImage} alt="" style={{ width:"100%", borderRadius:10, marginTop:6, maxHeight:120, objectFit:"cover" }}/>}
+        <ImageUploadField value={content.headerImage||""} onChange={v => onChange({ ...content, headerImage:v })} placeholder="Header image URL"/>
       </div>
 
       {/* Question */}
@@ -628,10 +655,7 @@ function MultipleChoiceE({ content, onChange }) {
                 {opts.length>2 && <button onClick={() => onChange({ ...content, options:opts.filter((_,x)=>x!==i), optionImages:optImgs.filter((_,x)=>x!==i), correct:correct.filter(x=>x!==i).map(x=>x>i?x-1:x) })} style={ctrlX()}>✕</button>}
               </div>
               {/* Option image */}
-              <div style={{ display:"flex", gap:6, alignItems:"center" }}>
-                <input value={optImgs[i]||""} onChange={e => setOptImg(i,e.target.value)} placeholder="Image URL for this option (optional)" style={{ ...inp(), fontSize:11 }}/>
-                {optImgs[i] && <img src={optImgs[i]} alt="" style={{ width:44, height:44, borderRadius:6, objectFit:"cover", flexShrink:0 }}/>}
-              </div>
+              <ImageUploadField value={optImgs[i]||""} onChange={v => setOptImg(i,v)} placeholder="Image for this option (optional)"/>
             </div>
           ))}
           {opts.length<6 && <button onClick={() => onChange({ ...content, options:[...opts,""], optionImages:[...optImgs,""] })} style={addX()}>+ Add option</button>}
@@ -648,8 +672,7 @@ function MultipleChoiceE({ content, onChange }) {
       {/* Success image */}
       <div>
         <p style={lbl()}>Success Image <span style={{ color:"#94A3B8", fontWeight:400 }}>· shown after correct answer</span></p>
-        <input value={content.successImage||""} onChange={e => onChange({ ...content, successImage:e.target.value })} placeholder="https://... image URL" style={inp()}/>
-        {content.successImage && <img src={content.successImage} alt="" style={{ width:"100%", borderRadius:10, marginTop:6, maxHeight:120, objectFit:"cover" }}/>}
+        <ImageUploadField value={content.successImage||""} onChange={v => onChange({ ...content, successImage:v })} placeholder="Success image URL"/>
       </div>
 
       {/* Success text */}
