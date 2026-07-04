@@ -565,6 +565,8 @@ function BlankOptionsE({ content, onChange }) {
 
 function ImageUploadField({ value, onChange, placeholder }) {
   const [uploading, setUploading] = useState(false);
+  const [showLib, setShowLib] = useState(false);
+
   const upload = async (file) => {
     if (!file) return;
     setUploading(true);
@@ -577,16 +579,22 @@ function ImageUploadField({ value, onChange, placeholder }) {
     }
     setUploading(false);
   };
+
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
       <div style={{ display:"flex", gap:6 }}>
         <input value={value||""} onChange={e => onChange(e.target.value)} placeholder={placeholder||"https://..."} style={{ ...inp(), flex:1, fontSize:12 }}/>
-        <label style={{ display:"flex", alignItems:"center", gap:4, padding:"6px 12px", borderRadius:8, border:"1.5px dashed #C7D2FE", background:"#EEF2FF", color:"#5B4EFF", fontSize:12, fontWeight:700, cursor:"pointer", flexShrink:0, whiteSpace:"nowrap" }}>
-          {uploading ? "⏳" : "⬆ Upload"}
+        <label style={{ display:"flex", alignItems:"center", gap:4, padding:"6px 10px", borderRadius:8, border:"1.5px dashed #C7D2FE", background:"#EEF2FF", color:"#5B4EFF", fontSize:12, fontWeight:700, cursor:"pointer", flexShrink:0, whiteSpace:"nowrap" }}>
+          {uploading ? "⏳" : "⬆"}
           <input type="file" accept="image/*" style={{ display:"none" }} onChange={e => upload(e.target.files[0])}/>
         </label>
+        <button onClick={() => setShowLib(true)} style={{ padding:"6px 10px", borderRadius:8, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:12, fontWeight:700, color:"#374151", cursor:"pointer", flexShrink:0 }}>
+          🗂 Library
+        </button>
+        {value && <button onClick={() => onChange("")} style={{ padding:"6px 8px", borderRadius:8, border:"1.5px solid #FEE2E2", background:"#fff", color:"#ef4444", fontSize:12, cursor:"pointer", flexShrink:0 }}>✕</button>}
       </div>
       {value && <img src={value} alt="" style={{ width:"100%", borderRadius:8, maxHeight:100, objectFit:"cover" }}/>}
+      {showLib && <MediaLibrary accept="image" onSelect={m => { onChange(m.url); setShowLib(false); }} onClose={() => setShowLib(false)}/>}
     </div>
   );
 }
