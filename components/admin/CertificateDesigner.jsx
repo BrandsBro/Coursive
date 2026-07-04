@@ -80,21 +80,25 @@ export default function CertificateDesigner() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [certType, setCertType] = useState("course"); // course or challenge
   const [tab, setTab] = useState("background");
   const certRef = useRef();
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [certType]);
 
   const load = async () => {
     setLoading(true);
-    const { data } = await supabase.from("settings").select("*").eq("key", "certificate_design").single();
+    const key = certType === "course" ? "certificate_design" : "certificate_design_challenge";
+    const { data } = await supabase.from("settings").select("*").eq("key", key).single();
     if (data?.value) setDesign({ ...DEFAULT_DESIGN, ...data.value });
+    else setDesign(DEFAULT_DESIGN);
     setLoading(false);
   };
 
   const save = async () => {
     setSaving(true);
-    await supabase.from("settings").upsert({ key: "certificate_design", value: design });
+    const key = certType === "course" ? "certificate_design" : "certificate_design_challenge";
+    await supabase.from("settings").upsert({ key, value: design });
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
     setSaving(false);
@@ -123,9 +127,18 @@ export default function CertificateDesigner() {
       <div style={{ display:"flex", flexDirection:"column", gap:0, height:"calc(100vh - 64px)" }}>
         {/* Top bar */}
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"14px 24px", borderBottom:"1px solid #E2E8F0", background:"#fff", flexShrink:0 }}>
-          <div>
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
             <h1 style={{ fontSize:18, fontWeight:900, color:"#0f172a", margin:0 }}>Certificate Designer</h1>
-            <p style={{ fontSize:12, color:"#94A3B8", margin:0 }}>Design the certificate students receive on completion</p>
+            <div style={{ display:"flex", background:"#F1F5F9", borderRadius:10, padding:3, gap:2 }}>
+              <button onClick={() => setCertType("course")}
+                style={{ padding:"6px 16px", borderRadius:8, border:"none", background:certType==="course"?"#fff":"transparent", fontWeight:700, fontSize:12, color:certType==="course"?"#0f172a":"#94A3B8", cursor:"pointer" }}>
+                📚 Course
+              </button>
+              <button onClick={() => setCertType("challenge")}
+                style={{ padding:"6px 16px", borderRadius:8, border:"none", background:certType==="challenge"?"#fff":"transparent", fontWeight:700, fontSize:12, color:certType==="challenge"?"#0f172a":"#94A3B8", cursor:"pointer" }}>
+                🏆 Challenge
+              </button>
+            </div>
           </div>
           <div style={{ display:"flex", gap:10 }}>
             <button onClick={handleDownloadPreview} style={{ display:"flex", alignItems:"center", gap:6, padding:"9px 16px", borderRadius:10, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:13, fontWeight:600, cursor:"pointer" }}>
@@ -265,7 +278,7 @@ export default function CertificateDesigner() {
           {/* Right preview */}
           <div style={{ overflow:"auto", background:"#E2E8F0", display:"flex", alignItems:"center", justifyContent:"center", padding:32 }}>
             <div style={{ width:"100%", maxWidth:800 }}>
-              <p style={{ fontSize:12, color:"#64748B", textAlign:"center", marginBottom:12, fontWeight:600 }}>PREVIEW — Sample Certificate</p>
+              <p style={{ fontSize:12, color:"#64748B", textAlign:"center", marginBottom:12, fontWeight:600 }}>PREVIEW — {certType === "course" ? "Course" : "Challenge"} Certificate</p>
               <div ref={certRef}>
                 <CertificatePreview design={design} name={SAMPLE.name} course={SAMPLE.course} date={SAMPLE.date}/>
               </div>

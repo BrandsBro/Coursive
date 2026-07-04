@@ -18,15 +18,16 @@ const DEFAULT_DESIGN = {
   showDividers:true, dividerColor:"#7c3aed", showSeal:true, sealEmoji:"🏆",
 };
 
-export default function CertificateGenerator({ course, userName, completedDate, onClose }) {
+export default function CertificateGenerator({ course, userName, completedDate, onClose, type="course" }) {
   const [design, setDesign] = useState(DEFAULT_DESIGN);
   const [downloading, setDownloading] = useState(false);
   const certRef = useRef();
 
   useEffect(() => {
-    supabase.from("settings").select("*").eq("key","certificate_design").single()
+    const key = type === "challenge" ? "certificate_design_challenge" : "certificate_design";
+    supabase.from("settings").select("*").eq("key", key).single()
       .then(({ data }) => { if (data?.value) setDesign({ ...DEFAULT_DESIGN, ...data.value }); });
-  }, []);
+  }, [type]);
 
   const date = completedDate
     ? new Date(completedDate).toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"})
