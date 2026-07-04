@@ -28,8 +28,6 @@ export function BlockEditor({ block, onChange }) {
     case "image":        return <ImageE {...p}/>;
     case "video":        return <VideoE {...p}/>;
     case "audio":        return <AudioE {...p}/>;
-    case "quiz":         return <QuizE {...p}/>;
-    case "fillblank":    return <FillE {...p}/>;
     case "keypoints":    return <KeyE {...p}/>;
     case "callout":      return <CalloutE {...p}/>;
     case "multiplechoice": return <MultipleChoiceE {...p}/>;
@@ -79,31 +77,6 @@ export function BlockPreview({ block }) {
             </div>
           </div>
           <audio src={c.src} controls style={{ width:"100%", height:38 }}/>
-        </div>
-      );
-    }
-    case "quiz": {
-      const qs=c.questionStyle||{}; const os=c.optionStyle||{};
-      return (
-        <div>
-          <p style={{ fontSize:qs.fontSize||16, fontWeight:qs.bold?"700":"700", fontStyle:qs.italic?"italic":"normal", textAlign:qs.align||"left", color:"#0f172a", margin:"0 0 12px", lineHeight:1.4 }}>{c.question||"Question..."}</p>
-          {(c.options||[]).filter(Boolean).map((o,i) => (
-            <div key={i} style={{ padding:"10px 14px", borderRadius:10, border:`1.5px solid ${i===c.correct?"#86efac":"#E2E8F0"}`, background:i===c.correct?"#F0FDF4":"#fff", marginBottom:6, fontSize:os.fontSize||14, textAlign:os.align||"left", color:"#374151", display:"flex", alignItems:"center", gap:8 }}>
-              {i===c.correct && <Check size={14} color="#22c55e"/>}
-              <span style={{ fontWeight:600 }}>{String.fromCharCode(65+i)}.</span> {o}
-            </div>
-          ))}
-        </div>
-      );
-    }
-    case "fillblank": {
-      const ps=c.promptStyle||{}; const hs=c.hintStyle||{};
-      return (
-        <div>
-          <p style={{ fontSize:ps.fontSize||16, fontWeight:ps.bold?"700":"400", fontStyle:ps.italic?"italic":"normal", textAlign:ps.align||"left", color:"#0f172a", lineHeight:1.6, margin:"0 0 8px" }}>
-            {(c.prompt||"Prompt with ___").split("___").map((part,i,arr) => <span key={i}>{part}{i<arr.length-1 && <span style={{ display:"inline-block", minWidth:60, borderBottom:"2px solid #6366f1", margin:"0 4px" }}/>}</span>)}
-          </p>
-          {c.hint && <p style={{ fontSize:hs.fontSize||13, fontStyle:hs.italic?"italic":"italic", color:"#64748B", margin:0 }}>💡 {c.hint}</p>}
         </div>
       );
     }
