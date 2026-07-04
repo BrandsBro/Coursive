@@ -5,6 +5,28 @@ import { Save, Check, Loader } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const DEFAULT_PRICING = {
+  // Design
+  bgColor: "#0a081e",
+  bgGradientFrom: "#0a081e",
+  bgGradientTo: "#1e1b4b",
+  cardBg: "rgba(255,255,255,0.05)",
+  cardBorder: "rgba(255,255,255,0.12)",
+  cardSelectedBg: "rgba(91,78,255,0.2)",
+  cardSelectedBorder: "#5B4EFF",
+  popularBadgeBg: "#5B4EFF",
+  popularBadgeColor: "#ffffff",
+  buttonBg: "linear-gradient(135deg,#5B4EFF,#8B5CF6)",
+  buttonColor: "#ffffff",
+  buttonText: "Get My Plan →",
+  headingColor: "#ffffff",
+  priceColor: "#ffffff",
+  descColor: "rgba(255,255,255,0.5)",
+  discountBadgeBg: "#22c55e",
+  discountBadgeColor: "#ffffff",
+  legalTextColor: "rgba(255,255,255,0.4)",
+  toggleBg: "rgba(255,255,255,0.08)",
+  toggleActiveBg: "#fff",
+  toggleActiveColor: "#0f172a",
   plans: [
     {
       id: "weekly",
@@ -101,7 +123,7 @@ export default function PricingManager() {
 
         {/* Tabs */}
         <div style={{ display:"flex", background:"#F1F5F9", borderRadius:12, padding:4, gap:2 }}>
-          {[["plans","💳 Plans"],["trial","🎯 Trial"],["legal","📋 Legal Text"],["preview","👁 Preview"]].map(([v,l]) => (
+          {[["plans","💳 Plans"],["design","🎨 Design"],["trial","🎯 Trial"],["legal","📋 Legal Text"],["preview","👁 Preview"]].map(([v,l]) => (
             <button key={v} onClick={() => setActiveTab(v)}
               style={{ flex:1, padding:"10px", borderRadius:9, border:"none", background:activeTab===v?"#fff":"transparent", fontWeight:700, fontSize:13, color:activeTab===v?"#0f172a":"#94A3B8", cursor:"pointer" }}>
               {l}
@@ -193,6 +215,58 @@ export default function PricingManager() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Design Tab */}
+        {activeTab === "design" && (
+          <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+            <div style={{ background:"#fff", borderRadius:20, border:"1.5px solid #F1F5F9", padding:24 }}>
+              <h3 style={{ fontSize:15, fontWeight:800, color:"#0f172a", margin:"0 0 16px" }}>Background</h3>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+                <ColorField label="Gradient From" value={pricing.bgGradientFrom} onChange={v=>u("bgGradientFrom",v)}/>
+                <ColorField label="Gradient To" value={pricing.bgGradientTo} onChange={v=>u("bgGradientTo",v)}/>
+              </div>
+            </div>
+            <div style={{ background:"#fff", borderRadius:20, border:"1.5px solid #F1F5F9", padding:24 }}>
+              <h3 style={{ fontSize:15, fontWeight:800, color:"#0f172a", margin:"0 0 16px" }}>Cards</h3>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+                <ColorField label="Card Background" value={pricing.cardBg} onChange={v=>u("cardBg",v)}/>
+                <ColorField label="Card Border" value={pricing.cardBorder} onChange={v=>u("cardBorder",v)}/>
+                <ColorField label="Selected Card BG" value={pricing.cardSelectedBg} onChange={v=>u("cardSelectedBg",v)}/>
+                <ColorField label="Selected Border" value={pricing.cardSelectedBorder} onChange={v=>u("cardSelectedBorder",v)}/>
+              </div>
+            </div>
+            <div style={{ background:"#fff", borderRadius:20, border:"1.5px solid #F1F5F9", padding:24 }}>
+              <h3 style={{ fontSize:15, fontWeight:800, color:"#0f172a", margin:"0 0 16px" }}>Text Colors</h3>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+                <ColorField label="Heading Color" value={pricing.headingColor} onChange={v=>u("headingColor",v)}/>
+                <ColorField label="Price Color" value={pricing.priceColor} onChange={v=>u("priceColor",v)}/>
+                <ColorField label="Description Color" value={pricing.descColor} onChange={v=>u("descColor",v)}/>
+                <ColorField label="Legal Text Color" value={pricing.legalTextColor} onChange={v=>u("legalTextColor",v)}/>
+              </div>
+            </div>
+            <div style={{ background:"#fff", borderRadius:20, border:"1.5px solid #F1F5F9", padding:24 }}>
+              <h3 style={{ fontSize:15, fontWeight:800, color:"#0f172a", margin:"0 0 16px" }}>Button</h3>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+                <div>
+                  <label style={lbl()}>Button Text</label>
+                  <input value={pricing.buttonText||"Get My Plan →"} onChange={e=>u("buttonText",e.target.value)} style={inp()}/>
+                </div>
+                <ColorField label="Button Text Color" value={pricing.buttonColor} onChange={v=>u("buttonColor",v)}/>
+                <ColorField label="Button BG From" value={pricing.buttonBgFrom||"#5B4EFF"} onChange={v=>u("buttonBgFrom",v)}/>
+                <ColorField label="Button BG To" value={pricing.buttonBgTo||"#8B5CF6"} onChange={v=>u("buttonBgTo",v)}/>
+              </div>
+            </div>
+            <div style={{ background:"#fff", borderRadius:20, border:"1.5px solid #F1F5F9", padding:24 }}>
+              <h3 style={{ fontSize:15, fontWeight:800, color:"#0f172a", margin:"0 0 16px" }}>Badges</h3>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+                <ColorField label="Popular Badge BG" value={pricing.popularBadgeBg} onChange={v=>u("popularBadgeBg",v)}/>
+                <ColorField label="Popular Badge Text" value={pricing.popularBadgeColor} onChange={v=>u("popularBadgeColor",v)}/>
+                <ColorField label="Discount Badge BG" value={pricing.discountBadgeBg} onChange={v=>u("discountBadgeBg",v)}/>
+                <ColorField label="Discount Badge Text" value={pricing.discountBadgeColor} onChange={v=>u("discountBadgeColor",v)}/>
+              </div>
+            </div>
           </div>
         )}
 
@@ -299,6 +373,18 @@ export default function PricingManager() {
       </div>
       <style>{`.bspin{animation:bspin 0.7s linear infinite}@keyframes bspin{to{transform:rotate(360deg)}}`}</style>
     </AdminLayout>
+  );
+}
+
+function ColorField({ label, value, onChange }) {
+  return (
+    <div>
+      <label style={lbl()}>{label}</label>
+      <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+        <input type="color" value={(value||"#000000").startsWith("#")?(value||"#000000"):"#000000"} onChange={e=>onChange(e.target.value)} style={{ width:36, height:36, borderRadius:8, border:"1.5px solid #E2E8F0", cursor:"pointer", padding:2 }}/>
+        <input value={value||""} onChange={e=>onChange(e.target.value)} style={{ ...inp(), fontSize:12 }}/>
+      </div>
+    </div>
   );
 }
 

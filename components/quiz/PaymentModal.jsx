@@ -1,4 +1,6 @@
 "use client";
+import { supabase } from "@/lib/supabase";
+import { useEffect, useState } from "react";
 import { useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from "@stripe/react-stripe-js";
@@ -11,6 +13,8 @@ const CARD_STYLE = {
   },
 };
 
+// Plans loaded dynamically from admin pricing settings
+// Fallback hardcoded prices
 const PLANS = {
   "1-Week Plan":  { price:"$6.93",  recurringPrice:"$5.99",  label:"1-Week AI Program",  weeks:1  },
   "4-Week Plan":  { price:"$19.99", recurringPrice:"$16.99", label:"4-Week AI Program",  weeks:4  },
@@ -136,6 +140,28 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose }) {
 }
 
 export default function PaymentModal({ plan, paymentType, email, name, onClose, onSuccess }) {
+  const [pricingSettings, setPricingSettings] = useState(null);
+
+  useEffect(() => {
+    supabase.from("settings").select("value").eq("key","pricing").single()
+      .then(({ data }) => { if (data?.value) setPricingSettings(data.value); });
+  }, []);
+
+  // Build dynamic PLANS from settings
+  const dynamicPlans = pricingSettings?.plans ? Object.fromEntries(
+    pricingSettings.plans.filter(p=>p.active).map(p => [
+      p.name,
+      {
+        price: `${pricingSettings.currencySymbol||"$"}${p.introPrice}`,
+        recurringPrice: `${pricingSettings.currencySymbol||"$"}${(parseFloat(p.introPrice)*(1-(pricingSettings.autoRenewDiscount||15)/100)).toFixed(2)}`,
+        label: p.name,
+        weeks: Math.round(p.duration/7),
+      }
+    ])
+  ) : null;
+
+  const activePlans = dynamicPlans || PLANS;
+  const design = pricingSettings || {};
   return (
     <div style={{ position:"fixed", inset:0, zIndex:200, background:"rgba(15,23,42,0.6)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
       <div style={{ background:"#fff", borderRadius:24, padding:"28px 24px", width:"100%", maxWidth:440, boxShadow:"0 32px 80px rgba(0,0,0,0.3)", position:"relative", maxHeight:"90vh", overflowY:"auto" }}>
