@@ -25,6 +25,7 @@ export default function EmailTemplateEditor({ templateId }) {
   const [sending, setSending] = useState(false);
   const [sentOk, setSentOk] = useState(false);
   const [testEmail, setTestEmail] = useState("");
+  const [uploading, setUploading] = useState(false);
   const [tab, setTab] = useState("content");
 
   useEffect(() => { load(); }, [templateId]);
@@ -162,15 +163,33 @@ export default function EmailTemplateEditor({ templateId }) {
                 <>
                   <Section label="Logo Image">
                     <div style={{ marginBottom:8 }}>
-                      <p style={lbl()}>Logo Image URL</p>
-                      <input value={c.logoUrl||""} onChange={e=>uc("logoUrl",e.target.value)} placeholder="https://... (leave empty to use text)" style={inp()}/>
-                      <p style={{ fontSize:11, color:"#94A3B8", margin:"4px 0 0" }}>Upload your logo to Supabase storage or use a direct URL</p>
+                      <p style={lbl()}>Upload Logo</p>
+                      <label style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"12px", borderRadius:12, border:"1.5px dashed #C7D2FE", background:"#EEF2FF", color:"#5B4EFF", fontSize:13, fontWeight:700, cursor:"pointer", marginBottom:8 }}>
+                        {uploading ? "⏳ Uploading..." : "⬆ Upload Image"}
+                        <input type="file" accept="image/*" style={{ display:"none" }} onChange={async e => {
+                          const file = e.target.files[0];
+                          if (!file) return;
+                          setUploading(true);
+                          const path = `email-logos/${Date.now()}-${file.name}`;
+                          const { error } = await supabase.storage.from("lesson-media").upload(path, file, { upsert:true });
+                          if (!error) {
+                            const { data: urlData } = supabase.storage.from("lesson-media").getPublicUrl(path);
+                            uc("logoUrl", urlData.publicUrl);
+                          }
+                          setUploading(false);
+                        }}/>
+                      </label>
+                    </div>
+                    <div style={{ marginBottom:8 }}>
+                      <p style={lbl()}>Or paste URL</p>
+                      <input value={c.logoUrl||""} onChange={e=>uc("logoUrl",e.target.value)} placeholder="https://..." style={inp()}/>
                     </div>
                     {c.logoUrl && (
                       <div style={{ padding:12, background:"#1a1830", borderRadius:10, textAlign:"center", marginBottom:8 }}>
                         <img src={c.logoUrl} alt="Logo preview" style={{ maxHeight:48, maxWidth:"100%", objectFit:"contain" }}/>
                       </div>
                     )}
+                    {c.logoUrl && <button onClick={()=>uc("logoUrl","")} style={{ width:"100%", padding:"6px", borderRadius:8, border:"1.5px solid #FEE2E2", background:"#fff", color:"#ef4444", fontSize:12, cursor:"pointer" }}>Remove Logo</button>}
                     <FontSizeRow label="Logo Height (px)" value={c.logoHeight||40} onChange={v=>uc("logoHeight",v)}/>
                     <AlignRow label="Logo Align" value={c.logoAlign||"center"} onChange={v=>uc("logoAlign",v)}/>
                   </Section>
