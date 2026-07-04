@@ -142,6 +142,10 @@ export default function AdminChallengeDetail({ challenge: initial, courses }) {
               </div>
               <div>
                 <label style={lbl()}>Emoji</label>
+                <div style={{ display:"flex", gap:8, alignItems:"center", marginBottom:8 }}>
+                  <input value={dayForm.emoji||""} onChange={e=>setDayForm(p=>({...p,emoji:e.target.value}))} placeholder="Type any emoji..." style={{ ...iSt(), width:120, fontSize:20, textAlign:"center" }}/>
+                  <span style={{ fontSize:12, color:"#94A3B8" }}>or pick:</span>
+                </div>
                 <div style={{ display:"flex",gap:6,flexWrap:"wrap" }}>
                   {EMOJIS.map(e=>(
                     <button key={e} onClick={()=>setDayForm(p=>({...p,emoji:e}))} style={{ width:36,height:36,borderRadius:8,border:dayForm.emoji===e?"2.5px solid #6366f1":"1.5px solid #E2E8F0",background:dayForm.emoji===e?"#EEF2FF":"#fff",fontSize:18,cursor:"pointer" }}>{e}</button>
