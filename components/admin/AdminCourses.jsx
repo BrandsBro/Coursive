@@ -46,6 +46,7 @@ export default function AdminCourses({ courses: initial }) {
   };
 
   const handleDelete = async (id) => {
+    console.log("Deleting course ID:", id);
     try {
       const res = await fetch("/api/admin/delete-course", {
         method:"POST",
