@@ -43,7 +43,7 @@ export async function POST(req) {
 
     // Send welcome email
     await resend.emails.send({
-      from: "1Course <noreply@kingbrandsbro.pro>",
+      from: "onboarding@resend.dev",
       to: email,
       subject: "🎉 Welcome to 1Course! Your login details inside",
       html: `

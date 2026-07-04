@@ -92,7 +92,7 @@ export async function POST(req) {
     const isExistingUser = !!existingProfile;
     const emailSubject = isExistingUser ? "🎉 Your 1Course access has been renewed!" : "🎉 Welcome to 1Course! Your login details inside";
     const { error: emailError } = await resend.emails.send({
-      from: "1Course <noreply@kingbrandsbro.pro>",
+      from: "onboarding@resend.dev",
       to: email,
       subject: emailSubject,
       html: `

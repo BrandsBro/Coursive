@@ -49,7 +49,7 @@ export async function POST(req) {
 
     // Send branded email via Resend
     await resend.emails.send({
-      from: "1Course <noreply@kingbrandsbro.pro>",
+      from: "onboarding@resend.dev",
       to: email,
       subject: "🔑 Reset your 1Course password",
       html: `
