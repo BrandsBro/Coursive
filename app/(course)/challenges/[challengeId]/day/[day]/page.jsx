@@ -1,10 +1,10 @@
+export const dynamic = "force-dynamic";
 import LessonPage from "@/components/courses/LessonPage";
 import ChallengeReviews from "@/components/challenges/ChallengeReviews";
 import { getChallengeById } from "@/lib/db";
 import { getLessonContentFromDB } from "@/lib/getlessonContent";
 import { notFound } from "next/navigation";
 
-export const revalidate = 0;
 
 export default async function ChallengeDayPage({ params, searchParams }) {
   const { challengeId, day } = await params;

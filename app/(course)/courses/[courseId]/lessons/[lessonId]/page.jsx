@@ -1,10 +1,10 @@
+export const dynamic = "force-dynamic";
 import LessonPage from "@/components/courses/LessonPage";
 import { getCourseById } from "@/lib/db";
 import { getLessonContent } from "@/data/lessonContent";
 import { getLessonContentFromDB } from "@/lib/getlessonContent";
 import { notFound } from "next/navigation";
 
-export const revalidate = 0;
 
 export default async function LessonDetailPage({ params, searchParams }) {
   const { courseId, lessonId } = await params;

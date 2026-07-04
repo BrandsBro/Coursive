@@ -1,8 +1,8 @@
+export const dynamic = "force-dynamic";
 import { getChallengeById } from "@/lib/db";
 import ChallengePage from "@/components/challenges/ChallengePage";
 import { notFound } from "next/navigation";
 
-export const revalidate = 60;
 
 export default async function ChallengeDetailPage({ params }) {
   const { challengeId } = await params;
