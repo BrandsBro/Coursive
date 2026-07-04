@@ -7,9 +7,12 @@ import { useProgress } from "@/hooks/useProgress";
 import { useStreak } from "@/hooks/useStreak";
 import { useNotifications } from "@/hooks/useNotifications";
 import CertificateGenerator from "@/components/courses/CertificateGenerator";
+import { useAuth } from "@/lib/AuthContext";
 
 export default function LessonPage({ course, lesson, content, mode, challengeId, challengeDay }) {
   const router = useRouter();
+  const { user } = useAuth();
+  const userName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Student";
   const { markLessonComplete, getCompletedLessons, markChallengeDay } = useProgress();
   const { updateStreak } = useStreak();
   const { send: sendNotification } = useNotifications();
@@ -270,7 +273,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
           </div>
         </div>
       )}
-      {showCert && <CertificateGenerator course={course} userName="" completedDate={new Date().toISOString()} onClose={() => setShowCert(false)}/>}
+      {showCert && <CertificateGenerator course={course} userName={userName} completedDate={new Date().toISOString()} onClose={() => setShowCert(false)}/>}
     </div>
   );
 }
