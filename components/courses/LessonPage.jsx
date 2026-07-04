@@ -975,6 +975,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
             </button>
           )}
           {isChecked && (
+            <div>
             {isCorrect && c.successImage && (
               <img src={c.successImage} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12, objectFit:"cover" }}/>
             )}
@@ -986,6 +987,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
                 {isCorrect?"🎉 Correct!":"❌ Not quite"}
               </p>
               {c.explanation && <p style={{ fontSize:es.fontSize||13, color:"#374151", margin:0, lineHeight:1.6 }}>{c.explanation}</p>}
+            </div>
             </div>
           )}
         </div>
