@@ -181,6 +181,9 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
                   onClick={() => {
                     const nextStop = safeContent.findIndex((b, i) => i > idx && b.type === "continueblock");
                     setVisibleUntil(nextStop === -1 ? Infinity : nextStop);
+                    setTimeout(() => {
+                      window.scrollTo({ top: window.scrollY + 100, behavior: "smooth" });
+                    }, 50);
                   }}
                   style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(91,78,255,0.3)" }}>
                   {(block.content||{}).label||"Continue"} →
