@@ -935,7 +935,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
             </p>
           )}
           {c.headerImage && (
-            <img src={c.headerImage} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:16, objectFit:"cover", maxHeight:240 }}/>
+            <img src={c.headerImage} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:16, objectFit:"contain" }}/>
           )}
           {multiMode && !isChecked && (
             <div style={{ display:"inline-block", padding:"4px 12px", borderRadius:999, background:"#EEF2FF", color:"#6366f1", fontSize:12, fontWeight:700, marginBottom:12 }}>
@@ -979,7 +979,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
           {isChecked && (
             <div>
             {isCorrect && c.successImage && (
-              <img src={c.successImage} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12, objectFit:"cover" }}/>
+              <img src={c.successImage} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12, objectFit:"contain" }}/>
             )}
             {isCorrect && c.successText && (
               <p style={{ fontSize:14, color:"#374151", margin:"0 0 12px", lineHeight:1.65 }}>{c.successText}</p>

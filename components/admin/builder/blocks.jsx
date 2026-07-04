@@ -108,7 +108,7 @@ export function BlockPreview({ block }) {
         <div>
           {c.heading && <p style={{ fontSize:hs2.fontSize||20, fontWeight:"800", color:"#0f172a", margin:"0 0 4px" }}>{c.heading}</p>}
           {c.subheading && <p style={{ fontSize:ss2.fontSize||14, color:"#64748B", margin:"0 0 8px" }}>{c.subheading}</p>}
-          {c.headerImage && <img src={c.headerImage} alt="" style={{ width:"100%", borderRadius:10, marginBottom:10, maxHeight:100, objectFit:"cover" }}/>}
+          {c.headerImage && <img src={c.headerImage} alt="" style={{ width:"100%", borderRadius:10, marginBottom:10, objectFit:"contain" }}/>}
           <p style={{ fontSize:qs.fontSize||15, fontWeight:"700", color:"#0f172a", margin:"0 0 10px" }}>{c.question||"Question..."}</p>
           {(c.options||[]).filter(Boolean).map((o,i) => (
             <div key={i} style={{ borderRadius:10, border:`1.5px solid ${correctArr.includes(i)?"#22c55e":"#E2E8F0"}`, background:correctArr.includes(i)?"#F0FDF4":"#fff", marginBottom:6, overflow:"hidden" }}>
