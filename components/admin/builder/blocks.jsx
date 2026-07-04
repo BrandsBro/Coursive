@@ -116,6 +116,27 @@ export function BlockPreview({ block }) {
         </div>
       );
     }
+    case "multiplechoice": {
+      const qs=c.questionStyle||{}; const hs2=c.headingStyle||{}; const ss2=c.subheadingStyle||{};
+      const correctArr = Array.isArray(c.correct)?c.correct:c.correct!==undefined?[c.correct]:[];
+      return (
+        <div>
+          {c.heading && <p style={{ fontSize:hs2.fontSize||20, fontWeight:"800", color:"#0f172a", margin:"0 0 4px" }}>{c.heading}</p>}
+          {c.subheading && <p style={{ fontSize:ss2.fontSize||14, color:"#64748B", margin:"0 0 8px" }}>{c.subheading}</p>}
+          {c.headerImage && <img src={c.headerImage} alt="" style={{ width:"100%", borderRadius:10, marginBottom:10, maxHeight:100, objectFit:"cover" }}/>}
+          <p style={{ fontSize:qs.fontSize||15, fontWeight:"700", color:"#0f172a", margin:"0 0 10px" }}>{c.question||"Question..."}</p>
+          {(c.options||[]).filter(Boolean).map((o,i) => (
+            <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 12px", borderRadius:10, border:`1.5px solid ${correctArr.includes(i)?"#22c55e":"#E2E8F0"}`, background:correctArr.includes(i)?"#F0FDF4":"#fff", marginBottom:6 }}>
+              <div style={{ width:18, height:18, borderRadius:4, border:`2px solid ${correctArr.includes(i)?"#22c55e":"#D1D5DB"}`, background:correctArr.includes(i)?"#22c55e":"#fff", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                {correctArr.includes(i) && <Check size={11} color="#fff"/>}
+              </div>
+              {(c.optionImages||[])[i] && <img src={(c.optionImages||[])[i]} alt="" style={{ width:36, height:36, borderRadius:6, objectFit:"cover", flexShrink:0 }}/>}
+              <span style={{ fontSize:13, color:"#374151" }}>{o}</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
     case "reorder": {
       const is = c.itemStyle||{};
       return (
