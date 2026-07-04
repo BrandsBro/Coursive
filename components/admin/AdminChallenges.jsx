@@ -58,11 +58,12 @@ export default function AdminChallenges({ challenges: initial }) {
   };
 
   const handleDelete = async (id) => {
-    await supabase.from("challenge_days").delete().eq("challenge_id", id);
-    await supabase.from("challenge_reviews").delete().eq("challenge_id", id);
-    await supabase.from("challenge_progress").delete().eq("challenge_id", id);
-    await supabase.from("challenge_joins").delete().eq("challenge_id", id);
-    const { error } = await supabase.from("challenges").delete().eq("id", id);
+    const res = await fetch("/api/admin/delete-challenge", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ challengeId: id }),
+    });
+    const data = await res.json();
+    const error = data.error;
     if (error) { alert(error.message); return; }
     setChallenges(prev => prev.filter(c => c.id !== id));
     setDeleteId(null);
