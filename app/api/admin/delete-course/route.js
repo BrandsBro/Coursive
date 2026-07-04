@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -25,6 +26,8 @@ export async function POST(req) {
     const { error } = await supabase.from("courses").delete().eq("id", courseId);
     if (error) return NextResponse.json({ error: error.message }, { status:500 });
 
+    revalidatePath("/admin/courses");
+    revalidatePath("/courses");
     return NextResponse.json({ success: true });
   } catch(e) {
     return NextResponse.json({ error: e.message }, { status:500 });
