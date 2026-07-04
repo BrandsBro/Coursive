@@ -118,7 +118,7 @@ export default function AdminChallengeDetail({ challenge: initial, courses }) {
         </DndContext>
 
         {challenge.challengeDays.length===0 && (
-          <div style={{ textAlign:"center",padding:"40px 20px",background:"#fff",borderRadius:16,border:"2px dashed #E2E8F0" }}>
+          <div onClick={() => setDayForm({ topic:"", emoji:"🚀", course_id:"", lesson_id:"" })} style={{ textAlign:"center",padding:"40px 20px",background:"#fff",borderRadius:16,border:"2px dashed #E2E8F0",cursor:"pointer" }}>
             <p style={{ fontSize:32,marginBottom:8 }}>📅</p>
             <p style={{ fontSize:14,fontWeight:700,color:"#0f172a",margin:"0 0 4px" }}>No days yet</p>
             <p style={{ fontSize:13,color:"#94A3B8",margin:0 }}>Click "Add Day" to start building</p>
