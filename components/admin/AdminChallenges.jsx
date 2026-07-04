@@ -65,8 +65,8 @@ export default function AdminChallenges({ challenges: initial }) {
     const data = await res.json();
     const error = data.error;
     if (error) { alert(error); return; }
-    setChallenges(prev => prev.filter(c => c.id !== id));
     setDeleteId(null);
+    window.location.href = "/admin/challenges";
   };
 
   return (
