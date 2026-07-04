@@ -98,73 +98,123 @@ export default function EmailTemplateEditor({ templateId }) {
         </div>
 
         {/* Body */}
-        <div style={{ flex:1, display:"grid", gridTemplateColumns:"360px 1fr", overflow:"hidden" }}>
-          {/* Left */}
-          <div style={{ overflow:"auto", padding:20, borderRight:"1px solid #E2E8F0", background:"#FAFBFC" }}>
+        <div style={{ flex:1, display:"grid", gridTemplateColumns:"380px 1fr", overflow:"hidden" }}>
+          {/* Left controls */}
+          <div style={{ overflow:"auto", padding:0, borderRight:"1px solid #E2E8F0", background:"#FAFBFC" }}>
             {/* Tabs */}
-            <div style={{ display:"flex", background:"#F1F5F9", borderRadius:10, padding:3, marginBottom:20 }}>
-              {["content","design","settings"].map(t2 => (
-                <button key={t2} onClick={() => setTab(t2)} style={{ flex:1, padding:"7px", borderRadius:8, border:"none", background:tab===t2?"#fff":"transparent", fontWeight:700, fontSize:12, color:tab===t2?"#0f172a":"#94A3B8", cursor:"pointer", textTransform:"capitalize" }}>
-                  {t2}
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", borderBottom:"1px solid #E2E8F0" }}>
+              {[["content","Content"],["design","Design"],["logo","Logo"],["settings","Settings"]].map(t2 => (
+                <button key={t2[0]} onClick={() => setTab(t2[0])} style={{ padding:"10px 4px", border:"none", borderBottom:`2px solid ${tab===t2[0]?"#5B4EFF":"transparent"}`, background:"#fff", fontWeight:700, fontSize:11, color:tab===t2[0]?"#5B4EFF":"#94A3B8", cursor:"pointer" }}>
+                  {t2[1]}
                 </button>
               ))}
             </div>
 
-            {tab === "content" && (
-              <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                <TextBlock label="Subject Line" value={template.subject} onChange={v=>u("subject",v)}/>
-                <TextBlock label="Logo Text" value={c.logoText||"✦ 1Course"} onChange={v=>uc("logoText",v)} align={c.logoAlign||"center"} onAlign={v=>uc("logoAlign",v)}/>
-                <TextBlock label="Header Subtitle" value={c.headerText} onChange={v=>uc("headerText",v)} align={c.headerAlign||"center"} onAlign={v=>uc("headerAlign",v)}/>
-                <TextBlock label="Greeting" value={c.greetingText||"Congratulations, {name}! 🎉"} onChange={v=>uc("greetingText",v)} hint="Use {name} for customer name" align={c.greetingAlign||"left"} onAlign={v=>uc("greetingAlign",v)}/>
-                <TextBlock label="Body Text" value={c.bodyText} onChange={v=>uc("bodyText",v)} multiline align={c.bodyAlign||"left"} onAlign={v=>uc("bodyAlign",v)}/>
-                <TextBlock label="Button Text" value={c.buttonText} onChange={v=>uc("buttonText",v)} align={c.buttonAlign||"center"} onAlign={v=>uc("buttonAlign",v)}/>
-                <TextBlock label="Footer Text" value={c.footerText} onChange={v=>uc("footerText",v)} align={c.footerAlign||"center"} onAlign={v=>uc("footerAlign",v)}/>
-              </div>
-            )}
+            <div style={{ padding:16, display:"flex", flexDirection:"column", gap:12 }}>
+              {tab === "content" && (
+                <>
+                  <Field label="Subject Line"><input value={template.subject||""} onChange={e=>u("subject",e.target.value)} style={inp()}/></Field>
+                  <Field label="Header Subtitle"><input value={c.headerText||""} onChange={e=>uc("headerText",e.target.value)} style={inp()}/></Field>
+                  <Field label="Greeting" hint="Use {name}"><input value={c.greetingText||"Congratulations, {name}! 🎉"} onChange={e=>uc("greetingText",e.target.value)} style={inp()}/></Field>
+                  <Field label="Body Text"><textarea value={c.bodyText||""} onChange={e=>uc("bodyText",e.target.value)} rows={4} style={{ ...inp(), resize:"vertical" }}/></Field>
+                  <Field label="Button Text"><input value={c.buttonText||""} onChange={e=>uc("buttonText",e.target.value)} style={inp()}/></Field>
+                  <Field label="Button URL"><input value={c.buttonUrl||""} onChange={e=>uc("buttonUrl",e.target.value)} placeholder="https://1course.io/login" style={inp()}/></Field>
+                  <Field label="Footer Text"><input value={c.footerText||""} onChange={e=>uc("footerText",e.target.value)} style={inp()}/></Field>
+                  <Field label="Show Credentials Block">
+                    <Toggle value={c.showCredentials!==false} onChange={v=>uc("showCredentials",v)}/>
+                  </Field>
+                </>
+              )}
 
-            {tab === "design" && (
-              <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                <Section label="Header">
-                  <ColorRow label="Gradient Start" value={c.headerGradientStart||"#5B4EFF"} onChange={v=>uc("headerGradientStart",v)}/>
-                  <ColorRow label="Gradient End" value={c.headerGradientEnd||"#8B5CF6"} onChange={v=>uc("headerGradientEnd",v)}/>
-                </Section>
-                <Section label="Body">
-                  <ColorRow label="Background" value={c.bgColor||"#0a081e"} onChange={v=>uc("bgColor",v)}/>
-                  <ColorRow label="Card Background" value={c.cardBg||"#1a1830"} onChange={v=>uc("cardBg",v)}/>
-                  <ColorRow label="Greeting Color" value={c.greetingColor||"#5B4EFF"} onChange={v=>uc("greetingColor",v)}/>
-                  <ColorRow label="Body Text Color" value={c.bodyTextColor||"#aaaaaa"} onChange={v=>uc("bodyTextColor",v)}/>
-                </Section>
-                <Section label="Button">
-                  <ColorRow label="Button Color" value={c.buttonColor||"#5B4EFF"} onChange={v=>uc("buttonColor",v)}/>
-                  <ColorRow label="Button Text Color" value={c.buttonTextColor||"#ffffff"} onChange={v=>uc("buttonTextColor",v)}/>
-                </Section>
-              </div>
-            )}
+              {tab === "design" && (
+                <>
+                  <Section label="Header">
+                    <ColorRow label="Gradient Start" value={c.headerGradientStart||"#5B4EFF"} onChange={v=>uc("headerGradientStart",v)}/>
+                    <ColorRow label="Gradient End" value={c.headerGradientEnd||"#8B5CF6"} onChange={v=>uc("headerGradientEnd",v)}/>
+                    <AlignRow label="Header Align" value={c.headerAlign||"center"} onChange={v=>uc("headerAlign",v)}/>
+                  </Section>
+                  <Section label="Body">
+                    <ColorRow label="Background" value={c.bgColor||"#0a081e"} onChange={v=>uc("bgColor",v)}/>
+                    <ColorRow label="Card Background" value={c.cardBg||"#1a1830"} onChange={v=>uc("cardBg",v)}/>
+                    <ColorRow label="Card Border" value={c.cardBorder||"rgba(255,255,255,0.1)"} onChange={v=>uc("cardBorder",v)}/>
+                  </Section>
+                  <Section label="Text">
+                    <ColorRow label="Greeting Color" value={c.greetingColor||"#5B4EFF"} onChange={v=>uc("greetingColor",v)}/>
+                    <ColorRow label="Body Text Color" value={c.bodyTextColor||"#aaaaaa"} onChange={v=>uc("bodyTextColor",v)}/>
+                    <FontSizeRow label="Body Font Size" value={c.bodyFontSize||15} onChange={v=>uc("bodyFontSize",v)}/>
+                  </Section>
+                  <Section label="Button">
+                    <ColorRow label="Button BG Start" value={c.buttonColorFrom||"#5B4EFF"} onChange={v=>uc("buttonColorFrom",v)}/>
+                    <ColorRow label="Button BG End" value={c.buttonColorTo||"#8B5CF6"} onChange={v=>uc("buttonColorTo",v)}/>
+                    <ColorRow label="Button Text" value={c.buttonTextColor||"#ffffff"} onChange={v=>uc("buttonTextColor",v)}/>
+                    <FontSizeRow label="Button Font Size" value={c.buttonFontSize||16} onChange={v=>uc("buttonFontSize",v)}/>
+                    <AlignRow label="Button Align" value={c.buttonAlign||"center"} onChange={v=>uc("buttonAlign",v)}/>
+                  </Section>
+                  <Section label="Footer">
+                    <ColorRow label="Footer Text Color" value={c.footerColor||"rgba(255,255,255,0.3)"} onChange={v=>uc("footerColor",v)}/>
+                    <FontSizeRow label="Footer Font Size" value={c.footerFontSize||12} onChange={v=>uc("footerFontSize",v)}/>
+                    <AlignRow label="Footer Align" value={c.footerAlign||"center"} onChange={v=>uc("footerAlign",v)}/>
+                  </Section>
+                </>
+              )}
 
-            {tab === "settings" && (
-              <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-                <Section label="Trigger">
-                  <select value={template.trigger} onChange={e=>u("trigger",e.target.value)} style={inp()}>
-                    {TRIGGER_TYPES.map(t => <option key={t.value} value={t.value}>{t.icon} {t.label}</option>)}
-                  </select>
-                </Section>
-                <Section label="Status">
-                  <div style={{ display:"flex", alignItems:"center", gap:12 }}>
-                    <button onClick={() => u("active",!template.active)}
-                      style={{ width:44, height:24, borderRadius:999, border:"none", background:template.active?"#22c55e":"#E2E8F0", cursor:"pointer", position:"relative" }}>
-                      <div style={{ width:18, height:18, borderRadius:"50%", background:"#fff", position:"absolute", top:3, left:template.active?22:3, transition:"left 0.2s", boxShadow:"0 1px 4px rgba(0,0,0,0.2)" }}/>
-                    </button>
-                    <span style={{ fontSize:13, fontWeight:600, color:template.active?"#22c55e":"#94A3B8" }}>{template.active?"Active":"Paused"}</span>
-                  </div>
-                </Section>
-                <Section label="Description">
-                  <textarea value={template.description||""} onChange={e=>u("description",e.target.value)} style={{ ...inp(), minHeight:60, resize:"vertical" }}/>
-                </Section>
-              </div>
-            )}
+              {tab === "logo" && (
+                <>
+                  <Section label="Logo Image">
+                    <div style={{ marginBottom:8 }}>
+                      <p style={lbl()}>Logo Image URL</p>
+                      <input value={c.logoUrl||""} onChange={e=>uc("logoUrl",e.target.value)} placeholder="https://... (leave empty to use text)" style={inp()}/>
+                      <p style={{ fontSize:11, color:"#94A3B8", margin:"4px 0 0" }}>Upload your logo to Supabase storage or use a direct URL</p>
+                    </div>
+                    {c.logoUrl && (
+                      <div style={{ padding:12, background:"#1a1830", borderRadius:10, textAlign:"center", marginBottom:8 }}>
+                        <img src={c.logoUrl} alt="Logo preview" style={{ maxHeight:48, maxWidth:"100%", objectFit:"contain" }}/>
+                      </div>
+                    )}
+                    <FontSizeRow label="Logo Height (px)" value={c.logoHeight||40} onChange={v=>uc("logoHeight",v)}/>
+                    <AlignRow label="Logo Align" value={c.logoAlign||"center"} onChange={v=>uc("logoAlign",v)}/>
+                  </Section>
+                  <Section label="Logo Text (fallback)">
+                    <div>
+                      <p style={lbl()}>Text (if no image)</p>
+                      <input value={c.logoText||"✦ 1Course"} onChange={e=>uc("logoText",e.target.value)} style={inp()}/>
+                    </div>
+                    <FontSizeRow label="Text Size" value={c.logoTextSize||28} onChange={v=>uc("logoTextSize",v)}/>
+                    <ColorRow label="Text Color" value={c.logoTextColor||"#ffffff"} onChange={v=>uc("logoTextColor",v)}/>
+                  </Section>
+                  <Section label="Header Subtitle">
+                    <div>
+                      <p style={lbl()}>Subtitle Text</p>
+                      <input value={c.headerSubtitle||c.headerText||""} onChange={e=>uc("headerSubtitle",e.target.value)} placeholder="Password Reset" style={inp()}/>
+                    </div>
+                    <FontSizeRow label="Subtitle Size" value={c.headerSubtitleSize||14} onChange={v=>uc("headerSubtitleSize",v)}/>
+                    <ColorRow label="Subtitle Color" value={c.headerSubtitleColor||"rgba(255,255,255,0.8)"} onChange={v=>uc("headerSubtitleColor",v)}/>
+                  </Section>
+                </>
+              )}
+
+              {tab === "settings" && (
+                <>
+                  <Section label="Trigger">
+                    <select value={template.trigger} onChange={e=>u("trigger",e.target.value)} style={inp()}>
+                      {TRIGGER_TYPES.map(t => <option key={t.value} value={t.value}>{t.icon} {t.label}</option>)}
+                    </select>
+                  </Section>
+                  <Section label="Status">
+                    <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+                      <Toggle value={template.active} onChange={v=>u("active",v)}/>
+                      <span style={{ fontSize:13, fontWeight:600, color:template.active?"#22c55e":"#94A3B8" }}>{template.active?"Active":"Paused"}</span>
+                    </div>
+                  </Section>
+                  <Section label="Description">
+                    <textarea value={template.description||""} onChange={e=>u("description",e.target.value)} style={{ ...inp(), minHeight:60, resize:"vertical" }}/>
+                  </Section>
+                </>
+              )}
+            </div>
           </div>
 
-          {/* Right - preview */}
+          {/* Right preview */}
           <div style={{ overflow:"auto", padding:32, background:"#E2E8F0", display:"flex", justifyContent:"center" }}>
             <div style={{ width:"100%", maxWidth:600 }}>
               <div style={{ background:"#fff", borderRadius:8, overflow:"hidden", boxShadow:"0 8px 32px rgba(0,0,0,0.12)" }}>
@@ -183,69 +233,100 @@ export default function EmailTemplateEditor({ templateId }) {
   );
 }
 
-function TextBlock({ label, value, onChange, align, onAlign, multiline, hint }) {
+// ── Helpers ──
+function Field({ label, hint, children }) {
   return (
-    <div style={{ background:"#fff", borderRadius:12, border:"1.5px solid #E2E8F0", padding:12 }}>
-      <p style={{ fontSize:11, fontWeight:700, color:"#374151", textTransform:"uppercase", letterSpacing:0.5, margin:"0 0 8px" }}>{label} {hint && <span style={{ color:"#94A3B8", fontWeight:400, textTransform:"none" }}>· {hint}</span>}</p>
-      {multiline ? <textarea value={value||""} onChange={e=>onChange(e.target.value)} style={{ ...inp(), minHeight:70, resize:"vertical" }}/> : <input value={value||""} onChange={e=>onChange(e.target.value)} style={inp()}/>}
-      {onAlign && (
-        <div style={{ display:"flex", gap:6, marginTop:8 }}>
-          {[["left","⬅ Left"],["center","⬆ Center"],["right","➡ Right"]].map(([a,l]) => (
-            <button key={a} onClick={() => onAlign(a)} style={{ flex:1, padding:"5px", borderRadius:7, border:`1.5px solid ${align===a?"#5B4EFF":"#E2E8F0"}`, background:align===a?"#EEF2FF":"#F8FAFC", fontSize:11, fontWeight:700, color:align===a?"#5B4EFF":"#94A3B8", cursor:"pointer" }}>{l}</button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Section({ label, children }) {
-  return (
-    <div style={{ background:"#fff", borderRadius:12, border:"1.5px solid #E2E8F0", padding:14 }}>
-      <p style={{ fontSize:11, fontWeight:700, color:"#374151", textTransform:"uppercase", letterSpacing:0.5, margin:"0 0 12px" }}>{label}</p>
+    <div>
+      <p style={{ ...lbl(), marginBottom:6 }}>{label} {hint && <span style={{ color:"#94A3B8", fontWeight:400, textTransform:"none" }}>· {hint}</span>}</p>
       {children}
     </div>
   );
 }
-
+function Section({ label, children }) {
+  return (
+    <div style={{ background:"#fff", borderRadius:12, border:"1.5px solid #E2E8F0", padding:14 }}>
+      <p style={{ fontSize:10, fontWeight:700, color:"#374151", textTransform:"uppercase", letterSpacing:0.5, margin:"0 0 12px" }}>{label}</p>
+      <div style={{ display:"flex", flexDirection:"column", gap:10 }}>{children}</div>
+    </div>
+  );
+}
 function ColorRow({ label, value, onChange }) {
   return (
-    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:10 }}>
-      <span style={{ fontSize:13, color:"#374151", fontWeight:500 }}>{label}</span>
-      <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-        <input type="color" value={value.startsWith("#")?value:"#ffffff"} onChange={e=>onChange(e.target.value)} style={{ width:34, height:34, borderRadius:8, border:"1.5px solid #E2E8F0", cursor:"pointer", padding:2 }}/>
-        <input value={value} onChange={e=>onChange(e.target.value)} style={{ ...inp(), width:120, fontSize:12 }}/>
+    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+      <span style={{ fontSize:12, color:"#374151", fontWeight:500 }}>{label}</span>
+      <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+        <input type="color" value={(value||"#ffffff").startsWith("#")?(value||"#ffffff"):"#ffffff"} onChange={e=>onChange(e.target.value)} style={{ width:32, height:32, borderRadius:6, border:"1.5px solid #E2E8F0", cursor:"pointer", padding:2 }}/>
+        <input value={value||""} onChange={e=>onChange(e.target.value)} style={{ ...inp(), width:130, fontSize:11 }}/>
       </div>
     </div>
+  );
+}
+function FontSizeRow({ label, value, onChange }) {
+  return (
+    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+      <span style={{ fontSize:12, color:"#374151", fontWeight:500 }}>{label}</span>
+      <div style={{ display:"flex", alignItems:"center", gap:4 }}>
+        <button onClick={()=>onChange(Math.max(8,value-1))} style={fcb()}>−</button>
+        <span style={{ fontSize:12, fontWeight:700, minWidth:28, textAlign:"center" }}>{value}</span>
+        <button onClick={()=>onChange(Math.min(60,value+1))} style={fcb()}>+</button>
+        <span style={{ fontSize:11, color:"#94A3B8" }}>px</span>
+      </div>
+    </div>
+  );
+}
+function AlignRow({ label, value, onChange }) {
+  return (
+    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+      <span style={{ fontSize:12, color:"#374151", fontWeight:500 }}>{label}</span>
+      <div style={{ display:"flex", gap:4 }}>
+        {[["left","←"],["center","↔"],["right","→"]].map(([a,ic]) => (
+          <button key={a} onClick={()=>onChange(a)} style={{ width:28, height:28, borderRadius:7, border:`1.5px solid ${value===a?"#5B4EFF":"#E2E8F0"}`, background:value===a?"#EEF2FF":"#fff", cursor:"pointer", fontSize:12 }}>{ic}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+function Toggle({ value, onChange }) {
+  return (
+    <button onClick={()=>onChange(!value)} style={{ width:40, height:22, borderRadius:999, border:"none", background:value?"#22c55e":"#E2E8F0", cursor:"pointer", position:"relative", transition:"background 0.2s" }}>
+      <div style={{ width:16, height:16, borderRadius:"50%", background:"#fff", position:"absolute", top:3, left:value?21:3, transition:"left 0.2s", boxShadow:"0 1px 3px rgba(0,0,0,0.2)" }}/>
+    </button>
   );
 }
 
 function generateHtml(c, name, email, password) {
   const greeting = (c.greetingText||"Congratulations, {name}! 🎉").replace("{name}", name);
+  const logoHtml = c.logoUrl
+    ? `<img src="${c.logoUrl}" alt="Logo" style="height:${c.logoHeight||40}px;object-fit:contain;display:block;margin:0 auto ${c.logoAlign==="left"?"margin-left:0":"margin:0 auto"}" />`
+    : `<h1 style="margin:0;font-size:${c.logoTextSize||28}px;font-weight:900;color:${c.logoTextColor||"#ffffff"}">${c.logoText||"✦ 1Course"}</h1>`;
+
   return `
     <div style="font-family:sans-serif;background:${c.bgColor||"#0a081e"};color:#fff;padding:0;margin:0">
       <div style="background:linear-gradient(135deg,${c.headerGradientStart||"#5B4EFF"},${c.headerGradientEnd||"#8B5CF6"});padding:40px 32px;text-align:${c.logoAlign||"center"}">
-        <h1 style="margin:0;font-size:28px;font-weight:900;color:#fff">${c.logoText||"✦ 1Course"}</h1>
-        <p style="margin:8px 0 0;opacity:0.85;color:#fff;text-align:${c.headerAlign||"center"}">${c.headerText||""}</p>
+        ${logoHtml}
+        ${c.headerSubtitle||c.headerText ? `<p style="margin:10px 0 0;font-size:${c.headerSubtitleSize||14}px;color:${c.headerSubtitleColor||"rgba(255,255,255,0.8)"}">${c.headerSubtitle||c.headerText||""}</p>` : ""}
       </div>
       <div style="padding:32px">
-        <h2 style="font-size:22px;margin:0 0 12px;color:${c.greetingColor||"#5B4EFF"};text-align:${c.greetingAlign||"left"}">${greeting}</h2>
-        <p style="color:${c.bodyTextColor||"rgba(255,255,255,0.7)"};line-height:1.7;margin:0 0 20px;text-align:${c.bodyAlign||"left"}">${c.bodyText||""}</p>
-        <div style="background:${c.cardBg||"#1a1830"};border-radius:12px;padding:24px;margin:0 0 20px;border:1px solid rgba(255,255,255,0.1)">
+        <h2 style="font-size:22px;margin:0 0 12px;color:${c.greetingColor||"#5B4EFF"}">${greeting}</h2>
+        <p style="color:${c.bodyTextColor||"rgba(255,255,255,0.7)"};line-height:1.7;margin:0 0 20px;font-size:${c.bodyFontSize||15}px">${c.bodyText||""}</p>
+        ${c.showCredentials!==false ? `
+        <div style="background:${c.cardBg||"#1a1830"};border-radius:12px;padding:24px;margin:0 0 20px;border:1px solid ${c.cardBorder||"rgba(255,255,255,0.1)"}">
           <p style="margin:0 0 4px;color:rgba(255,255,255,0.5);font-size:11px;text-transform:uppercase">Email</p>
           <p style="margin:0 0 16px;font-weight:700;color:#a78bfa">${email}</p>
           <p style="margin:0 0 4px;color:rgba(255,255,255,0.5);font-size:11px;text-transform:uppercase">Temporary Password</p>
           <p style="margin:0;font-weight:900;font-size:20px;color:#fff;background:rgba(91,78,255,0.2);padding:12px;border-radius:8px;text-align:center;font-family:monospace">${password}</p>
-        </div>
+        </div>` : ""}
         <div style="text-align:${c.buttonAlign||"center"}">
-          <a href="#" style="display:inline-block;padding:16px 28px;background:${c.buttonColor||"#5B4EFF"};color:${c.buttonTextColor||"#fff"};text-decoration:none;border-radius:12px;font-weight:700;font-size:16px">${c.buttonText||"Visit 1Course →"}</a>
+          <a href="${c.buttonUrl||"#"}" style="display:inline-block;padding:16px 28px;background:linear-gradient(135deg,${c.buttonColorFrom||"#5B4EFF"},${c.buttonColorTo||"#8B5CF6"});color:${c.buttonTextColor||"#fff"};text-decoration:none;border-radius:12px;font-weight:700;font-size:${c.buttonFontSize||16}px">${c.buttonText||"Visit 1Course →"}</a>
         </div>
       </div>
       <div style="padding:20px 32px;border-top:1px solid rgba(255,255,255,0.08);text-align:${c.footerAlign||"center"}">
-        <p style="color:rgba(255,255,255,0.3);font-size:12px;margin:0">${c.footerText||""}</p>
+        <p style="color:${c.footerColor||"rgba(255,255,255,0.3)"};font-size:${c.footerFontSize||12}px;margin:0">${c.footerText||""}</p>
       </div>
     </div>
   `;
 }
 
+const lbl = () => ({ fontSize:11, fontWeight:700, color:"#374151", display:"block", textTransform:"uppercase", letterSpacing:0.5 });
 const inp = () => ({ width:"100%", padding:"9px 12px", borderRadius:9, border:"1.5px solid #E2E8F0", fontSize:13, outline:"none", boxSizing:"border-box", fontFamily:"inherit" });
+const fcb = () => ({ width:24, height:24, borderRadius:6, border:"1.5px solid #E2E8F0", background:"#fff", cursor:"pointer", fontSize:12, fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center", padding:0 });
