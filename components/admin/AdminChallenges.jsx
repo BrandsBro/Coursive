@@ -67,7 +67,7 @@ export default function AdminChallenges({ challenges: initial }) {
     if (error) { alert(error); return; }
     setDeleteId(null);
     setChallenges(prev => prev.filter(c => c.id !== id));
-    router.refresh();
+    window.location.reload();
   };
 
   return (
