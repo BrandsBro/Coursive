@@ -100,22 +100,7 @@ export function BlockPreview({ block }) {
       const ts=c.textStyle||{};
       return <div style={{ padding:"14px 18px", borderRadius:12, background:bg, borderLeft:`4px solid ${color}`, display:"flex", gap:12 }}><span style={{ fontSize:18, flexShrink:0 }}>{emoji}</span><p style={{ fontSize:ts.fontSize||14, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#374151", margin:0, lineHeight:1.65 }}>{c.text||"Callout text"}</p></div>;
     }
-    case "multiplechoice": {
-      const qs = c.questionStyle||{};
-      return (
-        <div>
-          <p style={{ fontSize:qs.fontSize||15, fontWeight:"700", color:"#0f172a", margin:"0 0 12px", lineHeight:1.5 }}>{c.question||"Question..."}</p>
-          {(c.options||[]).filter(Boolean).map((o,i) => (
-            <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", borderRadius:10, border:`1.5px solid ${i===c.correct?"#22c55e":"#E2E8F0"}`, background:i===c.correct?"#F0FDF4":"#fff", marginBottom:6 }}>
-              <div style={{ width:18, height:18, borderRadius:"50%", border:`2px solid ${i===c.correct?"#22c55e":"#D1D5DB"}`, background:i===c.correct?"#22c55e":"#fff", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                {i===c.correct && <div style={{ width:8, height:8, borderRadius:"50%", background:"#fff" }}/>}
-              </div>
-              <span style={{ fontSize:13, color:"#374151" }}>{o}</span>
-            </div>
-          ))}
-        </div>
-      );
-    }
+    
     case "multiplechoice": {
       const qs=c.questionStyle||{}; const hs2=c.headingStyle||{}; const ss2=c.subheadingStyle||{};
       const correctArr = Array.isArray(c.correct)?c.correct:c.correct!==undefined?[c.correct]:[];
