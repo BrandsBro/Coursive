@@ -903,38 +903,56 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       return <ReorderBlock c={c} idx={idx} checked={checked} setChecked={setChecked}/>;
     // ── MULTIPLE CHOICE ──
     case "multiplechoice": {
-      const sel = answers[idx];
+      const selArr = answers[idx] || [];
       const isChecked = checked[idx];
-      const isCorrect = sel === c.correct;
+      const correctArr = Array.isArray(c.correct) ? c.correct : c.correct!==undefined ? [c.correct] : [];
+      const multiMode = correctArr.length > 1;
+      const isCorrect = isChecked && correctArr.length === selArr.length && correctArr.every(i => selArr.includes(i));
       const qs = c.questionStyle||{};
       const os = c.optionStyle||{};
       const es = c.explanationStyle||{};
+
+      const toggleSel = (i) => {
+        if (isChecked) return;
+        if (multiMode) {
+          const ns = selArr.includes(i) ? selArr.filter(x=>x!==i) : [...selArr,i];
+          setAnswers(p=>({...p,[idx]:ns}));
+        } else {
+          setAnswers(p=>({...p,[idx]:[i]}));
+        }
+      };
+
       return (
         <div style={{ padding:"20px 0" }}>
+          {multiMode && !isChecked && (
+            <div style={{ display:"inline-block", padding:"4px 12px", borderRadius:999, background:"#EEF2FF", color:"#6366f1", fontSize:12, fontWeight:700, marginBottom:12 }}>
+              Select all that apply
+            </div>
+          )}
           <p style={{ fontSize:qs.fontSize||16, fontWeight:"700", fontStyle:qs.italic?"italic":"normal", textAlign:qs.align||"left", color:"#0f172a", margin:"0 0 16px", lineHeight:1.5 }}>
             {c.question}
           </p>
           <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
             {(c.options||[]).map((opt,i) => {
-              const isSel = sel===i;
-              const isRight = i===c.correct;
-              let border="#E2E8F0", bg="#fff", radioColor="#D1D5DB";
+              const isSel = selArr.includes(i);
+              const isRight = correctArr.includes(i);
+              let border="#E2E8F0", bg="#fff", checkColor="#D1D5DB";
               if (isChecked) {
-                if (isRight) { border="#22c55e"; bg="#F0FDF4"; radioColor="#22c55e"; }
-                else if (isSel) { border="#ef4444"; bg="#FEF2F2"; radioColor="#ef4444"; }
-              } else if (isSel) { border="#7c3aed"; bg="#F5F3FF"; radioColor="#7c3aed"; }
+                if (isRight) { border="#22c55e"; bg="#F0FDF4"; checkColor="#22c55e"; }
+                else if (isSel) { border="#ef4444"; bg="#FEF2F2"; checkColor="#ef4444"; }
+              } else if (isSel) { border="#7c3aed"; bg="#F5F3FF"; checkColor="#7c3aed"; }
               return (
-                <button key={i} onClick={() => !isChecked && setAnswers(p=>({...p,[idx]:i}))}
+                <button key={i} onClick={() => toggleSel(i)}
                   style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 16px", borderRadius:12, border:`1.5px solid ${border}`, background:bg, cursor:isChecked?"default":"pointer", textAlign:"left", transition:"all 0.15s" }}>
-                  <div style={{ width:20, height:20, borderRadius:"50%", border:`2px solid ${radioColor}`, background:isSel||isChecked&&isRight?radioColor:"#fff", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}>
-                    {(isSel || (isChecked && isRight)) && <div style={{ width:8, height:8, borderRadius:"50%", background:"#fff" }}/>}
+                  <div style={{ width:20, height:20, borderRadius:multiMode?4:"50%", border:`2px solid ${checkColor}`, background:isSel||isChecked&&isRight?checkColor:"#fff", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}>
+                    {(isSel || (isChecked && isRight)) && <Check size={12} color="#fff"/>}
                   </div>
                   <span style={{ fontSize:os.fontSize||14, color:"#374151", fontWeight:500, lineHeight:1.4 }}>{opt}</span>
                 </button>
               );
             })}
           </div>
-          {!isChecked && sel!==undefined && (
+          {!isChecked && selArr.length>0 && (
             <button onClick={() => setChecked(p=>({...p,[idx]:true}))}
               style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>
               Check
@@ -943,7 +961,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
           {isChecked && (
             <div style={{ padding:"16px 18px", borderRadius:14, background:isCorrect?"#F0FDF4":"#FEF2F2", border:`1.5px solid ${isCorrect?"#BBF7D0":"#FECACA"}` }}>
               <p style={{ fontSize:14, fontWeight:700, color:isCorrect?"#166534":"#DC2626", margin:"0 0 6px" }}>
-                {isCorrect?"🎉 Exactly!":"❌ Not quite"}
+                {isCorrect?"🎉 Correct!":"❌ Not quite"}
               </p>
               {c.explanation && <p style={{ fontSize:es.fontSize||13, color:"#374151", margin:0, lineHeight:1.6 }}>{c.explanation}</p>}
             </div>
