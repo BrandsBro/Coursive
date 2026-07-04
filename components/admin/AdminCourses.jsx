@@ -8,7 +8,7 @@ import { supabase } from "@/lib/supabase";
 
 const EMPTY = { id:"", title:"", description:"", emoji:"📚", image_url:"", gradient_from:"#6366f1", gradient_to:"#8b5cf6", hours:1, level:"Beginner", category:"Design" };
 const LEVELS = ["Beginner","Intermediate","Advanced"];
-const CATEGORIES = ["Design","Productivity","Video","No Code"];
+const CATEGORIES = ["Design","Productivity","Video","No Code","Research & Analysis","Coding","Image Generation","Writing"];
 const PRESET_GRADIENTS = [
   ["#ec4899","#8b5cf6"],["#6366f1","#0ea5e9"],["#f97316","#fbbf24"],
   ["#ec4899","#f43f5e"],["#10b981","#06b6d4"],["#10a37f","#0ea5e9"],
