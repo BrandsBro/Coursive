@@ -316,7 +316,7 @@ function Toggle({ value, onChange }) {
 function generateHtml(c, name, email, password) {
   const greeting = (c.greetingText||"Congratulations, {name}! 🎉").replace("{name}", name);
   const logoHtml = c.logoUrl
-    ? `<img src="${c.logoUrl}" alt="Logo" style="height:${c.logoHeight||40}px;object-fit:contain;display:block;margin:0 auto ${c.logoAlign==="left"?"margin-left:0":"margin:0 auto"}" />`
+    ? `<img src="${c.logoUrl}" alt="Logo" style="height:${c.logoHeight||40}px;object-fit:contain;display:block;margin:0 auto;" />`
     : `<h1 style="margin:0;font-size:${c.logoTextSize||28}px;font-weight:900;color:${c.logoTextColor||"#ffffff"}">${c.logoText||"✦ 1Course"}</h1>`;
 
   return `
