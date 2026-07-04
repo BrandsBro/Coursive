@@ -238,7 +238,7 @@ export default function EmailTemplateEditor({ templateId }) {
             <div style={{ width:"100%", maxWidth:600 }}>
               <div style={{ background:"#fff", borderRadius:8, overflow:"hidden", boxShadow:"0 8px 32px rgba(0,0,0,0.12)" }}>
                 <div style={{ background:"#F8FAFC", padding:"12px 16px", borderBottom:"1px solid #E2E8F0" }}>
-                  <p style={{ fontSize:12, color:"#64748B", margin:"0 0 2px" }}>From: <strong>1Course</strong> &lt;noreply@kingbrandsbro.pro&gt;</p>
+                  <p style={{ fontSize:12, color:"#64748B", margin:"0 0 2px" }}>From: <strong>1Course</strong></p>
                   <p style={{ fontSize:12, color:"#0f172a", margin:0 }}>Subject: <strong>{template.subject}</strong></p>
                 </div>
                 <div dangerouslySetInnerHTML={{ __html: generateHtml(c,"John Smith","john@example.com","testPass123!") }}/>

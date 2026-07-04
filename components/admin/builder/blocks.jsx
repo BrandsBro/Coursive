@@ -13,6 +13,7 @@ export const BLOCK_DEFS = {
   callout:      { icon:"💡", label:"Callout",        desc:"Highlight box",          color:"#65a30d", bg:"#F7FEE7", default:{ text:"", style:"info", textStyle:{} },                                                                preview:c=>c.text||"Empty callout" },
   divider:      { icon:"➖", label:"Divider",        desc:"Visual break",           color:"#64748b", bg:"#F8FAFC", default:{ style:"line" },                                                                                       preview:()=>"Section divider" },
   multiplechoice: { icon:"🔘", label:"Multiple Choice", desc:"Radio style quiz with explanation", color:"#7c3aed", bg:"#F5F3FF", default:{ question:"", options:["","",""], correct:0, explanation:"", questionStyle:{}, optionStyle:{}, explanationStyle:{} }, preview:c=>c.question||"No question" },
+  reorder: { icon:"↕️", label:"Reorder", desc:"Drag items into correct order", color:"#0d9488", bg:"#F0FDFA", default:{ question:"", items:["","","",""], itemStyle:{} }, preview:c=>c.question||"No question" },
   continueblock: { icon:"▶️", label:"Continue",       desc:"Stop point — hides content below", color:"#5B4EFF", bg:"#EEF2FF", default:{ label:"Continue" },                                                                    preview:()=>"── Continue button ──" },
   blankoptions: { icon:"🔤", label:"Blank + Options",desc:"Pick word from sentence",color:"#0891b2", bg:"#E0F2FE", default:{ sentence:"", markedWords:[], blanks:[], explanation:"", taskTitle:"", taskDesc:"", successText:"", successImages:[], sentenceStyle:{} },                         preview:c=>c.sentence||"No sentence" },
 };
@@ -29,6 +30,7 @@ export function BlockEditor({ block, onChange }) {
     case "keypoints":    return <KeyE {...p}/>;
     case "callout":      return <CalloutE {...p}/>;
     case "multiplechoice": return <MultipleChoiceE {...p}/>;
+    case "reorder": return <ReorderE {...p}/>;
     case "continueblock": return <ContinueE {...p}/>;
     case "blankoptions": return <BlankOptionsE {...p}/>;
     case "divider":      return <DividerE {...p}/>;
@@ -109,6 +111,20 @@ export function BlockPreview({ block }) {
                 {i===c.correct && <div style={{ width:8, height:8, borderRadius:"50%", background:"#fff" }}/>}
               </div>
               <span style={{ fontSize:13, color:"#374151" }}>{o}</span>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    case "reorder": {
+      const is = c.itemStyle||{};
+      return (
+        <div>
+          {c.question && <p style={{ fontSize:is.fontSize||15, fontWeight:"700", color:"#0f172a", margin:"0 0 12px" }}>{c.question}</p>}
+          {(c.items||[]).filter(Boolean).map((item,i) => (
+            <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", borderRadius:10, border:"1.5px solid #E2E8F0", background:"#fff", marginBottom:6 }}>
+              <span style={{ fontSize:16, color:"#CBD5E1" }}>⠿</span>
+              <span style={{ fontSize:14, color:"#374151" }}>{item}</span>
             </div>
           ))}
         </div>
@@ -566,6 +582,35 @@ function MultipleChoiceE({ content, onChange }) {
         <p style={{ fontSize:11, color:"#94A3B8", margin:"0 0 4px" }}>Shown after answering</p>
         <textarea value={content.explanation||""} onChange={e => onChange({ ...content, explanation:e.target.value })}
           placeholder="Explain why this is correct..." style={{ ...inp(), minHeight:70, resize:"vertical", ...styled(es) }}/>
+      </div>
+    </div>
+  );
+}
+
+function ReorderE({ content, onChange }) {
+  const items = content.items||["","","",""];
+  const is = content.itemStyle||{fontSize:15};
+  const setItem = (i,v) => { const a=[...items]; a[i]=v; onChange({ ...content, items:a }); };
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:12, paddingTop:12 }}>
+      <div>
+        <FC label="Question Style" style={is} setStyle={v => onChange({ ...content, itemStyle:v })}/>
+        <textarea value={content.question||""} onChange={e => onChange({ ...content, question:e.target.value })}
+          placeholder="Put these steps in the correct order..." style={{ ...inp(), minHeight:70, resize:"vertical", ...styled(is) }}/>
+      </div>
+      <div>
+        <p style={lbl()}>Items — add in CORRECT order</p>
+        <p style={{ fontSize:11, color:"#94A3B8", margin:"0 0 8px" }}>User will see these shuffled and must drag to match this order</p>
+        <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+          {items.map((item,i) => (
+            <div key={i} style={{ display:"flex", gap:8, alignItems:"center" }}>
+              <span style={{ width:24, height:24, borderRadius:"50%", background:"#0d9488", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, flexShrink:0 }}>{i+1}</span>
+              <input value={item} onChange={e => setItem(i,e.target.value)} placeholder={`Item ${i+1}`} style={{ ...inp(), flex:1 }}/>
+              {items.length>2 && <button onClick={() => onChange({ ...content, items:items.filter((_,x)=>x!==i) })} style={ctrlX()}>✕</button>}
+            </div>
+          ))}
+          {items.length<6 && <button onClick={() => onChange({ ...content, items:[...items,""] })} style={addX()}>+ Add item</button>}
+        </div>
       </div>
     </div>
   );
