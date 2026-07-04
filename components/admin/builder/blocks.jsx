@@ -664,46 +664,6 @@ function MultipleChoiceE({ content, onChange }) {
 
 
 
-function MultipleChoiceE({ content, onChange }) {
-  const opts = content.options||["","",""];
-  const setOpt = (i,v) => { const a=[...opts]; a[i]=v; onChange({ ...content, options:a }); };
-  const qs = content.questionStyle||{fontSize:16};
-  const os = content.optionStyle||{fontSize:14};
-  const es = content.explanationStyle||{fontSize:13};
-  return (
-    <div style={{ display:"flex", flexDirection:"column", gap:14, paddingTop:12 }}>
-      <div>
-        <FC label="Question Style" style={qs} setStyle={v => onChange({ ...content, questionStyle:v })}/>
-        <textarea value={content.question||""} onChange={e => onChange({ ...content, question:e.target.value })}
-          placeholder="Your question..." style={{ ...inp(), minHeight:80, resize:"vertical", ...styled(qs) }}/>
-      </div>
-      <div>
-        <FC label="Options Style" style={os} setStyle={v => onChange({ ...content, optionStyle:v })}/>
-        <p style={{ fontSize:10, color:"#94A3B8", margin:"0 0 6px" }}>Click ✓ to mark correct answer</p>
-        <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
-          {opts.map((o,i) => (
-            <div key={i} style={{ display:"flex", gap:8, alignItems:"center" }}>
-              <button onClick={() => onChange({ ...content, correct:i })}
-                style={{ width:28, height:28, borderRadius:"50%", border:`2px solid ${content.correct===i?"#22c55e":"#E2E8F0"}`, background:content.correct===i?"#22c55e":"#fff", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                {content.correct===i && <Check size={13} color="#fff"/>}
-              </button>
-              <input value={o} onChange={e => setOpt(i,e.target.value)} placeholder={`Option ${i+1}`}
-                style={{ ...inp(), flex:1, fontSize:os.fontSize||14, borderColor:content.correct===i?"#22c55e":"#E2E8F0" }}/>
-              {opts.length>2 && <button onClick={() => onChange({ ...content, options:opts.filter((_,x)=>x!==i), correct:Math.min(content.correct,opts.length-2) })} style={ctrlX()}>✕</button>}
-            </div>
-          ))}
-          {opts.length<6 && <button onClick={() => onChange({ ...content, options:[...opts,""] })} style={addX()}>+ Add option</button>}
-        </div>
-      </div>
-      <div>
-        <FC label="Explanation Style" style={es} setStyle={v => onChange({ ...content, explanationStyle:v })}/>
-        <p style={{ fontSize:11, color:"#94A3B8", margin:"0 0 4px" }}>Shown after answering</p>
-        <textarea value={content.explanation||""} onChange={e => onChange({ ...content, explanation:e.target.value })}
-          placeholder="Explain why this is correct..." style={{ ...inp(), minHeight:70, resize:"vertical", ...styled(es) }}/>
-      </div>
-    </div>
-  );
-}
 
 function ReorderE({ content, onChange }) {
   const items = content.items||["","","",""];
