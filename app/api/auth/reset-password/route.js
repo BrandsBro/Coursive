@@ -43,7 +43,7 @@ export async function POST(req) {
 
     // Send confirmation email
     await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: "noreply@1course.io",
       to: reset.email,
       subject: "🔐 Your 1Course password was changed",
       html: `

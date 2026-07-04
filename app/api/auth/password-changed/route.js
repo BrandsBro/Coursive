@@ -13,7 +13,7 @@ export async function POST(req) {
     if (!user) return NextResponse.json({ error:"Unauthorized" }, { status:401 });
 
     await resend.emails.send({
-      from: "onboarding@resend.dev",
+      from: "noreply@1course.io",
       to: user.email,
       subject: "🔐 Your 1Course password was changed",
       html: `
