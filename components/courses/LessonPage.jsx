@@ -598,6 +598,95 @@ function ReorderBlock({ c, idx, checked, setChecked }) {
   );
 }
 
+
+function ReorderBlock({ c, idx, checked, setChecked }) {
+  const correctOrder = (c.items||[]).filter(Boolean);
+  const shuffled = useMemo(() => [...correctOrder].sort(() => Math.random() - 0.5), []);
+  const [order, setOrder] = useState(shuffled);
+  const [dragIdx, setDragIdx] = useState(null);
+  const [dragOverIdx, setDragOverIdx] = useState(null);
+  const [selected, setSelected] = useState(null);
+  const isChecked = checked["ro_"+idx];
+  const isCorrect = isChecked && order.every((item,i) => item === correctOrder[i]);
+
+  const handleDragStart = (i) => setDragIdx(i);
+  const handleDragOver = (e,i) => { e.preventDefault(); setDragOverIdx(i); };
+  const handleDrop = (i) => {
+    if (dragIdx===null||dragIdx===i) { setDragIdx(null); setDragOverIdx(null); return; }
+    const n=[...order]; const d=n.splice(dragIdx,1)[0]; n.splice(i,0,d);
+    setOrder(n); setDragIdx(null); setDragOverIdx(null);
+  };
+  const handleTap = (i) => {
+    if (isChecked) return;
+    if (selected===null) { setSelected(i); }
+    else if (selected===i) { setSelected(null); }
+    else {
+      const n=[...order]; [n[selected],n[i]]=[n[i],n[selected]];
+      setOrder(n); setSelected(null);
+    }
+  };
+  const reset = () => { setOrder([...correctOrder].sort(()=>Math.random()-0.5)); setChecked(p=>({...p,["ro_"+idx]:false})); setSelected(null); };
+
+  return (
+    <div style={{ padding:"20px 0" }}>
+      {c.question && <p style={{ fontSize:16, fontWeight:700, color:"#0f172a", margin:"0 0 12px", lineHeight:1.5 }}>{c.question}</p>}
+      {!isChecked && (
+        <div>
+          <p style={{ fontSize:12, color:"#94A3B8", margin:"0 0 10px" }}>
+            {selected!==null ? "Now tap another item to swap" : "Tap to select then tap another to swap · drag to reorder"}
+          </p>
+          <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
+            {order.map((item,i) => (
+              <div key={item} draggable
+                onDragStart={()=>handleDragStart(i)} onDragOver={e=>handleDragOver(e,i)}
+                onDrop={()=>handleDrop(i)} onDragEnd={()=>{setDragIdx(null);setDragOverIdx(null);}}
+                onClick={()=>handleTap(i)}
+                style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 16px", borderRadius:12, border:`2px solid ${selected===i?"#5B4EFF":dragOverIdx===i?"#8B5CF6":"#E2E8F0"}`, background:selected===i?"#EEF2FF":"#fff", cursor:"pointer", boxShadow:selected===i?"0 0 0 3px rgba(91,78,255,0.2)":"none", transition:"all 0.15s" }}>
+                <span style={{ fontSize:20, color:selected===i?"#5B4EFF":"#CBD5E1" }}>⠿</span>
+                <span style={{ fontSize:15, color:selected===i?"#4338CA":"#374151", fontWeight:selected===i?700:500, flex:1 }}>{item}</span>
+                <span style={{ fontSize:12, fontWeight:700, width:24, height:24, borderRadius:"50%", background:selected===i?"#5B4EFF":"#F1F5F9", color:selected===i?"#fff":"#94A3B8", display:"flex", alignItems:"center", justifyContent:"center" }}>{i+1}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {isChecked && (
+        <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
+          {order.map((item,i) => {
+            const ok = item===correctOrder[i];
+            return (
+              <div key={item} style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 16px", borderRadius:12, border:`2px solid ${ok?"#22c55e":"#ef4444"}`, background:ok?"#F0FDF4":"#FEF2F2" }}>
+                <span style={{ fontSize:16 }}>{ok?"✓":"✕"}</span>
+                <span style={{ fontSize:15, color:ok?"#166534":"#991B1B", fontWeight:500, flex:1 }}>{item}</span>
+                {!ok && <span style={{ fontSize:12, color:"#991B1B" }}>→ {correctOrder[i]}</span>}
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {!isChecked && (
+        <button onClick={() => setChecked(p=>({...p,["ro_"+idx]:true}))}
+          style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>
+          Check Order
+        </button>
+      )}
+      {isChecked && isCorrect && (
+        <div style={{ padding:"14px 18px", borderRadius:14, background:"#F0FDF4", border:"1.5px solid #BBF7D0" }}>
+          <p style={{ fontSize:15, fontWeight:700, color:"#166534", margin:0 }}>🎉 Perfect order!</p>
+        </div>
+      )}
+      {isChecked && !isCorrect && (
+        <div>
+          <div style={{ padding:"14px 18px", borderRadius:14, background:"#FEF2F2", border:"1.5px solid #FECACA", marginBottom:10 }}>
+            <p style={{ fontSize:15, fontWeight:700, color:"#DC2626", margin:0 }}>❌ Not quite — try again!</p>
+          </div>
+          <button onClick={reset} style={{ width:"100%", padding:"12px", borderRadius:12, border:"none", background:"#5B4EFF", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>🔄 Try Again</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fillInputs, setFillInputs, fillChecked, setFillChecked, fillShowAnswer, setFillShowAnswer }) {
   const c = block.content || block;
 
