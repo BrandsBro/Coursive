@@ -49,8 +49,9 @@ export default function AdminChallengeDetail({ challenge: initial, courses }) {
     setLoading(true);
     const dayNum = dayForm.day_number || (challenge.challengeDays.length + 1);
     const row = { challenge_id:challenge.id, day_number:dayNum, topic:dayForm.topic, emoji:dayForm.emoji, course_id:dayForm.course_id||null, lesson_id:dayForm.lesson_id||null };
-    const { error } = await supabase.from("challenge_days").upsert(row, { onConflict:"challenge_id,day_number" });
-    if (error) { alert(error.message); setLoading(false); return; }
+    const res = await fetch("/api/admin/save-challenge-day", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(row) });
+    const data = await res.json();
+    if (data.error) { alert(data.error); setLoading(false); return; }
     const updated = { day:dayNum, topic:dayForm.topic, emoji:dayForm.emoji, courseId:row.course_id, lessonId:row.lesson_id };
     if (dayForm.day_number) setChallenge(p=>({...p,challengeDays:p.challengeDays.map(d=>d.day===dayForm.day_number?updated:d)}));
     else setChallenge(p=>({...p,challengeDays:[...p.challengeDays, updated]}));
