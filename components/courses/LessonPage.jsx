@@ -842,8 +842,8 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
                   </div>
                       <span style={{ fontSize:os.fontSize||14, color:"#374151", fontWeight:500, lineHeight:1.4, flex:1 }}>{opt}</span>
                   </div>
-                {c.optionImages?.[i] && (
-                  <img src={c.optionImages[i]} alt="" style={{ width:"100%", borderRadius:10, marginTop:4, objectFit:"contain", display:"block" }}/>
+                {c.optionImages?.[i] && isSel && (
+                  <img src={c.optionImages[i]} alt="" style={{ width:"100%", borderRadius:10, marginTop:8, objectFit:"contain", display:"block" }}/>
                 )}
             </button>
               );
