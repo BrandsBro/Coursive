@@ -126,8 +126,9 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
       const currentDay = parts ? parseInt(parts[parts.length - 1]) : 1;
       const nextDay = currentDay + 1;
       const totalDays = course?.units?.[0]?.lessons?.length || 0;
-      if (nextDay <= totalDays) router.push("/challenges/" + challengeId + "/day/" + nextDay);
-      else router.push("/challenges/" + challengeId + "?joined=true");
+      // Show day complete screen first
+      if (nextDay <= totalDays) router.push("/challenges/" + challengeId + "?dayComplete=" + currentDay);
+      else router.push("/challenges/" + challengeId + "?dayComplete=" + currentDay + "&allDone=true");
     } else if (nextLesson) {
       router.push("/courses/" + course.id + "/lessons/" + nextLesson.id + "?mode=" + mode);
     } else {
