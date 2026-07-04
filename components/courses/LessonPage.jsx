@@ -112,7 +112,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
     if (challengeId && challengeDay) await markChallengeDay(challengeId, challengeDay);
     await sendNotification("lesson", "Lesson complete! 📚", 'You finished "' + (lesson?.title || "") + '"', "📚", "/courses/" + course?.id);
     const isLast = !allLessons[currentIdx + 1];
-    if (isLast) {
+    if (isLast && !challengeId) {
       await sendNotification("certificate", "Certificate earned! 🏆", 'You completed "' + (course?.title || "") + '"', "🏆", "/profile");
       setTimeout(() => setShowCert(true), 2200);
     }
