@@ -509,6 +509,7 @@ function ReorderBlock({ c, idx, checked, setChecked }) {
   const [order, setOrder] = useState(shuffled);
   const [dragIdx, setDragIdx] = useState(null);
   const [dragOverIdx, setDragOverIdx] = useState(null);
+  const [selected, setSelected] = useState(null); // for tap-to-swap on mobile
   const isChecked = checked["ro_"+idx];
   const isCorrect = isChecked && order.every((item,i) => item === correctOrder[i]);
 
@@ -519,21 +520,48 @@ function ReorderBlock({ c, idx, checked, setChecked }) {
     const n=[...order]; const d=n.splice(dragIdx,1)[0]; n.splice(i,0,d);
     setOrder(n); setDragIdx(null); setDragOverIdx(null);
   };
-  const reset = () => { setOrder([...correctOrder].sort(()=>Math.random()-0.5)); setChecked(p=>({...p,["ro_"+idx]:false})); };
+
+  // Tap to select then tap another to swap
+  const handleTap = (i) => {
+    if (isChecked) return;
+    if (selected === null) {
+      setSelected(i);
+    } else if (selected === i) {
+      setSelected(null);
+    } else {
+      const n=[...order];
+      [n[selected], n[i]] = [n[i], n[selected]];
+      setOrder(n);
+      setSelected(null);
+    }
+  };
+
+  const reset = () => { setOrder([...correctOrder].sort(()=>Math.random()-0.5)); setChecked(p=>({...p,["ro_"+idx]:false})); setSelected(null); };
 
   return (
     <div style={{ padding:"20px 0" }}>
       {c.question && <p style={{ fontSize:16, fontWeight:700, color:"#0f172a", margin:"0 0 16px", lineHeight:1.5 }}>{c.question}</p>}
       {!isChecked && (
-        <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
-          {order.map((item,i) => (
-            <div key={item} draggable onDragStart={()=>handleDragStart(i)} onDragOver={e=>handleDragOver(e,i)} onDrop={()=>handleDrop(i)} onDragEnd={()=>{setDragIdx(null);setDragOverIdx(null);}}
-              style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 16px", borderRadius:12, border:`2px solid ${dragOverIdx===i?"#5B4EFF":"#E2E8F0"}`, background:dragIdx===i?"#EEF2FF":"#fff", cursor:"grab", boxShadow:"0 2px 4px rgba(0,0,0,0.04)" }}>
-              <span style={{ fontSize:20, color:"#CBD5E1" }}>⠿</span>
-              <span style={{ fontSize:15, color:"#374151", fontWeight:500, flex:1 }}>{item}</span>
-              <span style={{ fontSize:12, color:"#CBD5E1", fontWeight:700 }}>{i+1}</span>
-            </div>
-          ))}
+        <div>
+          <p style={{ fontSize:12, color:"#94A3B8", margin:"0 0 10px" }}>
+            {selected !== null ? "Now tap another item to swap positions" : "Tap to select, then tap another to swap · or drag to reorder"}
+          </p>
+          <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
+            {order.map((item,i) => (
+              <div key={item}
+                draggable
+                onDragStart={()=>handleDragStart(i)}
+                onDragOver={e=>handleDragOver(e,i)}
+                onDrop={()=>handleDrop(i)}
+                onDragEnd={()=>{setDragIdx(null);setDragOverIdx(null);}}
+                onClick={()=>handleTap(i)}
+                style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 16px", borderRadius:12, border:`2px solid ${selected===i?"#5B4EFF":dragOverIdx===i?"#8B5CF6":"#E2E8F0"}`, background:selected===i?"#EEF2FF":dragIdx===i?"#F5F3FF":"#fff", cursor:"pointer", boxShadow:selected===i?"0 0 0 3px rgba(91,78,255,0.2)":"0 2px 4px rgba(0,0,0,0.04)", transition:"all 0.15s" }}>
+                <span style={{ fontSize:20, color:selected===i?"#5B4EFF":"#CBD5E1" }}>⠿</span>
+                <span style={{ fontSize:15, color:selected===i?"#4338CA":"#374151", fontWeight:selected===i?700:500, flex:1 }}>{item}</span>
+                <span style={{ fontSize:12, fontWeight:700, width:24, height:24, borderRadius:"50%", background:selected===i?"#5B4EFF":"#F1F5F9", color:selected===i?"#fff":"#94A3B8", display:"flex", alignItems:"center", justifyContent:"center" }}>{i+1}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
       {isChecked && (
