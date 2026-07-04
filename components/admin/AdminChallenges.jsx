@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 
 import { useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
@@ -25,6 +26,7 @@ const PRESETS = [
 ];
 
 export default function AdminChallenges({ challenges: initial }) {
+  const router = useRouter();
   const [challenges, setChallenges] = useState(initial);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -66,7 +68,8 @@ export default function AdminChallenges({ challenges: initial }) {
     const error = data.error;
     if (error) { alert(error); return; }
     setDeleteId(null);
-    window.location.href = "/admin/challenges";
+    setChallenges(prev => prev.filter(c => c.id !== id));
+    router.refresh();
   };
 
   return (
