@@ -358,7 +358,14 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
                   return (
                     <span onClick={() => !isChecked && (val ? clearBlank(i) : setActiveBlank(i))}
                       style={{ display:"inline-block", minWidth:140, padding:"8px 20px", margin:"0 6px", borderRadius:14, border:`2.5px solid ${isActive?"#5B4EFF":ok?"#22c55e":wrong?"#ef4444":val?"#374151":"#D1D5DB"}`, background:isActive?"#EEF2FF":ok?"#F0FDF4":wrong?"#FEF2F2":val?"#F9FAFB":"#F9FAFB", color:isActive?"#5B4EFF":ok?"#166534":wrong?"#991B1B":val?"#111827":"#94A3B8", fontWeight:700, fontSize:18, textAlign:"center", verticalAlign:"middle", cursor:!isChecked?"pointer":"default", boxShadow:isActive?"0 0 0 4px rgba(91,78,255,0.2), 0 4px 12px rgba(91,78,255,0.15)":val?"0 2px 8px rgba(0,0,0,0.08)":"0 2px 0 #D1D5DB", transition:"all 0.2s", transform:isActive?"scale(1.05)":"scale(1)", animation:isActive&&!val?"blink 1s ease-in-out infinite":"none", position:"relative" }}>
-                      {val || (isActive ? <span style={{ opacity:0.4 }}>_ _ _</span> : <span style={{ opacity:0.25 }}>_ _ _</span>)}
+                      {val ? (
+                        <span style={{ display:"flex", alignItems:"center", gap:6 }}>
+                          {val}
+                          {!isChecked && <span onClick={e => { e.stopPropagation(); clearBlank(i); }} style={{ width:18, height:18, borderRadius:"50%", background:"rgba(0,0,0,0.15)", display:"inline-flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:900, cursor:"pointer", flexShrink:0 }}>✕</span>}
+                        </span>
+                      ) : (
+                        isActive ? <span style={{ opacity:0.5 }}>_ _ _</span> : <span style={{ opacity:0.2 }}>_ _ _</span>
+                      )}
                       {isActive && !val && <span style={{ position:"absolute", bottom:-6, left:"50%", transform:"translateX(-50%)", width:6, height:6, borderRadius:"50%", background:"#5B4EFF", display:"block" }}/>}
                     </span>
                   );
