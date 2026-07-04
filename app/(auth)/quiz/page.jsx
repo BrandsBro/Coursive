@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import QuizFlow from "@/components/quiz/QuizFlow";
 import { createClient } from "@supabase/supabase-js";
 
