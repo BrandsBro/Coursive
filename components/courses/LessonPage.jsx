@@ -254,15 +254,9 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
             </Link>
           ) : <div/>}
           {!isComplete && !completed ? (
-            hasContent ? (
-              <button onClick={handleComplete} style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(124,58,237,0.4)" }}>
-                ✓ Mark Complete
-              </button>
-            ) : (
-              <button disabled style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"#E2E8F0", color:"#94A3B8", fontSize:14, fontWeight:700, cursor:"not-allowed" }}>
-                Content not ready yet
-              </button>
-            )
+            <button onClick={handleComplete} style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(124,58,237,0.4)" }}>
+              {hasContent ? "✓ Mark Complete" : nextLesson ? "✓ Next Lesson" : "🏆 Finish Course"}
+            </button>
           ) : (
             <button onClick={handleNext} style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#22c55e,#16a34a)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7 }}>
               {nextLesson ? <><span>Next Lesson</span><ChevronRight size={15}/></> : <><Trophy size={15}/><span>Finish Course</span></>}
@@ -498,6 +492,74 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
   );
 }
 
+
+
+function ReorderBlock({ c, idx, checked, setChecked }) {
+  const correctOrder = (c.items||[]).filter(Boolean);
+  const shuffled = useMemo(() => [...correctOrder].sort(() => Math.random() - 0.5), []);
+  const [order, setOrder] = useState(shuffled);
+  const [dragIdx, setDragIdx] = useState(null);
+  const [dragOverIdx, setDragOverIdx] = useState(null);
+  const isChecked = checked["ro_"+idx];
+  const isCorrect = isChecked && order.every((item,i) => item === correctOrder[i]);
+
+  const handleDragStart = (i) => setDragIdx(i);
+  const handleDragOver = (e,i) => { e.preventDefault(); setDragOverIdx(i); };
+  const handleDrop = (i) => {
+    if (dragIdx===null||dragIdx===i) { setDragIdx(null); setDragOverIdx(null); return; }
+    const n=[...order]; const d=n.splice(dragIdx,1)[0]; n.splice(i,0,d);
+    setOrder(n); setDragIdx(null); setDragOverIdx(null);
+  };
+  const reset = () => { setOrder([...correctOrder].sort(()=>Math.random()-0.5)); setChecked(p=>({...p,["ro_"+idx]:false})); };
+
+  return (
+    <div style={{ padding:"20px 0" }}>
+      {c.question && <p style={{ fontSize:16, fontWeight:700, color:"#0f172a", margin:"0 0 16px", lineHeight:1.5 }}>{c.question}</p>}
+      {!isChecked && (
+        <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
+          {order.map((item,i) => (
+            <div key={item} draggable onDragStart={()=>handleDragStart(i)} onDragOver={e=>handleDragOver(e,i)} onDrop={()=>handleDrop(i)} onDragEnd={()=>{setDragIdx(null);setDragOverIdx(null);}}
+              style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 16px", borderRadius:12, border:`2px solid ${dragOverIdx===i?"#5B4EFF":"#E2E8F0"}`, background:dragIdx===i?"#EEF2FF":"#fff", cursor:"grab", boxShadow:"0 2px 4px rgba(0,0,0,0.04)" }}>
+              <span style={{ fontSize:20, color:"#CBD5E1" }}>⠿</span>
+              <span style={{ fontSize:15, color:"#374151", fontWeight:500, flex:1 }}>{item}</span>
+              <span style={{ fontSize:12, color:"#CBD5E1", fontWeight:700 }}>{i+1}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {isChecked && (
+        <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
+          {order.map((item,i) => {
+            const ok = item===correctOrder[i];
+            return (
+              <div key={item} style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 16px", borderRadius:12, border:`2px solid ${ok?"#22c55e":"#ef4444"}`, background:ok?"#F0FDF4":"#FEF2F2" }}>
+                <span style={{ fontSize:16 }}>{ok?"✓":"✕"}</span>
+                <span style={{ fontSize:15, color:ok?"#166534":"#991B1B", fontWeight:500, flex:1 }}>{item}</span>
+                {!ok && <span style={{ fontSize:12, color:"#991B1B" }}>→ {correctOrder[i]}</span>}
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {!isChecked && (
+        <button onClick={() => setChecked(p=>({...p,["ro_"+idx]:true}))} style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>Check Order</button>
+      )}
+      {isChecked && isCorrect && (
+        <div style={{ padding:"14px 18px", borderRadius:14, background:"#F0FDF4", border:"1.5px solid #BBF7D0" }}>
+          <p style={{ fontSize:15, fontWeight:700, color:"#166534", margin:0 }}>🎉 Perfect order!</p>
+        </div>
+      )}
+      {isChecked && !isCorrect && (
+        <div>
+          <div style={{ padding:"14px 18px", borderRadius:14, background:"#FEF2F2", border:"1.5px solid #FECACA", marginBottom:10 }}>
+            <p style={{ fontSize:15, fontWeight:700, color:"#DC2626", margin:0 }}>❌ Not quite — try again!</p>
+          </div>
+          <button onClick={reset} style={{ width:"100%", padding:"12px", borderRadius:12, border:"none", background:"#5B4EFF", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>🔄 Try Again</button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fillInputs, setFillInputs, fillChecked, setFillChecked, fillShowAnswer, setFillShowAnswer }) {
   const c = block.content || block;
@@ -826,6 +888,8 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
     }
 
     // ── REORDER ──
+    case "reorder":
+      return <ReorderBlock c={c} idx={idx} checked={checked} setChecked={setChecked}/>;
     case "reorder":
       return <ReorderBlock c={c} idx={idx} checked={checked} setChecked={setChecked}/>;
     // ── MULTIPLE CHOICE ──
