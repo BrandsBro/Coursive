@@ -231,16 +231,41 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
 
       {/* Complete modal */}
       {showComplete && (
-        <div style={{ position:"fixed", inset:0, background:"rgba(15,23,42,0.6)", zIndex:100, display:"flex", alignItems:"center", justifyContent:"center", padding:20, backdropFilter:"blur(4px)" }}>
-          <div style={{ background:"#fff", borderRadius:28, padding:"40px 36px", textAlign:"center", maxWidth:380, width:"100%", boxShadow:"0 32px 80px rgba(0,0,0,0.3)" }}>
-            <div style={{ fontSize:48, marginBottom:16 }}>🎉</div>
-            <h2 style={{ fontSize:24, fontWeight:900, color:"#0f172a", margin:"0 0 8px" }}>Lesson Complete!</h2>
-            <p style={{ fontSize:14, color:"#64748B", margin:"0 0 28px" }}>{nextLesson ? 'Up next: "'+nextLesson.title+'"' : "You've finished this course!"}</p>
-            <div style={{ display:"flex", gap:10 }}>
-              <button onClick={() => setShowComplete(false)} style={{ flex:1, padding:"12px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:13, fontWeight:600, color:"#374151", cursor:"pointer" }}>Stay here</button>
-              <button onClick={() => { setShowComplete(false); handleNext(); }} style={{ flex:2, padding:"12px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>
-                {nextLesson ? "Next lesson →" : "Back to course"}
-              </button>
+        <div style={{ position:"fixed", inset:0, background:"rgba(15,23,42,0.7)", zIndex:100, display:"flex", alignItems:"center", justifyContent:"center", padding:20, backdropFilter:"blur(8px)" }}>
+          <div style={{ background:"#fff", borderRadius:28, width:"100%", maxWidth:400, boxShadow:"0 32px 80px rgba(0,0,0,0.3)", overflow:"hidden" }}>
+            {/* Top gradient */}
+            <div style={{ background:"linear-gradient(135deg,#7c3aed,#4f46e5)", padding:"32px 28px", textAlign:"center" }}>
+              <div style={{ fontSize:56, marginBottom:12 }}>🎉</div>
+              <h2 style={{ fontSize:24, fontWeight:900, color:"#fff", margin:"0 0 6px" }}>
+                {nextLesson ? "Lesson Complete!" : "Course Complete! 🏆"}
+              </h2>
+              <p style={{ fontSize:14, color:"rgba(255,255,255,0.75)", margin:0 }}>
+                {nextLesson ? "Great work — keep going!" : "You finished the entire course!"}
+              </p>
+            </div>
+            {/* Body */}
+            <div style={{ padding:"24px 28px" }}>
+              {nextLesson && (
+                <div style={{ background:"#F8FAFC", borderRadius:14, padding:"14px 16px", marginBottom:20, display:"flex", alignItems:"center", gap:12 }}>
+                  <div style={{ width:40, height:40, borderRadius:10, background:"linear-gradient(135deg,#7c3aed,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <ChevronRight size={20} color="#fff"/>
+                  </div>
+                  <div>
+                    <p style={{ fontSize:11, color:"#94A3B8", margin:"0 0 2px", fontWeight:600, textTransform:"uppercase" }}>Up next</p>
+                    <p style={{ fontSize:14, fontWeight:700, color:"#0f172a", margin:0 }}>{nextLesson.title}</p>
+                  </div>
+                </div>
+              )}
+              <div style={{ display:"flex", gap:10 }}>
+                <button onClick={() => setShowComplete(false)}
+                  style={{ flex:1, padding:"13px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:13, fontWeight:600, color:"#374151", cursor:"pointer" }}>
+                  Stay here
+                </button>
+                <button onClick={() => { setShowComplete(false); handleNext(); }}
+                  style={{ flex:2, padding:"13px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(124,58,237,0.4)" }}>
+                  {nextLesson ? "Next Lesson →" : "Finish Course 🏆"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
