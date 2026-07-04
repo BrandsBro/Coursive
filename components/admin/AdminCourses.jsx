@@ -47,20 +47,13 @@ export default function AdminCourses({ courses: initial }) {
 
   const handleDelete = async (id) => {
     try {
-      // Delete lesson content first
-      const { data: lessons } = await supabase.from("lessons").select("id").eq("course_id", id);
-      if (lessons?.length) {
-        for (const lesson of lessons) {
-          await supabase.from("lesson_content").delete().eq("lesson_id", lesson.id);
-        }
-      }
-      // Delete related data
-      await supabase.from("lessons").delete().eq("course_id", id);
-      await supabase.from("course_units").delete().eq("course_id", id);
-      await supabase.from("course_reviews").delete().eq("course_id", id);
-      // Delete course
-      const { error } = await supabase.from("courses").delete().eq("id", id);
-      if (error) { alert("Delete failed: " + error.message); return; }
+      const res = await fetch("/api/admin/delete-course", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ courseId: id }),
+      });
+      const data = await res.json();
+      if (data.error) { alert("Delete failed: " + data.error); return; }
       setCourses(prev => prev.filter(c => c.id !== id));
       setDeleteId(null);
     } catch(e) {
