@@ -1,6 +1,5 @@
 "use client";
 import ChallengeReviews from "@/components/challenges/ChallengeReviews";
-import ChallengeLeaderboard from "@/components/challenges/ChallengeLeaderboard";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, Clock, Star, X, Check } from "lucide-react";
@@ -192,7 +191,7 @@ export default function ChallengePage({ challenge }) {
         {/* Tabs */}
         <div className="max-w-2xl mx-auto px-5 pb-3">
           <div style={{ display:"flex", gap:6, background:"#F1F5F9", borderRadius:14, padding:4 }}>
-            {[["overview","📚 Days"],["leaderboard","🏆 Leaderboard"]].map(([val,label]) => (
+            {[["overview","📚 Days"]].map(([val,label]) => (
               <button key={val} onClick={() => setActiveTab(val)}
                 style={{ flex:1, padding:"10px", borderRadius:11, border:"none",
                   background:activeTab===val?"#fff":"transparent",
