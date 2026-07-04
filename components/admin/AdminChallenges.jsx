@@ -52,7 +52,9 @@ export default function AdminChallenges({ challenges: initial }) {
     if (data.error) { alert(data.error); setLoading(false); return; }
     setLoading(false);
     setShowForm(false);
-    window.location.reload();
+    const updated = { id:form.id, title:form.title, subtitle:form.subtitle, description:form.description, emoji:form.emoji, imageUrl:form.image_url, gradientBg:form.gradient_bg, days:parseInt(form.days), level:form.level, challengeDays:[], reviews:[] };
+    if (editing) setChallenges(prev => prev.map(c => c.id === editing ? updated : c));
+    else setChallenges(prev => [...prev, updated]);
   };
 
   const handleDelete = async (id) => {
@@ -65,7 +67,6 @@ export default function AdminChallenges({ challenges: initial }) {
     if (error) { alert(error); return; }
     setChallenges(prev => prev.filter(c => c.id !== id));
     setDeleteId(null);
-    window.location.reload();
   };
 
   return (
