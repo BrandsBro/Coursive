@@ -54,7 +54,7 @@ export default function AdminChallenges({ challenges: initial }) {
     if (data.error) { alert(data.error); setLoading(false); return; }
     setLoading(false);
     setShowForm(false);
-    router.refresh();
+    window.location.href = "/admin/challenges";
   };
 
   const handleDelete = async (id) => {
