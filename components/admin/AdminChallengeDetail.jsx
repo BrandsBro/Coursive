@@ -46,6 +46,7 @@ export default function AdminChallengeDetail({ challenge: initial, courses }) {
 
   const saveDay = async () => {
     if (!dayForm.topic) return;
+    console.log("Saving day for challenge:", challenge.id, "dayForm:", dayForm);
     setLoading(true);
     const dayNum = dayForm.day_number || (challenge.challengeDays.length + 1);
     const row = { challenge_id:challenge.id, day_number:dayNum, topic:dayForm.topic, emoji:dayForm.emoji, course_id:dayForm.course_id||null, lesson_id:dayForm.lesson_id||null };
