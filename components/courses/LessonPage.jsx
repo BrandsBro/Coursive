@@ -182,8 +182,9 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
                     const nextStop = safeContent.findIndex((b, i) => i > idx && b.type === "continueblock");
                     setVisibleUntil(nextStop === -1 ? Infinity : nextStop);
                     setTimeout(() => {
-                      window.scrollTo({ top: window.scrollY + 100, behavior: "smooth" });
-                    }, 50);
+                      const el = document.getElementById("after-continue-"+idx);
+                      if (el) el.scrollIntoView({ behavior:"smooth", block:"start" });
+                    }, 100);
                   }}
                   style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(91,78,255,0.3)" }}>
                   {(block.content||{}).label||"Continue"} →
@@ -236,14 +237,19 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
                 </div>
               );
             }
+            // Check if previous block was a continue block
+            const prevBlock = safeContent[idx-1];
             return (
-              <ContentBlock key={block.id||idx} block={block} idx={idx}
+              <div key={block.id||idx}>
+                {prevBlock?.type === "continueblock" && <div id={"after-continue-"+(idx-1)} style={{ scrollMarginTop:70 }}/>}
+              <ContentBlock block={block} idx={idx}
                 answers={answers} setAnswers={setAnswers}
                 checked={checked} setChecked={setChecked}
                 fillInputs={fillInputs} setFillInputs={setFillInputs}
                 fillChecked={fillChecked} setFillChecked={setFillChecked}
                 fillShowAnswer={fillShowAnswer} setFillShowAnswer={setFillShowAnswer}
               />
+              </div>
             );
           })}
         </div>
