@@ -12,7 +12,7 @@ export const BLOCK_DEFS = {
   keypoints:    { icon:"⭐", label:"Key Points",     desc:"Bullet list",            color:"#0d9488", bg:"#F0FDFA", default:{ title:"Key Takeaways", points:["","",""], titleStyle:{}, pointStyle:{} },                            preview:c=>(c.points||[]).filter(Boolean).join(", ")||"No points" },
   callout:      { icon:"💡", label:"Callout",        desc:"Highlight box",          color:"#65a30d", bg:"#F7FEE7", default:{ text:"", style:"info", textStyle:{} },                                                                preview:c=>c.text||"Empty callout" },
   divider:      { icon:"➖", label:"Divider",        desc:"Visual break",           color:"#64748b", bg:"#F8FAFC", default:{ style:"line" },                                                                                       preview:()=>"Section divider" },
-  multiplechoice: { icon:"🔘", label:"Multiple Choice", desc:"Radio style quiz with explanation", color:"#7c3aed", bg:"#F5F3FF", default:{ question:"", options:["","",""], correct:0, explanation:"", questionStyle:{}, optionStyle:{}, explanationStyle:{} }, preview:c=>c.question||"No question" },
+  multiplechoice: { icon:"🔘", label:"Multiple Choice", desc:"Radio style quiz with explanation", color:"#7c3aed", bg:"#F5F3FF", default:{ heading:"", subheading:"", question:"", options:["","",""], correct:[], explanation:"", headingStyle:{}, subheadingStyle:{}, questionStyle:{}, optionStyle:{}, explanationStyle:{} }, preview:c=>c.question||"No question" },
   reorder: { icon:"↕️", label:"Reorder", desc:"Drag items into correct order", color:"#0d9488", bg:"#F0FDFA", default:{ question:"", items:["","","",""], itemStyle:{} }, preview:c=>c.question||"No question" },
   continueblock: { icon:"▶️", label:"Continue",       desc:"Stop point — hides content below", color:"#5B4EFF", bg:"#EEF2FF", default:{ label:"Continue" },                                                                    preview:()=>"── Continue button ──" },
   blankoptions: { icon:"🔤", label:"Blank + Options",desc:"Pick word from sentence",color:"#0891b2", bg:"#E0F2FE", default:{ sentence:"", markedWords:[], blanks:[], explanation:"", taskTitle:"", taskDesc:"", successText:"", successImages:[], sentenceStyle:{} },                         preview:c=>c.sentence||"No sentence" },
@@ -344,8 +344,18 @@ function QuizE({ content, onChange }) {
   const qs = content.questionStyle||{fontSize:16};
   const os = content.optionStyle||{fontSize:14};
   const es = content.explanationStyle||{fontSize:13};
+  const hs = content.headingStyle||{fontSize:20};
+  const ss = content.subheadingStyle||{fontSize:14};
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:14, paddingTop:12 }}>
+      <div>
+        <FC label="Heading Style" style={hs} setStyle={v => onChange({ ...content, headingStyle:v })}/>
+        <input value={content.heading||""} onChange={e => onChange({ ...content, heading:e.target.value })} placeholder="Section heading (optional)" style={{ ...inp(), ...styled(hs), fontWeight:hs.bold?"900":"800" }}/>
+      </div>
+      <div>
+        <FC label="Subheading Style" style={ss} setStyle={v => onChange({ ...content, subheadingStyle:v })}/>
+        <input value={content.subheading||""} onChange={e => onChange({ ...content, subheading:e.target.value })} placeholder="Subheading or context (optional)" style={{ ...inp(), ...styled(ss) }}/>
+      </div>
       <div>
         <FC label="Question Style" style={qs} setStyle={v => onChange({ ...content, questionStyle:v })}/>
         <textarea value={content.question||""} onChange={e => onChange({ ...content, question:e.target.value })} placeholder="Your question..." style={{ ...inp(), minHeight:70, resize:"vertical", ...styled(qs) }}/>

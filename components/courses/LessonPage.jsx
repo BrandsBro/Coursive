@@ -924,6 +924,16 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
 
       return (
         <div style={{ padding:"20px 0" }}>
+          {c.heading && (
+            <p style={{ fontSize:(c.headingStyle||{}).fontSize||20, fontWeight:"800", color:"#0f172a", margin:"0 0 4px", textAlign:(c.headingStyle||{}).align||"left" }}>
+              {c.heading}
+            </p>
+          )}
+          {c.subheading && (
+            <p style={{ fontSize:(c.subheadingStyle||{}).fontSize||14, color:"#64748B", margin:"0 0 14px", textAlign:(c.subheadingStyle||{}).align||"left" }}>
+              {c.subheading}
+            </p>
+          )}
           {multiMode && !isChecked && (
             <div style={{ display:"inline-block", padding:"4px 12px", borderRadius:999, background:"#EEF2FF", color:"#6366f1", fontSize:12, fontWeight:700, marginBottom:12 }}>
               Select all that apply
