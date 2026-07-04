@@ -133,28 +133,48 @@ export default function EmailTemplateEditor({ templateId }) {
                     <ColorRow label="Gradient Start" value={c.headerGradientStart||"#5B4EFF"} onChange={v=>uc("headerGradientStart",v)}/>
                     <ColorRow label="Gradient End" value={c.headerGradientEnd||"#8B5CF6"} onChange={v=>uc("headerGradientEnd",v)}/>
                     <AlignRow label="Header Align" value={c.headerAlign||"center"} onChange={v=>uc("headerAlign",v)}/>
+                    <FontSizeRow label="Header Height (padding)" value={c.headerPadding||40} onChange={v=>uc("headerPadding",v)}/>
                   </Section>
                   <Section label="Body">
-                    <ColorRow label="Background" value={c.bgColor||"#0a081e"} onChange={v=>uc("bgColor",v)}/>
+                    <ColorRow label="Page Background" value={c.bgColor||"#0a081e"} onChange={v=>uc("bgColor",v)}/>
                     <ColorRow label="Card Background" value={c.cardBg||"#1a1830"} onChange={v=>uc("cardBg",v)}/>
                     <ColorRow label="Card Border" value={c.cardBorder||"rgba(255,255,255,0.1)"} onChange={v=>uc("cardBorder",v)}/>
+                    <ColorRow label="Outer BG Color" value={c.outerBg||"#050411"} onChange={v=>uc("outerBg",v)}/>
+                    <FontSizeRow label="Body Padding" value={c.bodyPadding||32} onChange={v=>uc("bodyPadding",v)}/>
                   </Section>
-                  <Section label="Text">
+                  <Section label="Greeting">
                     <ColorRow label="Greeting Color" value={c.greetingColor||"#5B4EFF"} onChange={v=>uc("greetingColor",v)}/>
+                    <FontSizeRow label="Greeting Font Size" value={c.greetingFontSize||22} onChange={v=>uc("greetingFontSize",v)}/>
+                    <AlignRow label="Greeting Align" value={c.greetingAlign||"left"} onChange={v=>uc("greetingAlign",v)}/>
+                  </Section>
+                  <Section label="Body Text">
                     <ColorRow label="Body Text Color" value={c.bodyTextColor||"#aaaaaa"} onChange={v=>uc("bodyTextColor",v)}/>
                     <FontSizeRow label="Body Font Size" value={c.bodyFontSize||15} onChange={v=>uc("bodyFontSize",v)}/>
+                    <AlignRow label="Body Text Align" value={c.bodyTextAlign||"left"} onChange={v=>uc("bodyTextAlign",v)}/>
+                  </Section>
+                  <Section label="Credentials Block">
+                    <ColorRow label="Label Color" value={c.credLabelColor||"rgba(255,255,255,0.5)"} onChange={v=>uc("credLabelColor",v)}/>
+                    <ColorRow label="Email Color" value={c.credEmailColor||"#a78bfa"} onChange={v=>uc("credEmailColor",v)}/>
+                    <ColorRow label="Password BG" value={c.credPwBg||"rgba(91,78,255,0.2)"} onChange={v=>uc("credPwBg",v)}/>
+                    <ColorRow label="Password Text" value={c.credPwColor||"#ffffff"} onChange={v=>uc("credPwColor",v)}/>
                   </Section>
                   <Section label="Button">
                     <ColorRow label="Button BG Start" value={c.buttonColorFrom||"#5B4EFF"} onChange={v=>uc("buttonColorFrom",v)}/>
                     <ColorRow label="Button BG End" value={c.buttonColorTo||"#8B5CF6"} onChange={v=>uc("buttonColorTo",v)}/>
-                    <ColorRow label="Button Text" value={c.buttonTextColor||"#ffffff"} onChange={v=>uc("buttonTextColor",v)}/>
+                    <ColorRow label="Button Text Color" value={c.buttonTextColor||"#ffffff"} onChange={v=>uc("buttonTextColor",v)}/>
                     <FontSizeRow label="Button Font Size" value={c.buttonFontSize||16} onChange={v=>uc("buttonFontSize",v)}/>
+                    <FontSizeRow label="Button Border Radius" value={c.buttonRadius||12} onChange={v=>uc("buttonRadius",v)}/>
+                    <FontSizeRow label="Button Padding V" value={c.buttonPaddingV||16} onChange={v=>uc("buttonPaddingV",v)}/>
                     <AlignRow label="Button Align" value={c.buttonAlign||"center"} onChange={v=>uc("buttonAlign",v)}/>
+                  </Section>
+                  <Section label="Divider">
+                    <ColorRow label="Divider Color" value={c.dividerColor||"rgba(255,255,255,0.08)"} onChange={v=>uc("dividerColor",v)}/>
                   </Section>
                   <Section label="Footer">
                     <ColorRow label="Footer Text Color" value={c.footerColor||"rgba(255,255,255,0.3)"} onChange={v=>uc("footerColor",v)}/>
                     <FontSizeRow label="Footer Font Size" value={c.footerFontSize||12} onChange={v=>uc("footerFontSize",v)}/>
                     <AlignRow label="Footer Align" value={c.footerAlign||"center"} onChange={v=>uc("footerAlign",v)}/>
+                    <ColorRow label="Footer BG" value={c.footerBg||"transparent"} onChange={v=>uc("footerBg",v)}/>
                   </Section>
                 </>
               )}
@@ -320,27 +340,29 @@ function generateHtml(c, name, email, password) {
     : `<h1 style="margin:0;font-size:${c.logoTextSize||28}px;font-weight:900;color:${c.logoTextColor||"#ffffff"}">${c.logoText||"✦ 1Course"}</h1>`;
 
   return `
-    <div style="font-family:sans-serif;background:${c.bgColor||"#0a081e"};color:#fff;padding:0;margin:0">
-      <div style="background:linear-gradient(135deg,${c.headerGradientStart||"#5B4EFF"},${c.headerGradientEnd||"#8B5CF6"});padding:40px 32px;text-align:${c.logoAlign||"center"}">
-        ${logoHtml}
-        ${c.headerSubtitle||c.headerText ? `<p style="margin:10px 0 0;font-size:${c.headerSubtitleSize||14}px;color:${c.headerSubtitleColor||"rgba(255,255,255,0.8)"}">${c.headerSubtitle||c.headerText||""}</p>` : ""}
-      </div>
-      <div style="padding:32px">
-        <h2 style="font-size:22px;margin:0 0 12px;color:${c.greetingColor||"#5B4EFF"}">${greeting}</h2>
-        <p style="color:${c.bodyTextColor||"rgba(255,255,255,0.7)"};line-height:1.7;margin:0 0 20px;font-size:${c.bodyFontSize||15}px">${c.bodyText||""}</p>
-        ${c.showCredentials!==false ? `
-        <div style="background:${c.cardBg||"#1a1830"};border-radius:12px;padding:24px;margin:0 0 20px;border:1px solid ${c.cardBorder||"rgba(255,255,255,0.1)"}">
-          <p style="margin:0 0 4px;color:rgba(255,255,255,0.5);font-size:11px;text-transform:uppercase">Email</p>
-          <p style="margin:0 0 16px;font-weight:700;color:#a78bfa">${email}</p>
-          <p style="margin:0 0 4px;color:rgba(255,255,255,0.5);font-size:11px;text-transform:uppercase">Temporary Password</p>
-          <p style="margin:0;font-weight:900;font-size:20px;color:#fff;background:rgba(91,78,255,0.2);padding:12px;border-radius:8px;text-align:center;font-family:monospace">${password}</p>
-        </div>` : ""}
-        <div style="text-align:${c.buttonAlign||"center"}">
-          <a href="${c.buttonUrl||"#"}" style="display:inline-block;padding:16px 28px;background:linear-gradient(135deg,${c.buttonColorFrom||"#5B4EFF"},${c.buttonColorTo||"#8B5CF6"});color:${c.buttonTextColor||"#fff"};text-decoration:none;border-radius:12px;font-weight:700;font-size:${c.buttonFontSize||16}px">${c.buttonText||"Visit 1Course →"}</a>
+    <div style="font-family:sans-serif;background:${c.outerBg||c.bgColor||"#050411"};padding:0;margin:0">
+      <div style="max-width:600px;margin:0 auto;background:${c.bgColor||"#0a081e"}">
+        <div style="background:linear-gradient(135deg,${c.headerGradientStart||"#5B4EFF"},${c.headerGradientEnd||"#8B5CF6"});padding:${c.headerPadding||40}px 32px;text-align:center">
+          ${logoHtml}
+          ${c.headerSubtitle||c.headerText ? `<p style="margin:10px 0 0;font-size:${c.headerSubtitleSize||14}px;color:${c.headerSubtitleColor||"rgba(255,255,255,0.8)"};text-align:center">${c.headerSubtitle||c.headerText||""}</p>` : ""}
         </div>
-      </div>
-      <div style="padding:20px 32px;border-top:1px solid rgba(255,255,255,0.08);text-align:${c.footerAlign||"center"}">
-        <p style="color:${c.footerColor||"rgba(255,255,255,0.3)"};font-size:${c.footerFontSize||12}px;margin:0">${c.footerText||""}</p>
+        <div style="padding:${c.bodyPadding||32}px">
+          <h2 style="font-size:${c.greetingFontSize||22}px;margin:0 0 12px;color:${c.greetingColor||"#5B4EFF"};text-align:${c.greetingAlign||"left"}">${greeting}</h2>
+          <p style="color:${c.bodyTextColor||"rgba(255,255,255,0.7)"};line-height:1.7;margin:0 0 20px;font-size:${c.bodyFontSize||15}px;text-align:${c.bodyTextAlign||"left"}">${c.bodyText||""}</p>
+          ${c.showCredentials!==false ? `
+          <div style="background:${c.cardBg||"#1a1830"};border-radius:12px;padding:24px;margin:0 0 20px;border:1px solid ${c.cardBorder||"rgba(255,255,255,0.1)"}">
+            <p style="margin:0 0 4px;color:${c.credLabelColor||"rgba(255,255,255,0.5)"};font-size:11px;text-transform:uppercase">Email</p>
+            <p style="margin:0 0 16px;font-weight:700;color:${c.credEmailColor||"#a78bfa"}">${email}</p>
+            <p style="margin:0 0 4px;color:${c.credLabelColor||"rgba(255,255,255,0.5)"};font-size:11px;text-transform:uppercase">Temporary Password</p>
+            <p style="margin:0;font-weight:900;font-size:20px;color:${c.credPwColor||"#fff"};background:${c.credPwBg||"rgba(91,78,255,0.2)"};padding:12px;border-radius:8px;text-align:center;font-family:monospace">${password}</p>
+          </div>` : ""}
+          <div style="text-align:${c.buttonAlign||"center"}">
+            <a href="${c.buttonUrl||"#"}" style="display:inline-block;padding:${c.buttonPaddingV||16}px 28px;background:linear-gradient(135deg,${c.buttonColorFrom||"#5B4EFF"},${c.buttonColorTo||"#8B5CF6"});color:${c.buttonTextColor||"#fff"};text-decoration:none;border-radius:${c.buttonRadius||12}px;font-weight:700;font-size:${c.buttonFontSize||16}px">${c.buttonText||"Visit 1Course →"}</a>
+          </div>
+        </div>
+        <div style="padding:20px 32px;border-top:1px solid ${c.dividerColor||"rgba(255,255,255,0.08)"};text-align:${c.footerAlign||"center"};background:${c.footerBg||"transparent"}">
+          <p style="color:${c.footerColor||"rgba(255,255,255,0.3)"};font-size:${c.footerFontSize||12}px;margin:0">${c.footerText||""}</p>
+        </div>
       </div>
     </div>
   `;
