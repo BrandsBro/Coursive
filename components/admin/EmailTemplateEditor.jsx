@@ -73,7 +73,7 @@ function generateHtml(blocks, name, email, password, template) {
       case "heading":
         return `<div style="padding:4px 40px"><p style="font-size:${b.size||22}px;margin:0 0 8px;color:${b.color||"#fff"};text-align:${b.align||"left"};font-weight:${b.bold?"900":"700"};font-style:${b.italic?"italic":"normal"};line-height:1.3">${replace(b.text)}</p></div>`;
       case "text":
-        return `<div style="padding:4px 40px"><p style="color:${b.color||"rgba(255,255,255,0.7)"};font-size:${b.size||15}px;line-height:${b.lineHeight||1.8};text-align:${b.align||"left"};margin:0 0 8px">${replace(b.text)}</p></div>`;
+        return `<div style="padding:4px 40px"><div style="color:${b.color||"rgba(255,255,255,0.7)"};font-size:${b.size||15}px;line-height:${b.lineHeight||1.8};text-align:${b.align||"left"};margin:0 0 8px">${b.html ? replace(b.html) : (b.text||'').replace(/\n/g,'<br/>')}</div></div>`;
       case "button":
         return `<div style="padding:12px 40px;text-align:${b.align||"center"}"><a href="${b.url||"#"}" style="display:inline-block;padding:${b.paddingV||16}px ${b.paddingH||32}px;background:linear-gradient(135deg,${b.bgFrom||"#5B4EFF"},${b.bgTo||"#8B5CF6"});color:${b.color||"#fff"};text-decoration:none;border-radius:${b.radius||14}px;font-weight:700;font-size:${b.size||16}px">${b.text||"Click here"}</a></div>`;
       case "image":
@@ -352,7 +352,28 @@ function BlockControls({ block:b, onChange, uploadImg, uploading }) {
     );
     case "text": return (
       <div style={col()}>
-        <div><p style={lbl()}>Text <span style={{ color:"#94A3B8", fontWeight:400 }}>· {"{name}"} = user name</span></p><textarea value={b.text||""} onChange={e=>onChange("text",e.target.value)} rows={6} style={{ ...inp(), resize:"vertical" }}/></div>
+        <div>
+          <p style={lbl()}>Text <span style={{ color:"#94A3B8", fontWeight:400 }}>· paste formatted text, bold, line breaks all work</span></p>
+          <div
+            contentEditable
+            suppressContentEditableWarning
+            onInput={e => onChange("html", e.currentTarget.innerHTML)}
+            onPaste={e => {
+              e.preventDefault();
+              const html = e.clipboardData.getData("text/html");
+              const text = e.clipboardData.getData("text/plain");
+              if (html) document.execCommand("insertHTML", false, html);
+              else document.execCommand("insertHTML", false, text.replace(/\n/g, "<br/>"));
+            }}
+            dangerouslySetInnerHTML={{ __html: b.html || b.text?.replace(/\n/g,"<br/>") || "" }}
+            style={{ ...inp(), minHeight:140, resize:"vertical", cursor:"text", lineHeight:1.7, whiteSpace:"pre-wrap" }}
+          />
+          <div style={{ display:"flex", gap:4, marginTop:6 }}>
+            {[["bold","B","fontWeight:900"],["italic","I","fontStyle:italic"],["underline","U","textDecoration:underline"]].map(([cmd,label])=>(
+              <button key={cmd} onMouseDown={e=>{e.preventDefault();document.execCommand(cmd,false,null);}} style={{ padding:"3px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:13, cursor:"pointer", fontWeight:cmd==="bold"?900:400, fontStyle:cmd==="italic"?"italic":"normal", textDecoration:cmd==="underline"?"underline":"none" }}>{label}</button>
+            ))}
+          </div>
+        </div>
         <CF label="Color" value={b.color||"rgba(255,255,255,0.7)"} onChange={v=>onChange("color",v)}/>
         <SF label="Font Size" value={b.size||15} onChange={v=>onChange("size",v)}/>
         <AF label="Align" value={b.align||"left"} onChange={v=>onChange("align",v)}/>
