@@ -32,6 +32,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   const [showCert, setShowCert] = useState(false);
   const [activeTask, setActiveTask] = useState(null); // idx of active blankoptions block
   const [tasksDone, setTasksDone] = useState({});
+  const [activeTaskIdx, setActiveTaskIdx] = useState(null);
   const audioRef = useRef(null);
   const autoStartedRef = useRef(false);
   const allLessons = (course?.units || []).flatMap(u => u.lessons || []);
@@ -187,11 +188,48 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
             }
             if (block.type === "blankoptions") {
               const c = block.content || {};
+              const isDone = tasksDone[idx];
+              if (isDone) {
+                // Show completed card inline
+                return (
+                  <div key={block.id||idx} style={{ borderRadius:16, border:"1.5px solid #E2E8F0", overflow:"hidden" }}>
+                    <div style={{ padding:"12px 20px", background:"#F0FDF4", display:"flex", alignItems:"center", gap:8 }}>
+                      <Check size={16} color="#22c55e"/>
+                      <span style={{ fontSize:14, fontWeight:700, color:"#166534" }}>Task completed</span>
+                    </div>
+                    <div style={{ padding:"18px 20px" }}>
+                      {c.taskTitle && <h3 style={{ fontSize:16, fontWeight:800, color:"#0f172a", margin:"0 0 6px" }}>{c.taskTitle}</h3>}
+                      {c.taskDesc && <p style={{ fontSize:13, color:"#64748B", margin:"0 0 16px" }}>{c.taskDesc}</p>}
+                      <button onClick={() => setTasksDone(p=>({...p,[idx]:false}))} style={{ width:"100%", padding:"13px", borderRadius:12, border:"none", background:"#EEF2FF", color:"#5B4EFF", fontSize:14, fontWeight:700, cursor:"pointer" }}>
+                        🔁 Repeat task
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
               return (
-                <BlankOptionsBlock key={block.id||idx} c={c} idx={idx}
-                  checked={checked} setChecked={setChecked}
-                  fillShowAnswer={fillShowAnswer} setFillShowAnswer={setFillShowAnswer}
-                />
+                <div key={block.id||idx}>
+                  {activeTaskIdx !== idx ? (
+                    <button onClick={() => setActiveTaskIdx(idx)}
+                      style={{ width:"100%", padding:"18px 20px", borderRadius:16, border:"2px solid #E2E8F0", background:"#F8FAFC", cursor:"pointer", textAlign:"left", display:"flex", alignItems:"center", gap:14 }}>
+                      <div style={{ width:44, height:44, borderRadius:12, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                        <span style={{ fontSize:22 }}>🔤</span>
+                      </div>
+                      <div>
+                        <p style={{ fontSize:15, fontWeight:800, color:"#0f172a", margin:"0 0 2px" }}>{c.taskTitle||"Fill in the blanks"}</p>
+                        <p style={{ fontSize:13, color:"#94A3B8", margin:0 }}>{c.taskDesc||"Tap to start the task"}</p>
+                      </div>
+                      <div style={{ marginLeft:"auto", padding:"8px 16px", borderRadius:10, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:13, fontWeight:700 }}>Start →</div>
+                    </button>
+                  ) : (
+                    <BlankOptionsBlock c={c} idx={idx}
+                      checked={checked} setChecked={setChecked}
+                      fillShowAnswer={fillShowAnswer} setFillShowAnswer={setFillShowAnswer}
+                      onDone={() => { setTasksDone(p=>({...p,[idx]:true})); setActiveTaskIdx(null); }}
+                      onClose={() => setActiveTaskIdx(null)}
+                    />
+                  )}
+                </div>
               );
             }
             return (
@@ -289,7 +327,7 @@ function renderInline(text) {
 }
 
 
-function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFillShowAnswer }) {
+function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFillShowAnswer, onDone, onClose }) {
   const blanks = c.blanks || [];
   const sentence = c.sentence || "";
   const parts = sentence.split(/\(\s*[^)]*\s*\)/);
@@ -304,7 +342,6 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
 
   const [filled, setFilled] = useState(Array(blankCount).fill(null));
   const [activeBlank, setActiveBlank] = useState(0);
-  const [taskDone, setTaskDone] = useState(false);
 
   const isChecked = checked["bo_"+idx];
   const allFilled = filled.every(f => f !== null);
@@ -332,32 +369,14 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
     setActiveBlank(0);
     setChecked(p => ({...p, ["bo_"+idx]: false}));
     setFillShowAnswer(p => ({...p, ["bo_"+idx]: false}));
-    setTaskDone(false);
   };
 
-  if (taskDone) {
-    return (
-      <div style={{ borderRadius:16, border:"1.5px solid #E2E8F0", overflow:"hidden" }}>
-        <div style={{ padding:"12px 20px", background:"#F0FDF4", display:"flex", alignItems:"center", gap:8 }}>
-          <Check size={16} color="#22c55e"/>
-          <span style={{ fontSize:14, fontWeight:700, color:"#166534" }}>Task completed</span>
-        </div>
-        <div style={{ padding:"18px 20px" }}>
-          {c.taskTitle && <h3 style={{ fontSize:16, fontWeight:800, color:"#0f172a", margin:"0 0 6px" }}>{c.taskTitle}</h3>}
-          {c.taskDesc && <p style={{ fontSize:13, color:"#64748B", margin:"0 0 16px" }}>{c.taskDesc}</p>}
-          <button onClick={reset} style={{ width:"100%", padding:"13px", borderRadius:12, border:"none", background:"#EEF2FF", color:"#5B4EFF", fontSize:14, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
-            🔁 Repeat task
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div style={{ position:"fixed", inset:0, background:"#fff", zIndex:200, display:"flex", flexDirection:"column" }}>
       {/* Header */}
       <div style={{ padding:"14px 20px", borderBottom:"1px solid #F1F5F9", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-        <button onClick={() => setTaskDone(true)} style={{ width:32, height:32, borderRadius:"50%", border:"1.5px solid #E2E8F0", background:"#fff", cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", color:"#64748B" }}>✕</button>
+        <button onClick={() => onDone && onDone()} style={{ width:32, height:32, borderRadius:"50%", border:"1.5px solid #E2E8F0", background:"#fff", cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", color:"#64748B" }}>✕</button>
         {/* Progress dots */}
         <div style={{ display:"flex", gap:6 }}>
           {Array.from({length:blankCount},(_,i) => (
@@ -417,7 +436,7 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
               <div style={{ padding:"14px 18px", borderRadius:14, background:"#F0FDF4", border:"1.5px solid #BBF7D0", marginBottom:16 }}>
                 <p style={{ fontSize:15, fontWeight:700, color:"#166534", margin:0 }}>🎉 Correct!</p>
               </div>
-              <button onClick={() => setTaskDone(true)} style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer" }}>
+              <button onClick={() => onDone && onDone()} style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer" }}>
                 Continue →
               </button>
             </div>
