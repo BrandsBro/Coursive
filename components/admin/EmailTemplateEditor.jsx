@@ -116,11 +116,29 @@ export default function EmailTemplateEditor({ templateId }) {
                 <>
                   <Field label="Subject Line"><input value={template.subject||""} onChange={e=>u("subject",e.target.value)} style={inp()}/></Field>
                   <Field label="Header Subtitle"><input value={c.headerText||""} onChange={e=>uc("headerText",e.target.value)} style={inp()}/></Field>
+                  <Field label="Header Subtitle Color">
+                    <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+                      <input type="color" value={(c.headerSubtitleColor||"#cccccc").startsWith("#")?(c.headerSubtitleColor||"#cccccc"):"#cccccc"} onChange={e=>uc("headerSubtitleColor",e.target.value)} style={{ width:32, height:32, borderRadius:6, border:"1.5px solid #E2E8F0", cursor:"pointer", padding:2 }}/>
+                      <input value={c.headerSubtitleColor||"rgba(255,255,255,0.8)"} onChange={e=>uc("headerSubtitleColor",e.target.value)} style={{ ...inp(), fontSize:12 }}/>
+                    </div>
+                  </Field>
                   <Field label="Greeting" hint="Use {name}"><input value={c.greetingText||"Congratulations, {name}! 🎉"} onChange={e=>uc("greetingText",e.target.value)} style={inp()}/></Field>
-                  <Field label="Body Text"><textarea value={c.bodyText||""} onChange={e=>uc("bodyText",e.target.value)} rows={4} style={{ ...inp(), resize:"vertical" }}/></Field>
+                  <Field label="Body Text"><textarea value={c.bodyText||""} onChange={e=>uc("bodyText",e.target.value)} rows={5} style={{ ...inp(), resize:"vertical" }}/></Field>
+                  <Field label="Body Text Color">
+                    <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+                      <input type="color" value={(c.bodyTextColor||"#aaaaaa").startsWith("#")?(c.bodyTextColor||"#aaaaaa"):"#aaaaaa"} onChange={e=>uc("bodyTextColor",e.target.value)} style={{ width:32, height:32, borderRadius:6, border:"1.5px solid #E2E8F0", cursor:"pointer", padding:2 }}/>
+                      <input value={c.bodyTextColor||"rgba(255,255,255,0.7)"} onChange={e=>uc("bodyTextColor",e.target.value)} style={{ ...inp(), fontSize:12 }}/>
+                    </div>
+                  </Field>
                   <Field label="Button Text"><input value={c.buttonText||""} onChange={e=>uc("buttonText",e.target.value)} style={inp()}/></Field>
                   <Field label="Button URL"><input value={c.buttonUrl||""} onChange={e=>uc("buttonUrl",e.target.value)} placeholder="https://1course.io/login" style={inp()}/></Field>
                   <Field label="Footer Text"><input value={c.footerText||""} onChange={e=>uc("footerText",e.target.value)} style={inp()}/></Field>
+                  <Field label="Footer Text Color">
+                    <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+                      <input type="color" value={(c.footerColor||"#888888").startsWith("#")?(c.footerColor||"#888888"):"#888888"} onChange={e=>uc("footerColor",e.target.value)} style={{ width:32, height:32, borderRadius:6, border:"1.5px solid #E2E8F0", cursor:"pointer", padding:2 }}/>
+                      <input value={c.footerColor||"rgba(255,255,255,0.3)"} onChange={e=>uc("footerColor",e.target.value)} style={{ ...inp(), fontSize:12 }}/>
+                    </div>
+                  </Field>
                   <Field label="Show Credentials Block">
                     <Toggle value={c.showCredentials!==false} onChange={v=>uc("showCredentials",v)}/>
                   </Field>
