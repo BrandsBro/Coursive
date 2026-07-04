@@ -54,9 +54,7 @@ export default function AdminChallenges({ challenges: initial }) {
     if (data.error) { alert(data.error); setLoading(false); return; }
     setLoading(false);
     setShowForm(false);
-    const updated = { id:form.id, title:form.title, subtitle:form.subtitle, description:form.description, emoji:form.emoji, imageUrl:form.image_url, gradientBg:form.gradient_bg, days:parseInt(form.days), level:form.level, challengeDays:[], reviews:[] };
-    if (editing) setChallenges(prev => prev.map(c => c.id === editing ? updated : c));
-    else setChallenges(prev => [...prev, updated]);
+    router.refresh();
   };
 
   const handleDelete = async (id) => {
