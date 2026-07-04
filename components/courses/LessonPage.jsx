@@ -956,15 +956,17 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
               } else if (isSel) { border="#7c3aed"; bg="#F5F3FF"; checkColor="#7c3aed"; }
               return (
                 <button key={i} onClick={() => toggleSel(i)}
-                  style={{ display:"flex", alignItems:"center", gap:12, padding:"14px 16px", borderRadius:12, border:`1.5px solid ${border}`, background:bg, cursor:isChecked?"default":"pointer", textAlign:"left", transition:"all 0.15s" }}>
+                  style={{ display:"flex", flexDirection:c.optionImages?.[i]?"column":"row", alignItems:c.optionImages?.[i]?"flex-start":"center", gap:c.optionImages?.[i]?10:12, padding:"14px 16px", borderRadius:12, border:`1.5px solid ${border}`, background:bg, cursor:isChecked?"default":"pointer", textAlign:"left", transition:"all 0.15s", width:"100%" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:10, width:"100%" }}>
                   <div style={{ width:20, height:20, borderRadius:multiMode?4:"50%", border:`2px solid ${checkColor}`, background:isSel||isChecked&&isRight?checkColor:"#fff", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}>
                     {(isSel || (isChecked && isRight)) && <Check size={12} color="#fff"/>}
                   </div>
-                  <div style={{ flex:1 }}>
-                {c.optionImages?.[i] && <img src={c.optionImages[i]} alt="" style={{ width:"100%", borderRadius:10, marginBottom:6, objectFit:"cover", maxHeight:120 }}/>}
-                <span style={{ fontSize:os.fontSize||14, color:"#374151", fontWeight:500, lineHeight:1.4 }}>{opt}</span>
-              </div>
-                </button>
+                      <span style={{ fontSize:os.fontSize||14, color:"#374151", fontWeight:500, lineHeight:1.4, flex:1 }}>{opt}</span>
+                  </div>
+                {c.optionImages?.[i] && (
+                  <img src={c.optionImages[i]} alt="" style={{ width:"100%", borderRadius:10, marginTop:4, objectFit:"cover", display:"block" }}/>
+                )}
+            </button>
               );
             })}
           </div>
