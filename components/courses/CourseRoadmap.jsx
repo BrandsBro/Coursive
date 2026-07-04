@@ -253,15 +253,7 @@ export default function CourseRoadmap({ course, completedLessons = [], onViewCer
           );
         })}
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-card p-6 text-center">
-          <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Up Next</p>
-          <p className="text-xs font-bold text-primary mb-2">AI MASTERY • Communicating With AI</p>
-          <h3 className="font-bold text-gray-900 text-lg mb-1">Communicating With AI</h3>
-          <p className="text-sm text-gray-500 mb-4">Turn AI into a useful thinking partner</p>
-          <Link href="/courses" className="block bg-primary text-white px-8 py-3 rounded-xl text-sm font-semibold hover:bg-primary-dark transition-all">
-            Jump ahead to the next course
-          </Link>
-        </div>
+
       </div>
     </div>
   );
