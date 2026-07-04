@@ -565,6 +565,217 @@ function BlankOptionsE({ content, onChange }) {
 
 function MultipleChoiceE({ content, onChange }) {
   const opts = content.options||["","",""];
+  const optImgs = content.optionImages||opts.map(()=>"");
+  const setOpt = (i,v) => { const a=[...opts]; a[i]=v; onChange({ ...content, options:a }); };
+  const setOptImg = (i,v) => { const a=[...(content.optionImages||opts.map(()=>""))]; a[i]=v; onChange({ ...content, optionImages:a }); };
+  const qs = content.questionStyle||{fontSize:16};
+  const os = content.optionStyle||{fontSize:14};
+  const es = content.explanationStyle||{fontSize:13};
+  const hs = content.headingStyle||{fontSize:20};
+  const ss = content.subheadingStyle||{fontSize:14};
+  const correct = Array.isArray(content.correct) ? content.correct : content.correct!==undefined ? [content.correct] : [];
+  const toggleCorrect = (i) => {
+    const nc = correct.includes(i) ? correct.filter(x=>x!==i) : [...correct,i];
+    onChange({ ...content, correct:nc });
+  };
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:14, paddingTop:12 }}>
+
+      {/* Heading */}
+      <div>
+        <FC label="Heading Style" style={hs} setStyle={v => onChange({ ...content, headingStyle:v })}/>
+        <input value={content.heading||""} onChange={e => onChange({ ...content, heading:e.target.value })} placeholder="Heading (optional)" style={{ ...inp(), ...styled(hs), fontWeight:"800" }}/>
+      </div>
+
+      {/* Subheading */}
+      <div>
+        <FC label="Subheading Style" style={ss} setStyle={v => onChange({ ...content, subheadingStyle:v })}/>
+        <input value={content.subheading||""} onChange={e => onChange({ ...content, subheading:e.target.value })} placeholder="Subheading (optional)" style={{ ...inp(), ...styled(ss) }}/>
+      </div>
+
+      {/* Header image */}
+      <div>
+        <p style={lbl()}>Header Image <span style={{ color:"#94A3B8", fontWeight:400 }}>· optional</span></p>
+        <input value={content.headerImage||""} onChange={e => onChange({ ...content, headerImage:e.target.value })} placeholder="https://... image URL" style={inp()}/>
+        {content.headerImage && <img src={content.headerImage} alt="" style={{ width:"100%", borderRadius:10, marginTop:6, maxHeight:120, objectFit:"cover" }}/>}
+      </div>
+
+      {/* Question */}
+      <div>
+        <FC label="Question Style" style={qs} setStyle={v => onChange({ ...content, questionStyle:v })}/>
+        <textarea value={content.question||""} onChange={e => onChange({ ...content, question:e.target.value })}
+          placeholder="Your question..." style={{ ...inp(), minHeight:70, resize:"vertical", ...styled(qs) }}/>
+      </div>
+
+      {/* Options */}
+      <div>
+        <FC label="Options Style" style={os} setStyle={v => onChange({ ...content, optionStyle:v })}/>
+        <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
+          <p style={{ fontSize:10, color:"#94A3B8", margin:0 }}>Click ✓ to mark correct — can select multiple</p>
+          <span style={{ fontSize:10, fontWeight:700, color:"#22c55e", background:"#F0FDF4", padding:"2px 8px", borderRadius:999 }}>{correct.length} correct</span>
+        </div>
+        <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+          {opts.map((o,i) => (
+            <div key={i} style={{ background:"#F8FAFC", borderRadius:10, padding:10, border:`1.5px solid ${correct.includes(i)?"#22c55e":"#E2E8F0"}` }}>
+              <div style={{ display:"flex", gap:8, alignItems:"center", marginBottom:6 }}>
+                <button onClick={() => toggleCorrect(i)}
+                  style={{ width:28, height:28, borderRadius:6, border:`2px solid ${correct.includes(i)?"#22c55e":"#E2E8F0"}`, background:correct.includes(i)?"#22c55e":"#fff", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                  {correct.includes(i) && <Check size={13} color="#fff"/>}
+                </button>
+                <input value={o} onChange={e => setOpt(i,e.target.value)} placeholder={`Option ${i+1}`}
+                  style={{ ...inp(), flex:1, fontSize:os.fontSize||14 }}/>
+                {opts.length>2 && <button onClick={() => onChange({ ...content, options:opts.filter((_,x)=>x!==i), optionImages:optImgs.filter((_,x)=>x!==i), correct:correct.filter(x=>x!==i).map(x=>x>i?x-1:x) })} style={ctrlX()}>✕</button>}
+              </div>
+              {/* Option image */}
+              <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+                <input value={optImgs[i]||""} onChange={e => setOptImg(i,e.target.value)} placeholder="Image URL for this option (optional)" style={{ ...inp(), fontSize:11 }}/>
+                {optImgs[i] && <img src={optImgs[i]} alt="" style={{ width:44, height:44, borderRadius:6, objectFit:"cover", flexShrink:0 }}/>}
+              </div>
+            </div>
+          ))}
+          {opts.length<6 && <button onClick={() => onChange({ ...content, options:[...opts,""], optionImages:[...optImgs,""] })} style={addX()}>+ Add option</button>}
+        </div>
+      </div>
+
+      {/* Explanation */}
+      <div>
+        <FC label="Explanation Style" style={es} setStyle={v => onChange({ ...content, explanationStyle:v })}/>
+        <textarea value={content.explanation||""} onChange={e => onChange({ ...content, explanation:e.target.value })}
+          placeholder="Explain why this is correct..." style={{ ...inp(), minHeight:60, resize:"vertical", ...styled(es) }}/>
+      </div>
+
+      {/* Success image */}
+      <div>
+        <p style={lbl()}>Success Image <span style={{ color:"#94A3B8", fontWeight:400 }}>· shown after correct answer</span></p>
+        <input value={content.successImage||""} onChange={e => onChange({ ...content, successImage:e.target.value })} placeholder="https://... image URL" style={inp()}/>
+        {content.successImage && <img src={content.successImage} alt="" style={{ width:"100%", borderRadius:10, marginTop:6, maxHeight:120, objectFit:"cover" }}/>}
+      </div>
+
+      {/* Success text */}
+      <div>
+        <p style={lbl()}>Success Text <span style={{ color:"#94A3B8", fontWeight:400 }}>· shown after correct answer</span></p>
+        <textarea value={content.successText||""} onChange={e => onChange({ ...content, successText:e.target.value })}
+          placeholder="Well done! Here is why..." style={{ ...inp(), minHeight:50, resize:"vertical" }}/>
+      </div>
+    </div>
+  );
+}
+
+
+function BlankOptionsE({ content, onChange }) {
+  const [lib, setLib] = useState(false);
+  const successImages = content.successImages||[];
+  const blankCount = content.blankCount||2;
+  const blanks = Array.from({ length:blankCount }, (_,i) => content.blanks?.[i]||{ correct:"" });
+  const sentence = content.sentence||"";
+
+  const updateBlank = (i, val) => {
+    const nb = [...blanks]; nb[i] = { correct:val };
+    onChange({ ...content, blanks:nb });
+  };
+
+  const setCount = (n) => {
+    const nb = Array.from({ length:n }, (_,i) => content.blanks?.[i]||{ correct:"" });
+    onChange({ ...content, blankCount:n, blanks:nb });
+  };
+
+  // Preview: replace ___ with answers
+  const preview = () => {
+    let s = sentence; let i = 0;
+    return s.replace(/\([^)]+\)/g, () => {
+      const ans = blanks[i]?.correct || ("blank "+(i+1));
+      i++; return "["+ans+"]";
+    });
+  };
+
+  const blankCountInSentence = (sentence.match(/\([^)]+\)/g)||[]).length;
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:14, paddingTop:12 }}>
+
+      <div>
+        <p style={lbl()}>Task Title</p>
+        <input value={content.taskTitle||""} onChange={e => onChange({ ...content, taskTitle:e.target.value })} placeholder="e.g. Generate Your First Image" style={inp()}/>
+      </div>
+
+      <div>
+        <p style={lbl()}>Task Description <span style={{ color:"#94A3B8", fontWeight:400 }}>· optional</span></p>
+        <input value={content.taskDesc||""} onChange={e => onChange({ ...content, taskDesc:e.target.value })} placeholder="e.g. Ask Kling to generate an image of a horse." style={inp()}/>
+      </div>
+
+      <div>
+        <p style={lbl()}>How many blanks?</p>
+        <div style={{ display:"flex", gap:8 }}>
+          {[1,2,3,4].map(n => (
+            <button key={n} onClick={() => setCount(n)}
+              style={{ width:48, height:48, borderRadius:12, border:`2px solid ${blankCount===n?"#6366f1":"#E2E8F0"}`, background:blankCount===n?"#EEF2FF":"#fff", color:blankCount===n?"#6366f1":"#374151", fontSize:18, fontWeight:800, cursor:"pointer" }}>
+              {n}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <p style={lbl()}>Correct answer for each blank</p>
+        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+          {Array.from({ length:blankCount }, (_,i) => (
+            <div key={i} style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <span style={{ width:28, height:28, borderRadius:"50%", background:"#6366f1", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:800, flexShrink:0 }}>{i+1}</span>
+              <input value={blanks[i]?.correct||""} onChange={e => updateBlank(i, e.target.value)}
+                placeholder={`Answer for blank ${i+1} (e.g. white horse)`}
+                style={{ ...inp(), flex:1, margin:0 }}/>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <p style={lbl()}>Full sentence <span style={{ color:"#94A3B8", fontWeight:400 }}>· use () for each blank ({blankCount} needed)</span></p>
+        <textarea value={sentence} onChange={e => onChange({ ...content, sentence:e.target.value })}
+          placeholder={`e.g. A () in an open field, () lighting`}
+          style={{ ...inp(), minHeight:70, resize:"vertical" }}/>
+        <p style={{ fontSize:11, color:blankCountInSentence===blankCount?"#22c55e":"#f59e0b", margin:"4px 0 0", fontWeight:600 }}>
+          {blankCountInSentence===blankCount ? "✓ "+blankCount+" blank"+(blankCount>1?"s":"")+" found" : "⚠️ Found "+blankCountInSentence+" () but need "+blankCount}
+        </p>
+      </div>
+
+      {blankCountInSentence===blankCount && blanks.some(b=>b.correct) && (
+        <div style={{ padding:"12px 14px", borderRadius:10, background:"#EEF2FF", border:"1.5px solid #C7D2FE" }}>
+          <p style={{ fontSize:11, fontWeight:700, color:"#6366f1", margin:"0 0 4px" }}>PREVIEW</p>
+          <p style={{ fontSize:14, color:"#374151", margin:0, lineHeight:1.8 }}>{preview()}</p>
+        </div>
+      )}
+
+      <div>
+        <p style={lbl()}>Success Text <span style={{ color:"#94A3B8", fontWeight:400 }}>· shown after correct</span></p>
+        <textarea value={content.successText||""} onChange={e => onChange({ ...content, successText:e.target.value })}
+          placeholder="Great job! Here is what you created..." style={{ ...inp(), minHeight:60, resize:"vertical" }}/>
+      </div>
+
+      <div>
+        <p style={lbl()}>Success Images</p>
+        {successImages.map((url,i) => (
+          <div key={i} style={{ display:"flex", gap:6, marginBottom:6, alignItems:"center" }}>
+            <img src={url} alt="" style={{ width:40,height:40,borderRadius:6,objectFit:"cover" }}/>
+            <input value={url} onChange={e => { const a=[...successImages]; a[i]=e.target.value; onChange({ ...content, successImages:a }); }} style={{ ...inp(), flex:1 }}/>
+            <button onClick={() => onChange({ ...content, successImages:successImages.filter((_,x)=>x!==i) })} style={ctrlX()}>✕</button>
+          </div>
+        ))}
+        <div style={{ display:"flex", gap:6 }}>
+          <button onClick={() => setLib(true)} style={mediaBtn("#059669")}><ImageIcon size={13}/> Upload</button>
+          <button onClick={() => { const u=window.prompt("Image URL:"); if(u) onChange({ ...content, successImages:[...successImages,u] }); }} style={mediaBtn("#6366f1")}><Link2 size={13}/> URL</button>
+        </div>
+      </div>
+
+      {lib && <MediaLibrary accept="image" onSelect={m => { onChange({ ...content, successImages:[...successImages,m.url] }); setLib(false); }} onClose={() => setLib(false)}/>}
+    </div>
+  );
+}
+
+
+function MultipleChoiceE({ content, onChange }) {
+  const opts = content.options||["","",""];
   const setOpt = (i,v) => { const a=[...opts]; a[i]=v; onChange({ ...content, options:a }); };
   const qs = content.questionStyle||{fontSize:16};
   const os = content.optionStyle||{fontSize:14};
