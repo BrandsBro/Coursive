@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import AdminCourses from "@/components/admin/AdminCourses";
 import { getAllCourses } from "@/lib/db";
 

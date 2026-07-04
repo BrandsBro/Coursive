@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import CertificateBanner from "@/components/home/CertificateBanner";
 import SubscriptionGuard from "@/components/home/SubscriptionGuard";
 import CurrentCourseWidget from "@/components/home/CurrentCourseWidget";
@@ -6,7 +7,6 @@ import ChallengesSection from "@/components/home/ChallengesSection";
 import BrowseCourses from "@/components/home/BrowseCourses";
 import { getAllCourses, getAllChallenges } from "@/lib/db";
 
-export const revalidate = 60;
 
 export default async function DashboardPage() {
   const [courses, challenges] = await Promise.all([
