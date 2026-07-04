@@ -964,7 +964,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
                       <span style={{ fontSize:os.fontSize||14, color:"#374151", fontWeight:500, lineHeight:1.4, flex:1 }}>{opt}</span>
                   </div>
                 {c.optionImages?.[i] && (
-                  <img src={c.optionImages[i]} alt="" style={{ width:"100%", borderRadius:10, marginTop:4, objectFit:"cover", display:"block" }}/>
+                  <img src={c.optionImages[i]} alt="" style={{ width:"100%", borderRadius:10, marginTop:4, objectFit:"contain", display:"block" }}/>
                 )}
             </button>
               );

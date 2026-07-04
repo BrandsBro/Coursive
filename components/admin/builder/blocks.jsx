@@ -118,7 +118,7 @@ export function BlockPreview({ block }) {
                 </div>
                 <span style={{ fontSize:13, color:"#374151" }}>{o}</span>
               </div>
-              {(c.optionImages||[])[i] && <img src={(c.optionImages||[])[i]} alt="" style={{ width:"100%", display:"block", objectFit:"cover", maxHeight:160 }}/>}
+              {(c.optionImages||[])[i] && <img src={(c.optionImages||[])[i]} alt="" style={{ width:"100%", display:"block", objectFit:"contain" }}/>}
             </div>
           ))}
         </div>
