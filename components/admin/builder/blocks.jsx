@@ -12,7 +12,7 @@ export const BLOCK_DEFS = {
   keypoints:    { icon:"⭐", label:"Key Points",     desc:"Bullet list",            color:"#0d9488", bg:"#F0FDFA", default:{ title:"Key Takeaways", points:["","",""], titleStyle:{}, pointStyle:{} },                            preview:c=>(c.points||[]).filter(Boolean).join(", ")||"No points" },
   callout:      { icon:"💡", label:"Callout",        desc:"Highlight box",          color:"#65a30d", bg:"#F7FEE7", default:{ text:"", style:"info", textStyle:{} },                                                                preview:c=>c.text||"Empty callout" },
   divider:      { icon:"➖", label:"Divider",        desc:"Visual break",           color:"#64748b", bg:"#F8FAFC", default:{ style:"line" },                                                                                       preview:()=>"Section divider" },
-  multiplechoice: { icon:"🔘", label:"Multiple Choice", desc:"Radio style quiz with explanation", color:"#7c3aed", bg:"#F5F3FF", default:{ heading:"", subheading:"", question:"", options:["","",""], correct:[], explanation:"", headingStyle:{}, subheadingStyle:{}, questionStyle:{}, optionStyle:{}, explanationStyle:{} }, preview:c=>c.question||"No question" },
+  multiplechoice: { icon:"🔘", label:"Multiple Choice", desc:"Radio style quiz with explanation", color:"#7c3aed", bg:"#F5F3FF", default:{ heading:"", subheading:"", headerImage:"", question:"", options:["","",""], optionImages:["","",""], correct:[], explanation:"", successImage:"", successText:"", headingStyle:{}, subheadingStyle:{}, questionStyle:{}, optionStyle:{}, explanationStyle:{} }, preview:c=>c.question||"No question" },
   reorder: { icon:"↕️", label:"Reorder", desc:"Drag items into correct order", color:"#0d9488", bg:"#F0FDFA", default:{ question:"", items:["","","",""], itemStyle:{} }, preview:c=>c.question||"No question" },
   continueblock: { icon:"▶️", label:"Continue",       desc:"Stop point — hides content below", color:"#5B4EFF", bg:"#EEF2FF", default:{ label:"Continue" },                                                                    preview:()=>"── Continue button ──" },
   blankoptions: { icon:"🔤", label:"Blank + Options",desc:"Pick word from sentence",color:"#0891b2", bg:"#E0F2FE", default:{ sentence:"", markedWords:[], blanks:[], explanation:"", taskTitle:"", taskDesc:"", successText:"", successImages:[], sentenceStyle:{} },                         preview:c=>c.sentence||"No sentence" },
@@ -346,6 +346,8 @@ function QuizE({ content, onChange }) {
   const es = content.explanationStyle||{fontSize:13};
   const hs = content.headingStyle||{fontSize:20};
   const ss = content.subheadingStyle||{fontSize:14};
+  const optImgs = content.optionImages||opts.map(()=>"");
+  const setOptImg = (i,v) => { const a=[...optImgs]; a[i]=v; onChange({ ...content, optionImages:a }); };
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:14, paddingTop:12 }}>
       <div>
@@ -355,6 +357,11 @@ function QuizE({ content, onChange }) {
       <div>
         <FC label="Subheading Style" style={ss} setStyle={v => onChange({ ...content, subheadingStyle:v })}/>
         <input value={content.subheading||""} onChange={e => onChange({ ...content, subheading:e.target.value })} placeholder="Subheading or context (optional)" style={{ ...inp(), ...styled(ss) }}/>
+      </div>
+      <div>
+        <p style={lbl()}>Header Image <span style={{ color:"#94A3B8", fontWeight:400 }}>· shown between heading and question</span></p>
+        <input value={content.headerImage||""} onChange={e => onChange({ ...content, headerImage:e.target.value })} placeholder="https://... image URL" style={inp()}/>
+        {content.headerImage && <img src={content.headerImage} alt="" style={{ width:"100%", borderRadius:10, marginTop:6, maxHeight:120, objectFit:"cover" }}/>}
       </div>
       <div>
         <FC label="Question Style" style={qs} setStyle={v => onChange({ ...content, questionStyle:v })}/>

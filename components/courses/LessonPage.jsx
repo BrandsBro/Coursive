@@ -934,6 +934,9 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
               {c.subheading}
             </p>
           )}
+          {c.headerImage && (
+            <img src={c.headerImage} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:16, objectFit:"cover", maxHeight:240 }}/>
+          )}
           {multiMode && !isChecked && (
             <div style={{ display:"inline-block", padding:"4px 12px", borderRadius:999, background:"#EEF2FF", color:"#6366f1", fontSize:12, fontWeight:700, marginBottom:12 }}>
               Select all that apply
@@ -957,7 +960,10 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
                   <div style={{ width:20, height:20, borderRadius:multiMode?4:"50%", border:`2px solid ${checkColor}`, background:isSel||isChecked&&isRight?checkColor:"#fff", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}>
                     {(isSel || (isChecked && isRight)) && <Check size={12} color="#fff"/>}
                   </div>
-                  <span style={{ fontSize:os.fontSize||14, color:"#374151", fontWeight:500, lineHeight:1.4 }}>{opt}</span>
+                  <div style={{ flex:1 }}>
+                {c.optionImages?.[i] && <img src={c.optionImages[i]} alt="" style={{ width:"100%", borderRadius:10, marginBottom:6, objectFit:"cover", maxHeight:120 }}/>}
+                <span style={{ fontSize:os.fontSize||14, color:"#374151", fontWeight:500, lineHeight:1.4 }}>{opt}</span>
+              </div>
                 </button>
               );
             })}
@@ -969,6 +975,12 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
             </button>
           )}
           {isChecked && (
+            {isCorrect && c.successImage && (
+              <img src={c.successImage} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12, objectFit:"cover" }}/>
+            )}
+            {isCorrect && c.successText && (
+              <p style={{ fontSize:14, color:"#374151", margin:"0 0 12px", lineHeight:1.65 }}>{c.successText}</p>
+            )}
             <div style={{ padding:"16px 18px", borderRadius:14, background:isCorrect?"#F0FDF4":"#FEF2F2", border:`1.5px solid ${isCorrect?"#BBF7D0":"#FECACA"}` }}>
               <p style={{ fontSize:14, fontWeight:700, color:isCorrect?"#166534":"#DC2626", margin:"0 0 6px" }}>
                 {isCorrect?"🎉 Correct!":"❌ Not quite"}
