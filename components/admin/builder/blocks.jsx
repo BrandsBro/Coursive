@@ -111,12 +111,14 @@ export function BlockPreview({ block }) {
           {c.headerImage && <img src={c.headerImage} alt="" style={{ width:"100%", borderRadius:10, marginBottom:10, maxHeight:100, objectFit:"cover" }}/>}
           <p style={{ fontSize:qs.fontSize||15, fontWeight:"700", color:"#0f172a", margin:"0 0 10px" }}>{c.question||"Question..."}</p>
           {(c.options||[]).filter(Boolean).map((o,i) => (
-            <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 12px", borderRadius:10, border:`1.5px solid ${correctArr.includes(i)?"#22c55e":"#E2E8F0"}`, background:correctArr.includes(i)?"#F0FDF4":"#fff", marginBottom:6 }}>
-              <div style={{ width:18, height:18, borderRadius:4, border:`2px solid ${correctArr.includes(i)?"#22c55e":"#D1D5DB"}`, background:correctArr.includes(i)?"#22c55e":"#fff", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                {correctArr.includes(i) && <Check size={11} color="#fff"/>}
+            <div key={i} style={{ borderRadius:10, border:`1.5px solid ${correctArr.includes(i)?"#22c55e":"#E2E8F0"}`, background:correctArr.includes(i)?"#F0FDF4":"#fff", marginBottom:6, overflow:"hidden" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 12px" }}>
+                <div style={{ width:18, height:18, borderRadius:4, border:`2px solid ${correctArr.includes(i)?"#22c55e":"#D1D5DB"}`, background:correctArr.includes(i)?"#22c55e":"#fff", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                  {correctArr.includes(i) && <Check size={11} color="#fff"/>}
+                </div>
+                <span style={{ fontSize:13, color:"#374151" }}>{o}</span>
               </div>
-              {(c.optionImages||[])[i] && <img src={(c.optionImages||[])[i]} alt="" style={{ width:36, height:36, borderRadius:6, objectFit:"cover", flexShrink:0 }}/>}
-              <span style={{ fontSize:13, color:"#374151" }}>{o}</span>
+              {(c.optionImages||[])[i] && <img src={(c.optionImages||[])[i]} alt="" style={{ width:"100%", display:"block", objectFit:"cover", maxHeight:160 }}/>}
             </div>
           ))}
         </div>
