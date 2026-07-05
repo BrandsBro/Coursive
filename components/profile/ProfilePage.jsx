@@ -34,6 +34,7 @@ export default function ProfilePage() {
   const [sub, setSub] = useState(null);
   const [certCourse, setCertCourse] = useState(null);
   const [showRenew, setShowRenew] = useState(false);
+  const [renewPlan, setRenewPlan] = useState(null);
   const [memberSince, setMemberSince] = useState("");
   const [editName, setEditName] = useState(false);
   const [newName, setNewName] = useState("");
@@ -384,6 +385,27 @@ export default function ProfilePage() {
                 <button onClick={() => setShowRenew(true)} style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
                   🚀 {daysLeft > 0 ? "Extend Subscription" : "Renew Access"}
                 </button>
+                {/* Upgrade options */}
+                {daysLeft > 0 && sub?.plan === "1-Week Plan" && (
+                  <div style={{ display:"flex", flexDirection:"column", gap:8, marginTop:8 }}>
+                    <p style={{ fontSize:12, color:"#94A3B8", margin:0, fontWeight:600 }}>⬆ Upgrade your plan:</p>
+                    {["4-Week Plan","12-Week Plan"].map(upgradePlan => (
+                      <button key={upgradePlan} onClick={() => { setRenewPlan(upgradePlan); setShowRenew(true); }}
+                        style={{ width:"100%", padding:"12px", borderRadius:12, border:"1.5px solid #C7D2FE", background:"#EEF2FF", color:"#5B4EFF", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                        ⬆ Upgrade to {upgradePlan}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {daysLeft > 0 && sub?.plan === "4-Week Plan" && (
+                  <div style={{ display:"flex", flexDirection:"column", gap:8, marginTop:8 }}>
+                    <p style={{ fontSize:12, color:"#94A3B8", margin:0, fontWeight:600 }}>⬆ Upgrade your plan:</p>
+                    <button onClick={() => { setRenewPlan("12-Week Plan"); setShowRenew(true); }}
+                      style={{ width:"100%", padding:"12px", borderRadius:12, border:"1.5px solid #C7D2FE", background:"#EEF2FF", color:"#5B4EFF", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                      ⬆ Upgrade to 12-Week Plan
+                    </button>
+                  </div>
+                )}
               </div>
             </>
           ) : (
@@ -403,13 +425,13 @@ export default function ProfilePage() {
 
       {showRenew && (
         <PaymentModal
-          plan={sub?.plan || "4-Week Plan"}
+          plan={renewPlan || sub?.plan || "4-Week Plan"}
           paymentType="one_time"
           email={email}
           name={displayName}
-          isRenewal={true}
-          onClose={() => setShowRenew(false)}
-          onSuccess={() => { setShowRenew(false); window.location.reload(); }}
+          isRenewal={!renewPlan}
+          onClose={() => { setShowRenew(false); setRenewPlan(null); }}
+          onSuccess={() => { setShowRenew(false); setRenewPlan(null); window.location.reload(); }}
         />
       )}
       {certCourse && (
