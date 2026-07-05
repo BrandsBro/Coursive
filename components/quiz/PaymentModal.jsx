@@ -20,14 +20,14 @@ const PLANS = {
   "12-Week Plan": { price:"$39.99", recurringPrice:"$32.99", label:"12-Week AI Program", weeks:12 },
 };
 
-function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose }) {
+function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, displayPrice: propDisplayPrice }) {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const planInfo = PLANS[plan] || PLANS["4-Week Plan"];
-  const displayPrice = paymentType === "recurring" ? planInfo.recurringPrice : planInfo.price;
+  const displayPrice = propDisplayPrice || planInfo.price;
 
   const handlePay = async () => {
     if (!stripe || !elements) return;
@@ -174,7 +174,7 @@ export default function PaymentModal({ plan, paymentType, email, name, onClose, 
           </p>
         </div>
         <Elements stripe={stripePromise} options={{ appearance:{ theme:"stripe" } }}>
-          <CheckoutForm plan={plan} paymentType={paymentType} email={email} name={name} onSuccess={onSuccess} onClose={onClose}/>
+          <CheckoutForm plan={plan} paymentType={paymentType} email={email} name={name} onSuccess={onSuccess} onClose={onClose} displayPrice={activeDisplayPrice}/>
         </Elements>
       </div>
     </div>

@@ -1,23 +1,22 @@
 content = open('components/quiz/PaymentModal.jsx', encoding='utf-8').read()
 
-# Fix planInfo and displayPrice to use dynamicPlans
+# Update CheckoutForm to accept displayPrice prop
 content = content.replace(
-    '  const activePlanInfo = (dynamicPlans && dynamicPlans[plan]) || PLANS[plan] || PLANS["4-Week Plan"];\n  const planInfo = activePlanInfo;\n  const displayPrice = isRenewal ? (dynamicPlans?.[plan]?.price || planInfo.price) : planInfo.price;',
-    '  const planInfo = PLANS[plan] || PLANS["4-Week Plan"];\n  const displayPrice = planInfo.price;'
+    'function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose }) {',
+    'function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, displayPrice: propDisplayPrice }) {'
 )
 
-# Fix the display to use dynamicPlans when available
+# Use prop if provided, fallback to hardcoded
 content = content.replace(
-    '  const activePlans = dynamicPlans || PLANS;\n  const design = pricingSettings || {};',
-    '''  const activePlans = dynamicPlans || PLANS;
-  const design = pricingSettings || {};
-  const activePlanInfo = (dynamicPlans && dynamicPlans[plan]) || PLANS[plan] || PLANS["4-Week Plan"];
-  const activeDisplayPrice = activePlanInfo.price;'''
+    '  const planInfo = PLANS[plan] || PLANS["4-Week Plan"];\n  const displayPrice = paymentType === "recurring" ? planInfo.recurringPrice : planInfo.price;',
+    '  const planInfo = PLANS[plan] || PLANS["4-Week Plan"];\n  const displayPrice = propDisplayPrice || planInfo.price;'
 )
 
-# Replace all displayPrice with activeDisplayPrice in JSX
-content = content.replace('>{displayPrice}</span>', '>{activeDisplayPrice}</span>')
-content = content.replace('`🔒 Confirm Payment ${displayPrice}`', '`🔒 Confirm Payment ${activeDisplayPrice}`')
+# Pass displayPrice from PaymentModal to CheckoutForm
+content = content.replace(
+    '<CheckoutForm plan={plan} paymentType={paymentType} email={email} name={name} onSuccess={onSuccess} onClose={onClose}/>',
+    '<CheckoutForm plan={plan} paymentType={paymentType} email={email} name={name} onSuccess={onSuccess} onClose={onClose} displayPrice={activeDisplayPrice}/>'
+)
 
 open('components/quiz/PaymentModal.jsx', 'w', encoding='utf-8').write(content)
 print("Done!")
