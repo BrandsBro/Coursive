@@ -58,13 +58,18 @@ function getBlockDefaults(type) {
 }
 
 function generateHtml(blocks, name, email, password, template) {
-  const replace = (text) => (text || "")
-    .replace(/\{name\}/g, name).replace(/&#123;name&#125;/g, name)
-    .replace(/\{email\}/g, email).replace(/&#123;email&#125;/g, email)
-    .replace(/\{Renewal Date\}/g, "August 2, 2026").replace(/&#123;Renewal Date&#125;/g, "August 2, 2026")
-    .replace(/\{Plan Name\}/g, "4-Week Plan").replace(/&#123;Plan Name&#125;/g, "4-Week Plan")
-    .replace(/\{Amount\}/g, "$19.99").replace(/&#123;Amount&#125;/g, "$19.99")
-    .replace(/\{Plan\}/g, "4-Week Plan").replace(/&#123;Plan&#125;/g, "4-Week Plan");
+  const replace = (text) => {
+    if (!text) return "";
+    // Decode HTML entities first
+    let t = text.replace(/&#123;/g,"{").replace(/&#125;/g,"}");
+    t = t.replace(/\{name\}/g, name);
+    t = t.replace(/\{email\}/g, email);
+    t = t.replace(/\{Renewal Date\}/g, "August 2, 2026");
+    t = t.replace(/\{Plan Name\}/g, "4-Week Plan");
+    t = t.replace(/\{Amount\}/g, "$19.99");
+    t = t.replace(/\{Plan\}/g, "4-Week Plan");
+    return t;
+  };
   const cardBg = template?.cardBg || "#0a081e";
   const emailBg = template?.emailBg || "#050411";
   const blockHtml = (blocks || []).map((b) => {
@@ -72,7 +77,11 @@ function generateHtml(blocks, name, email, password, template) {
       case "header": return `<div style="background:linear-gradient(135deg,${b.bg1||"#5B4EFF"},${b.bg2||"#8B5CF6"});padding:${b.padding||48}px 40px;text-align:center"></div>`;
       case "logo": if (!b.logoUrl) return `<div style="padding:20px 40px;text-align:${b.align||"center"}"><p style="color:rgba(255,255,255,0.3);font-size:12px;margin:0">[Logo placeholder]</p></div>`; return `<div style="padding:20px 40px;text-align:${b.align||"center"}"><img src="${b.logoUrl}" alt="Logo" style="height:${b.logoHeight||44}px;object-fit:contain;display:inline-block"/></div>`;
       case "heading": return `<div style="padding:4px 40px"><p style="font-size:${b.size||22}px;margin:0 0 8px;color:${b.color||"#fff"};text-align:${b.align||"left"};font-weight:${b.bold?"900":"700"};font-style:${b.italic?"italic":"normal"};line-height:1.3">${replace(b.text)}</p></div>`;
-      case "text": return `<div style="padding:4px 40px"><div style="color:${b.color||"rgba(255,255,255,0.7)"};font-size:${b.size||15}px;line-height:${b.lineHeight||1.8};text-align:${b.align||"left"};margin:0 0 8px">${b.html ? replace(b.html) : (b.text||"").replace(/\n/g,"<br/>")}</div></div>`;
+      case "text": {
+        const rawHtml = b.html || (b.text||"").replace(/\n/g,"<br/>");
+        const replacedHtml = replace(rawHtml);
+        return `<div style="padding:4px 40px"><div style="color:${b.color||"rgba(255,255,255,0.7)"};font-size:${b.size||15}px;line-height:${b.lineHeight||1.8};text-align:${b.align||"left"};margin:0 0 8px">${replacedHtml}</div></div>`;
+      }
       case "button": return `<div style="padding:12px 40px;text-align:${b.align||"center"}"><a href="${b.url||"#"}" style="display:inline-block;padding:${b.paddingV||16}px ${b.paddingH||32}px;background:linear-gradient(135deg,${b.bgFrom||"#5B4EFF"},${b.bgTo||"#8B5CF6"});color:${b.color||"#fff"};text-decoration:none;border-radius:${b.radius||14}px;font-weight:700;font-size:${b.size||16}px">${b.text||"Click here"}</a></div>`;
       case "image": if (!b.url) return ""; return `<div style="padding:8px 40px;text-align:${b.align||"center"}"><img src="${b.url}" alt="" style="width:100%;border-radius:${b.radius||12}px;display:block"/></div>`;
       case "divider": return `<div style="margin:${b.margin||24}px 40px;border-top:1px solid ${b.color||"rgba(255,255,255,0.08)"}"></div>`;
