@@ -281,7 +281,7 @@ export default function EmailTemplateEditor({ templateId }) {
           </div>
 
           {/* Center — preview */}
-          <div style={{ overflow:"auto", background:"#CBD5E1", display:"flex", flexDirection:"column", alignItems:"center", padding:"32px 24px" }}>
+          <div style={{ overflow:"auto", background:"#CBD5E1", display:"flex", flexDirection:"column", alignItems:"center", padding:"32px 24px", minHeight:0 }}>
             <p style={{ fontSize:11, color:"#64748B", fontWeight:700, marginBottom:12, letterSpacing:0.5 }}>EMAIL PREVIEW</p>
             <div style={{ width:"100%", maxWidth:640, background:"#fff", borderRadius:12, overflow:"hidden", boxShadow:"0 8px 40px rgba(0,0,0,0.15)" }}>
               <div style={{ background:"#F1F5F9", padding:"10px 16px", borderBottom:"1px solid #E2E8F0" }}>
@@ -488,3 +488,4 @@ const col = () => ({ display:"flex", flexDirection:"column", gap:14 });
 const lbl = () => ({ fontSize:10, fontWeight:700, color:"#374151", display:"block", marginBottom:4, textTransform:"uppercase", letterSpacing:0.5 });
 const inp = () => ({ width:"100%", padding:"8px 11px", borderRadius:9, border:"1.5px solid #E2E8F0", fontSize:12, outline:"none", boxSizing:"border-box", fontFamily:"inherit" });
 const ib  = () => ({ width:22, height:22, borderRadius:5, border:"1.5px solid #E2E8F0", background:"#fff", cursor:"pointer", fontSize:11, display:"flex", alignItems:"center", justifyContent:"center", padding:0 });
+
