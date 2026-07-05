@@ -200,7 +200,16 @@ export default function PricingManager() {
                 />
                 <div style={{ marginTop:10, padding:"12px 14px", background:"#F8FAFC", borderRadius:10, border:"1px solid #E2E8F0" }}>
                   <p style={{ fontSize:10, fontWeight:700, color:"#94A3B8", margin:"0 0 4px", textTransform:"uppercase" }}>Preview</p>
-                  <p style={{ fontSize:11, color:"#64748B", lineHeight:1.7, margin:0 }}>{plan.legalText}</p>
+                  <p style={{ fontSize:11, color:"#64748B", lineHeight:1.7, margin:0 }}>
+                    {(plan.legalText||"")
+                      .replace(/{salePrice}/g, pricing.currencySymbol + plan.salePrice)
+                      .replace(/{regularPrice}/g, pricing.currencySymbol + (plan.regularPrice||""))
+                      .replace(/{4weekRegularPrice}/g, pricing.currencySymbol + (pricing.plans.find(p=>p.id==="monthly")?.regularPrice||"39.99"))
+                      .replace(/{12weekRegularPrice}/g, pricing.currencySymbol + (pricing.plans.find(p=>p.id==="quarterly")?.regularPrice||"69.99"))
+                      .replace(/{name}/g, plan.name)
+                      .replace(/{duration}/g, String(plan.duration))
+                    }
+                  </p>
                 </div>
               </div>
             ))}
