@@ -74,7 +74,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
       <div style={{ background:"#F8FAFC", borderRadius:12, padding:"16px 18px", marginBottom:20 }}>
         <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
           <span style={{ fontSize:14, color:"#374151" }}>{planInfo.label}</span>
-          <span style={{ fontSize:14, fontWeight:700, color:"#0f172a" }}>{activeDisplayPrice}</span>
+          <span style={{ fontSize:14, fontWeight:700, color:"#0f172a" }}>{displayPrice}</span>
         </div>
         {paymentType === "recurring" && (
           <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
@@ -84,7 +84,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
         )}
         <div style={{ borderTop:"1px solid #E2E8F0", paddingTop:8, display:"flex", justifyContent:"space-between" }}>
           <span style={{ fontSize:15, fontWeight:800, color:"#0f172a" }}>Total</span>
-          <span style={{ fontSize:15, fontWeight:800, color:"#5B4EFF" }}>{activeDisplayPrice}</span>
+          <span style={{ fontSize:15, fontWeight:800, color:"#5B4EFF" }}>{displayPrice}</span>
         </div>
         {paymentType === "recurring" && (
           <p style={{ fontSize:11, color:"#94A3B8", margin:"8px 0 0" }}>Billed every {planInfo.weeks} week{planInfo.weeks>1?"s":""} · Cancel anytime</p>
@@ -123,7 +123,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
 
       <button onClick={handlePay} disabled={loading || !stripe}
         style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, cursor:loading?"not-allowed":"pointer", opacity:loading?0.7:1, marginBottom:12 }}>
-        {loading ? "Processing..." : `🔒 Confirm Payment ${activeDisplayPrice}`}
+        {loading ? "Processing..." : `🔒 Confirm Payment ${displayPrice}`}
       </button>
 
       <div style={{ textAlign:"center" }}>
@@ -174,7 +174,7 @@ export default function PaymentModal({ plan, paymentType, email, name, onClose, 
           </p>
         </div>
         <Elements stripe={stripePromise} options={{ appearance:{ theme:"stripe" } }}>
-          <CheckoutForm plan={plan} paymentType={paymentType} email={email} name={name} onSuccess={onSuccess} onClose={onClose} displayPrice={activeDisplayPrice}/>
+          <CheckoutForm plan={plan} paymentType={paymentType} email={email} name={name} onSuccess={onSuccess} onClose={onClose} displayPrice={displayPrice}/>
         </Elements>
       </div>
     </div>
