@@ -2,7 +2,7 @@
 import { supabase } from "@/lib/supabase";
 import { ArrowLeft, Check, Copy, Loader, Plus, Save, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const TRIGGER_TYPES = [
   { value: "after_payment", label: "After Payment", icon: "💳" },
@@ -244,12 +244,65 @@ export default function EmailTemplateEditor({ templateId }) {
   );
 }
 
+function TextBlockEditor({ b, onChange }) {
+  const editorRef = React.useRef(null);
+  const isInitialized = React.useRef(false);
+
+  React.useEffect(() => {
+    if (editorRef.current && !isInitialized.current) {
+      editorRef.current.innerHTML = b.html || b.text?.replace(/\n/g,"<br/>") || "";
+      isInitialized.current = true;
+    }
+  }, []);
+
+  const execCmd = (cmd) => {
+    editorRef.current?.focus();
+    document.execCommand(cmd, false, null);
+    onChange("html", editorRef.current.innerHTML);
+  };
+
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:14}}>
+      <div>
+        <p style={lbl()}>Text <span style={{color:"#94A3B8",fontWeight:400}}>· paste formatted text, bold, line breaks work</span></p>
+        <div style={{display:"flex",gap:4,marginBottom:6}}>
+          {[["bold","B"],["italic","I"],["underline","U"]].map(([cmd,label])=>(
+            <button key={cmd} onMouseDown={(e)=>{e.preventDefault();execCmd(cmd);}} style={{padding:"3px 10px",borderRadius:6,border:"1.5px solid #E2E8F0",background:"#fff",fontSize:13,cursor:"pointer",fontWeight:cmd==="bold"?900:400,fontStyle:cmd==="italic"?"italic":"normal",textDecoration:cmd==="underline"?"underline":"none"}}>{label}</button>
+          ))}
+        </div>
+        <div
+          ref={editorRef}
+          contentEditable
+          suppressContentEditableWarning
+          onInput={(e) => onChange("html", e.currentTarget.innerHTML)}
+          onPaste={(e) => {
+            e.preventDefault();
+            const html = e.clipboardData.getData("text/html");
+            const text = e.clipboardData.getData("text/plain");
+            if (html) document.execCommand("insertHTML", false, html);
+            else document.execCommand("insertHTML", false, text.replace(/\n/g,"<br/>"));
+            onChange("html", e.currentTarget.innerHTML);
+          }}
+          style={{...inp(),minHeight:140,cursor:"text",lineHeight:1.7,whiteSpace:"pre-wrap",outline:"2px solid #5B4EFF"}}
+        />
+      </div>
+      <CF label="Color" value={b.color||"rgba(255,255,255,0.7)"} onChange={(v)=>onChange("color",v)}/>
+      <SF label="Font Size" value={b.size||15} onChange={(v)=>onChange("size",v)}/>
+      <AF label="Align" value={b.align||"left"} onChange={(v)=>onChange("align",v)}/>
+      <div>
+        <p style={lbl()}>Line Height: {b.lineHeight||1.8}</p>
+        <input type="range" min={1} max={2.5} step={0.1} value={b.lineHeight||1.8} onChange={(e)=>onChange("lineHeight",parseFloat(e.target.value))} style={{width:"100%"}}/>
+      </div>
+    </div>
+  );
+}
+
 function BlockControls({ block: b, onChange, uploadImg, uploading }) {
   switch (b.type) {
     case "header": return (<div style={col()}><CF label="Gradient Start" value={b.bg1||"#5B4EFF"} onChange={(v)=>onChange("bg1",v)}/><CF label="Gradient End" value={b.bg2||"#8B5CF6"} onChange={(v)=>onChange("bg2",v)}/><SF label="Padding (px)" value={b.padding||48} onChange={(v)=>onChange("padding",v)}/></div>);
     case "logo": return (<div style={col()}><div><p style={lbl()}>Logo URL</p><input value={b.logoUrl||""} onChange={(e)=>onChange("logoUrl",e.target.value)} placeholder="https://..." style={inp()}/></div><label style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,padding:"9px",borderRadius:9,border:"1.5px dashed #C7D2FE",background:"#EEF2FF",color:"#5B4EFF",fontSize:12,fontWeight:700,cursor:"pointer"}}>{uploading?"⏳ Uploading...":"⬆ Upload Logo"}<input type="file" accept="image/*" style={{display:"none"}} onChange={(e)=>uploadImg(e.target.files[0],b.id)}/></label>{b.logoUrl&&<img src={b.logoUrl} alt="" style={{maxHeight:40,objectFit:"contain",borderRadius:6}}/>}<SF label="Height (px)" value={b.logoHeight||44} onChange={(v)=>onChange("logoHeight",v)}/><AF label="Align" value={b.align||"center"} onChange={(v)=>onChange("align",v)}/></div>);
     case "heading": return (<div style={col()}><div><p style={lbl()}>Text <span style={{color:"#94A3B8",fontWeight:400}}>· {"{name}"} = user name</span></p><textarea value={b.text||""} onChange={(e)=>onChange("text",e.target.value)} rows={3} style={{...inp(),resize:"vertical"}}/></div><CF label="Color" value={b.color||"#fff"} onChange={(v)=>onChange("color",v)}/><SF label="Font Size" value={b.size||22} onChange={(v)=>onChange("size",v)}/><AF label="Align" value={b.align||"left"} onChange={(v)=>onChange("align",v)}/><div style={{display:"flex",gap:6}}><button onClick={()=>onChange("bold",!b.bold)} style={{flex:1,padding:"6px",borderRadius:7,border:`1.5px solid ${b.bold?"#5B4EFF":"#E2E8F0"}`,background:b.bold?"#EEF2FF":"#fff",fontWeight:900,fontSize:14,cursor:"pointer"}}>B</button><button onClick={()=>onChange("italic",!b.italic)} style={{flex:1,padding:"6px",borderRadius:7,border:`1.5px solid ${b.italic?"#5B4EFF":"#E2E8F0"}`,background:b.italic?"#EEF2FF":"#fff",fontStyle:"italic",fontWeight:700,fontSize:14,cursor:"pointer"}}>I</button></div></div>);
-    case "text": return (<div style={col()}><div><p style={lbl()}>Text <span style={{color:"#94A3B8",fontWeight:400}}>· paste formatted text, bold, line breaks all work</span></p><div contentEditable suppressContentEditableWarning onInput={(e)=>onChange("html",e.currentTarget.innerHTML)} onPaste={(e)=>{e.preventDefault();const html=e.clipboardData.getData("text/html");const text=e.clipboardData.getData("text/plain");if(html)document.execCommand("insertHTML",false,html);else document.execCommand("insertHTML",false,text.replace(/\n/g,"<br/>"));}} dangerouslySetInnerHTML={{__html:b.html||b.text?.replace(/\n/g,"<br/>")||""}} style={{...inp(),minHeight:140,resize:"vertical",cursor:"text",lineHeight:1.7,whiteSpace:"pre-wrap"}}/><div style={{display:"flex",gap:4,marginTop:6}}>{[["bold","B"],["italic","I"],["underline","U"]].map(([cmd,label])=>(<button key={cmd} onMouseDown={(e)=>{e.preventDefault();document.execCommand(cmd,false,null);}} style={{padding:"3px 10px",borderRadius:6,border:"1.5px solid #E2E8F0",background:"#fff",fontSize:13,cursor:"pointer",fontWeight:cmd==="bold"?900:400,fontStyle:cmd==="italic"?"italic":"normal",textDecoration:cmd==="underline"?"underline":"none"}}>{label}</button>))}</div></div><CF label="Color" value={b.color||"rgba(255,255,255,0.7)"} onChange={(v)=>onChange("color",v)}/><SF label="Font Size" value={b.size||15} onChange={(v)=>onChange("size",v)}/><AF label="Align" value={b.align||"left"} onChange={(v)=>onChange("align",v)}/><div><p style={lbl()}>Line Height: {b.lineHeight||1.8}</p><input type="range" min={1} max={2.5} step={0.1} value={b.lineHeight||1.8} onChange={(e)=>onChange("lineHeight",parseFloat(e.target.value))} style={{width:"100%"}}/></div></div>);
+    case "text": return <TextBlockEditor b={b} onChange={onChange}/>;
     case "button": return (<div style={col()}><div><p style={lbl()}>Button Text</p><input value={b.text||""} onChange={(e)=>onChange("text",e.target.value)} style={inp()}/></div><div><p style={lbl()}>URL</p><input value={b.url||""} onChange={(e)=>onChange("url",e.target.value)} style={inp()}/></div><CF label="BG Start" value={b.bgFrom||"#5B4EFF"} onChange={(v)=>onChange("bgFrom",v)}/><CF label="BG End" value={b.bgTo||"#8B5CF6"} onChange={(v)=>onChange("bgTo",v)}/><CF label="Text Color" value={b.color||"#fff"} onChange={(v)=>onChange("color",v)}/><SF label="Font Size" value={b.size||16} onChange={(v)=>onChange("size",v)}/><SF label="Border Radius" value={b.radius||14} onChange={(v)=>onChange("radius",v)}/><SF label="Padding Vertical" value={b.paddingV||16} onChange={(v)=>onChange("paddingV",v)}/><SF label="Padding Horizontal" value={b.paddingH||32} onChange={(v)=>onChange("paddingH",v)}/><AF label="Align" value={b.align||"center"} onChange={(v)=>onChange("align",v)}/></div>);
     case "image": return (<div style={col()}><div><p style={lbl()}>Image URL</p><input value={b.url||""} onChange={(e)=>onChange("url",e.target.value)} style={inp()}/></div><label style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,padding:"9px",borderRadius:9,border:"1.5px dashed #C7D2FE",background:"#EEF2FF",color:"#5B4EFF",fontSize:12,fontWeight:700,cursor:"pointer"}}>⬆ Upload Image<input type="file" accept="image/*" style={{display:"none"}} onChange={async(e)=>{const file=e.target.files[0];if(!file)return;const path=`email/${Date.now()}-${file.name}`;const{error}=await supabase.storage.from("lesson-media").upload(path,file,{upsert:true});if(!error){const{data}=supabase.storage.from("lesson-media").getPublicUrl(path);onChange("url",data.publicUrl);}}}/></label>{b.url&&<img src={b.url} alt="" style={{width:"100%",borderRadius:6,maxHeight:80,objectFit:"cover"}}/>}<SF label="Border Radius" value={b.radius||12} onChange={(v)=>onChange("radius",v)}/><AF label="Align" value={b.align||"center"} onChange={(v)=>onChange("align",v)}/></div>);
     case "divider": return (<div style={col()}><CF label="Color" value={b.color||"rgba(255,255,255,0.08)"} onChange={(v)=>onChange("color",v)}/><SF label="Margin (px)" value={b.margin||24} onChange={(v)=>onChange("margin",v)}/></div>);
