@@ -5,6 +5,7 @@ old = '''    const weeks = PLAN_WEEKS[plan] || 4;
     const now = new Date();
     const expiresAt = new Date(now.getTime() + weeks * 7 * 24 * 60 * 60 * 1000);
     const nextBillingAt = paymentType === "recurring" ? expiresAt : null;
+
     const { data: sub, error: subError } = await supabase.from("subscriptions").insert({
       user_id: userId, plan, type: paymentType, status: "active", amount_paid: amount,
       stripe_payment_intent_id: paymentIntentId, started_at: now.toISOString(),
@@ -33,6 +34,7 @@ new = '''    const weeks = PLAN_WEEKS[plan] || 4;
 
     const expiresAt = new Date(startFrom.getTime() + weeks * 7 * 24 * 60 * 60 * 1000);
     const nextBillingAt = paymentType === "recurring" ? expiresAt : null;
+
     const { data: sub, error: subError } = await supabase.from("subscriptions").insert({
       user_id: userId, plan, type: paymentType, status: "active", amount_paid: amount,
       stripe_payment_intent_id: paymentIntentId, started_at: startFrom.toISOString(),
