@@ -1,8 +1,8 @@
 content = open('components/quiz/PaymentModal.jsx', encoding='utf-8').read()
 
 content = content.replace(
-    '{activeDisplayPrice}',
-    '{displayPrice}'
+    '  displayPrice={displayPrice}/>',
+    '  displayPrice={activeDisplayPrice}/>'
 )
 
 open('components/quiz/PaymentModal.jsx', 'w', encoding='utf-8').write(content)
