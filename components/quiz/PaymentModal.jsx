@@ -74,7 +74,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose }) {
       <div style={{ background:"#F8FAFC", borderRadius:12, padding:"16px 18px", marginBottom:20 }}>
         <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
           <span style={{ fontSize:14, color:"#374151" }}>{planInfo.label}</span>
-          <span style={{ fontSize:14, fontWeight:700, color:"#0f172a" }}>{displayPrice}</span>
+          <span style={{ fontSize:14, fontWeight:700, color:"#0f172a" }}>{activeDisplayPrice}</span>
         </div>
         {paymentType === "recurring" && (
           <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
@@ -84,7 +84,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose }) {
         )}
         <div style={{ borderTop:"1px solid #E2E8F0", paddingTop:8, display:"flex", justifyContent:"space-between" }}>
           <span style={{ fontSize:15, fontWeight:800, color:"#0f172a" }}>Total</span>
-          <span style={{ fontSize:15, fontWeight:800, color:"#5B4EFF" }}>{displayPrice}</span>
+          <span style={{ fontSize:15, fontWeight:800, color:"#5B4EFF" }}>{activeDisplayPrice}</span>
         </div>
         {paymentType === "recurring" && (
           <p style={{ fontSize:11, color:"#94A3B8", margin:"8px 0 0" }}>Billed every {planInfo.weeks} week{planInfo.weeks>1?"s":""} · Cancel anytime</p>
@@ -123,7 +123,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose }) {
 
       <button onClick={handlePay} disabled={loading || !stripe}
         style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, cursor:loading?"not-allowed":"pointer", opacity:loading?0.7:1, marginBottom:12 }}>
-        {loading ? "Processing..." : `🔒 Confirm Payment ${displayPrice}`}
+        {loading ? "Processing..." : `🔒 Confirm Payment ${activeDisplayPrice}`}
       </button>
 
       <div style={{ textAlign:"center" }}>
@@ -161,6 +161,8 @@ export default function PaymentModal({ plan, paymentType, email, name, onClose, 
 
   const activePlans = dynamicPlans || PLANS;
   const design = pricingSettings || {};
+  const activePlanInfo = (dynamicPlans && dynamicPlans[plan]) || PLANS[plan] || PLANS["4-Week Plan"];
+  const activeDisplayPrice = activePlanInfo.price;
   return (
     <div style={{ position:"fixed", inset:0, zIndex:200, background:"rgba(15,23,42,0.6)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
       <div style={{ background:"#fff", borderRadius:24, padding:"28px 24px", width:"100%", maxWidth:440, boxShadow:"0 32px 80px rgba(0,0,0,0.3)", position:"relative", maxHeight:"90vh", overflowY:"auto" }}>

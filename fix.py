@@ -1,28 +1,23 @@
-content = open('components/profile/ProfilePage.jsx', encoding='utf-8').read()
+content = open('components/quiz/PaymentModal.jsx', encoding='utf-8').read()
 
+# Fix planInfo and displayPrice to use dynamicPlans
 content = content.replace(
-    '''      {showRenew && (
-        <PaymentModal
-          plan={sub?.plan || "4-Week Plan"}
-          paymentType="one_time"
-          email={email}
-          name={displayName}
-          onClose={() => setShowRenew(false)}
-          onSuccess={() => { setShowRenew(false); window.location.reload(); }}
-        />
-      )}''',
-    '''      {showRenew && (
-        <PaymentModal
-          plan={sub?.plan || "4-Week Plan"}
-          paymentType="one_time"
-          email={email}
-          name={displayName}
-          isRenewal={true}
-          onClose={() => setShowRenew(false)}
-          onSuccess={() => { setShowRenew(false); window.location.reload(); }}
-        />
-      )}'''
+    '  const activePlanInfo = (dynamicPlans && dynamicPlans[plan]) || PLANS[plan] || PLANS["4-Week Plan"];\n  const planInfo = activePlanInfo;\n  const displayPrice = isRenewal ? (dynamicPlans?.[plan]?.price || planInfo.price) : planInfo.price;',
+    '  const planInfo = PLANS[plan] || PLANS["4-Week Plan"];\n  const displayPrice = planInfo.price;'
 )
 
-open('components/profile/ProfilePage.jsx', 'w', encoding='utf-8').write(content)
-print("Done!" if "isRenewal={true}" in open('components/profile/ProfilePage.jsx', encoding='utf-8').read() else "FAILED - PaymentModal not found")
+# Fix the display to use dynamicPlans when available
+content = content.replace(
+    '  const activePlans = dynamicPlans || PLANS;\n  const design = pricingSettings || {};',
+    '''  const activePlans = dynamicPlans || PLANS;
+  const design = pricingSettings || {};
+  const activePlanInfo = (dynamicPlans && dynamicPlans[plan]) || PLANS[plan] || PLANS["4-Week Plan"];
+  const activeDisplayPrice = activePlanInfo.price;'''
+)
+
+# Replace all displayPrice with activeDisplayPrice in JSX
+content = content.replace('>{displayPrice}</span>', '>{activeDisplayPrice}</span>')
+content = content.replace('`🔒 Confirm Payment ${displayPrice}`', '`🔒 Confirm Payment ${activeDisplayPrice}`')
+
+open('components/quiz/PaymentModal.jsx', 'w', encoding='utf-8').write(content)
+print("Done!")
