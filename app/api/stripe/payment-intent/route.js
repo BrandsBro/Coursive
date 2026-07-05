@@ -19,7 +19,7 @@ export async function POST(req) {
       currency: "usd",
       payment_method_types: ["card"],
       metadata: { plan, email, name },
-      receipt_email: email,
+      ...(email && email.includes("@") ? { receipt_email: email } : {}),
     });
 
     return NextResponse.json({ clientSecret: paymentIntent.client_secret });
