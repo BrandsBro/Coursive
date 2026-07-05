@@ -1,20 +1,45 @@
-content = open('app/api/stripe/payment-intent/route.js', encoding='utf-8').read()
+content = open('app/api/stripe/create-account/route.js', encoding='utf-8').read()
 
-content = content.replace(
-    '''    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency: "usd",
-      metadata: { plan, email, name },
-      receipt_email: email,
-    });''',
-    '''    const paymentIntent = await stripe.paymentIntents.create({
-      amount,
-      currency: "usd",
-      payment_method_types: ["card"],
-      metadata: { plan, email, name },
-      receipt_email: email,
-    });'''
-)
+old = '''    // For renewals, extend from current expiry if not expired yet
+    let startFrom = now;
+    console.log("isRenewal:", !!existingProfile, "weeks:", weeks, "plan:", plan);
+    if (existingProfile) {
+      const { data: existingSub } = await supabase.from("subscriptions")
+        .select("expires_at").eq("user_id", userId).eq("status","active")
+        .order("expires_at", { ascending: false }).limit(1).single();
+      if (existingSub?.expires_at) {
+        const currentExpiry = new Date(existingSub.expires_at);
+        if (currentExpiry > now) startFrom = currentExpiry;
+      }
+      // Mark old subscriptions as renewed
+      await supabase.from("subscriptions").update({ status:"renewed" })
+        .eq("user_id", userId).eq("status","active");
+    }'''
 
-open('app/api/stripe/payment-intent/route.js', 'w', encoding='utf-8').write(content)
+new = '''    // For renewals, extend from current expiry if not expired yet
+    let startFrom = now;
+    if (existingProfile) {
+      const { data: existingSubs } = await supabase.from("subscriptions")
+        .select("expires_at, status")
+        .eq("user_id", userId)
+        .order("expires_at", { ascending: false })
+        .limit(1);
+      const existingSub = existingSubs?.[0];
+      console.log("Existing sub:", existingSub);
+      if (existingSub?.expires_at) {
+        const currentExpiry = new Date(existingSub.expires_at);
+        if (currentExpiry > now) {
+          startFrom = currentExpiry;
+          console.log("Extending from:", startFrom);
+        }
+      }
+      // Mark old subscriptions as renewed
+      await supabase.from("subscriptions").update({ status:"renewed" })
+        .eq("user_id", userId)
+        .neq("status","renewed");
+    }
+    console.log("startFrom:", startFrom, "expiresAt will be:", new Date(startFrom.getTime() + weeks * 7 * 24 * 60 * 60 * 1000));'''
+
+content = content.replace(old, new)
+open('app/api/stripe/create-account/route.js', 'w', encoding='utf-8').write(content)
 print("Done!")
