@@ -70,9 +70,7 @@ export default function ExpiredPage() {
             <button onClick={() => setShowRenew(true)} style={{ display:"block", width:"100%", padding:"16px", borderRadius:14, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, border:"none", cursor:"pointer", boxShadow:"0 8px 24px rgba(91,78,255,0.4)" }}>
               🚀 Renew My Access
             </button>
-            <button onClick={handleSignOut} style={{ padding:"12px", borderRadius:14, border:"1px solid rgba(255,255,255,0.15)", background:"transparent", color:"rgba(255,255,255,0.6)", fontSize:14, fontWeight:600, cursor:"pointer" }}>
-              Sign Out
-            </button>
+
           </div>
 
 
