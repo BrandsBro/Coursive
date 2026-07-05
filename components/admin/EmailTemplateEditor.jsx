@@ -157,7 +157,7 @@ export default function EmailTemplateEditor({ templateId }) {
       </div>
 
       {/* 3-column body */}
-      <div style={{ flex: 1, display: "grid", gridTemplateColumns: "200px 1fr 300px", overflow: "hidden" }}>
+      <div style={{ flex: 1, display: "grid", gridTemplateColumns: "260px 1fr 320px", overflow: "hidden" }}>
         {/* Left — block list */}
         <div style={{ overflow: "auto", borderRight: "1px solid #E2E8F0", background: "#F8FAFC", display: "flex", flexDirection: "column" }}>
           <div style={{ padding: "12px 10px", borderBottom: "1px solid #E2E8F0" }}>
