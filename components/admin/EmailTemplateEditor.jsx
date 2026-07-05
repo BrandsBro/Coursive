@@ -58,7 +58,13 @@ function getBlockDefaults(type) {
 }
 
 function generateHtml(blocks, name, email, password, template) {
-  const replace = (text) => (text || "").replace(/\{name\}/g, name).replace(/\{email\}/g, email);
+  const replace = (text) => (text || "")
+    .replace(/\{name\}/g, name)
+    .replace(/\{email\}/g, email)
+    .replace(/\{Renewal Date\}/g, "August 2, 2026")
+    .replace(/\{Plan Name\}/g, "4-Week Plan")
+    .replace(/\{Amount\}/g, "$19.99")
+    .replace(/\{Plan\}/g, "4-Week Plan");
   const cardBg = template?.cardBg || "#0a081e";
   const emailBg = template?.emailBg || "#050411";
   const blockHtml = (blocks || []).map((b) => {
