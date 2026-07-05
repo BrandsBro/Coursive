@@ -407,6 +407,7 @@ export default function ProfilePage() {
           paymentType="one_time"
           email={email}
           name={displayName}
+          isRenewal={true}
           onClose={() => setShowRenew(false)}
           onSuccess={() => { setShowRenew(false); window.location.reload(); }}
         />
