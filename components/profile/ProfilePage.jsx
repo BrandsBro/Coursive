@@ -9,6 +9,7 @@ import { supabase } from "@/lib/supabase";
 import { courses } from "@/data/courses";
 import { challenges } from "@/data/challenges";
 import CertificateGenerator from "@/components/courses/CertificateGenerator";
+import PaymentModal from "@/components/quiz/PaymentModal";
 import ChangePassword from "@/components/profile/ChangePassword";
 
 const COURSE_STYLES = {
@@ -32,6 +33,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [sub, setSub] = useState(null);
   const [certCourse, setCertCourse] = useState(null);
+  const [showRenew, setShowRenew] = useState(false);
   const [memberSince, setMemberSince] = useState("");
   const [editName, setEditName] = useState(false);
   const [newName, setNewName] = useState("");
@@ -379,11 +381,9 @@ export default function ProfilePage() {
                     <p style={{ fontSize:13, color:"#991B1B", fontWeight:600, margin:0 }}>🔒 Your subscription has expired. Renew to regain access.</p>
                   </div>
                 )}
-                <Link href="/quiz" style={{ textDecoration:"none" }}>
-                  <button style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
-                    🚀 {daysLeft > 0 ? "Upgrade / Renew Plan" : "Renew Access"}
-                  </button>
-                </Link>
+                <button onClick={() => setShowRenew(true)} style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
+                  🚀 {daysLeft > 0 ? "Renew Subscription" : "Renew Access"}
+                </button>
               </div>
             </>
           ) : (
@@ -401,6 +401,16 @@ export default function ProfilePage() {
         <ChangePassword/>
       )}
 
+      {showRenew && (
+        <PaymentModal
+          plan={sub?.plan || "4-Week Plan"}
+          paymentType="one_time"
+          email={email}
+          name={displayName}
+          onClose={() => setShowRenew(false)}
+          onSuccess={() => { setShowRenew(false); window.location.reload(); }}
+        />
+      )}
       {certCourse && (
         <CertificateGenerator
           course={certCourse}
