@@ -283,7 +283,7 @@ export default function EmailTemplateEditor({ templateId }) {
           {/* Center — preview */}
           <div style={{ overflow:"auto", background:"#CBD5E1", display:"flex", flexDirection:"column", alignItems:"center", padding:"32px 24px", minHeight:0 }}>
             <p style={{ fontSize:11, color:"#64748B", fontWeight:700, marginBottom:12, letterSpacing:0.5 }}>EMAIL PREVIEW</p>
-            <div style={{ width:"100%", maxWidth:640, background:"#fff", borderRadius:12, overflow:"hidden", boxShadow:"0 8px 40px rgba(0,0,0,0.15)" }}>
+            <div style={{ width:"100%", maxWidth:640, background:"#fff", borderRadius:12, overflow:"visible", boxShadow:"0 8px 40px rgba(0,0,0,0.15)" }}>
               <div style={{ background:"#F1F5F9", padding:"10px 16px", borderBottom:"1px solid #E2E8F0" }}>
                 <p style={{ fontSize:11, color:"#64748B", margin:0 }}>To: <strong>john@example.com</strong> · Subject: <strong>{template.subject||"(no subject)"}</strong></p>
               </div>
