@@ -370,14 +370,20 @@ function BlockPreview({ block, idx, isActive, onClick }) {
           </div>
         );
       case "sales": {
-        const plans = (c.plans||[]).filter(Boolean).map(p => { const parts = p.split("|"); return { name:parts[0], price:parts[1] }; });
+        const plans = (c.plans||[]).filter(Boolean).map(p => { const parts = p.split("|"); return { name:parts[0], price:parts[1], originalPrice:parts[2] }; });
         return (
           <div>
             <h3 style={{ fontSize:13, fontWeight:800, color:"#0f172a", margin:"0 0 10px" }}>{c.heading||"Sales Page"}</h3>
             {plans.map((plan,i) => (
-              <div key={i} style={{ padding:"10px 14px", borderRadius:10, border:`1.5px solid ${i===1?"#5B4EFF":"#E2E8F0"}`, background:i===1?"#EEF2FF":"#F8FAFC", marginBottom:6, display:"flex", justifyContent:"space-between" }}>
-                <span style={{ fontSize:12, fontWeight:700, color:"#0f172a" }}>{plan.name}</span>
-                <span style={{ fontSize:13, fontWeight:900, color:"#5B4EFF" }}>${plan.price}</span>
+              <div key={i} style={{ padding:"10px 14px", borderRadius:10, border:`1.5px solid ${i===1?"#5B4EFF":"#E2E8F0"}`, background:i===1?"#EEF2FF":"#F8FAFC", marginBottom:6, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                  <span style={{ fontSize:12, fontWeight:700, color:"#0f172a" }}>{plan.name}</span>
+                  <span style={{ background:"#ef4444", color:"#fff", fontSize:9, fontWeight:800, padding:"1px 6px", borderRadius:999 }}>50% OFF</span>
+                </div>
+                <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                  {plan.originalPrice && <span style={{ fontSize:11, color:"#94A3B8", textDecoration:"line-through" }}>${plan.originalPrice}</span>}
+                  <span style={{ fontSize:13, fontWeight:900, color:"#5B4EFF" }}>${plan.price}</span>
+                </div>
               </div>
             ))}
             <div style={{ padding:"10px", borderRadius:10, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", textAlign:"center", marginTop:8 }}>
@@ -605,8 +611,11 @@ function BlockEditor({ type, content, onChange }) {
     return (
       <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
         <Field label="Heading"><input value={content.heading||""} onChange={e=>u("heading",e.target.value)} placeholder="Your Personalized A.I. Certificate Program is Ready!" style={inp()}/></Field>
-        <Field label="Plans (name|price, one per line)">
-          <textarea value={(content.plans||[]).join("\n")} onChange={e=>u("plans",e.target.value.split("\n"))} placeholder={"1-Week Plan|6.93\n4-Week Plan|19.99\n12-Week Plan|39.99"} style={{ ...inp(), minHeight:80, resize:"vertical" }}/>
+        <Field label="Plans (name|price|originalPrice, one per line)" hint="originalPrice shown crossed out">
+          <textarea value={(content.plans||[]).join("\n")} onChange={e=>u("plans",e.target.value.split("\n"))} placeholder={"1-Week Plan|6.93|13.86\n4-Week Plan|19.99|39.99\n12-Week Plan|39.99|79.99"} style={{ ...inp(), minHeight:80, resize:"vertical" }}/>
+        </Field>
+        <Field label="Legal Text" hint="shown below button — use {price}, {plan}">
+          <textarea value={content.legalText||""} onChange={e=>u("legalText",e.target.value)} placeholder="By clicking Get My Plan, I agree to pay {price} for my {plan}..." style={{ ...inp(), minHeight:100, resize:"vertical" }}/>
         </Field>
       </div>
     );
@@ -667,7 +676,7 @@ function getDefaultContent(type) {
     case "summary":         return { title:"Your Personal Summary", subtitle:"The quiz indicates that what held you back is time, not capability", statLabel:"A.I. Skills", items:["Your focus|Future-proofing your role","Your readiness|Ready to learn online","Your pace|20 min a day","Learning experience|Self-taught so far"] };
     case "comparison":      return { title:"Your Personalized A.I. Certificate Program", without:["No time to get started","No recognized credential","A.I. feels hard to use","Invisible to employers"], with:["Clear, step-by-step path","Shareable A.I. credential","Reliable results from A.I.","Stand out from other workers"] };
     case "signup":          return { heading:"Your A.I. Program is Ready!", subtext:"Enter your details to continue" };
-    case "sales":           return { heading:"Your Personalized A.I. Certificate Program is Ready!", plans:["1-Week Plan|6.93","4-Week Plan|19.99","12-Week Plan|39.99"] };
+    case "sales":           return { heading:"Your Personalized A.I. Certificate Program is Ready!", plans:["1-Week Plan|6.93|13.86","4-Week Plan|19.99|39.99","12-Week Plan|39.99|79.99"], legalText:"By clicking Get My Plan, I agree to pay {price} for my {plan}. This plan will automatically renew every 4 weeks at the regular price until cancelled. Cancel anytime at 1course.io/profile." };
     default: return {};
   }
 }
