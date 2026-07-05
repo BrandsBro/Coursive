@@ -147,7 +147,7 @@ export default function EmailTemplateEditor({ templateId }) {
         <div style={{ flex: 1, minWidth: 0 }}>
           <input value={template.name || ""} onChange={(e) => u("name", e.target.value)} style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", border: "none", outline: "none", background: "transparent", width: "100%" }} />
         </div>
-        <input value={template.subject || ""} onChange={(e) => u("subject", e.target.value)} placeholder="Subject line..." style={{ padding: "7px 12px", borderRadius: 9, border: "1.5px solid #E2E8F0", fontSize: 13, width: 240, outline: "none", flexShrink: 0 }} />
+        <input value={template.subject || ""} onChange={(e) => u("subject", e.target.value)} placeholder="Subject line..." style={{ padding: "7px 12px", borderRadius: 9, border: "1.5px solid #E2E8F0", fontSize: 13, width: 380, outline: "none", flexShrink: 0 }} />
         <select value={template.trigger || "manual"} onChange={(e) => u("trigger", e.target.value)} style={{ padding: "7px 10px", borderRadius: 9, border: "1.5px solid #E2E8F0", fontSize: 12, outline: "none", flexShrink: 0 }}>
           {TRIGGER_TYPES.map((t) => (<option key={t.value} value={t.value}>{t.icon} {t.label}</option>))}
         </select>

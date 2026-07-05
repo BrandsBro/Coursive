@@ -1,8 +1,8 @@
 content = open('components/admin/EmailTemplateEditor.jsx', encoding='utf-8').read()
 
 content = content.replace(
-    'case "heading": return (<div style={col()}><div><p style={lbl()}>Text <span style={{color:"#94A3B8",fontWeight:400}}>· {"{name}"} = user name</span></p><textarea value={b.text||""} onChange={(e)=>onChange("text",e.target.value)} rows={3} style={{...inp(),resize:"vertical"}}/>',
-    'case "heading": return (<div style={col()}><div><p style={lbl()}>Text <span style={{color:"#94A3B8",fontWeight:400}}>· {"{name}"} = user name</span></p><textarea value={b.text||""} onChange={(e)=>onChange("text",e.target.value)} rows={5} style={{...inp(),resize:"vertical",minHeight:100}}/>'
+    'value={template.subject || ""} onChange={(e) => u("subject", e.target.value)} placeholder="Subject line..." style={{ padding: "7px 12px", borderRadius: 9, border: "1.5px solid #E2E8F0", fontSize: 13, width: 240, outline: "none", flexShrink: 0 }}',
+    'value={template.subject || ""} onChange={(e) => u("subject", e.target.value)} placeholder="Subject line..." style={{ padding: "7px 12px", borderRadius: 9, border: "1.5px solid #E2E8F0", fontSize: 13, width: 380, outline: "none", flexShrink: 0 }}'
 )
 
 open('components/admin/EmailTemplateEditor.jsx', 'w', encoding='utf-8').write(content)
