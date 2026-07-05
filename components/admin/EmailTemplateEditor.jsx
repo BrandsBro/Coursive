@@ -1,9 +1,12 @@
 import os
+
+# Restore EmailTemplateEditor.jsx from git
+os.system('git checkout HEAD -- components/admin/EmailTemplateEditor.jsx')
+
+# Create cron route
 os.makedirs('app/api/cron', exist_ok=True)
 
-code = open('app/api/cron/route.js', 'w', encoding='utf-8') if False else None
-
-content = '''import { NextResponse } from "next/server";
+cron_code = '''import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 
@@ -37,15 +40,7 @@ export async function GET(req) {
   try {
     const in3days = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
     const in3daysEnd = new Date(in3days.getTime() + 24 * 60 * 60 * 1000);
-
-    const { data: expiring3 } = await supabase
-      .from("subscriptions")
-      .select("*, profiles(email, full_name)")
-      .eq("status", "active")
-      .eq("type", "recurring")
-      .gte("expires_at", in3days.toISOString())
-      .lt("expires_at", in3daysEnd.toISOString());
-
+    const { data: expiring3 } = await supabase.from("subscriptions").select("*, profiles(email, full_name)").eq("status","active").eq("type","recurring").gte("expires_at",in3days.toISOString()).lt("expires_at",in3daysEnd.toISOString());
     const tmpl3 = await getTemplate("expiry_warning_3");
     for (const sub of expiring3 || []) {
       const email = sub.profiles?.email;
@@ -58,15 +53,7 @@ export async function GET(req) {
 
     const in1day = new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000);
     const in1dayEnd = new Date(in1day.getTime() + 24 * 60 * 60 * 1000);
-
-    const { data: expiring1 } = await supabase
-      .from("subscriptions")
-      .select("*, profiles(email, full_name)")
-      .eq("status", "active")
-      .eq("type", "recurring")
-      .gte("expires_at", in1day.toISOString())
-      .lt("expires_at", in1dayEnd.toISOString());
-
+    const { data: expiring1 } = await supabase.from("subscriptions").select("*, profiles(email, full_name)").eq("status","active").eq("type","recurring").gte("expires_at",in1day.toISOString()).lt("expires_at",in1dayEnd.toISOString());
     const tmpl1 = await getTemplate("expiry_warning_1");
     for (const sub of expiring1 || []) {
       const email = sub.profiles?.email;
@@ -85,5 +72,5 @@ export async function GET(req) {
 }
 '''
 
-open('app/api/cron/route.js', 'w', encoding='utf-8').write(content)
+open('app/api/cron/route.js', 'w', encoding='utf-8').write(cron_code)
 print("Done!")
