@@ -382,7 +382,7 @@ export default function ProfilePage() {
                   </div>
                 )}
                 <button onClick={() => setShowRenew(true)} style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
-                  🚀 {daysLeft > 0 ? "Renew Subscription" : "Renew Access"}
+                  🚀 {daysLeft > 0 ? "Extend Subscription" : "Renew Access"}
                 </button>
               </div>
             </>

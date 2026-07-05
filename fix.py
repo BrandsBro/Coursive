@@ -1,7 +1,9 @@
-content = open('components/quiz/QuizFlow.jsx', encoding='utf-8').read()
+content = open('components/profile/ProfilePage.jsx', encoding='utf-8').read()
+
 content = content.replace(
-    '"🔄 Auto-renew — Cancel anytime"',
-    '"One-time payment"'
+    '🚀 {daysLeft > 0 ? "Renew Subscription" : "Renew Access"}',
+    '🚀 {daysLeft > 0 ? "Extend Subscription" : "Renew Access"}'
 )
-open('components/quiz/QuizFlow.jsx', 'w', encoding='utf-8').write(content)
+
+open('components/profile/ProfilePage.jsx', 'w', encoding='utf-8').write(content)
 print("Done!")
