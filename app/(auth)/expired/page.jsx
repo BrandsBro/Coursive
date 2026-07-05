@@ -2,17 +2,22 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import Link from "next/link";
+import PaymentModal from "@/components/quiz/PaymentModal";
 
 export default function ExpiredPage() {
   const router = useRouter();
   const [sub, setSub] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showRenew, setShowRenew] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push("/login"); return; }
+      setUserEmail(user.email || "");
+      setUserName(user.user_metadata?.full_name || "");
       const { data } = await supabase
         .from("subscriptions")
         .select("*")
@@ -62,19 +67,28 @@ export default function ExpiredPage() {
           )}
 
           <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-            <Link href="/renew" style={{ display:"block", padding:"16px", borderRadius:14, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, textDecoration:"none", boxShadow:"0 8px 24px rgba(91,78,255,0.4)" }}>
+            <button onClick={() => setShowRenew(true)} style={{ display:"block", width:"100%", padding:"16px", borderRadius:14, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, border:"none", cursor:"pointer", boxShadow:"0 8px 24px rgba(91,78,255,0.4)" }}>
               🚀 Renew My Access
-            </Link>
+            </button>
             <button onClick={handleSignOut} style={{ padding:"12px", borderRadius:14, border:"1px solid rgba(255,255,255,0.15)", background:"transparent", color:"rgba(255,255,255,0.6)", fontSize:14, fontWeight:600, cursor:"pointer" }}>
               Sign Out
             </button>
           </div>
 
-          <p style={{ fontSize:12, color:"rgba(255,255,255,0.3)", marginTop:20 }}>
-            Need help? Contact us at support@kingbrandsbro.pro
-          </p>
+
         </div>
       </div>
+      {showRenew && (
+        <PaymentModal
+          plan={sub?.plan || "4-Week Plan"}
+          paymentType="one_time"
+          email={userEmail}
+          name={userName}
+          isRenewal={true}
+          onClose={() => setShowRenew(false)}
+          onSuccess={() => { setShowRenew(false); router.push("/home"); }}
+        />
+      )}
     </div>
   );
 }
