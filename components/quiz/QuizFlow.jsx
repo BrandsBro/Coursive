@@ -550,13 +550,6 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
           </div>
 
           <p style={{ fontSize:13, color:"#64748B", margin:"0 0 20px" }}>People using plan for 3 months achieve twice as many results as for 1 month</p>
-          <button onClick={handleGetPlan} style={{ width:"100%", padding:"18px", borderRadius:16, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, cursor:"pointer", boxShadow:"0 8px 24px rgba(91,78,255,0.4)", marginBottom:12 }}>
-            GET MY PLAN →
-          </button>
-          <div style={{ display:"flex", justifyContent:"center", gap:16, marginTop:12 }}>
-            <span style={{ fontSize:12, color:"#64748B" }}>⏱ {mins}:{secs} left</span>
-            <span style={{ fontSize:12, color:"#64748B" }}>🔒 Secure checkout</span>
-          </div>
           {/* Legal text for selected plan */}
           {pricingData && (() => {
             const planData = pricingData.plans?.find(p => p.name === selectedPlan);
@@ -570,11 +563,18 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
               .replace(/{duration}/g, String(planData.duration))
               .replace(/1course\.io\/profile/g, "<a href='https://1course.io/profile' style='color:#5B4EFF;font-weight:700;text-decoration:underline'>my profile</a>");
             return (
-              <p style={{ fontSize:11, color:"#94A3B8", lineHeight:1.7, margin:"16px 0 0", textAlign:"center" }}
+              <p style={{ fontSize:11, color:"#94A3B8", lineHeight:1.7, margin:"0 0 16px", textAlign:"center" }}
                 dangerouslySetInnerHTML={{ __html: legalHtml }}
               />
             );
           })()}
+          <button onClick={handleGetPlan} style={{ width:"100%", padding:"18px", borderRadius:16, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, cursor:"pointer", boxShadow:"0 8px 24px rgba(91,78,255,0.4)", marginBottom:12 }}>
+            GET MY PLAN →
+          </button>
+          <div style={{ display:"flex", justifyContent:"center", gap:16, marginTop:12 }}>
+            <span style={{ fontSize:12, color:"#64748B" }}>⏱ {mins}:{secs} left</span>
+            <span style={{ fontSize:12, color:"#64748B" }}>🔒 Secure checkout</span>
+          </div>
         </div>
         {showPayment && (
           <PaymentModal plan={selectedPlan} paymentType={paymentType} email={email} name={name} onClose={() => setShowPayment(false)} onSuccess={handlePaymentSuccess}/>
