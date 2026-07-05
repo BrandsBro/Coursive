@@ -180,7 +180,7 @@ function generateHtml(blocks, name, email, password, template) {
     })
     .join("");
 
-  return `<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;background:${emailBg};padding:32px 0"><div style="max-width:600px;margin:0 auto;background:${cardBg};border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.4)">${blockHtml}</div></div>`;
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;background:${emailBg};padding:32px 0"><div style="max-width:600px;margin:0 auto;background:${cardBg};border-radius:${template?.cardRadius||20}px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.4);border:${template?.cardBorderWidth||0}px solid ${template?.cardBorder||"transparent"}">${blockHtml}</div></div>`;
 }
 
 export default function EmailTemplateEditor({ templateId }) {
