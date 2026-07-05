@@ -78,7 +78,7 @@ export default function ExpiredPage() {
       </div>
       {showRenew && (
         <PaymentModal
-          plan={sub?.plan || "4-Week Plan"}
+          plan={sub?.plan === "1-Week Plan" ? "4-Week Plan" : (sub?.plan || "4-Week Plan")}
           paymentType="one_time"
           email={userEmail}
           name={userName}
