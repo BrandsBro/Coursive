@@ -1,5 +1,4 @@
 "use client";
-import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/lib/supabase";
 import { ArrowLeft, Check, Copy, Loader, Plus, Save, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -844,8 +843,7 @@ export default function EmailTemplateEditor({ templateId }) {
             )}
           </div>
         </div>
-      </div>
-    </AdminLayout>
+    </div>
   );
 }
 

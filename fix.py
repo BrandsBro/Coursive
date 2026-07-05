@@ -1,18 +1,27 @@
 content = open('components/admin/EmailTemplateEditor.jsx', encoding='utf-8').read()
 
-# Fix - add after the Global Card BG (line 726 area)
+# Remove AdminLayout import and wrapper
 content = content.replace(
-    '''                <CF label="Card BG" value={template.cardBg||"#0a081e"} onChange={v=>u("cardBg",v)}/>
-              </div>
-            </div>
-          </div>''',
-    '''                <CF label="Card BG" value={template.cardBg||"#0a081e"} onChange={v=>u("cardBg",v)}/>
-                <CF label="Card Border Color" value={template.cardBorder||"transparent"} onChange={v=>u("cardBorder",v)}/>
-                <SF label="Border Width" value={template.cardBorderWidth||0} onChange={v=>u("cardBorderWidth",v)}/>
-                <SF label="Border Radius" value={template.cardRadius||20} onChange={v=>u("cardRadius",v)}/>
-              </div>
-            </div>
-          </div>'''
+    'import AdminLayout from "@/components/admin/AdminLayout";\n',
+    ''
+)
+content = content.replace(
+    '    <AdminLayout>\n      <div style={{ display:"flex", flexDirection:"column", height:"calc(100vh - 64px)", overflow:"hidden" }}>',
+    '    <div style={{ display:"flex", flexDirection:"column", height:"100vh", overflow:"hidden" }}>'
+)
+content = content.replace(
+    '      </div>\n    </AdminLayout>',
+    '    </div>'
+)
+
+# Fix loading and not found states too
+content = content.replace(
+    'if (loading) return <AdminLayout><div style={{ padding:80, textAlign:"center" }}><Loader size={32} color="#94A3B8"/></div></AdminLayout>;',
+    'if (loading) return <div style={{ padding:80, textAlign:"center" }}><Loader size={32} color="#94A3B8"/></div>;'
+)
+content = content.replace(
+    'if (!template) return <AdminLayout><div style={{ padding:80, textAlign:"center", color:"#94A3B8" }}>Template not found</div></AdminLayout>;',
+    'if (!template) return <div style={{ padding:80, textAlign:"center", color:"#94A3B8" }}>Template not found</div>;'
 )
 
 open('components/admin/EmailTemplateEditor.jsx', 'w', encoding='utf-8').write(content)
