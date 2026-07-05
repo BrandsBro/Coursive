@@ -138,7 +138,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose }) {
   );
 }
 
-export default function PaymentModal({ plan, paymentType, email, name, onClose, onSuccess }) {
+export default function PaymentModal({ plan, paymentType, email, name, onClose, onSuccess, isRenewal=false }) {
   const [pricingSettings, setPricingSettings] = useState(null);
 
   useEffect(() => {
@@ -151,8 +151,8 @@ export default function PaymentModal({ plan, paymentType, email, name, onClose, 
     pricingSettings.plans.filter(p=>p.active).map(p => [
       p.name,
       {
-        price: `${pricingSettings.currencySymbol||"$"}${p.introPrice}`,
-        recurringPrice: `${pricingSettings.currencySymbol||"$"}${(parseFloat(p.introPrice)*(1-(pricingSettings.autoRenewDiscount||15)/100)).toFixed(2)}`,
+        price: isRenewal ? `${pricingSettings.currencySymbol||"$"}${p.regularPrice||p.originalPrice||p.introPrice}` : `${pricingSettings.currencySymbol||"$"}${p.salePrice||p.introPrice}`,
+        recurringPrice: isRenewal ? `${pricingSettings.currencySymbol||"$"}${p.regularPrice||p.originalPrice||p.introPrice}` : `${pricingSettings.currencySymbol||"$"}${p.salePrice||p.introPrice}`,
         label: p.name,
         weeks: Math.round(p.duration/7),
       }
