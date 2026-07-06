@@ -38,7 +38,7 @@ export default function CertificateGenerator({ course, userName, completedDate, 
     try {
       const { default: jsPDF } = await import("jspdf");
       const { default: html2canvas } = await import("html2canvas");
-      const canvas = await html2canvas(certRef.current, { scale:3, useCORS:true, backgroundColor:"#ffffff", logging:false });
+      const canvas = await html2canvas(certRef.current, { scale:3, useCORS:true, allowTaint:true, backgroundColor:"#ffffff", logging:false, imageTimeout:0 });
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({ orientation:"landscape", unit:"mm", format:"a4" });
       const w = pdf.internal.pageSize.getWidth();
