@@ -142,7 +142,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
       <div style={{ background:"#fff", borderBottom:"1px solid #F1F5F9", height:58, position:"sticky", top:0, zIndex:50 }}>
         <div style={{ maxWidth:720, margin:"0 auto", padding:"0 12px", height:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, flexWrap:"wrap" }}>
           <Link href={challengeId ? "/challenges/"+challengeId : "/courses/"+(course?.id||"")} style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:6, color:"#64748B", fontSize:13, fontWeight:600 }}>
-            <ChevronLeft size={16}/>{challengeId ? "Back to Challenge" : course?.title}
+<ChevronLeft size={16}/><span className="hidden sm:inline">{challengeId ? "Back to Challenge" : course?.title}</span>
           </Link>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <span className="hidden sm:inline" style={{ fontSize:12, color:"#94A3B8" }}>{lesson?.duration} min read</span>
