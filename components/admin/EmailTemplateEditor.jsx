@@ -14,6 +14,7 @@ const TRIGGER_TYPES = [
   { value: "welcome_reminder", label: "Welcome Reminder", icon: "👋" },
   { value: "manual", label: "Manual", icon: "✉️" },
   { value: "password_changed", label: "Password Changed", icon: "🔐" },
+  { value: "forgot_password", label: "Forgot Password", icon: "🔑" },
 ];
 
 const BLOCK_TYPES = [
