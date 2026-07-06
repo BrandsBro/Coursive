@@ -80,14 +80,10 @@ export default function ProfilePage() {
     await supabase.from("subscriptions").update({ status: "cancelled" }).eq("id", sub.id);
     setCancelled(true);
     setSub(prev => ({ ...prev, status: "cancelled" }));
-    await fetch("/api/send-email", {
+    await fetch("/api/admin/send-cancel-email", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        to: email,
-        subject: "Your 1Course subscription has been cancelled",
-        html: "<div style='font-family:sans-serif;max-width:600px;margin:0 auto;background:#0a081e;color:#fff;border-radius:16px;padding:32px'><h2 style='color:#5B4EFF'>Subscription Cancelled</h2><p style='color:rgba(255,255,255,0.7)'>Hi " + displayName + ",</p><p style='color:rgba(255,255,255,0.7)'>Your subscription has been cancelled. You will keep access until " + new Date(sub.expires_at).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"}) + ".</p><p style='color:rgba(255,255,255,0.7)'>We hope to see you again. You can always renew at 1course.io/profile.</p><p style='color:rgba(255,255,255,0.5)'>The 1Course Team</p></div>"
-      })
+      body: JSON.stringify({ email, name: displayName, expiresAt: sub.expires_at })
     });
     setCancelling(false);
   };
