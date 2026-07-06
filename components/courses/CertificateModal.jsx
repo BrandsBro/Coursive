@@ -31,8 +31,9 @@ async function toBase64(url) {
   } catch (e) { return null; }
 }
 
-export default function CertificateModal({ course, userName, onClose }) {
+export default function CertificateModal({ course, userName: userNameProp, onClose }) {
   const [design, setDesign] = useState(null);
+  const [userName, setUserName] = useState(userNameProp || "");
   const [downloading, setDownloading] = useState(false);
   const certRef = useRef(null);
 
@@ -40,7 +41,7 @@ export default function CertificateModal({ course, userName, onClose }) {
     year: "numeric", month: "long", day: "numeric",
   });
 
-  // Load the design saved in the admin Certificate Designer
+  // Load design + resolve user name if not passed as prop
   useEffect(() => {
     supabase
       .from("settings")
@@ -50,7 +51,23 @@ export default function CertificateModal({ course, userName, onClose }) {
       .then(({ data }) => {
         setDesign(data?.value ? { ...DEFAULT_DESIGN, ...data.value } : DEFAULT_DESIGN);
       });
-  }, []);
+
+    if (!userNameProp) {
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (!user) return;
+        // Try profiles table first, then fall back to auth metadata
+        supabase.from("profiles").select("full_name").eq("id", user.id).single()
+          .then(({ data: profile }) => {
+            const name =
+              profile?.full_name ||
+              user.user_metadata?.full_name ||
+              user.email?.split("@")[0] ||
+              "Learner";
+            setUserName(name);
+          });
+      });
+    }
+  }, [userNameProp]);
 
   const handleDownload = async () => {
     if (!design || !certRef.current) return;
