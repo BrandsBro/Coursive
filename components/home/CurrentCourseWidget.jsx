@@ -86,7 +86,7 @@ export default function CurrentCourseWidget({ courses = [] }) {
         )}
         <div style={{ display:"flex",gap:10 }}>
           <Link href="/courses" style={{ textDecoration:"none",flex:1 }}>
-            <div style={{ padding:"12px",borderRadius:14,border:"1.5px solid #E5E7EB",textAlign:"center",fontSize:13,fontWeight:600,color:"#4B5563",cursor:"pointer" }}>
+            <div className="all-courses-btn" style={{ padding:"12px",borderRadius:14,border:"1.5px solid #E5E7EB",textAlign:"center",fontSize:13,fontWeight:600,color:"#4B5563",cursor:"pointer" }}>
               All courses
             </div>
           </Link>

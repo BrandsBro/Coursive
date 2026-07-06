@@ -24,6 +24,7 @@ export default async function DashboardPage() {
         }
         @media (max-width: 768px) {
           .course-desc { display: none !important; }
+          .all-courses-btn { display: none !important; }
           .top-grid { grid-template-columns: 1fr; }
           .cert-badges { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 8px !important; width: 100% !important; }
           .cert-inner { flex-direction: column !important; align-items: center !important; text-align: center !important; }
