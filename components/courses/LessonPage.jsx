@@ -146,6 +146,14 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
           .lesson-back-text { max-width: 80px; }
         }
       `}</style>
+      <style>{`
+        .lesson-nav { padding: 0 12px; }
+        .lesson-back-text { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        @media (max-width: 640px) {
+          .lesson-listen-btn { padding: 6px 10px !important; font-size: 11px !important; }
+          .lesson-back-text { max-width: 80px; }
+        }
+      `}</style>
       {/* Top nav */}
       <div style={{ background:"#fff", borderBottom:"1px solid #F1F5F9", height:58, position:"sticky", top:0, zIndex:50 }}>
         <div className="lesson-nav" style={{ maxWidth:720, margin:"0 auto", height:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, overflow:"hidden" }}>
