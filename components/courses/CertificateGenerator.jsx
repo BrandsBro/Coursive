@@ -89,7 +89,7 @@ export default function CertificateGenerator({ course, userName, completedDate, 
           </div>
         </div>
         <div ref={certRef}>
-          {design ? <CertificatePreview design={{...DEFAULT_DESIGN, ...design}} name={userName} course={course?.title} date={date}/> : <div style={{padding:40, textAlign:"center", color:"#fff"}}>Loading...</div>}
+          {design ? <CertificatePreview design={design} name={userName} course={course?.title} date={date}/> : <div style={{padding:40, textAlign:"center", color:"#fff"}}>Loading...</div>}
         </div>
       </div>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
