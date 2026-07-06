@@ -53,8 +53,14 @@ export default function ProfilePage() {
     });
     if (user.created_at) setMemberSince(new Date(user.created_at).toLocaleDateString("en-US",{ month:"long", year:"numeric" }));
     // Load courses
-    supabase.from("courses").select("id, title, course_units(id, title, order_index, course_lessons(id, title, order_index))").order("created_at").then(({ data }) => {
-      console.log("Courses loaded:", data); if (data) setCourses(data);
+    supabase.from("courses").select("id, title").order("created_at").then(async ({ data: courseList }) => {
+      if (!courseList) return;
+      const withUnits = await Promise.all(courseList.map(async (course) => {
+        const { data: units } = await supabase.from("course_units").select("id, title, order_index, course_lessons(id, title, order_index)").eq("course_id", course.id).order("order_index");
+        return { ...course, course_units: units || [] };
+      }));
+      console.log("Courses loaded:", withUnits);
+      setCourses(withUnits);
     });
     // Load challenges
     supabase.from("challenges").select("*").order("created_at").then(({ data }) => {
