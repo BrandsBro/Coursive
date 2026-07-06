@@ -66,7 +66,7 @@ export default function CourseRoadmap({ course, completedLessons = [], onViewCer
     setActiveLesson(prev => prev?.id === lesson.id ? null : lesson);
   };
 
-  const handleReset = () => { resetCourse(course.id); setConfirmReset(false); };
+  const handleReset = () => { resetCourse(course.id); setConfirmReset(false); window.location.reload(); };
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
