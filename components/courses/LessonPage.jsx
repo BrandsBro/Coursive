@@ -413,7 +413,7 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
           {c.taskDesc && <p style={{ fontSize:15, color:"#374151", margin:"0 0 28px", lineHeight:1.65 }}>{c.taskDesc}</p>}
 
           {/* Sentence with blanks */}
-          <div style={{ fontSize:20, fontWeight:500, color:"#0f172a", lineHeight:3.2, marginBottom:8 }}>
+          <div style={{ fontSize:16, fontWeight:500, color:"#0f172a", lineHeight:3.5, marginBottom:8 }}>
             {parts.map((part, i) => (
               <span key={i}>
                 {part}
@@ -424,7 +424,7 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
                   const wrong = isChecked && val !== derivedBlanks[i]?.correct;
                   return (
                     <span onClick={() => !isChecked && (val ? clearBlank(i) : setActiveBlank(i))}
-                      style={{ display:"inline-block", minWidth:140, padding:"8px 20px", margin:"0 6px", borderRadius:14, border:`2.5px solid ${isActive?"#5B4EFF":ok?"#22c55e":wrong?"#ef4444":val?"#374151":"#D1D5DB"}`, background:isActive?"#EEF2FF":ok?"#F0FDF4":wrong?"#FEF2F2":val?"#F9FAFB":"#F9FAFB", color:isActive?"#5B4EFF":ok?"#166534":wrong?"#991B1B":val?"#111827":"#94A3B8", fontWeight:700, fontSize:18, textAlign:"center", verticalAlign:"middle", cursor:!isChecked?"pointer":"default", boxShadow:isActive?"0 0 0 4px rgba(91,78,255,0.2), 0 4px 12px rgba(91,78,255,0.15)":val?"0 2px 8px rgba(0,0,0,0.08)":"0 2px 0 #D1D5DB", transition:"all 0.2s", transform:isActive?"scale(1.05)":"scale(1)", animation:isActive&&!val?"blink 1s ease-in-out infinite":"none", position:"relative" }}>
+                      style={{ display:"inline-block", minWidth:80, maxWidth:"90vw", padding:"8px 12px", margin:"0 4px", borderRadius:14, border:`2.5px solid ${isActive?"#5B4EFF":ok?"#22c55e":wrong?"#ef4444":val?"#374151":"#D1D5DB"}`, background:isActive?"#EEF2FF":ok?"#F0FDF4":wrong?"#FEF2F2":val?"#F9FAFB":"#F9FAFB", color:isActive?"#5B4EFF":ok?"#166534":wrong?"#991B1B":val?"#111827":"#94A3B8", fontWeight:700, fontSize:18, textAlign:"center", verticalAlign:"middle", cursor:!isChecked?"pointer":"default", boxShadow:isActive?"0 0 0 4px rgba(91,78,255,0.2), 0 4px 12px rgba(91,78,255,0.15)":val?"0 2px 8px rgba(0,0,0,0.08)":"0 2px 0 #D1D5DB", transition:"all 0.2s", transform:isActive?"scale(1.05)":"scale(1)", animation:isActive&&!val?"blink 1s ease-in-out infinite":"none", position:"relative" }}>
                       {val ? (
                         <span style={{ display:"flex", alignItems:"center", gap:6 }}>
                           {val}
