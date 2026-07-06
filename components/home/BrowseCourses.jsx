@@ -73,7 +73,7 @@ export default function BrowseCourses({ courses = [] }) {
         }
         @media (max-width: 640px) {
           .courses-grid {
-            grid-template-columns: repeat(1, 1fr);
+            grid-template-columns: repeat(1, 1fr) !important;
             gap: 12px;
           }
           .browse-header {
