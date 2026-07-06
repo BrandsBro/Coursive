@@ -24,6 +24,8 @@ export default async function DashboardPage() {
         }
         @media (max-width: 768px) {
           .top-grid { grid-template-columns: 1fr; }
+          .cert-badges { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 8px !important; width: 100% !important; }
+          .cert-inner { flex-direction: column !important; }
         }
       `}</style>
       <div style={{ maxWidth:1200, margin:"0 auto", padding:"24px 20px" }}>

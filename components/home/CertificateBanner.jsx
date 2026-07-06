@@ -92,16 +92,7 @@ export default function CertificateBanner({ courses = [] }) {
         }}
       />
 
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-          display: "flex",
-          alignItems: "center",
-          gap: 20,
-          flexWrap: "wrap",
-        }}
-      >
+      <div className="cert-inner" style={{ position:"relative", zIndex:1, display:"flex", alignItems:"center", gap:20, flexWrap:"wrap" }}>
         {/* Icon */}
         <div
           style={{
@@ -196,7 +187,7 @@ export default function CertificateBanner({ courses = [] }) {
         </div>
 
         {/* Course badges */}
-        <div style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0, flexWrap:"wrap" }}>
+        <div className="cert-badges" style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0, flexWrap:"wrap" }}>
           {CERT.map((c) => {
             const course = courses.find((x) => x.id === c.id);
             const total = course ? course.units?.flatMap((u) => u.lessons).length || 0 : 0;
