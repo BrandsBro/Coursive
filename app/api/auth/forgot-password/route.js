@@ -84,7 +84,7 @@ export async function POST(req) {
     console.error("Forgot password error:", e);
     return NextResponse.json({ error: e.message }, { status:500 });
   }
-}    const resetLink = `${process.env.NEXT_PUBLIC_SITE_URL}/reset-password?token=${token}`;
+}
 
     // Load template from admin
     const { data: settingsData } = await supabase.from("settings").select("value").eq("key","email_templates").single();
