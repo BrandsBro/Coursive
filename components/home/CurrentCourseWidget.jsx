@@ -49,7 +49,7 @@ export default function CurrentCourseWidget({ courses = [] }) {
               <span style={{ color:"#fff",fontSize:10,fontWeight:700,letterSpacing:0.5 }}>CURRENT COURSE</span>
             </div>
             <h3 style={{ color:"#fff",fontSize:"clamp(18px,4vw,24px)",fontWeight:900,margin:"0 0 4px",lineHeight:1.15 }}>{activeCourse.title}</h3>
-            <p style={{ color:"rgba(255,255,255,0.65)",fontSize:13,margin:0 }}>{activeCourse.description}</p>
+            <p className="course-desc" style={{ color:"rgba(255,255,255,0.65)",fontSize:13,margin:0 }}>{activeCourse.description}</p>
           </div>
           <div style={{ fontSize:48,lineHeight:1,marginTop:-4,flexShrink:0 }}>{s.emoji}</div>
         </div>
