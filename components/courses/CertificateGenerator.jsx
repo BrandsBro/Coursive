@@ -33,7 +33,7 @@ async function toBase64(url) {
 }
 
 export default function CertificateGenerator({ course, userName, completedDate, onClose, type="course" }) {
-  const [design, setDesign] = useState(DEFAULT_DESIGN);
+  const [design, setDesign] = useState(null);
   const [downloading, setDownloading] = useState(false);
   const certRef = useRef();
 
@@ -89,7 +89,7 @@ export default function CertificateGenerator({ course, userName, completedDate, 
           </div>
         </div>
         <div ref={certRef}>
-          <CertificatePreview design={design} name={userName} course={course?.title} date={date}/>
+          {design ? <CertificatePreview design={{...DEFAULT_DESIGN, ...design}} name={userName} course={course?.title} date={date}/> : <div style={{padding:40, textAlign:"center", color:"#fff"}}>Loading...</div>}
         </div>
       </div>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
