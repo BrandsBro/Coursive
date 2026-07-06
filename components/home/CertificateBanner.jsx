@@ -196,76 +196,27 @@ export default function CertificateBanner({ courses = [] }) {
         </div>
 
         {/* Course badges */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
-            flexShrink: 0,
-            flexWrap: "wrap",
-          }}
-        >
+        <div style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0, flexWrap:"wrap" }}>
           {CERT.map((c) => {
             const course = courses.find((x) => x.id === c.id);
-            const total = course
-              ? course.units?.flatMap((u) => u.lessons).length || 0
-              : 0;
+            const total = course ? course.units?.flatMap((u) => u.lessons).length || 0 : 0;
             const pct = getCoursePercent(c.id, total);
             const done = pct === 100;
             return (
-              <Link
-                key={c.id}
-                href={`/courses/${c.id}`}
-                style={{ textDecoration: "none" }}
-              >
+              <Link key={c.id} href={`/courses/${c.id}`} style={{ textDecoration:"none" }}>
                 <div title={course?.title}>
-                  <div
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 12,
-                      fontSize: 18,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      background: done ? c.color : "rgba(255,255,255,0.06)",
-                      border: done
-                        ? "none"
-                        : "1.5px solid rgba(255,255,255,0.12)",
-                      boxShadow: done ? `0 4px 16px ${c.glow}` : "none",
-                      transition: "all 0.3s",
-                    }}
-                  >
-                    {c.emoji}
-                  </div>
-                  <p
-                    style={{
-                      textAlign: "center",
-                      fontSize: 9,
-                      color: done ? "#a78bfa" : "rgba(255,255,255,0.3)",
-                      margin: "4px 0 0",
-                      fontWeight: 600,
-                    }}
-                  >
+                  <div style={{ width:40, height:40, borderRadius:12, fontSize:12, fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center", background:done ? c.color : "rgba(255,255,255,0.06)", border:done ? "none" : "1.5px solid rgba(255,255,255,0.12)", boxShadow:done ? `0 4px 16px ${c.glow}` : "none", transition:"all 0.3s", color:done?"#fff":"rgba(255,255,255,0.4)" }}>
                     {pct > 0 ? `${pct}%` : "—"}
+                  </div>
+                  <p style={{ textAlign:"center", fontSize:9, color:done?"#a78bfa":"rgba(255,255,255,0.3)", margin:"4px 0 0", fontWeight:600, maxWidth:40, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+                    {course?.title?.split(" ")[0] || ""}
                   </p>
                 </div>
               </Link>
             );
           })}
-          <Link href="/courses" style={{ textDecoration: "none" }}>
-            <div
-              style={{
-                width: 44,
-                height: 44,
-                borderRadius: 13,
-                border: "1.5px dashed rgba(255,255,255,0.15)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "rgba(255,255,255,0.03)",
-              }}
-            >
+          <Link href="/courses" style={{ textDecoration:"none" }}>
+            <div style={{ width:44, height:44, borderRadius:13, border:"1.5px dashed rgba(255,255,255,0.15)", display:"flex", alignItems:"center", justifyContent:"center", background:"rgba(255,255,255,0.03)" }}>
               <ChevronRight size={16} color="rgba(255,255,255,0.3)" />
             </div>
           </Link>
