@@ -15,6 +15,7 @@ const NAV = [
   { href:"/admin/users",      icon:Users,           label:"Users"       },
   { href:"/admin/analytics",  icon:TrendingUp,      label:"Analytics"   },
   { href:"/admin/media",      icon:HardDrive,       label:"Media"       },
+  { href:"/admin/certificates", icon:Award,           label:"Certificates" },
   { href:"/admin/branding",     icon:Palette,         label:"Branding"      },
   { href:"/admin/pricing",      icon:CreditCard,      label:"Pricing"       },
   { href:"/admin/reviews",    icon:MessageSquare,   label:"Reviews"     },
