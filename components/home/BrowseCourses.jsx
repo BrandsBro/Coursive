@@ -19,7 +19,7 @@ export default function BrowseCourses({ courses = [] }) {
   return (
     <>
       <div>
-        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 18 }}>
+        <div className="browse-header" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 18 }}>
           <div>
             <h2 style={{ fontSize: 21, fontWeight: 900, color: "#0f172a", margin: "0 0 2px" }}>Browse Courses</h2>
             <p style={{ fontSize: 13, color: "#94A3B8", margin: 0 }}>Pick a course · Learn at your pace</p>
@@ -75,6 +75,12 @@ export default function BrowseCourses({ courses = [] }) {
           .courses-grid {
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
+          }
+          .browse-header {
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+            gap: 12px !important;
           }
         }
       `}</style>
