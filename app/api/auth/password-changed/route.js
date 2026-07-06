@@ -26,7 +26,13 @@ export async function POST(req) {
       subject = pwTmpl.subject || subject;
       const cardBg = pwTmpl.cardBg || "#0a081e";
       const emailBg = pwTmpl.emailBg || "#050411";
-      const replace = (text) => (text||"").replace(/{name}/g, userName).replace(/{email}/g, user.email);
+      const replace = (text) => {
+        if (!text) return "";
+        let t = text.replace(/&#123;/g,"{").replace(/&#125;/g,"}");
+        t = t.replace(/{name}/g, userName);
+        t = t.replace(/{email}/g, user.email);
+        return t;
+      };
       const blockHtml = pwTmpl.blocks.map(b => {
         switch(b.type) {
           case "header": return `<div style="background:linear-gradient(135deg,${b.bg1||"#5B4EFF"},${b.bg2||"#8B5CF6"});padding:${b.padding||48}px 40px;text-align:center"></div>`;
