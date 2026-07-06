@@ -58,8 +58,8 @@ export default function ProfilePage() {
       const withUnits = await Promise.all(courseList.map(async (course) => {
         const { data: units } = await supabase.from("course_units").select("id, title, order_index").eq("course_id", course.id).order("order_index");
         const unitsWithLessons = await Promise.all((units||[]).map(async (unit) => {
-          const { data: lessons } = await supabase.from("course_lessons").select("id, title, order_index").eq("unit_id", unit.id).order("order_index");
-          return { ...unit, course_lessons: lessons || [] };
+          const { data: lessons } = await supabase.from("lessons").select("id, title, order_index").eq("unit_id", unit.id).order("order_index");
+          return { ...unit, lessons: lessons || [] };
         }));
         return { ...course, course_units: unitsWithLessons };
       }));
@@ -77,9 +77,9 @@ export default function ProfilePage() {
 
   const totalLessons = (courses||[]).reduce((s,c) => s + (getCompletedLessons(c.id)||[]).length, 0);
   const certsEarned = (courses||[]).filter(c => hasCertificate(c.id)).length;
-  const coursesStarted = courses.filter(c => getCoursePercent(c.id, (c.course_units||[]).flatMap(u=>u.course_lessons||[]).length) > 0).length;
+  const coursesStarted = courses.filter(c => getCoursePercent(c.id, (c.course_units||[]).flatMap(u=>u.lessons||[]).length) > 0).length;
   const challengesJoined = (challenges||[]).filter(c => hasJoinedChallenge(c.id)).length;
-  const completedCourses = (courses||[]).filter(c => getCoursePercent(c.id, (c.course_units||[]).flatMap(u=>u.course_lessons||[]).length) === 100);
+  const completedCourses = (courses||[]).filter(c => getCoursePercent(c.id, (c.course_units||[]).flatMap(u=>u.lessons||[]).length) === 100);
   const inProgressCourses = (courses||[]).filter(c => { const p = getCoursePercent(c.id, c.units.flatMap(u=>u.lessons).length); return p>0 && p<100; });
 
   const daysLeft = sub ? Math.ceil((new Date(sub.expires_at) - new Date()) / (1000*60*60*24)) : null;
@@ -285,7 +285,7 @@ export default function ProfilePage() {
               <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
                 {inProgressCourses.map(c => {
                   const s = COURSE_STYLES[c.id] || { g:"linear-gradient(135deg,#6366f1,#8b5cf6)", e:"📚" };
-                  const total = (c.course_units||[]).flatMap(u=>u.course_lessons||[]).length;
+                  const total = (c.course_units||[]).flatMap(u=>u.lessons||[]).length;
                   const pct = getCoursePercent(c.id, total);
                   return (
                     <Link key={c.id} href={`/courses/${c.id}`} style={{ textDecoration:"none" }}>
