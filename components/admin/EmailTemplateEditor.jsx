@@ -13,6 +13,7 @@ const TRIGGER_TYPES = [
   { value: "cancellation", label: "On Cancellation", icon: "❌" },
   { value: "welcome_reminder", label: "Welcome Reminder", icon: "👋" },
   { value: "manual", label: "Manual", icon: "✉️" },
+  { value: "password_changed", label: "Password Changed", icon: "🔐" },
 ];
 
 const BLOCK_TYPES = [
