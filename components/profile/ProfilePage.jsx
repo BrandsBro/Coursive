@@ -80,7 +80,7 @@ export default function ProfilePage() {
   const coursesStarted = courses.filter(c => getCoursePercent(c.id, (c.course_units||[]).flatMap(u=>u.lessons||[]).length) > 0).length;
   const challengesJoined = (challenges||[]).filter(c => hasJoinedChallenge(c.id)).length;
   const completedCourses = (courses||[]).filter(c => getCoursePercent(c.id, (c.course_units||[]).flatMap(u=>u.lessons||[]).length) === 100);
-  const inProgressCourses = (courses||[]).filter(c => { const p = getCoursePercent(c.id, c.units.flatMap(u=>u.lessons).length); return p>0 && p<100; });
+  const inProgressCourses = (courses||[]).filter(c => { const p = getCoursePercent(c.id, (c.course_units||[]).flatMap(u=>u.lessons||[]).length); return p>0 && p<100; });
 
   const daysLeft = sub ? Math.ceil((new Date(sub.expires_at) - new Date()) / (1000*60*60*24)) : null;
 
