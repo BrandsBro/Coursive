@@ -67,6 +67,24 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
+  // 5. Check subscription expiry for logged in users
+  if (session && !isPublic && !isAdmin && pathname !== "/expired") {
+    const { data: sub } = await supabase
+      .from("subscriptions")
+      .select("expires_at, status")
+      .eq("user_id", session.user.id)
+      .order("expires_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (sub) {
+      const isExpired = new Date(sub.expires_at) < new Date();
+      const isCancelled = sub.status === "cancelled" && isExpired;
+      if (isExpired || isCancelled) {
+        return NextResponse.redirect(new URL("/expired", req.url));
+      }
+    }
+  }
+
   return res;
 }
 
