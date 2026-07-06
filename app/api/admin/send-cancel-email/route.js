@@ -11,6 +11,7 @@ export async function POST(req) {
     const { data: settingsData } = await supabase.from("settings").select("value").eq("key","email_templates").single();
     const templates = settingsData?.value || [];
     const tmpl = templates.find(t => t.trigger === "cancellation" && t.active !== false);
+    console.log("Templates found:", templates.length, "Cancellation template:", tmpl?.name, "active:", tmpl?.active);
 
     let subject = "Your 1Course subscription has been cancelled";
     let html = "";
