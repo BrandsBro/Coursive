@@ -59,7 +59,7 @@ export default function CertificateModal({ course, onClose }) {
       pdf.setFontSize(11);
       pdf.setTextColor(91, 78, 255);
       pdf.setFont("helvetica", "bold");
-      pdf.text("✦ 1COURSE", pdfWidth / 2, 28, { align: "center" });
+      pdf.text("1Course", pdfWidth / 2, 28, { align: "center" });
 
       // Add the certificate image
       pdf.addImage(imgData, "PNG", margin, yPos, imgWidth, imgHeight);
