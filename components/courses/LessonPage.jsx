@@ -140,12 +140,12 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
     <div style={{ minHeight:"100vh", background:"#fff" }}>
       {/* Top nav */}
       <div style={{ background:"#fff", borderBottom:"1px solid #F1F5F9", height:58, position:"sticky", top:0, zIndex:50 }}>
-        <div style={{ maxWidth:720, margin:"0 auto", padding:"0 20px", height:"100%", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+        <div style={{ maxWidth:720, margin:"0 auto", padding:"0 12px", height:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, flexWrap:"wrap" }}>
           <Link href={challengeId ? "/challenges/"+challengeId : "/courses/"+(course?.id||"")} style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:6, color:"#64748B", fontSize:13, fontWeight:600 }}>
             <ChevronLeft size={16}/>{challengeId ? "Back to Challenge" : course?.title}
           </Link>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-            <span style={{ fontSize:12, color:"#94A3B8" }}>{lesson?.duration} min read</span>
+            <span className="hidden sm:inline" style={{ fontSize:12, color:"#94A3B8" }}>{lesson?.duration} min read</span>
             <button onClick={handleListen} disabled={!hasContent || isLoading}
               style={{ display:"flex", alignItems:"center", gap:6, padding:"7px 14px", borderRadius:10, border:"1.5px solid #E2E8F0", background:isReading?"#0891b2":isLoading?"#e0f2fe":"#fff", color:isReading?"#fff":"#0891b2", fontSize:12, fontWeight:700, cursor:hasContent&&!isLoading?"pointer":"not-allowed", opacity:hasContent?1:0.5 }}>
               {isLoading ? "⏳ Loading..." : isReading ? "⏹ Stop" : "🎧 Listen"}

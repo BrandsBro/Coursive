@@ -8,7 +8,7 @@ import { useProgress } from "@/hooks/useProgress";
 
 const NODE_SIZE = 80;
 const ROW_HEIGHT = 190;
-const SVG_W = 480;
+const SVG_W = 480; // viewBox width - keeps coordinates but scales with CSS
 const LEFT_CX = 160;
 const RIGHT_CX = 400;
 const R = 25;
