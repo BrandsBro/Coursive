@@ -30,7 +30,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   const [isReading, setIsReading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showCert, setShowCert] = useState(false);
-  const [activeTask, setActiveTask] = useState(null); // idx of active blankoptions block
+  const [activeTask, setActiveTask] = useState(null);
   const [tasksDone, setTasksDone] = useState({});
   const [activeTaskIdx, setActiveTaskIdx] = useState(null);
   const audioRef = useRef(null);
@@ -45,7 +45,6 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
     if (!Array.isArray(allBlocks) || allBlocks.length === 0) return "";
     const visibleBlocks = allBlocks.filter((b, i) => i < visibleUntil && b.type !== "continueblock");
     const ttsBlocks = visibleBlocks.filter(b => b.content?.ttsEnabled === true);
-    // If admin enabled TTS on specific blocks, only read those. Else read text+heading.
     const blocksToRead = ttsBlocks.length > 0
       ? ttsBlocks
       : visibleBlocks.filter(b => b.type === "text" || b.type === "heading");
@@ -126,7 +125,6 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
       const currentDay = parts ? parseInt(parts[parts.length - 1]) : 1;
       const nextDay = currentDay + 1;
       const totalDays = course?.units?.[0]?.lessons?.length || 0;
-      // Show day complete screen first
       if (nextDay <= totalDays) router.push("/challenges/" + challengeId + "?dayComplete=" + currentDay);
       else router.push("/challenges/" + challengeId + "?dayComplete=" + currentDay + "&allDone=true");
     } else if (nextLesson) {
@@ -145,20 +143,23 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
           .lesson-listen-btn { padding: 6px 10px !important; font-size: 11px !important; }
           .lesson-back-text { max-width: 80px; }
         }
-      `}</style>
-      <style>{`
-        .lesson-nav { padding: 0 12px; }
-        .lesson-back-text { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        @media (max-width: 640px) {
-          .lesson-listen-btn { padding: 6px 10px !important; font-size: 11px !important; }
-          .lesson-back-text { max-width: 80px; }
+        .complete-modal-header { padding: 28px 20px; }
+        .complete-modal-body { padding: 20px; }
+        .complete-modal-emoji { font-size: 44px; margin-bottom: 10px; }
+        .complete-modal-title { font-size: 20px; }
+        @media (min-width: 400px) {
+          .complete-modal-header { padding: 32px 28px; }
+          .complete-modal-body { padding: 24px 28px; }
+          .complete-modal-emoji { font-size: 56px; margin-bottom: 12px; }
+          .complete-modal-title { font-size: 24px; }
         }
       `}</style>
+
       {/* Top nav */}
       <div style={{ background:"#fff", borderBottom:"1px solid #F1F5F9", height:58, position:"sticky", top:0, zIndex:50 }}>
         <div className="lesson-nav" style={{ maxWidth:720, margin:"0 auto", height:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, overflow:"hidden" }}>
           <Link href={challengeId ? "/challenges/"+challengeId : "/courses/"+(course?.id||"")} style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:6, color:"#64748B", fontSize:13, fontWeight:600 }}>
-<ChevronLeft size={16}/><span className="lesson-back-text">{challengeId ? "Back" : course?.title}</span>
+            <ChevronLeft size={16}/><span className="lesson-back-text">{challengeId ? "Back" : course?.title}</span>
           </Link>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <span className="hidden sm:inline" style={{ fontSize:12, color:"#94A3B8" }}>{lesson?.duration} min read</span>
@@ -177,9 +178,6 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
 
       {/* Main content */}
       <div style={{ maxWidth:720, margin:"0 auto", padding:"32px 24px 80px" }}>
-
-
-        {/* Check if any blankoptions block is currently active (visible and not done) */}
         <div style={{ display:"flex", flexDirection:"column", gap:24 }}>
           {!hasContent && (
             <div style={{ textAlign:"center", padding:"60px 20px", background:"#fff", borderRadius:24, border:"2px dashed #E2E8F0" }}>
@@ -211,7 +209,6 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
               const c = block.content || {};
               const isDone = tasksDone[idx];
               if (isDone) {
-                // Show completed card inline
                 return (
                   <div key={block.id||idx} style={{ borderRadius:16, border:"1.5px solid #E2E8F0", overflow:"hidden" }}>
                     <div style={{ padding:"12px 20px", background:"#F0FDF4", display:"flex", alignItems:"center", gap:8 }}>
@@ -253,77 +250,78 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
                 </div>
               );
             }
-            // Check if previous block was a continue block
             const prevBlock = safeContent[idx-1];
             return (
               <div key={block.id||idx}>
                 {prevBlock?.type === "continueblock" && <div id={"after-continue-"+(idx-1)} style={{ scrollMarginTop:70 }}/>}
-              <ContentBlock block={block} idx={idx}
-                answers={answers} setAnswers={setAnswers}
-                checked={checked} setChecked={setChecked}
-                fillInputs={fillInputs} setFillInputs={setFillInputs}
-                fillChecked={fillChecked} setFillChecked={setFillChecked}
-                fillShowAnswer={fillShowAnswer} setFillShowAnswer={setFillShowAnswer}
-              />
+                <ContentBlock block={block} idx={idx}
+                  answers={answers} setAnswers={setAnswers}
+                  checked={checked} setChecked={setChecked}
+                  fillInputs={fillInputs} setFillInputs={setFillInputs}
+                  fillChecked={fillChecked} setFillChecked={setFillChecked}
+                  fillShowAnswer={fillShowAnswer} setFillShowAnswer={setFillShowAnswer}
+                />
               </div>
             );
           })}
         </div>
 
-        {/* Bottom navigation - only show when all content revealed */}
-        {visibleUntil === Infinity && <div style={{ marginTop:48, paddingTop:32, borderTop:"1px solid #F1F5F9", display:"flex", gap:12, alignItems:"center", justifyContent:"space-between" }}>
-          {prevLesson ? (
-            <Link href={challengeId ? "/challenges/"+challengeId+"/day/"+(parseInt(lesson?.id?.split("_day_").pop())-1) : "/courses/"+course.id+"/lessons/"+prevLesson.id+"?mode="+mode}
-              style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:6, padding:"11px 18px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", color:"#374151", fontSize:13, fontWeight:600 }}>
-              <ChevronLeft size={15}/> Previous
-            </Link>
-          ) : <div/>}
-          {!isComplete && !completed ? (
-            <button onClick={handleComplete} style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(124,58,237,0.4)" }}>
-              {hasContent ? "✓ Mark Complete" : nextLesson ? "✓ Next Lesson" : "🏆 Finish Course"}
-            </button>
-          ) : (
-            <button onClick={handleNext} style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#22c55e,#16a34a)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7 }}>
-              {nextLesson ? <><span>Next Lesson</span><ChevronRight size={15}/></> : <><Trophy size={15}/><span>Finish Course</span></>}
-            </button>
-          )}
-        </div>}
+        {/* Bottom navigation */}
+        {visibleUntil === Infinity && (
+          <div style={{ marginTop:48, paddingTop:32, borderTop:"1px solid #F1F5F9", display:"flex", gap:12, alignItems:"center", justifyContent:"space-between" }}>
+            {prevLesson ? (
+              <Link href={challengeId ? "/challenges/"+challengeId+"/day/"+(parseInt(lesson?.id?.split("_day_").pop())-1) : "/courses/"+course.id+"/lessons/"+prevLesson.id+"?mode="+mode}
+                style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:6, padding:"11px 18px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", color:"#374151", fontSize:13, fontWeight:600 }}>
+                <ChevronLeft size={15}/> Previous
+              </Link>
+            ) : <div/>}
+            {!isComplete && !completed ? (
+              <button onClick={handleComplete} style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(124,58,237,0.4)" }}>
+                {hasContent ? "✓ Mark Complete" : nextLesson ? "✓ Next Lesson" : "🏆 Finish Course"}
+              </button>
+            ) : (
+              <button onClick={handleNext} style={{ flex:1, maxWidth:280, padding:"13px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#22c55e,#16a34a)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:7 }}>
+                {nextLesson ? <><span>Next Lesson</span><ChevronRight size={15}/></> : <><Trophy size={15}/><span>Finish Course</span></>}
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Complete modal */}
+      {/* Complete modal — fully responsive */}
       {showComplete && (
-        <div style={{ position:"fixed", inset:0, background:"rgba(15,23,42,0.7)", zIndex:100, display:"flex", alignItems:"center", justifyContent:"center", padding:20, backdropFilter:"blur(8px)" }}>
-          <div style={{ background:"#fff", borderRadius:28, width:"100%", maxWidth:400, boxShadow:"0 32px 80px rgba(0,0,0,0.3)", overflow:"hidden" }}>
+        <div style={{ position:"fixed", inset:0, background:"rgba(15,23,42,0.7)", zIndex:100, display:"flex", alignItems:"center", justifyContent:"center", padding:"16px", backdropFilter:"blur(8px)" }}>
+          <div style={{ background:"#fff", borderRadius:24, width:"100%", maxWidth:400, boxShadow:"0 32px 80px rgba(0,0,0,0.3)", overflow:"hidden" }}>
             {/* Top gradient */}
-            <div style={{ background:"linear-gradient(135deg,#7c3aed,#4f46e5)", padding:"32px 28px", textAlign:"center" }}>
-              <div style={{ fontSize:56, marginBottom:12 }}>🎉</div>
-              <h2 style={{ fontSize:24, fontWeight:900, color:"#fff", margin:"0 0 6px" }}>
+            <div className="complete-modal-header" style={{ background:"linear-gradient(135deg,#7c3aed,#4f46e5)", textAlign:"center" }}>
+              <div className="complete-modal-emoji">🎉</div>
+              <h2 className="complete-modal-title" style={{ fontWeight:900, color:"#fff", margin:"0 0 6px" }}>
                 {nextLesson ? "Lesson Complete!" : "Course Complete! 🏆"}
               </h2>
-              <p style={{ fontSize:14, color:"rgba(255,255,255,0.75)", margin:0 }}>
+              <p style={{ fontSize:13, color:"rgba(255,255,255,0.75)", margin:0 }}>
                 {nextLesson ? "Great work — keep going!" : "You finished the entire course!"}
               </p>
             </div>
             {/* Body */}
-            <div style={{ padding:"24px 28px" }}>
+            <div className="complete-modal-body">
               {nextLesson && (
-                <div style={{ background:"#F8FAFC", borderRadius:14, padding:"14px 16px", marginBottom:20, display:"flex", alignItems:"center", gap:12 }}>
-                  <div style={{ width:40, height:40, borderRadius:10, background:"linear-gradient(135deg,#7c3aed,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                    <ChevronRight size={20} color="#fff"/>
+                <div style={{ background:"#F8FAFC", borderRadius:14, padding:"12px 14px", marginBottom:16, display:"flex", alignItems:"center", gap:12 }}>
+                  <div style={{ width:36, height:36, borderRadius:10, background:"linear-gradient(135deg,#7c3aed,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <ChevronRight size={18} color="#fff"/>
                   </div>
-                  <div>
-                    <p style={{ fontSize:11, color:"#94A3B8", margin:"0 0 2px", fontWeight:600, textTransform:"uppercase" }}>Up next</p>
-                    <p style={{ fontSize:14, fontWeight:700, color:"#0f172a", margin:0 }}>{nextLesson.title}</p>
+                  <div style={{ minWidth:0 }}>
+                    <p style={{ fontSize:10, color:"#94A3B8", margin:"0 0 2px", fontWeight:600, textTransform:"uppercase" }}>Up next</p>
+                    <p style={{ fontSize:13, fontWeight:700, color:"#0f172a", margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{nextLesson.title}</p>
                   </div>
                 </div>
               )}
               <div style={{ display:"flex", gap:10 }}>
                 <button onClick={() => setShowComplete(false)}
-                  style={{ flex:1, padding:"13px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:13, fontWeight:600, color:"#374151", cursor:"pointer" }}>
+                  style={{ flex:1, padding:"12px 8px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:13, fontWeight:600, color:"#374151", cursor:"pointer" }}>
                   Stay here
                 </button>
                 <button onClick={() => { setShowComplete(false); handleNext(); }}
-                  style={{ flex:2, padding:"13px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(124,58,237,0.4)" }}>
+                  style={{ flex:2, padding:"12px 8px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(124,58,237,0.4)" }}>
                   {nextLesson ? "Next Lesson →" : "Finish Course 🏆"}
                 </button>
               </div>
@@ -331,6 +329,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
           </div>
         </div>
       )}
+
       {showCert && <CertificateGenerator course={course} userName={userName} completedDate={new Date().toISOString()} onClose={() => setShowCert(false)}/>}
     </div>
   );
@@ -345,7 +344,6 @@ function renderInline(text) {
     return <span key={i}>{part}</span>;
   });
 }
-
 
 function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFillShowAnswer, onDone, onClose }) {
   const blanks = c.blanks || [];
@@ -391,13 +389,10 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
     setFillShowAnswer(p => ({...p, ["bo_"+idx]: false}));
   };
 
-
   return (
     <div style={{ position:"fixed", inset:0, background:"#fff", zIndex:200, display:"flex", flexDirection:"column" }}>
-      {/* Header */}
       <div style={{ padding:"14px 20px", borderBottom:"1px solid #F1F5F9", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <button onClick={() => onDone && onDone()} style={{ width:32, height:32, borderRadius:"50%", border:"1.5px solid #E2E8F0", background:"#fff", cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", color:"#64748B" }}>✕</button>
-        {/* Progress dots */}
         <div style={{ display:"flex", gap:6 }}>
           {Array.from({length:blankCount},(_,i) => (
             <div key={i} onClick={() => !isChecked && setActiveBlank(i)} style={{ width:filled[i]?28:24, height:8, borderRadius:999, background:filled[i]?"#5B4EFF":activeBlank===i?"#C7D2FE":"#E2E8F0", transition:"all 0.2s", cursor:"pointer" }}/>
@@ -406,13 +401,11 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
         <div style={{ width:32 }}/>
       </div>
 
-      {/* Content */}
       <div style={{ flex:1, overflowY:"auto", display:"flex", flexDirection:"column" }}>
         <div style={{ maxWidth:600, margin:"0 auto", width:"100%", padding:"32px 24px", flex:1 }}>
           {c.taskTitle && <h2 style={{ fontSize:22, fontWeight:800, color:"#0f172a", margin:"0 0 8px" }}>{c.taskTitle}</h2>}
           {c.taskDesc && <p style={{ fontSize:15, color:"#374151", margin:"0 0 28px", lineHeight:1.65 }}>{c.taskDesc}</p>}
 
-          {/* Sentence with blanks */}
           <div style={{ fontSize:16, fontWeight:500, color:"#0f172a", lineHeight:3.5, marginBottom:8 }}>
             {parts.map((part, i) => (
               <span key={i}>
@@ -441,14 +434,12 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
             ))}
           </div>
 
-          {/* Hint */}
           {!isChecked && activeBlank !== null && (
             <p style={{ fontSize:13, color:"#94A3B8", margin:"0 0 8px" }}>
               Tap an option below to fill blank {activeBlank + 1}
             </p>
           )}
 
-          {/* Correct result */}
           {isChecked && allCorrect && (
             <div style={{ marginTop:16 }}>
               {(c.successImages||[]).filter(Boolean).map((url,i) => <img key={i} src={url} alt="" style={{ width:"100%", borderRadius:16, marginBottom:12, objectFit:"contain" }}/>)}
@@ -462,7 +453,6 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
             </div>
           )}
 
-          {/* Almost right */}
           {isChecked && !allCorrect && (
             <div style={{ marginTop:16 }}>
               <div style={{ padding:"14px 18px", borderRadius:14, border:"2px solid #f59e0b", background:"#FFFBEB", marginBottom:12 }}>
@@ -483,7 +473,6 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
         </div>
       </div>
 
-      {/* Bottom options */}
       {!isChecked && (
         <div style={{ borderTop:"1px solid #F1F5F9", padding:"20px 24px 32px", background:"#fff" }}>
           <div style={{ maxWidth:600, margin:"0 auto" }}>
@@ -499,7 +488,6 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
                 );
               })}
             </div>
-            {/* Check button */}
             {allFilled ? (
               <button onClick={() => setChecked(p => ({...p, ["bo_"+idx]: true}))}
                 style={{ width:"100%", padding:"16px", borderRadius:16, border:"none", background:"#22c55e", color:"#fff", fontSize:16, fontWeight:800, cursor:"pointer", boxShadow:"0 4px 0 #16a34a", transition:"transform 0.1s" }}>
@@ -517,15 +505,13 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
   );
 }
 
-
-
 function ReorderBlock({ c, idx, checked, setChecked }) {
   const correctOrder = (c.items||[]).filter(Boolean);
   const shuffled = useMemo(() => [...correctOrder].sort(() => Math.random() - 0.5), []);
   const [order, setOrder] = useState(shuffled);
   const [dragIdx, setDragIdx] = useState(null);
   const [dragOverIdx, setDragOverIdx] = useState(null);
-  const [selected, setSelected] = useState(null); // for tap-to-swap on mobile
+  const [selected, setSelected] = useState(null);
   const isChecked = checked["ro_"+idx];
   const isCorrect = isChecked && order.every((item,i) => item === correctOrder[i]);
 
@@ -537,7 +523,6 @@ function ReorderBlock({ c, idx, checked, setChecked }) {
     setOrder(n); setDragIdx(null); setDragOverIdx(null);
   };
 
-  // Tap to select then tap another to swap
   const handleTap = (i) => {
     if (isChecked) return;
     if (selected === null) {
@@ -614,14 +599,11 @@ function ReorderBlock({ c, idx, checked, setChecked }) {
   );
 }
 
-
-
 function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fillInputs, setFillInputs, fillChecked, setFillChecked, fillShowAnswer, setFillShowAnswer }) {
   const c = block.content || block;
 
   switch (block.type) {
 
-    // ── HEADING ──
     case "heading": {
       const ts = c.textStyle || {};
       const sz = c.level==="h1"?28:c.level==="h2"?22:18;
@@ -632,7 +614,6 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       );
     }
 
-    // ── TEXT ──
     case "text": {
       const ts = c.textStyle || {};
       if (c.html) {
@@ -650,7 +631,6 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       );
     }
 
-    // ── IMAGE ──
     case "image":
       if (!c.src) return null;
       return (
@@ -664,7 +644,6 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
         </figure>
       );
 
-    // ── VIDEO ──
     case "video": {
       const src = c.src || "";
       let ytId = null;
@@ -683,7 +662,6 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       );
     }
 
-    // ── AUDIO ──
     case "audio": {
       if (!c.src) return null;
       const ts = c.titleStyle || {};
@@ -694,7 +672,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
               <Music size={20} color="#374151"/>
             </div>
             <div>
-              <p style={{ fontSize:ts.fontSize||15, fontWeight:ts.bold?"700":"700", fontStyle:ts.italic?"italic":"normal", color:"#0f172a", margin:"0 0 2px" }}>{c.title||"Audio"}</p>
+              <p style={{ fontSize:ts.fontSize||15, fontWeight:"700", fontStyle:ts.italic?"italic":"normal", color:"#0f172a", margin:"0 0 2px" }}>{c.title||"Audio"}</p>
               {c.caption && <p style={{ fontSize:13, color:"#64748B", margin:0 }}>{c.caption}</p>}
             </div>
           </div>
@@ -703,7 +681,6 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       );
     }
 
-    // ── QUIZ ──
     case "quiz": {
       const sel = answers[idx];
       const isChecked = checked[idx];
@@ -712,7 +689,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       const os = c.optionStyle || {};
       return (
         <div style={{ padding:"20px 0" }}>
-          <p style={{ fontSize:qs.fontSize||16, fontWeight:qs.bold?"700":"700", fontStyle:qs.italic?"italic":"normal", textAlign:qs.align||"left", color:"#0f172a", margin:"0 0 16px", lineHeight:1.4 }}>
+          <p style={{ fontSize:qs.fontSize||16, fontWeight:"700", fontStyle:qs.italic?"italic":"normal", textAlign:qs.align||"left", color:"#0f172a", margin:"0 0 16px", lineHeight:1.4 }}>
             {c.question}
           </p>
           <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
@@ -749,7 +726,6 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       );
     }
 
-    // ── FILL IN THE BLANK ──
     case "fillblank": {
       const val = fillInputs[idx] || "";
       const isChecked = fillChecked[idx];
@@ -819,135 +795,12 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       );
     }
 
-    // ── BLANK + OPTIONS ──
     case "blankoptions":
       return <BlankOptionsBlock c={c} idx={idx} checked={checked} setChecked={setChecked} fillShowAnswer={fillShowAnswer} setFillShowAnswer={setFillShowAnswer}/>;
-    case "blankoptions_OLD": {
-      const sentence = c.sentence || "";
-      const markedWords = c.markedWords || [];
-      const blanks = c.blanks || [];
-      const words = sentence.split(" ").filter(Boolean);
-      const blankCount = markedWords.length;
-      const selectedMap = answers["bo_"+idx] || {};
-      const isChecked = checked["bo_"+idx];
-      const showAns = fillShowAnswer?.["bo_"+idx];
-      const allFilled = Object.keys(selectedMap).filter(k => selectedMap[k]!==undefined && selectedMap[k]!==null && selectedMap[k]!=="").length === blankCount;
-      const allCorrect = blanks.length > 0 && blanks.every((b,i) => selectedMap[i]===b.correct || selectedMap[String(i)]===b.correct);
-      const getOptions = (i) => {
-        const b = blanks[i];
-        if (!b) return [];
-        return [b.correct, b.w1, b.w2, b.w3].filter(Boolean).sort(() => Math.sin(idx*100+i*37) - 0.5);
-      };
-      const sentenceParts = [];
-      words.forEach((word, wi) => {
-        if (markedWords.includes(wi)) sentenceParts.push({ type:"blank", blankIdx:markedWords.indexOf(wi) });
-        else sentenceParts.push({ type:"word", text:word });
-      });
-      const ss = c.sentenceStyle || {};
 
-      return (
-        <div style={{ padding:"20px 0" }}>
-          {/* Sentence with blank slots */}
-          <p style={{ fontSize:ss.fontSize||18, fontWeight:ss.bold?"700":"500", textAlign:ss.align||"left", color:"#0f172a", margin:"0 0 28px", lineHeight:2.6 }}>
-            {sentenceParts.map((part, i) => {
-              if (part.type === "word") return <span key={i}>{part.text} </span>;
-              const bi = part.blankIdx;
-              const sel = selectedMap[bi] || selectedMap[String(bi)];
-              const correct = blanks[bi]?.correct;
-              const ok = isChecked && sel === correct;
-              const wrong = isChecked && sel !== correct;
-              return (
-                <span key={i} style={{ display:"inline-block", minWidth:80, padding:"4px 16px", margin:"0 4px", borderRadius:10, border:"2px solid "+(ok?"#22c55e":wrong?"#ef4444":sel?"#111827":"#D1D5DB"), background:"#fff", color:ok?"#166534":wrong?"#991B1B":sel?"#111827":"#9CA3AF", fontWeight:700, fontSize:16, textAlign:"center", verticalAlign:"middle", boxShadow:ok||wrong?"none":sel?"0 2px 0 #111827":"0 2px 0 #D1D5DB" }}>
-                  {sel || "_____"}
-                </span>
-              );
-            })}
-          </p>
-
-          {/* Options per blank */}
-          {!isChecked && (
-            <div style={{ display:"flex", flexDirection:"column", gap:20, marginBottom:16 }}>
-              {Array.from({ length: blankCount }, (_, i) => (
-                <div key={i}>
-                  {blankCount > 1 && (
-                    <p style={{ fontSize:11, fontWeight:700, color:"#6B7280", margin:"0 0 8px", textTransform:"uppercase", letterSpacing:0.5 }}>
-                      Blank {i+1}
-                    </p>
-                  )}
-                  <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-                    {getOptions(i).map((opt, j) => {
-                      const sel = selectedMap[String(i)] || selectedMap[i];
-                      const isSel = sel === opt;
-                      return (
-                        <button key={j}
-                          onClick={() => setAnswers(p => ({...p, ["bo_"+idx]: {...selectedMap, [String(i)]: sel===opt ? undefined : opt}}))}
-                          style={{ padding:"10px 22px", borderRadius:12, border:"2px solid "+(isSel?"#111827":"#E5E7EB"), background:"#fff", color:"#111827", fontSize:15, fontWeight:600, cursor:"pointer", boxShadow:isSel?"0 2px 0 #111827":"0 2px 0 #D1D5DB" }}>
-                          {opt}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {!isChecked && allFilled && (
-            <button onClick={() => setChecked(p => ({...p, ["bo_"+idx]: true}))}
-              style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>
-              Check
-            </button>
-          )}
-
-          {isChecked && allCorrect && (
-            <div style={{ padding:"16px 18px", borderRadius:14, background:"#F0FDF4", border:"1.5px solid #BBF7D0" }}>
-              <p style={{ fontSize:15, fontWeight:700, color:"#166534", margin:0 }}>
-                🎉 {blankCount > 1 ? "All correct!" : "Correct!"}
-              </p>
-              {c.explanation && <p style={{ fontSize:13, color:"#166534", margin:"4px 0 0" }}>{c.explanation}</p>}
-            </div>
-          )}
-
-          {isChecked && !allCorrect && (
-            <div>
-              <div style={{ padding:"14px 18px", borderRadius:14, background:"#FEF2F2", border:"1.5px solid #FECACA", marginBottom:10 }}>
-                <p style={{ fontSize:15, fontWeight:700, color:"#DC2626", margin:0 }}>❌ Not quite — try again!</p>
-              </div>
-              <div style={{ display:"flex", gap:10, marginBottom:10 }}>
-                <button
-                  onClick={() => {
-                    setChecked(p => ({...p, ["bo_"+idx]: false}));
-                    setAnswers(p => ({...p, ["bo_"+idx]: {}}));
-                  }}
-                  style={{ flex:1, padding:"12px", borderRadius:12, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:14, fontWeight:600, color:"#374151", cursor:"pointer" }}>
-                  Try Again
-                </button>
-                <button onClick={() => setFillShowAnswer(p => ({...p, ["bo_"+idx]: true}))}
-                  style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"#111827", color:"#fff", fontSize:14, fontWeight:600, cursor:"pointer" }}>
-                  See Answers
-                </button>
-              </div>
-              {showAns && (
-                <div style={{ padding:"14px 16px", borderRadius:12, background:"#F9FAFB", border:"1.5px solid #E5E7EB" }}>
-                  {blanks.map((b, i) => (
-                    <p key={i} style={{ fontSize:14, color:"#374151", margin:"0 0 4px", fontWeight:600 }}>
-                      Blank {i+1}: <strong style={{ color:"#111827" }}>{b.correct}</strong>
-                    </p>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    // ── REORDER ──
     case "reorder":
       return <ReorderBlock c={c} idx={idx} checked={checked} setChecked={setChecked}/>;
-    case "reorder":
-      return <ReorderBlock c={c} idx={idx} checked={checked} setChecked={setChecked}/>;
-    // ── MULTIPLE CHOICE ──
+
     case "multiplechoice": {
       const selArr = answers[idx] || [];
       const isChecked = checked[idx];
@@ -1004,15 +857,15 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
                 <button key={i} onClick={() => toggleSel(i)}
                   style={{ display:"flex", flexDirection:c.optionImages?.[i]?"column":"row", alignItems:c.optionImages?.[i]?"flex-start":"center", gap:c.optionImages?.[i]?10:12, padding:"14px 16px", borderRadius:12, border:`1.5px solid ${border}`, background:bg, cursor:isChecked?"default":"pointer", textAlign:"left", transition:"all 0.15s", width:"100%" }}>
                   <div style={{ display:"flex", alignItems:"center", gap:10, width:"100%" }}>
-                  <div style={{ width:20, height:20, borderRadius:multiMode?4:"50%", border:`2px solid ${checkColor}`, background:isSel||isChecked&&isRight?checkColor:"#fff", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}>
-                    {(isSel || (isChecked && isRight)) && <Check size={12} color="#fff"/>}
+                    <div style={{ width:20, height:20, borderRadius:multiMode?4:"50%", border:`2px solid ${checkColor}`, background:isSel||isChecked&&isRight?checkColor:"#fff", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}>
+                      {(isSel || (isChecked && isRight)) && <Check size={12} color="#fff"/>}
+                    </div>
+                    <span style={{ fontSize:os.fontSize||14, color:"#374151", fontWeight:500, lineHeight:1.4, flex:1 }}>{opt}</span>
                   </div>
-                      <span style={{ fontSize:os.fontSize||14, color:"#374151", fontWeight:500, lineHeight:1.4, flex:1 }}>{opt}</span>
-                  </div>
-                {c.optionImages?.[i] && isSel && (
-                  <img src={c.optionImages[i]} alt="" style={{ width:"100%", borderRadius:10, marginTop:8, objectFit:"contain", display:"block" }}/>
-                )}
-            </button>
+                  {c.optionImages?.[i] && isSel && (
+                    <img src={c.optionImages[i]} alt="" style={{ width:"100%", borderRadius:10, marginTop:8, objectFit:"contain", display:"block" }}/>
+                  )}
+                </button>
               );
             })}
           </div>
@@ -1024,24 +877,24 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
           )}
           {isChecked && (
             <div>
-            {isCorrect && c.successImage && (
-              <img src={c.successImage} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12, objectFit:"contain" }}/>
-            )}
-            {isCorrect && c.successText && (
-              <p style={{ fontSize:14, color:"#374151", margin:"0 0 12px", lineHeight:1.65 }}>{c.successText}</p>
-            )}
-            <div style={{ padding:"16px 18px", borderRadius:14, background:isCorrect?"#F0FDF4":"#FEF2F2", border:`1.5px solid ${isCorrect?"#BBF7D0":"#FECACA"}` }}>
-              <p style={{ fontSize:14, fontWeight:700, color:isCorrect?"#166534":"#DC2626", margin:"0 0 6px" }}>
-                {isCorrect?"🎉 Correct!":"❌ Not quite"}
-              </p>
-              {c.explanation && <p style={{ fontSize:es.fontSize||13, color:"#374151", margin:0, lineHeight:1.6 }}>{c.explanation}</p>}
-            </div>
+              {isCorrect && c.successImage && (
+                <img src={c.successImage} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12, objectFit:"contain" }}/>
+              )}
+              {isCorrect && c.successText && (
+                <p style={{ fontSize:14, color:"#374151", margin:"0 0 12px", lineHeight:1.65 }}>{c.successText}</p>
+              )}
+              <div style={{ padding:"16px 18px", borderRadius:14, background:isCorrect?"#F0FDF4":"#FEF2F2", border:`1.5px solid ${isCorrect?"#BBF7D0":"#FECACA"}` }}>
+                <p style={{ fontSize:14, fontWeight:700, color:isCorrect?"#166534":"#DC2626", margin:"0 0 6px" }}>
+                  {isCorrect?"🎉 Correct!":"❌ Not quite"}
+                </p>
+                {c.explanation && <p style={{ fontSize:es.fontSize||13, color:"#374151", margin:0, lineHeight:1.6 }}>{c.explanation}</p>}
+              </div>
             </div>
           )}
         </div>
       );
     }
-    // ── KEY POINTS ──
+
     case "keypoints": {
       const ts = c.titleStyle || {};
       const ps = c.pointStyle || {};
@@ -1066,7 +919,6 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       );
     }
 
-    // ── CALLOUT ──
     case "callout": {
       const map = {
         info:    ["💡","#0891b2"],
@@ -1086,7 +938,6 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       );
     }
 
-    // ── DIVIDER ──
     case "divider":
       return c.style==="dots"
         ? <div style={{ textAlign:"center", color:"#CBD5E1", fontSize:18, letterSpacing:10, padding:"8px 0" }}>• • •</div>

@@ -8,7 +8,7 @@ import { useProgress } from "@/hooks/useProgress";
 
 const NODE_SIZE = 80;
 const ROW_HEIGHT = 190;
-const SVG_W = 480; // viewBox width - keeps coordinates but scales with CSS
+const SVG_W = 480;
 const LEFT_CX = 160;
 const RIGHT_CX = 400;
 const R = 25;
@@ -52,7 +52,6 @@ export default function CourseRoadmap({ course, completedLessons = [], onViewCer
     return completedSet.has(allLessons[gi - 1].id);
   };
 
-  // ← KEY: completed lessons are ALWAYS accessible (can revisit)
   const isAccessible = (lesson, gi) => completedSet.has(lesson.id) || isUnlocked(gi);
 
   const currentGlobalIdx = allLessons.findIndex((l, i) => isUnlocked(i) && !completedSet.has(l.id));
@@ -62,7 +61,7 @@ export default function CourseRoadmap({ course, completedLessons = [], onViewCer
   );
 
   const toggle = (lesson, gi) => {
-    if (!isAccessible(lesson, gi)) return; // only locked future lessons are blocked
+    if (!isAccessible(lesson, gi)) return;
     setActiveLesson(prev => prev?.id === lesson.id ? null : lesson);
   };
 
@@ -179,7 +178,7 @@ export default function CourseRoadmap({ course, completedLessons = [], onViewCer
                   const isLeft = gi % 2 === 0;
                   const done = completedSet.has(lesson.id);
                   const isCur = gi === currentGlobalIdx;
-                  const accessible = isAccessible(lesson, gi); // completed OR unlocked
+                  const accessible = isAccessible(lesson, gi);
                   const locked = !accessible;
                   const isActive = activeLesson?.id === lesson.id;
                   const cx = isLeft ? LEFT_CX : RIGHT_CX;
@@ -194,53 +193,44 @@ export default function CourseRoadmap({ course, completedLessons = [], onViewCer
                         </div>
                       )}
 
-                      {/* Redo badge for completed lessons */}
                       {done && !isCur && isActive && (
                         <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap z-10">
                           Redo
                         </div>
                       )}
 
-                      <div className="relative">
-                        {isActive && (
-                          <div style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%)", width:"min(280px,80vw)", zIndex:50 }}>
-                              <LessonPopup lesson={lesson} courseId={course.id} onClose={() => setActiveLesson(null)} />
-                            </div>
-                        )}
-
-                        <button
-                          onClick={() => toggle(lesson, gi)}
-                          disabled={locked}
-                          className="focus:outline-none"
-                          title={done ? "Click to redo this lesson" : locked ? "Complete previous lessons first" : ""}
-                        >
-                          <div className="flex items-center justify-center transition-all duration-200"
-                            style={{
-                              width:NODE_SIZE, height:NODE_SIZE, borderRadius:16,
-                              background: done ? "#22C55E"
-                                : isCur ? "linear-gradient(135deg,#7C3AED,#5B4EFF)"
-                                : accessible && lesson.type==="quiz" ? "#FEF3C7"
-                                : accessible ? "#EEF0FF"
-                                : "#F3F4F6",
-                              border: done ? "none"
-                                : isCur ? "none"
-                                : accessible && lesson.type==="quiz" ? "2px solid #FCD34D"
-                                : accessible ? "2px solid rgba(91,78,255,0.2)"
-                                : "2px solid #E5E7EB",
-                              boxShadow: isCur ? "0 8px 24px rgba(91,78,255,0.35)"
-                                : done ? "0 4px 12px rgba(34,197,94,0.3)" : "none",
-                              cursor: locked ? "not-allowed" : "pointer",
-                              opacity: locked ? 0.4 : 1,
-                              animation: isCur ? "nodeRipple 1.5s ease-out infinite" : "none",
-                            }}>
-                            {done ? <Check size={24} color="#fff" strokeWidth={3} />
-                              : isCur ? <Play size={24} color="#fff" fill="#fff" style={{ marginLeft:3 }} />
-                              : locked ? <Lock size={20} color="#D1D5DB" />
-                              : lesson.type==="quiz" ? <Trophy size={20} color="#F59E0B" />
-                              : <BookOpen size={20} color="#5B4EFF" />}
-                          </div>
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => toggle(lesson, gi)}
+                        disabled={locked}
+                        className="focus:outline-none"
+                        title={done ? "Click to redo this lesson" : locked ? "Complete previous lessons first" : ""}
+                      >
+                        <div className="flex items-center justify-center transition-all duration-200"
+                          style={{
+                            width:NODE_SIZE, height:NODE_SIZE, borderRadius:16,
+                            background: done ? "#22C55E"
+                              : isCur ? "linear-gradient(135deg,#7C3AED,#5B4EFF)"
+                              : accessible && lesson.type==="quiz" ? "#FEF3C7"
+                              : accessible ? "#EEF0FF"
+                              : "#F3F4F6",
+                            border: done ? "none"
+                              : isCur ? "none"
+                              : accessible && lesson.type==="quiz" ? "2px solid #FCD34D"
+                              : accessible ? "2px solid rgba(91,78,255,0.2)"
+                              : "2px solid #E5E7EB",
+                            boxShadow: isCur ? "0 8px 24px rgba(91,78,255,0.35)"
+                              : done ? "0 4px 12px rgba(34,197,94,0.3)" : "none",
+                            cursor: locked ? "not-allowed" : "pointer",
+                            opacity: locked ? 0.4 : 1,
+                            animation: isCur ? "nodeRipple 1.5s ease-out infinite" : "none",
+                          }}>
+                          {done ? <Check size={24} color="#fff" strokeWidth={3} />
+                            : isCur ? <Play size={24} color="#fff" fill="#fff" style={{ marginLeft:3 }} />
+                            : locked ? <Lock size={20} color="#D1D5DB" />
+                            : lesson.type==="quiz" ? <Trophy size={20} color="#F59E0B" />
+                            : <BookOpen size={20} color="#5B4EFF" />}
+                        </div>
+                      </button>
 
                       <span style={{ fontSize:12,fontWeight:500,textAlign:"center",lineHeight:1.3,marginTop:8,display:"block",width:96,color:locked?"#9CA3AF":done?"#22C55E":"#374151" }}>
                         {lesson.title}
@@ -252,9 +242,35 @@ export default function CourseRoadmap({ course, completedLessons = [], onViewCer
             </div>
           );
         })}
-
-
       </div>
+
+      {/* Fixed centered popup — renders outside node layout to avoid overflow/clipping issues */}
+      {activeLesson && (
+        <>
+          {/* Backdrop — tap outside to close */}
+          <div
+            onClick={() => setActiveLesson(null)}
+            style={{ position:"fixed", inset:0, zIndex:199, background:"transparent" }}
+          />
+          {/* Popup centered on screen */}
+          <div style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "calc(100vw - 40px)",
+            maxWidth: 340,
+            zIndex: 200,
+          }}>
+            <LessonPopup
+              lesson={activeLesson}
+              courseId={course.id}
+              onClose={() => setActiveLesson(null)}
+            />
+          </div>
+        </>
+      )}
+
     </div>
   );
 }
