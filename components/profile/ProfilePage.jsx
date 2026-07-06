@@ -6,8 +6,7 @@ import { useProgress } from "@/hooks/useProgress";
 import { useStreak } from "@/hooks/useStreak";
 import { useAuth } from "@/lib/AuthContext";
 import { supabase } from "@/lib/supabase";
-import { courses } from "@/data/courses";
-import { challenges } from "@/data/challenges";
+
 import CertificateGenerator from "@/components/courses/CertificateGenerator";
 import PaymentModal from "@/components/quiz/PaymentModal";
 import ChangePassword from "@/components/profile/ChangePassword";
@@ -41,6 +40,8 @@ export default function ProfilePage() {
   const [editName, setEditName] = useState(false);
   const [newName, setNewName] = useState("");
   const [saving, setSaving] = useState(false);
+  const [courses, setCourses] = useState([]);
+  const [challenges, setChallenges] = useState([]);
 
   useEffect(() => {
     if (!user) return;
@@ -51,6 +52,14 @@ export default function ProfilePage() {
       if (data) setSub(data);
     });
     if (user.created_at) setMemberSince(new Date(user.created_at).toLocaleDateString("en-US",{ month:"long", year:"numeric" }));
+    // Load courses
+    supabase.from("courses").select("*, units:course_units(*, lessons:course_lessons(*))").order("created_at").then(({ data }) => {
+      if (data) setCourses(data);
+    });
+    // Load challenges
+    supabase.from("challenges").select("*").order("created_at").then(({ data }) => {
+      if (data) setChallenges(data);
+    });
   }, [user]);
 
   const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split("@")[0] || "Learner";
