@@ -56,10 +56,13 @@ export default function ProfilePage() {
     supabase.from("courses").select("id, title").order("created_at").then(async ({ data: courseList }) => {
       if (!courseList) return;
       const withUnits = await Promise.all(courseList.map(async (course) => {
-        const { data: units } = await supabase.from("course_units").select("id, title, order_index, course_lessons(id, title, order_index)").eq("course_id", course.id).order("order_index");
-        return { ...course, course_units: units || [] };
+        const { data: units } = await supabase.from("course_units").select("id, title, order_index").eq("course_id", course.id).order("order_index");
+        const unitsWithLessons = await Promise.all((units||[]).map(async (unit) => {
+          const { data: lessons } = await supabase.from("course_lessons").select("id, title, order_index").eq("unit_id", unit.id).order("order_index");
+          return { ...unit, course_lessons: lessons || [] };
+        }));
+        return { ...course, course_units: unitsWithLessons };
       }));
-      console.log("Courses loaded:", withUnits);
       setCourses(withUnits);
     });
     // Load challenges
