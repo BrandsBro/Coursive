@@ -182,7 +182,7 @@ export default function ProfilePage() {
 
       {/* Tab content */}
       {tab === "Overview" && (
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr", gap:16 }}>
           {/* Streak card */}
           <div style={{ background:"#fff", borderRadius:20, border:"1.5px solid #F1F5F9", padding:24 }}>
             <h3 style={{ fontSize:15, fontWeight:800, color:"#0f172a", margin:"0 0 16px", display:"flex", alignItems:"center", gap:8 }}>
@@ -208,28 +208,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Quick links */}
-          <div style={{ background:"#fff", borderRadius:20, border:"1.5px solid #F1F5F9", padding:24 }}>
-            <h3 style={{ fontSize:15, fontWeight:800, color:"#0f172a", margin:"0 0 16px" }}>Quick Actions</h3>
-            <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-              {[
-                { icon:"📚", label:"Continue Learning", href:"/courses", color:"#6366f1" },
-                { icon:"🏆", label:"Daily Challenges", href:"/challenges", color:"#f59e0b" },
-                { icon:"🎯", label:"Take the Quiz", href:"/quiz", color:"#22c55e" },
-                { icon:"🔔", label:"Notifications", href:"/home", color:"#8b5cf6" },
-              ].map((a,i) => (
-                <Link key={i} href={a.href} style={{ textDecoration:"none" }}>
-                  <div style={{ display:"flex", alignItems:"center", gap:12, padding:"12px 14px", borderRadius:12, background:"#F8FAFC", border:"1.5px solid #F1F5F9", cursor:"pointer", transition:"all 0.15s" }}
-                    onMouseEnter={e=>{ e.currentTarget.style.background="#EEF2FF"; e.currentTarget.style.borderColor="#C7D2FE"; }}
-                    onMouseLeave={e=>{ e.currentTarget.style.background="#F8FAFC"; e.currentTarget.style.borderColor="#F1F5F9"; }}>
-                    <span style={{ fontSize:20 }}>{a.icon}</span>
-                    <span style={{ fontSize:13, fontWeight:700, color:"#0f172a", flex:1 }}>{a.label}</span>
-                    <ChevronRight size={14} color="#94A3B8"/>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
+
         </div>
       )}
 
