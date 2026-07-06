@@ -144,13 +144,7 @@ export default function CertificateBanner({ courses = [] }) {
           >
             AI Mastery Certificate
           </h2>
-          <p
-            style={{
-              color: "rgba(255,255,255,0.45)",
-              fontSize: 12,
-              margin: "0 0 10px",
-            }}
-          >
+          <p className="cert-desc" style={{ color:"rgba(255,255,255,0.45)", fontSize:12, margin:"0 0 10px" }}>
             Complete all courses · Earn your professional certificate
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
