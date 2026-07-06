@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 const NAV = [
   { href:"/admin",            icon:LayoutDashboard, label:"Dashboard"   },
   { href:"/admin/courses",    icon:BookOpen,        label:"Courses"     },
+  { href:"/admin/challenges", icon:Trophy,          label:"Challenges"  },
   { href:"/admin/quiz",       icon:ClipboardList,   label:"Quiz Flow"   },
   { href:"/admin/emails",     icon:Mail,            label:"Emails"      },
   { href:"/admin/payments",   icon:CreditCard,      label:"Payments"    },
