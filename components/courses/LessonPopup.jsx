@@ -21,7 +21,7 @@ export default function LessonPopup({ lesson, courseId, onClose }) {
         </button>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row">
         <Link
           href={`/courses/${courseId}/lessons/${lesson.id}?mode=read`}
           className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-gray-200 text-xs font-semibold text-gray-700 hover:border-primary hover:text-primary transition-all"
