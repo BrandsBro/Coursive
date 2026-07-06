@@ -18,6 +18,20 @@ const DEFAULT_DESIGN = {
   showDividers:true, dividerColor:"#7c3aed", showSeal:true, sealEmoji:"🏆",
 };
 
+async function toBase64(url) {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  } catch(e) {
+    return null;
+  }
+}
+
 export default function CertificateGenerator({ course, userName, completedDate, onClose, type="course" }) {
   const [design, setDesign] = useState(DEFAULT_DESIGN);
   const [downloading, setDownloading] = useState(false);
@@ -38,7 +52,16 @@ export default function CertificateGenerator({ course, userName, completedDate, 
     try {
       const { default: jsPDF } = await import("jspdf");
       const { default: html2canvas } = await import("html2canvas");
-      const canvas = await html2canvas(certRef.current, { scale:3, useCORS:true, allowTaint:false, backgroundColor:"#ffffff", logging:false, imageTimeout:15000, onclone: (doc) => { doc.querySelectorAll("img").forEach(img => { img.crossOrigin = "anonymous"; }); } });
+      // Convert logo to base64 to avoid CORS
+    if (design.logoUrl && certRef.current) {
+      const b64 = await toBase64(design.logoUrl);
+      if (b64) {
+        const imgs = certRef.current.querySelectorAll("img");
+        imgs.forEach(img => { if (img.src === design.logoUrl) img.src = b64; });
+        await new Promise(r => setTimeout(r, 500));
+      }
+    }
+    const canvas = await html2canvas(certRef.current, { scale:3, useCORS:true, allowTaint:true, backgroundColor:"#ffffff", logging:false, imageTimeout:15000 });
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({ orientation:"landscape", unit:"mm", format:"a4" });
       const w = pdf.internal.pageSize.getWidth();
