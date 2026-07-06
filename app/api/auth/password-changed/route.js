@@ -11,6 +11,8 @@ export async function POST(req) {
     const token = authHeader?.replace("Bearer ", "");
     const { data: { user } } = await supabase.auth.getUser(token);
     if (!user) return NextResponse.json({ error:"Unauthorized" }, { status:401 });
+    const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", user.id).single();
+    const userName = profile?.full_name || user.user_metadata?.full_name || "there";
 
     const { data: settingsData } = await supabase.from("settings").select("value").eq("key","email_templates").single();
     const templates = settingsData?.value || [];
@@ -24,7 +26,7 @@ export async function POST(req) {
       subject = pwTmpl.subject || subject;
       const cardBg = pwTmpl.cardBg || "#0a081e";
       const emailBg = pwTmpl.emailBg || "#050411";
-      const replace = (text) => (text||"").replace(/{email}/g, user.email);
+      const replace = (text) => (text||"").replace(/{name}/g, userName).replace(/{email}/g, user.email);
       const blockHtml = pwTmpl.blocks.map(b => {
         switch(b.type) {
           case "header": return `<div style="background:linear-gradient(135deg,${b.bg1||"#5B4EFF"},${b.bg2||"#8B5CF6"});padding:${b.padding||48}px 40px;text-align:center"></div>`;
