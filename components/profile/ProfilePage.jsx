@@ -54,7 +54,7 @@ export default function ProfilePage() {
     if (user.created_at) setMemberSince(new Date(user.created_at).toLocaleDateString("en-US",{ month:"long", year:"numeric" }));
     // Load courses
     supabase.from("courses").select("id, title, course_units(id, title, order_index, course_lessons(id, title, order_index))").order("created_at").then(({ data }) => {
-      if (data) setCourses(data);
+      console.log("Courses loaded:", data); if (data) setCourses(data);
     });
     // Load challenges
     supabase.from("challenges").select("*").order("created_at").then(({ data }) => {
