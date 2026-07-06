@@ -30,8 +30,7 @@ export async function POST(req) {
           case "header": return `<div style="background:linear-gradient(135deg,${b.bg1||"#5B4EFF"},${b.bg2||"#8B5CF6"});padding:${b.padding||48}px 40px;text-align:center"></div>`;
           case "logo": return b.logoUrl ? `<div style="padding:20px 40px;text-align:${b.align||"center"}"><img src="${b.logoUrl}" alt="Logo" style="height:${b.logoHeight||44}px;object-fit:contain;display:inline-block"/></div>` : "";
           case "heading": return `<div style="padding:4px 40px"><p style="font-size:${b.size||22}px;margin:0 0 8px;color:${b.color||"#fff"};text-align:${b.align||"left"};font-weight:${b.bold?"900":"700"};line-height:1.3">${replace(b.text)}</p></div>`;
-          case "text": return `<div style="padding:4px 40px"><div style="color:${b.color||"rgba(255,255,255,0.7)"};font-size:${b.size||15}px;line-height:${b.lineHeight||1.8};text-align:${b.align||"left"};margin:0 0 8px">${b.html ? replace(b.html) : (b.text||"").replace(/
-/g,"<br/>")}</div></div>`;
+          case "text": return `<div style="padding:4px 40px"><div style="color:${b.color||"rgba(255,255,255,0.7)"};font-size:${b.size||15}px;line-height:${b.lineHeight||1.8};text-align:${b.align||"left"};margin:0 0 8px">${b.html ? replace(b.html) : (b.text||"").split("\n").join("<br/>")}</div></div>`;
           case "button": return `<div style="padding:12px 40px;text-align:${b.align||"center"}"><a href="${b.url||"#"}" style="display:inline-block;padding:${b.paddingV||16}px ${b.paddingH||32}px;background:linear-gradient(135deg,${b.bgFrom||"#5B4EFF"},${b.bgTo||"#8B5CF6"});color:${b.color||"#fff"};text-decoration:none;border-radius:${b.radius||14}px;font-weight:700;font-size:${b.size||16}px">${b.text||"Click here"}</a></div>`;
           case "divider": return `<div style="margin:${b.margin||24}px 40px;border-top:1px solid ${b.color||"rgba(255,255,255,0.08)"}"></div>`;
           case "spacer": return `<div style="height:${b.height||24}px"></div>`;
