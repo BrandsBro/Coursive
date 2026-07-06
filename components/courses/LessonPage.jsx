@@ -138,11 +138,19 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
 
   return (
     <div style={{ minHeight:"100vh", background:"#fff" }}>
+      <style>{`
+        .lesson-nav { padding: 0 12px; }
+        .lesson-back-text { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        @media (max-width: 640px) {
+          .lesson-listen-btn { padding: 6px 10px !important; font-size: 11px !important; }
+          .lesson-back-text { max-width: 80px; }
+        }
+      `}</style>
       {/* Top nav */}
       <div style={{ background:"#fff", borderBottom:"1px solid #F1F5F9", height:58, position:"sticky", top:0, zIndex:50 }}>
-        <div style={{ maxWidth:720, margin:"0 auto", padding:"0 12px", height:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, overflow:"hidden" }}>
+        <div className="lesson-nav" style={{ maxWidth:720, margin:"0 auto", height:"100%", display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, overflow:"hidden" }}>
           <Link href={challengeId ? "/challenges/"+challengeId : "/courses/"+(course?.id||"")} style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:6, color:"#64748B", fontSize:13, fontWeight:600 }}>
-<ChevronLeft size={16}/><span style={{ overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", maxWidth:"120px" }}>{challengeId ? "Back" : course?.title}</span>
+<ChevronLeft size={16}/><span className="lesson-back-text">{challengeId ? "Back" : course?.title}</span>
           </Link>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <span className="hidden sm:inline" style={{ fontSize:12, color:"#94A3B8" }}>{lesson?.duration} min read</span>
