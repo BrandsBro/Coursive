@@ -84,7 +84,7 @@ export default function CurrentCourseWidget({ courses = [] }) {
             <span style={{ fontSize:11,color:"#9CA3AF",fontWeight:600,flexShrink:0 }}>{pct}%</span>
           </div>
         )}
-        <div style={{ display:"flex",gap:10 }}>
+        <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
           <Link href="/courses" style={{ textDecoration:"none",flex:1 }}>
             <div style={{ padding:"12px",borderRadius:14,border:"1.5px solid #E5E7EB",textAlign:"center",fontSize:13,fontWeight:600,color:"#4B5563",cursor:"pointer" }}>
               All courses
