@@ -64,12 +64,9 @@ export default function CertificateModal({ course, onClose }) {
       // Add the certificate image
       pdf.addImage(imgData, "PNG", margin, yPos, imgWidth, imgHeight);
 
-      // Add footer
       pdf.setFontSize(9);
       pdf.setTextColor(156, 163, 175);
       pdf.setFont("helvetica", "normal");
-      pdf.text("This certificate was issued by 1Course — AI Learning Platform", pdfWidth / 2, pdfHeight - 18, { align: "center" });
-      pdf.text(`1course.io • ${date}`, pdfWidth / 2, pdfHeight - 13, { align: "center" });
 
       pdf.save(`${course.title.replace(/\s+/g, "_")}_Certificate.pdf`);
     } catch (err) {
