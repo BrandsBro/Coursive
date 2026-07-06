@@ -30,7 +30,11 @@ export default function ChangePassword() {
       if (updateErr) { setError(updateErr.message); setLoading(false); return; }
 
       // Send confirmation email
-      await fetch("/api/auth/password-changed", { method:"POST" });
+      const { data: { session } } = await supabase.auth.getSession();
+      await fetch("/api/auth/password-changed", {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + session?.access_token }
+      });
 
       setSuccess(true);
       setCurrent(""); setNewPw(""); setConfirm("");
