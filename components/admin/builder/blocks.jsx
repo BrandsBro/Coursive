@@ -130,7 +130,7 @@ export function BlockPreview({ block }) {
       const is = c.itemStyle||{};
       return (
         <div>
-          {c.question && <p style={{ fontSize:is.fontSize||15, fontWeight:"700", color:"#0f172a", margin:"0 0 12px" }}>{c.question}</p>}
+          {c.question && <p style={{ fontSize:(c.questionStyle||{}).fontSize||15, fontWeight:(c.questionStyle||{}).bold?"700":"400", fontStyle:(c.questionStyle||{}).italic?"italic":"normal", textAlign:(c.questionStyle||{}).align||"left", color:"#0f172a", margin:"0 0 12px" }}>{c.question}</p>}
           {(c.items||[]).filter(Boolean).map((item,i) => (
             <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"10px 14px", borderRadius:10, border:"1.5px solid #E2E8F0", background:"#fff", marginBottom:6 }}>
               <span style={{ fontSize:16, color:"#CBD5E1" }}>⠿</span>
@@ -793,14 +793,15 @@ function MultipleChoiceE({ content, onChange }) {
 
 function ReorderE({ content, onChange }) {
   const items = content.items||["","","",""];
+  const qs = content.questionStyle||{fontSize:15};
   const is = content.itemStyle||{fontSize:15};
   const setItem = (i,v) => { const a=[...items]; a[i]=v; onChange({ ...content, items:a }); };
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:12, paddingTop:12 }}>
       <div>
-        <FC label="Question Style" style={is} setStyle={v => onChange({ ...content, itemStyle:v })}/>
+        <FC label="Question Style" style={qs} setStyle={v => onChange({ ...content, questionStyle:v })}/>
         <textarea value={content.question||""} onChange={e => onChange({ ...content, question:e.target.value })}
-          placeholder="Put these steps in the correct order..." style={{ ...inp(), minHeight:70, resize:"vertical", ...styled(is) }}/>
+          placeholder="Put these steps in the correct order..." style={{ ...inp(), minHeight:70, resize:"vertical", ...styled(qs) }}/>
       </div>
       <div>
         <p style={lbl()}>Items — add in CORRECT order</p>
