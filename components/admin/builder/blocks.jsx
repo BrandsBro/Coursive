@@ -799,6 +799,10 @@ function ReorderE({ content, onChange }) {
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:12, paddingTop:12 }}>
       <div>
+        <p style={lbl()}>Heading <span style={{ color:"#94A3B8", fontWeight:400 }}>· optional</span></p>
+        <input value={content.heading||""} onChange={e => onChange({ ...content, heading:e.target.value })} placeholder="e.g. Put these steps in order" style={inp()}/>
+      </div>
+      <div>
         <FC label="Question Style" style={qs} setStyle={v => onChange({ ...content, questionStyle:v })}/>
         <textarea value={content.question||""} onChange={e => onChange({ ...content, question:e.target.value })}
           placeholder="Put these steps in the correct order..." style={{ ...inp(), minHeight:70, resize:"vertical", ...styled(qs) }}/>
