@@ -48,7 +48,7 @@ export function BlockPreview({ block }) {
     }
     case "text": {
       const ts = c.textStyle||{};
-      if (c.html) return <div style={{ fontSize:ts.fontSize||15, textAlign:ts.align||"left", color:"#374151", lineHeight:1.75 }} dangerouslySetInnerHTML={{ __html:c.html }}/>;
+      if (c.html) return <><style>{`.preview-text ul{list-style-type:disc!important;padding-left:24px!important;margin:8px 0!important}.preview-text ol{list-style-type:decimal!important;padding-left:24px!important;margin:8px 0!important}.preview-text li{display:list-item!important}.preview-text h2{font-size:22px!important;font-weight:800!important;color:#0f172a}.preview-text h3{font-size:18px!important;font-weight:700!important;color:#0f172a}`}</style><div className="preview-text" style={{ fontSize:ts.fontSize||15, textAlign:ts.align||"left", color:"#374151", lineHeight:1.75 }} dangerouslySetInnerHTML={{ __html:c.html }}/></>;
       return <p style={{ fontSize:ts.fontSize||15, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#374151", lineHeight:1.75, margin:0, whiteSpace:"pre-wrap" }}>{c.text||"Text content..."}</p>;
     }
     case "image":
