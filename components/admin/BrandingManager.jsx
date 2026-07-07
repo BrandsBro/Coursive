@@ -5,10 +5,14 @@ import { Save, Check, Loader, Upload } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const DEFAULT_BRANDING = {
-  logoMain: "",        // shown on marketing/auth pages (white version)
-  logoApp: "",         // shown after login in navbar (black version)
-  favicon: "",         // favicon for all pages
+  logoMain: "",
+  logoApp: "",
+  favicon: "",
   siteName: "1Course",
+  logoMainSizeMobile: 60,
+  logoMainSizeDesktop: 117,
+  logoAppSizeMobile: 60,
+  logoAppSizeDesktop: 117,
 };
 
 export default function BrandingManager() {
@@ -113,6 +117,47 @@ export default function BrandingManager() {
             />
           </div>
 
+          {/* Logo Sizes */}
+          <div style={{ background:"#fff", borderRadius:20, border:"1.5px solid #F1F5F9", padding:24 }}>
+            <h3 style={{ fontSize:15, fontWeight:800, color:"#0f172a", margin:"0 0 4px" }}>Logo Sizes</h3>
+            <p style={{ fontSize:13, color:"#64748B", margin:"0 0 20px" }}>Control logo height in pixels for mobile and desktop</p>
+            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
+              <div>
+                <p style={{ fontSize:12, fontWeight:700, color:"#374151", margin:"0 0 8px" }}>Marketing Logo</p>
+                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ fontSize:12, color:"#64748B", minWidth:70 }}>📱 Mobile</span>
+                    <input type="number" value={branding.logoMainSizeMobile||60} onChange={e => u("logoMainSizeMobile", parseInt(e.target.value))}
+                      style={{ width:80, padding:"6px 10px", borderRadius:8, border:"1.5px solid #E2E8F0", fontSize:13, outline:"none" }}/>
+                    <span style={{ fontSize:11, color:"#94A3B8" }}>px</span>
+                  </div>
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ fontSize:12, color:"#64748B", minWidth:70 }}>🖥️ Desktop</span>
+                    <input type="number" value={branding.logoMainSizeDesktop||117} onChange={e => u("logoMainSizeDesktop", parseInt(e.target.value))}
+                      style={{ width:80, padding:"6px 10px", borderRadius:8, border:"1.5px solid #E2E8F0", fontSize:13, outline:"none" }}/>
+                    <span style={{ fontSize:11, color:"#94A3B8" }}>px</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <p style={{ fontSize:12, fontWeight:700, color:"#374151", margin:"0 0 8px" }}>App Logo</p>
+                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ fontSize:12, color:"#64748B", minWidth:70 }}>📱 Mobile</span>
+                    <input type="number" value={branding.logoAppSizeMobile||60} onChange={e => u("logoAppSizeMobile", parseInt(e.target.value))}
+                      style={{ width:80, padding:"6px 10px", borderRadius:8, border:"1.5px solid #E2E8F0", fontSize:13, outline:"none" }}/>
+                    <span style={{ fontSize:11, color:"#94A3B8" }}>px</span>
+                  </div>
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ fontSize:12, color:"#64748B", minWidth:70 }}>🖥️ Desktop</span>
+                    <input type="number" value={branding.logoAppSizeDesktop||117} onChange={e => u("logoAppSizeDesktop", parseInt(e.target.value))}
+                      style={{ width:80, padding:"6px 10px", borderRadius:8, border:"1.5px solid #E2E8F0", fontSize:13, outline:"none" }}/>
+                    <span style={{ fontSize:11, color:"#94A3B8" }}>px</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           {/* Instructions */}
           <div style={{ background:"#EEF2FF", borderRadius:16, border:"1.5px solid #C7D2FE", padding:20 }}>
             <h3 style={{ fontSize:14, fontWeight:800, color:"#4338CA", margin:"0 0 10px" }}>📌 How to apply changes</h3>
