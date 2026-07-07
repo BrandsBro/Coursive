@@ -9,9 +9,6 @@ const COLORS = [
   { color: "#E11D48", bg: "#fff0f3" },
   { color: "#1D4ED8", bg: "#eff3ff" },
   { color: "#F97316", bg: "#fff7ed" },
-  { color: "#0891b2", bg: "#ecfbff" },
-  { color: "#059669", bg: "#ecfdf5" },
-  { color: "#7c3aed", bg: "#f5f0ff" },
 ];
 
 const CERT_IMAGE =
@@ -20,9 +17,10 @@ const CERT_IMAGE =
 export default function CertificateBanner({ courses = [] }) {
   const { getCoursePercent } = useProgress();
 
-  const CERT = courses.map((course, i) => ({
+  const CERT = courses.slice(0, 5).map((course, i) => ({
     id: course.id,
     emoji: course.emoji || "📚",
+    image: course.image || course.thumbnail || course.cover || null,
     ...COLORS[i % COLORS.length],
   }));
 
@@ -101,7 +99,7 @@ export default function CertificateBanner({ courses = [] }) {
         </div>
       </div>
 
-      {/* Right: course badges */}
+      {/* Right: exactly 5 course badges + arrow */}
       <div
         style={{
           display: "flex",
@@ -112,8 +110,7 @@ export default function CertificateBanner({ courses = [] }) {
       >
         {CERT.map((c) => {
           const course = courses.find((x) => x.id === c.id);
-          const total =
-            course?.units?.flatMap((u) => u.lessons).length || 0;
+          const total = course?.units?.flatMap((u) => u.lessons).length || 0;
           const pct = getCoursePercent(c.id, total);
           const done = pct === 100;
 
@@ -144,10 +141,24 @@ export default function CertificateBanner({ courses = [] }) {
                     justifyContent: "center",
                     fontSize: 22,
                     position: "relative",
+                    overflow: "hidden",
                     transition: "all 0.3s",
                   }}
                 >
-                  <span>{c.emoji}</span>
+                  {c.image ? (
+                    <img
+                      src={c.image}
+                      alt={course?.title || ""}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: 12,
+                      }}
+                    />
+                  ) : (
+                    <span>{c.emoji}</span>
+                  )}
                   {done && (
                     <div
                       style={{
@@ -182,21 +193,34 @@ export default function CertificateBanner({ courses = [] }) {
           );
         })}
 
-        {/* View all arrow */}
+        {/* Arrow → all courses */}
         <Link href="/courses" style={{ textDecoration: "none" }}>
           <div
             style={{
-              width: 54,
-              height: 54,
-              borderRadius: 14,
-              border: "1.5px dashed #c7cadf",
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
-              justifyContent: "center",
-              background: "rgba(99,102,241,0.04)",
+              gap: 4,
             }}
           >
-            <ChevronRight size={18} color="#9ca3af" />
+            <div
+              style={{
+                width: 54,
+                height: 54,
+                borderRadius: 14,
+                border: "1.5px dashed #c7cadf",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "rgba(99,102,241,0.04)",
+                transition: "background 0.2s",
+              }}
+            >
+              <ChevronRight size={20} color="#9ca3af" />
+            </div>
+            <span style={{ fontSize: 9, fontWeight: 700, color: "#9ca3af" }}>
+              All
+            </span>
           </div>
         </Link>
       </div>

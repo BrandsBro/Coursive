@@ -6,11 +6,13 @@ import { supabase } from "@/lib/supabase";
 
 export default function PaymentSettings() {
   const [settings, setSettings] = useState({
-    mode: "test", // test or live
+    mode: "test",
     testPublishableKey: "",
     testSecretKey: "",
+    testWebhookSecret: "",
     livePublishableKey: "",
     liveSecretKey: "",
+    liveWebhookSecret: "",
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -107,6 +109,12 @@ export default function PaymentSettings() {
                   placeholder="sk_test_..."
                   style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #E2E8F0", fontSize:13, outline:"none", boxSizing:"border-box", fontFamily:"monospace" }}/>
               </div>
+              <div>
+                <label style={{ fontSize:12, fontWeight:700, color:"#374151", display:"block", marginBottom:6 }}>Webhook Secret</label>
+                <input type="password" value={settings.testWebhookSecret||""} onChange={e => u("testWebhookSecret", e.target.value)}
+                  placeholder="whsec_..."
+                  style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #E2E8F0", fontSize:13, outline:"none", boxSizing:"border-box", fontFamily:"monospace" }}/>
+              </div>
             </div>
           </div>
 
@@ -128,6 +136,12 @@ export default function PaymentSettings() {
                 <label style={{ fontSize:12, fontWeight:700, color:"#374151", display:"block", marginBottom:6 }}>Secret Key</label>
                 <input type="password" value={settings.liveSecretKey||""} onChange={e => u("liveSecretKey", e.target.value)}
                   placeholder="sk_live_..."
+                  style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #E2E8F0", fontSize:13, outline:"none", boxSizing:"border-box", fontFamily:"monospace" }}/>
+              </div>
+              <div>
+                <label style={{ fontSize:12, fontWeight:700, color:"#374151", display:"block", marginBottom:6 }}>Webhook Secret</label>
+                <input type="password" value={settings.liveWebhookSecret||""} onChange={e => u("liveWebhookSecret", e.target.value)}
+                  placeholder="whsec_..."
                   style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #E2E8F0", fontSize:13, outline:"none", boxSizing:"border-box", fontFamily:"monospace" }}/>
               </div>
             </div>

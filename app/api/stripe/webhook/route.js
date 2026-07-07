@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { getStripeKey, getWebhookSecret } from "@/lib/stripe";
 import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// Keys loaded dynamically
 const resend = new Resend(process.env.RESEND_API_KEY);
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -16,7 +17,7 @@ export async function POST(req) {
 
   let event;
   try {
-    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
   } catch (e) {
     console.error("Webhook signature error:", e.message);
     return NextResponse.json({ error: e.message }, { status: 400 });
