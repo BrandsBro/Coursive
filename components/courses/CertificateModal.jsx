@@ -178,7 +178,7 @@ export default function CertificateModal({ course, userName: userNameProp, onClo
         </div>
 
         {/* Certificate — captured for PDF */}
-        <div ref={certRef}>
+        <div className="cert-preview-wrapper" ref={certRef}>
           {design
             ? <CertificatePreview design={design} name={userName} course={course?.title} date={date}/>
             : (
@@ -197,6 +197,13 @@ export default function CertificateModal({ course, userName: userNameProp, onClo
       </div>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 768px) {
+          .cert-preview-wrapper {
+            transform: scale(0.55);
+            transform-origin: top center;
+            margin-bottom: -45%;
+          }
+        }
         @media (max-width: 768px) { .cert-modal-top-btns { display: none !important; } }
         @media (max-width: 768px) { .cert-modal-bottom-btns { display: flex !important; } }
       `}</style>

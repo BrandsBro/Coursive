@@ -201,7 +201,7 @@ export default function CertificateGenerator({ course, userName, completedDate, 
         </div>
 
         {/* Certificate preview — this is what gets captured for the PDF */}
-        <div ref={certRef}>
+        <div className="cert-preview-wrapper" ref={certRef}>
           {design
             ? <CertificatePreview design={design} name={userName} course={course?.title} date={date}/>
             : (
@@ -226,6 +226,13 @@ export default function CertificateGenerator({ course, userName, completedDate, 
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 768px) {
+          .cert-preview-wrapper {
+            transform: scale(0.55);
+            transform-origin: top center;
+            margin-bottom: -45%;
+          }
+        }
         @media (max-width: 768px) {
           .cert-top-btns { display: none !important; }
         }
