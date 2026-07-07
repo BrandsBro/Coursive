@@ -35,7 +35,16 @@ export default function CertificateModal({ course, userName: userNameProp, onClo
   const [design, setDesign] = useState(null);
   const [userName, setUserName] = useState(userNameProp || "");
   const [downloading, setDownloading] = useState(false);
+  const [tapCount, setTapCount] = useState(0);
   const certRef = useRef(null);
+
+  const handleDoubleTap = () => {
+    setTapCount(c => {
+      if (c + 1 >= 2) { onClose(); return 0; }
+      setTimeout(() => setTapCount(0), 400);
+      return c + 1;
+    });
+  };
 
   const date = new Date().toLocaleDateString("en-US", {
     year: "numeric", month: "long", day: "numeric",
@@ -134,20 +143,21 @@ export default function CertificateModal({ course, userName: userNameProp, onClo
   };
 
   return (
-    <div style={{
+    <div onClick={handleDoubleTap} style={{
       position:"fixed", inset:0,
       background:"rgba(15,23,42,0.85)",
       zIndex:300,
       display:"flex", alignItems:"center", justifyContent:"center",
       padding:20,
       backdropFilter:"blur(8px)",
+      overflowY:"auto",
     }}>
       <div style={{ width:"100%", maxWidth:860, display:"flex", flexDirection:"column", gap:16 }}>
 
         {/* Header */}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <p style={{ color:"rgba(255,255,255,0.75)", fontSize:13, margin:0, fontWeight:600 }}>🏆 Your Certificate</p>
-          <div style={{ display:"flex", gap:10 }}>
+          <div className="cert-modal-top-btns" style={{ display:"flex", gap:10 }}>
             <button onClick={handleShare}
               style={{ display:"flex", alignItems:"center", gap:7, padding:"10px 18px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.08)", color:"#fff", fontSize:14, fontWeight:600, cursor:"pointer" }}>
               <Share2 size={14}/> Share
@@ -183,8 +193,23 @@ export default function CertificateModal({ course, userName: userNameProp, onClo
         <button onClick={onClose} style={{ background:"none", border:"none", color:"rgba(255,255,255,0.4)", fontSize:13, fontWeight:600, cursor:"pointer", textAlign:"center" }}>
           Continue learning →
         </button>
+        {/* Mobile bottom buttons */}
+        <div className="cert-modal-bottom-btns" style={{ display:"none", gap:10 }}>
+          <button onClick={handleDownload} disabled={downloading || !design}
+            style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"14px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
+            <Download size={16}/> {downloading ? "Generating..." : "Download PDF"}
+          </button>
+          <button onClick={handleShare}
+            style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.08)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
+            Share
+          </button>
+        </div>
       </div>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 768px) { .cert-modal-top-btns { display: none !important; } }
+        @media (max-width: 768px) { .cert-modal-bottom-btns { display: flex !important; } }
+      `}</style>
     </div>
   );
 }

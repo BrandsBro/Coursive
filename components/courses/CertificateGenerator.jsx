@@ -47,10 +47,35 @@ async function toBase64(url) {
 }
 
 export default function CertificateGenerator({ course, userName, completedDate, onClose, type = "course" }) {
-  const [design, setDesign] = useState(null);   // null = still loading
+  const [design, setDesign] = useState(null);
   const [loadError, setLoadError] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [tapCount, setTapCount] = useState(0);
   const certRef = useRef();
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
+  const handleDoubleTap = () => {
+    setTapCount(c => {
+      if (c + 1 >= 2) { onClose(); return 0; }
+      setTimeout(() => setTapCount(0), 400);
+      return c + 1;
+    });
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "My 1Course Certificate",
+          text: "I just completed " + (course?.title || "a course") + " on 1Course!",
+          url: window.location.origin,
+        });
+      } catch(_) {}
+    } else {
+      navigator.clipboard?.writeText("I just completed " + (course?.title || "a course") + " on 1Course! 🎉 1course.io");
+      alert("Link copied!");
+    }
+  };
 
   // Load the design saved in the admin panel
   useEffect(() => {
@@ -140,7 +165,7 @@ export default function CertificateGenerator({ course, userName, completedDate, 
         {/* Header bar */}
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <p style={{ color:"rgba(255,255,255,0.75)", fontSize:13, margin:0, fontWeight:600 }}>🏆 Your Certificate</p>
-          <div style={{ display:"flex", gap:10 }}>
+          <div className="cert-top-btns" style={{ display:"flex", gap:10 }}>
             <button
               onClick={handleDownload}
               disabled={downloading || !design}
@@ -158,6 +183,10 @@ export default function CertificateGenerator({ course, userName, completedDate, 
                   ? <><Loader size={15} style={{ animation:"spin 0.7s linear infinite" }}/> Loading...</>
                   : <><Download size={15}/> Download PDF</>
               }
+            </button>
+            <button onClick={handleShare}
+              style={{ display:"flex", alignItems:"center", gap:7, padding:"10px 16px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.08)", color:"#fff", fontSize:14, fontWeight:600, cursor:"pointer" }}>
+              Share
             </button>
             <button
               onClick={onClose}
@@ -195,7 +224,24 @@ export default function CertificateGenerator({ course, userName, completedDate, 
         )}
       </div>
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 768px) {
+          .cert-top-btns { display: none !important; }
+        }
+      `}</style>
+      {/* Mobile bottom buttons */}
+      <div className="cert-mobile-btns" style={{ display:"none" }}>
+        <style>{`@media (max-width: 768px) { .cert-mobile-btns { display: flex !important; gap: 10px; } }`}</style>
+        <button onClick={handleDownload} disabled={downloading || !design}
+          style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"14px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
+          <Download size={16}/> {downloading ? "Generating..." : "Download PDF"}
+        </button>
+        <button onClick={handleShare}
+          style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.08)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
+          Share
+        </button>
+      </div>
     </div>
   );
 }
