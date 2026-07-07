@@ -1,4 +1,5 @@
 "use client";
+import { useBranding } from "@/lib/useBranding";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -24,6 +25,7 @@ const NAV = [
 ];
 
 export default function AdminLayout({ children }) {
+  const branding = useBranding();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -40,7 +42,7 @@ export default function AdminLayout({ children }) {
         {/* Logo */}
         <div style={{ padding:"24px 20px", borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
           <Link href="/home" style={{ textDecoration:"none" }}>
-            <img src="https://i.postimg.cc/HsMMTybQ/1course-Logo-White-Version.png" alt="1Course" style={{ height:28, objectFit:"contain" }}/>
+            <img src={branding.logoMain||"https://i.postimg.cc/HsMMTybQ/1course-Logo-White-Version.png"} alt="1Course" style={{ height:28, objectFit:"contain" }}/>
           </Link>
           <div style={{ marginTop:4, background:"rgba(99,102,241,0.25)", borderRadius:6, padding:"2px 8px", display:"inline-block" }}>
             <span style={{ color:"#a5b4fc", fontSize:10, fontWeight:700, letterSpacing:1 }}>ADMIN</span>

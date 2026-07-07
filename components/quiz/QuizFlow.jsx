@@ -1,4 +1,5 @@
 "use client";
+import { useBranding } from "@/lib/useBranding";
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
@@ -15,7 +16,8 @@ const FIXED_REVIEWS = [
 
 const END_SEQUENCE = ["loading", "summary", "comparison", "signup", "sales"];
 
-export default function QuizFlow({ blocks }) {
+export default function QuizFlow({
+  const branding = useBranding(); blocks }) {
   const router = useRouter();
 
   const [currentIdx, setCurrentIdx] = useState(() => {
@@ -141,7 +143,7 @@ export default function QuizFlow({ blocks }) {
             )}
           </div>
           {/* Logo center */}
-          <img src="https://i.postimg.cc/7Pd7vVJs/1course-Logo-Black-Version.png" alt="1Course" style={{ height:28, objectFit:"contain" }}/>
+          <img src={branding.logoApp||"https://i.postimg.cc/7Pd7vVJs/1course-Logo-Black-Version.png"} alt="1Course" style={{ height:28, objectFit:"contain" }}/>
           {/* Step counter */}
           <div style={{ width:80, textAlign:"right" }}>
             {endStep !== "sales" && (

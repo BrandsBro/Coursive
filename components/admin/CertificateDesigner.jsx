@@ -16,7 +16,7 @@ const DEFAULT_DESIGN = {
 
   // Header
   showLogo: true,
-  logoUrl: "https://i.postimg.cc/7Pd7vVJs/1course-Logo-Black-Version.png",
+  logoUrl: "",  // Set from branding settings
   logoSize: 80,
 
   // Top label

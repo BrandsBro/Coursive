@@ -1,4 +1,5 @@
 "use client";
+import { useBranding } from "@/lib/useBranding";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -18,6 +19,7 @@ const NAV_LINKS = [
 ];
 
 export default function Navbar() {
+  const branding = useBranding();
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuth();
@@ -75,7 +77,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/home" style={{ textDecoration:"none", flexShrink:0 }}>
-            <img src="https://i.postimg.cc/7Pd7vVJs/1course-Logo-Black-Version.png" alt="1Course" style={{ height:26, objectFit:"contain" }}/>
+            <img src={branding.logoApp||"https://i.postimg.cc/7Pd7vVJs/1course-Logo-Black-Version.png"} alt="1Course" style={{ height:26, objectFit:"contain" }}/>
           </Link>
 
           {/* Desktop nav links */}
