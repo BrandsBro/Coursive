@@ -279,12 +279,17 @@ function TextE({ content, onChange }) {
         {toolBtn(false, "justifyCenter", "↔", {})}
         {toolBtn(false, "justifyRight", "➡", {})}
         <div style={{ width:1, height:18, background:"#E2E8F0" }}/>
-        {toolBtn("ul", "insertUnorderedList", "• List", {})}
-        {toolBtn("ol", "insertOrderedList", "1. List", {})}
+        <button onMouseDown={e => { e.preventDefault(); execCmd("insertUnorderedList"); }}
+          style={{ padding:"4px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:activeFormats.ul?"#5B4EFF":"#fff", color:activeFormats.ul?"#fff":"#374151", cursor:"pointer", fontSize:13, fontWeight:700 }}>• List</button>
+        <button onMouseDown={e => { e.preventDefault(); execCmd("insertOrderedList"); }}
+          style={{ padding:"4px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:activeFormats.ol?"#5B4EFF":"#fff", color:activeFormats.ol?"#fff":"#374151", cursor:"pointer", fontSize:13, fontWeight:700 }}>1. List</button>
         <div style={{ width:1, height:18, background:"#E2E8F0" }}/>
-        {toolBtn(false, "h2", "H2", { fontSize:11 }, () => execCmd("formatBlock", "h2"))}
-        {toolBtn(false, "h3", "H3", { fontSize:11 }, () => execCmd("formatBlock", "h3"))}
-        {toolBtn(false, "p", "¶", { fontSize:11 }, () => execCmd("formatBlock", "p"))}
+        <button onMouseDown={e => { e.preventDefault(); execCmd("formatBlock", "h2"); }}
+          style={{ padding:"4px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:"#fff", color:"#374151", cursor:"pointer", fontSize:13, fontWeight:800 }}>H2</button>
+        <button onMouseDown={e => { e.preventDefault(); execCmd("formatBlock", "h3"); }}
+          style={{ padding:"4px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:"#fff", color:"#374151", cursor:"pointer", fontSize:13, fontWeight:800 }}>H3</button>
+        <button onMouseDown={e => { e.preventDefault(); execCmd("formatBlock", "p"); }}
+          style={{ padding:"4px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:"#fff", color:"#374151", cursor:"pointer", fontSize:11 }}>¶ Normal</button>
         <span style={{ fontSize:10, color:"#94A3B8", marginLeft:"auto" }}>Select text to format</span>
       </div>
       {/* Editor */}
