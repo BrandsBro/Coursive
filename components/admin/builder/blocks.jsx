@@ -589,31 +589,27 @@ function MatchingE({ content, onChange }) {
 }
 
 function BlankOptionsE({ content, onChange }) {
-function BlankOptionsE({ content, onChange }) {
   const [lib, setLib] = useState(false);
   const successImages = content.successImages||[];
   const sentence = content.sentence||"";
-  // Auto-detect blanks from (answer) syntax
   const blankMatches = (sentence.match(/\(([^)]+)\)/g)||[]).map(m => m.replace(/^\(|\)$/g,"").trim());
   const blankCount = blankMatches.length;
-  const blanks = blankMatches.map(m => ({ correct: m }));
-  // Auto-sync blanks when sentence changes
+
   useEffect(() => {
-    onChange({ ...content, blanks, blankCount });
+    const autoB = blankMatches.map(m => ({ correct: m }));
+    onChange({ ...content, blanks: autoB, blankCount: blankMatches.length });
   }, [sentence]);
+
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:14, paddingTop:12 }}>
-
       <div>
         <p style={lbl()}>Task Title</p>
         <input value={content.taskTitle||""} onChange={e => onChange({ ...content, taskTitle:e.target.value })} placeholder="e.g. Generate Your First Image" style={inp()}/>
       </div>
-
       <div>
         <p style={lbl()}>Task Description <span style={{ color:"#94A3B8", fontWeight:400 }}>· optional</span></p>
         <input value={content.taskDesc||""} onChange={e => onChange({ ...content, taskDesc:e.target.value })} placeholder="e.g. Ask Kling to generate an image of a horse." style={inp()}/>
       </div>
-
       <div style={{ background:"#EEF2FF", borderRadius:10, padding:"10px 14px" }}>
         <p style={{ fontSize:12, color:"#5B4EFF", fontWeight:700, margin:"0 0 4px" }}>💡 How to add blanks</p>
         <p style={{ fontSize:12, color:"#6366f1", margin:0 }}>Wrap answers in brackets: <strong>(answer)</strong> → auto becomes a blank</p>
@@ -638,13 +634,11 @@ function BlankOptionsE({ content, onChange }) {
           </div>
         </div>
       )}
-
       <div>
         <p style={lbl()}>Success Text <span style={{ color:"#94A3B8", fontWeight:400 }}>· shown after correct</span></p>
         <textarea value={content.successText||""} onChange={e => onChange({ ...content, successText:e.target.value })}
           placeholder="Great job! Here is what you created..." style={{ ...inp(), minHeight:60, resize:"vertical" }}/>
       </div>
-
       <div>
         <p style={lbl()}>Success Images</p>
         {successImages.map((url,i) => (
@@ -659,12 +653,10 @@ function BlankOptionsE({ content, onChange }) {
           <button onClick={() => { const u=window.prompt("Image URL:"); if(u) onChange({ ...content, successImages:[...successImages,u] }); }} style={mediaBtn("#6366f1")}><Link2 size={13}/> URL</button>
         </div>
       </div>
-
       {lib && <MediaLibrary accept="image" onSelect={m => { onChange({ ...content, successImages:[...successImages,m.url] }); setLib(false); }} onClose={() => setLib(false)}/>}
     </div>
   );
 }
-
 
 function ImageUploadField({ value, onChange, placeholder }) {
   const [uploading, setUploading] = useState(false);
