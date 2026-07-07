@@ -100,6 +100,16 @@ export default function CourseRoadmap({ course, completedLessons = [], onViewCer
                 <button onClick={onViewCertificate} style={{ width:"100%",padding:"12px",borderRadius:14,border:"1.5px solid #E5E7EB",background:"#fff",color:"#374151",fontWeight:600,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8 }}>
                   <Download size={16} /> Download PDF
                 </button>
+                <button onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({ title:"My 1Course Certificate", text:"I just completed "+course.title+" on 1Course! 🎉", url:window.location.origin });
+                  } else {
+                    navigator.clipboard?.writeText("I just completed "+course.title+" on 1Course! 🎉 1course.io");
+                    alert("Link copied!");
+                  }
+                }} style={{ width:"100%",padding:"12px",borderRadius:14,border:"1.5px solid #C7D2FE",background:"#EEF2FF",color:"#5B4EFF",fontWeight:600,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8 }}>
+                  🔗 Share Certificate
+                </button>
                 {!confirmReset
                   ? <button onClick={() => setConfirmReset(true)} style={{ width:"100%",padding:"10px",borderRadius:12,border:"1px dashed #D1D5DB",background:"none",color:"#9CA3AF",fontWeight:500,fontSize:13,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6 }}>
                       <RotateCcw size={13} /> Retake course
