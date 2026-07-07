@@ -517,7 +517,13 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
   }
 
   if (step === "sales") {
-    const plans = [
+    const plans = pricingData?.plans ? pricingData.plans.map(p => ({
+      name: p.name,
+      price: p.salePrice,
+      originalPrice: p.regularPrice,
+      weeks: p.id==="weekly" ? 1 : p.id==="monthly" ? 4 : 12,
+      popular: p.id==="monthly",
+    })) : [
       { name:"1-Week Plan",  price:"6.93",  originalPrice:"13.86", weeks:1 },
       { name:"4-Week Plan",  price:"19.99", originalPrice:"39.99", weeks:4, popular:true },
       { name:"12-Week Plan", price:"39.99", originalPrice:"79.99", weeks:12 },
