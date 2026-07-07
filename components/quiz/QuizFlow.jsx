@@ -16,8 +16,8 @@ const FIXED_REVIEWS = [
 
 const END_SEQUENCE = ["loading", "summary", "comparison", "signup", "sales"];
 
-export default function QuizFlow({
-  const branding = useBranding(); blocks }) {
+export default function QuizFlow({ blocks }) {
+  const branding = useBranding();
   const router = useRouter();
 
   const [currentIdx, setCurrentIdx] = useState(() => {
