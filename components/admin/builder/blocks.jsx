@@ -503,13 +503,12 @@ function BlankOptionsE({ content, onChange }) {
 
       <div>
         <p style={lbl()}>How many blanks?</p>
-        <div style={{ display:"flex", gap:8 }}>
-          {[1,2,3,4].map(n => (
-            <button key={n} onClick={() => setCount(n)}
-              style={{ width:48, height:48, borderRadius:12, border:`2px solid ${blankCount===n?"#6366f1":"#E2E8F0"}`, background:blankCount===n?"#EEF2FF":"#fff", color:blankCount===n?"#6366f1":"#374151", fontSize:18, fontWeight:800, cursor:"pointer" }}>
-              {n}
-            </button>
-          ))}
+        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <button onClick={() => setCount(Math.max(1, blankCount-1))}
+            style={{ width:40, height:40, borderRadius:10, border:"2px solid #E2E8F0", background:"#fff", fontSize:20, fontWeight:800, cursor:"pointer" }}>−</button>
+          <span style={{ fontSize:18, fontWeight:800, color:"#374151", minWidth:32, textAlign:"center" }}>{blankCount}</span>
+          <button onClick={() => setCount(blankCount+1)}
+            style={{ width:40, height:40, borderRadius:10, border:"2px solid #6366f1", background:"#EEF2FF", color:"#6366f1", fontSize:20, fontWeight:800, cursor:"pointer" }}>+</button>
         </div>
       </div>
 

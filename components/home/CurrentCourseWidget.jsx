@@ -84,19 +84,20 @@ export default function CurrentCourseWidget({ courses = [] }) {
             <span style={{ fontSize:11,color:"#9CA3AF",fontWeight:600,flexShrink:0 }}>{pct}%</span>
           </div>
         )}
-        <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
-          <Link href="/courses" style={{ textDecoration:"none",flex:1 }}>
-            <div style={{ padding:"12px",borderRadius:14,border:"1.5px solid #E5E7EB",textAlign:"center",fontSize:13,fontWeight:600,color:"#4B5563",cursor:"pointer" }}>
-              All courses
-            </div>
-          </Link>
-          <Link href={`/courses/${activeCourse.id}`} style={{ textDecoration:"none",flex:2 }}>
-            <div style={{ padding:"12px",borderRadius:14,background:s.grad,textAlign:"center",fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6,boxShadow:`0 4px 14px ${s.accent}55` }}>
-              <Play size={13} fill="#fff" color="#fff" />
-              {pct > 0 ? "Continue learning" : "Start course"}
-            </div>
-          </Link>
-        </div>
+    <div className="flex flex-col md:flex-row gap-2.5">
+  <Link href="/courses" style={{ textDecoration:"none",flex:1 }}>
+    <div style={{ padding:"12px",borderRadius:14,border:"1.5px solid #E5E7EB",textAlign:"center",fontSize:13,fontWeight:600,color:"#4B5563",cursor:"pointer" }}>
+      All courses
+    </div>
+  </Link>
+  
+  <Link href={`/courses/${activeCourse.id}`} style={{ textDecoration:"none",flex:2 }}>
+    <div style={{ padding:"12px",borderRadius:14,background:s.grad,textAlign:"center",fontSize:13,fontWeight:700,color:"#fff",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6,boxShadow:`0 4px 14px ${s.accent}55` }}>
+      <Play size={13} fill="#fff" color="#fff" />
+      {pct > 0 ? "Continue learning" : "Start course"}
+    </div>
+  </Link>
+</div>
       </div>
     </div>
   );

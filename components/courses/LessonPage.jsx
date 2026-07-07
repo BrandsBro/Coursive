@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Check, Trophy, Music } from "lucide-react";
@@ -143,16 +144,6 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
           .lesson-listen-btn { padding: 6px 10px !important; font-size: 11px !important; }
           .lesson-back-text { max-width: 80px; }
         }
-        .complete-modal-header { padding: 28px 20px; }
-        .complete-modal-body { padding: 20px; }
-        .complete-modal-emoji { font-size: 44px; margin-bottom: 10px; }
-        .complete-modal-title { font-size: 20px; }
-        @media (min-width: 400px) {
-          .complete-modal-header { padding: 32px 28px; }
-          .complete-modal-body { padding: 24px 28px; }
-          .complete-modal-emoji { font-size: 56px; margin-bottom: 12px; }
-          .complete-modal-title { font-size: 24px; }
-        }
       `}</style>
 
       {/* Top nav */}
@@ -288,49 +279,110 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
         )}
       </div>
 
-      {/* Complete modal — fully responsive */}
-      {showComplete && (
-        <div style={{ position:"fixed", inset:0, background:"rgba(15,23,42,0.7)", zIndex:100, display:"flex", alignItems:"center", justifyContent:"center", padding:"16px", backdropFilter:"blur(8px)" }}>
-          <div style={{ background:"#fff", borderRadius:24, width:"100%", maxWidth:400, boxShadow:"0 32px 80px rgba(0,0,0,0.3)", overflow:"hidden" }}>
-            {/* Top gradient */}
-            <div className="complete-modal-header" style={{ background:"linear-gradient(135deg,#7c3aed,#4f46e5)", textAlign:"center" }}>
-              <div className="complete-modal-emoji">🎉</div>
-              <h2 className="complete-modal-title" style={{ fontWeight:900, color:"#fff", margin:"0 0 6px" }}>
+      {/* Portaled modals — rendered directly into document.body so parent
+          CSS transforms/overflow can never clip or misposition them */}
+      {showComplete && typeof document !== "undefined" && createPortal(
+        <div
+          onClick={() => setShowComplete(false)}
+          style={{
+            position:"fixed",
+            top:0, left:0, right:0, bottom:0,
+            zIndex:9999,
+            background:"rgba(15,23,42,0.65)",
+            backdropFilter:"blur(4px)",
+          }}>
+          {/* Sheet — stopPropagation so tapping sheet doesn't close modal */}
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              position:"absolute",
+              bottom:0, left:0, right:0,
+              background:"#fff",
+              borderRadius:"24px 24px 0 0",
+              boxShadow:"0 -8px 40px rgba(0,0,0,0.2)",
+              padding:"12px 16px 40px",
+              boxSizing:"border-box",
+            }}>
+            {/* Drag handle */}
+            <div style={{ display:"flex", justifyContent:"center", marginBottom:16 }}>
+              <div style={{ width:36, height:4, borderRadius:999, background:"#E2E8F0" }}/>
+            </div>
+            {/* Gradient card */}
+            <div style={{
+              background:"linear-gradient(135deg,#7c3aed,#4f46e5)",
+              borderRadius:18,
+              padding:"20px 16px",
+              textAlign:"center",
+              marginBottom:16,
+            }}>
+              <div style={{ fontSize:36, lineHeight:1, marginBottom:8 }}>🎉</div>
+              <h2 style={{ fontSize:18, fontWeight:900, color:"#fff", margin:"0 0 4px", lineHeight:1.2 }}>
                 {nextLesson ? "Lesson Complete!" : "Course Complete! 🏆"}
               </h2>
-              <p style={{ fontSize:13, color:"rgba(255,255,255,0.75)", margin:0 }}>
+              <p style={{ fontSize:12, color:"rgba(255,255,255,0.8)", margin:0 }}>
                 {nextLesson ? "Great work — keep going!" : "You finished the entire course!"}
               </p>
             </div>
-            {/* Body */}
-            <div className="complete-modal-body">
-              {nextLesson && (
-                <div style={{ background:"#F8FAFC", borderRadius:14, padding:"12px 14px", marginBottom:16, display:"flex", alignItems:"center", gap:12 }}>
-                  <div style={{ width:36, height:36, borderRadius:10, background:"linear-gradient(135deg,#7c3aed,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                    <ChevronRight size={18} color="#fff"/>
-                  </div>
-                  <div style={{ minWidth:0 }}>
-                    <p style={{ fontSize:10, color:"#94A3B8", margin:"0 0 2px", fontWeight:600, textTransform:"uppercase" }}>Up next</p>
-                    <p style={{ fontSize:13, fontWeight:700, color:"#0f172a", margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{nextLesson.title}</p>
-                  </div>
+            {/* Up next */}
+            {nextLesson && (
+              <div style={{
+                background:"#F8FAFC",
+                borderRadius:14,
+                padding:"12px 14px",
+                marginBottom:12,
+                display:"flex",
+                alignItems:"center",
+                gap:10,
+              }}>
+                <div style={{
+                  width:32, height:32, flexShrink:0,
+                  borderRadius:9,
+                  background:"linear-gradient(135deg,#7c3aed,#4f46e5)",
+                  display:"flex", alignItems:"center", justifyContent:"center",
+                }}>
+                  <ChevronRight size={15} color="#fff"/>
                 </div>
-              )}
-              <div style={{ display:"flex", gap:10 }}>
-                <button onClick={() => setShowComplete(false)}
-                  style={{ flex:1, padding:"12px 8px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:13, fontWeight:600, color:"#374151", cursor:"pointer" }}>
-                  Stay here
-                </button>
-                <button onClick={() => { setShowComplete(false); handleNext(); }}
-                  style={{ flex:2, padding:"12px 8px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(124,58,237,0.4)" }}>
-                  {nextLesson ? "Next Lesson →" : "Finish Course 🏆"}
-                </button>
+                <div style={{ minWidth:0, flex:1 }}>
+                  <p style={{ fontSize:10, color:"#94A3B8", margin:"0 0 1px", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.5px" }}>Up next</p>
+                  <p style={{ fontSize:13, fontWeight:700, color:"#0f172a", margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+                    {nextLesson.title}
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
+            <button
+              onClick={() => { setShowComplete(false); handleNext(); }}
+              style={{
+                display:"block", width:"100%", boxSizing:"border-box",
+                padding:"15px", marginBottom:8,
+                borderRadius:14, border:"none",
+                background:"linear-gradient(135deg,#7c3aed,#4f46e5)",
+                color:"#fff", fontSize:15, fontWeight:700,
+                cursor:"pointer",
+                boxShadow:"0 4px 14px rgba(124,58,237,0.35)"
+              }}>
+              {nextLesson ? "Next Lesson →" : "Finish Course 🏆"}
+            </button>
+            <button
+              onClick={() => setShowComplete(false)}
+              style={{
+                display:"block", width:"100%", boxSizing:"border-box",
+                padding:"13px",
+                borderRadius:14, border:"1.5px solid #E2E8F0",
+                background:"#fff", fontSize:14, fontWeight:600,
+                color:"#64748B", cursor:"pointer"
+              }}>
+              Stay here
+            </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {showCert && <CertificateGenerator course={course} userName={userName} completedDate={new Date().toISOString()} onClose={() => setShowCert(false)}/>}
+      {showCert && typeof document !== "undefined" && createPortal(
+        <CertificateGenerator course={course} userName={userName} completedDate={new Date().toISOString()} onClose={() => setShowCert(false)}/>,
+        document.body
+      )}
     </div>
   );
 }
