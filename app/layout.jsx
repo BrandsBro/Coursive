@@ -31,9 +31,24 @@ export async function generateMetadata() {
   };
 }
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const branding = await getBranding();
+  const logoMainDesktop = branding.logoMainSizeDesktop || 117;
+  const logoMainMobile = branding.logoMainSizeMobile || 60;
+  const logoAppDesktop = branding.logoAppSizeDesktop || 117;
+  const logoAppMobile = branding.logoAppSizeMobile || 60;
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <style>{`
+          .logo-main { height: ${logoMainDesktop}px !important; }
+          .logo-app { height: ${logoAppDesktop}px !important; }
+          @media (max-width: 768px) {
+            .logo-main { height: ${logoMainMobile}px !important; }
+            .logo-app { height: ${logoAppMobile}px !important; }
+          }
+        `}</style>
+      </head>
       <body className={inter.className} suppressHydrationWarning>
         <AuthProvider>
           {children}
