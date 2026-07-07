@@ -98,7 +98,7 @@ export function BlockPreview({ block }) {
       const map={ info:["💡","#0891b2","#EFF6FF"], warning:["⚠️","#d97706","#FFFBEB"], success:["✅","#059669","#ECFDF5"], error:["❌","#dc2626","#FEF2F2"] };
       const [emoji,color,bg]=map[c.style||"info"];
       const ts=c.textStyle||{};
-      return <div style={{ padding:"14px 18px", borderRadius:12, background:bg, borderLeft:`4px solid ${color}`, display:"flex", gap:12 }}><span style={{ fontSize:18, flexShrink:0 }}>{emoji}</span><p style={{ fontSize:ts.fontSize||14, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#374151", margin:0, lineHeight:1.65 }}>{c.text||"Callout text"}</p></div>;
+      return <div style={{ padding:"14px 18px", borderRadius:12, background:bg, borderLeft:`4px solid ${color}`, display:"flex", gap:12 }}><span style={{ fontSize:18, flexShrink:0 }}>{emoji}</span><div><p style={{ fontSize:ts.fontSize||14, fontWeight:"800", color:"#374151", margin:c.text?"0 0 4px":0 }}>{c.heading}</p><p style={{ fontSize:ts.fontSize||14, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#374151", margin:0, lineHeight:1.65 }}>{c.text||"Callout text"}</p></div></div>;
     }
     
     case "multiplechoice": {
@@ -453,6 +453,10 @@ function CalloutE({ content, onChange }) {
         <div style={{ display:"flex", gap:6 }}>
           {styles.map(([v,l,col]) => <button key={v} onClick={() => onChange({ ...content, style:v })} style={{ ...pill(content.style===v,col), flex:1, fontSize:11 }}>{l}</button>)}
         </div>
+      </div>
+      <div>
+        <p style={lbl()}>Heading <span style={{ color:"#94A3B8", fontWeight:400 }}>· optional</span></p>
+        <input value={content.heading||""} onChange={e => onChange({ ...content, heading:e.target.value })} placeholder="Callout heading..." style={inp()}/>
       </div>
       <FC label="Text Style" style={ts} setStyle={v => onChange({ ...content, textStyle:v })}/>
       <textarea value={content.text||""} onChange={e => onChange({ ...content, text:e.target.value })} placeholder="Callout message..." style={{ ...inp(), minHeight:80, resize:"vertical", ...styled(ts) }}/>
