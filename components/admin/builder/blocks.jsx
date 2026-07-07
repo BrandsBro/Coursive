@@ -301,7 +301,14 @@ function TextE({ content, onChange }) {
       <FC label="Text Style" style={ts} setStyle={v => onChange({ ...content, textStyle:v })} showBold={false} showItalic={false}/>
       {/* Toolbar */}
       <div style={{ display:"flex", gap:6, alignItems:"center", padding:"6px 10px", background:"#F8FAFC", borderRadius:"8px 8px 0 0", border:"1.5px solid #E2E8F0", borderBottom:"none", flexWrap:"wrap" }}>
-       
+        {toolBtn("bold", "bold", "B", { fontWeight:900 })}
+        {toolBtn("italic", "italic", "I", { fontStyle:"italic" })}
+        {toolBtn("underline", "underline", "U", { textDecoration:"underline" })}
+        {toolBtn(false, "strikeThrough", "S", { textDecoration:"line-through" })}
+        <div style={{ width:1, height:18, background:"#E2E8F0" }}/>
+        {toolBtn(false, "justifyLeft", "⬅", {})}
+        {toolBtn(false, "justifyCenter", "↔", {})}
+        {toolBtn(false, "justifyRight", "➡", {})}
         <div style={{ width:1, height:18, background:"#E2E8F0" }}/>
         <button onMouseDown={e => { e.preventDefault(); execCmd("insertUnorderedList"); }}
           style={{ padding:"4px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:activeFormats.ul?"#5B4EFF":"#fff", color:activeFormats.ul?"#fff":"#374151", cursor:"pointer", fontSize:13, fontWeight:700 }}>• List</button>
