@@ -44,13 +44,7 @@ export default function LessonBuilder({ lessonId, lessonTitle, backTo }) {
     setLoading(false);
   };
 
-  const prevBlocksLen = useRef(0);
-  useEffect(() => {
-    if (blocks.length > prevBlocksLen.current && leftPanelRef.current) {
-      leftPanelRef.current.scrollTop = leftPanelRef.current.scrollHeight;
-    }
-    prevBlocksLen.current = blocks.length;
-  }, [blocks.length]);
+
 
   const addBlock = (type) => {
     const block = {
