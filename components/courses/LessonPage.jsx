@@ -564,6 +564,138 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
   );
 }
 
+function MatchingBlock({ c, idx, checked, setChecked }) {
+  const pairs = c.pairs || [];
+  const isChecked = checked["match_"+idx];
+
+  const shuffled = (arr) => {
+    const a = [...arr.map((p,i) => ({ ...p, origIdx:i }))];
+    for (let i = a.length-1; i > 0; i--) {
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  };
+
+  const [leftItems] = useState(() => shuffled(pairs));
+  const [rightItems] = useState(() => shuffled(pairs));
+  const [selectedLeft, setSelectedLeft] = useState(null);
+  const [selectedRight, setSelectedRight] = useState(null);
+  const [matches, setMatches] = useState({});
+
+  const handleLeft = (i) => {
+    if (isChecked) return;
+    setSelectedLeft(i);
+    if (selectedRight !== null) {
+      setMatches(m => ({ ...m, [i]: selectedRight }));
+      setSelectedLeft(null);
+      setSelectedRight(null);
+    }
+  };
+
+  const handleRight = (i) => {
+    if (isChecked) return;
+    setSelectedRight(i);
+    if (selectedLeft !== null) {
+      setMatches(m => ({ ...m, [selectedLeft]: i }));
+      setSelectedLeft(null);
+      setSelectedRight(null);
+    }
+  };
+
+  const allMatched = Object.keys(matches).length === pairs.length;
+
+  const isCorrect = (leftIdx, rightIdx) => {
+    const leftOrig = leftItems[leftIdx]?.origIdx;
+    const rightOrig = rightItems[rightIdx]?.origIdx;
+    return leftOrig === rightOrig;
+  };
+
+  const score = Object.entries(matches).filter(([l,r]) => isCorrect(parseInt(l),r)).length;
+
+  const reset = () => {
+    setMatches({});
+    setSelectedLeft(null);
+    setSelectedRight(null);
+    setChecked(p => ({ ...p, ["match_"+idx]: false }));
+  };
+
+  const getMatchedRight = (leftIdx) => matches[leftIdx] !== undefined ? matches[leftIdx] : null;
+  const isRightMatched = (rightIdx) => Object.values(matches).includes(rightIdx);
+  const getLeftForRight = (rightIdx) => parseInt(Object.keys(matches).find(k => matches[k] === rightIdx));
+
+  return (
+    <div style={{ padding:"20px 0" }}>
+      <style>{".match-item{transition:all 0.2s}"}</style>
+      {c.heading && <p style={{ fontSize:17, fontWeight:800, color:"#0f172a", margin:"0 0 4px" }}>{c.heading}</p>}
+      {c.subheading && <p style={{ fontSize:13, color:"#64748B", margin:"0 0 16px" }}>{c.subheading}</p>}
+      {!c.heading && !c.subheading && <p style={{ fontSize:13, color:"#64748B", margin:"0 0 16px" }}>Tap a left item then a right item to match them</p>}
+
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:16 }}>
+        {/* Left column */}
+        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+          {leftItems.map((item, i) => {
+            const matchedRight = getMatchedRight(i);
+            const isMatched = matchedRight !== null;
+            const correct = isChecked && isMatched && isCorrect(i, matchedRight);
+            const wrong = isChecked && isMatched && !isCorrect(i, matchedRight);
+            const isSelected = selectedLeft === i;
+            return (
+              <button key={i} className="match-item" onClick={() => handleLeft(i)}
+                style={{ padding:"10px 12px", borderRadius:12, border:`2px solid ${correct?"#22c55e":wrong?"#ef4444":isSelected?"#5B4EFF":isMatched?"#7c3aed":"#E2E8F0"}`, background:correct?"#F0FDF4":wrong?"#FEF2F2":isSelected?"#EEF2FF":isMatched?"#F5F3FF":"#fff", color:correct?"#166534":wrong?"#991B1B":isSelected?"#4338CA":isMatched?"#6D28D9":"#374151", fontSize:13, fontWeight:700, cursor:isChecked?"default":"pointer", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between", gap:6 }}>
+                <span>{item.left}</span>
+                {isMatched && <span style={{ fontSize:10, opacity:0.6 }}>{correct?"✓":wrong?"✗":"🔗"}</span>}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Right column */}
+        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+          {rightItems.map((item, i) => {
+            const isMatched = isRightMatched(i);
+            const leftIdx = isMatched ? getLeftForRight(i) : null;
+            const correct = isChecked && isMatched && isCorrect(leftIdx, i);
+            const wrong = isChecked && isMatched && !isCorrect(leftIdx, i);
+            const isSelected = selectedRight === i;
+            return (
+              <button key={i} className="match-item" onClick={() => handleRight(i)}
+                style={{ padding:"10px 12px", borderRadius:12, border:`2px solid ${correct?"#22c55e":wrong?"#ef4444":isSelected?"#5B4EFF":isMatched?"#7c3aed":"#E2E8F0"}`, background:correct?"#F0FDF4":wrong?"#FEF2F2":isSelected?"#EEF2FF":isMatched?"#F5F3FF":"#fff", color:correct?"#166534":wrong?"#991B1B":isSelected?"#4338CA":isMatched?"#6D28D9":"#374151", fontSize:13, fontWeight:700, cursor:isChecked?"default":"pointer", textAlign:"left", display:"flex", alignItems:"center", justifyContent:"space-between", gap:6 }}>
+                <span style={{ fontSize:10, opacity:0.6 }}>{isMatched ? (correct?"✓":wrong?"✗":"🔗") : ""}</span>
+                <span style={{ flex:1, textAlign:"right" }}>{item.right}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {!isChecked && allMatched && (
+        <button onClick={() => setChecked(p => ({ ...p, ["match_"+idx]: true }))}
+          style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>
+          Check ✓
+        </button>
+      )}
+
+      {!isChecked && !allMatched && (
+        <p style={{ textAlign:"center", fontSize:12, color:"#94A3B8" }}>{Object.keys(matches).length}/{pairs.length} matched</p>
+      )}
+
+      {isChecked && (
+        <div>
+          <div style={{ padding:"14px 18px", borderRadius:14, background:score===pairs.length?"#F0FDF4":"#FEF2F2", border:`1.5px solid ${score===pairs.length?"#BBF7D0":"#FECACA"}`, marginBottom:12 }}>
+            <p style={{ fontSize:15, fontWeight:800, color:score===pairs.length?"#166534":"#DC2626", margin:0 }}>
+              {score===pairs.length?"🎉 Perfect! All matched correctly!":score+"/"+pairs.length+" correct"}
+            </p>
+          </div>
+          <button onClick={reset} style={{ width:"100%", padding:"12px", borderRadius:12, border:"none", background:"#5B4EFF", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
+            🔄 Try Again
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ReorderBlock({ c, idx, checked, setChecked }) {
   const correctOrder = (c.items||[]).filter(Boolean);
   const shuffled = useMemo(() => [...correctOrder].sort(() => Math.random() - 0.5), []);
@@ -857,6 +989,8 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
     case "blankoptions":
       return <BlankOptionsBlock c={c} idx={idx} checked={checked} setChecked={setChecked} fillShowAnswer={fillShowAnswer} setFillShowAnswer={setFillShowAnswer}/>;
 
+    case "matching":
+      return <MatchingBlock c={c} idx={idx} checked={checked} setChecked={setChecked}/>;
     case "reorder":
       return <ReorderBlock c={c} idx={idx} checked={checked} setChecked={setChecked}/>;
 

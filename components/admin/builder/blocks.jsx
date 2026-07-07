@@ -15,6 +15,7 @@ export const BLOCK_DEFS = {
   multiplechoice: { icon:"🔘", label:"Multiple Choice", desc:"Radio style quiz with explanation", color:"#7c3aed", bg:"#F5F3FF", default:{ heading:"", subheading:"", headerImage:"", question:"", options:["","",""], optionImages:["","",""], correct:[], explanation:"", successImage:"", successText:"", headingStyle:{}, subheadingStyle:{}, questionStyle:{}, optionStyle:{}, explanationStyle:{} }, preview:c=>c.question||"No question" },
   reorder: { icon:"↕️", label:"Reorder", desc:"Drag items into correct order", color:"#0d9488", bg:"#F0FDFA", default:{ question:"", items:["","","",""], itemStyle:{} }, preview:c=>c.question||"No question" },
   continueblock: { icon:"▶️", label:"Continue",       desc:"Stop point — hides content below", color:"#5B4EFF", bg:"#EEF2FF", default:{ label:"Continue" },                                                                    preview:()=>"── Continue button ──" },
+  matching: { icon:"🔗", label:"Matching", desc:"Match left to right", color:"#7c3aed", bg:"#F5F3FF", default:{ heading:"", subheading:"", pairs:[{left:"",right:""},{left:"",right:""}] }, preview:c=>c.heading||"Matching exercise" },
   blankoptions: { icon:"🔤", label:"Blank + Options",desc:"Pick word from sentence",color:"#0891b2", bg:"#E0F2FE", default:{ sentence:"", markedWords:[], blanks:[], explanation:"", taskTitle:"", taskDesc:"", successText:"", successImages:[], sentenceStyle:{} },                         preview:c=>c.sentence||"No sentence" },
 };
 
@@ -32,6 +33,7 @@ export function BlockEditor({ block, onChange }) {
     case "multiplechoice": return <MultipleChoiceE {...p}/>;
     case "reorder": return <ReorderE {...p}/>;
     case "continueblock": return <ContinueE {...p}/>;
+    case "matching":     return <MatchingE {...p}/>;
     case "blankoptions": return <BlankOptionsE {...p}/>;
     case "divider":      return <DividerE {...p}/>;
     default: return null;
@@ -140,6 +142,23 @@ export function BlockPreview({ block }) {
     }
     case "continueblock":
       return <div style={{ width:"100%", padding:"14px", borderRadius:14, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, textAlign:"center" }}>{c.label||"Continue"}</div>;
+    case "matching": {
+      const pairs = c.pairs || [];
+      return (
+        <div style={{ padding:"8px 0" }}>
+          {c.heading && <p style={{ fontSize:15, fontWeight:800, color:"#0f172a", margin:"0 0 4px" }}>{c.heading}</p>}
+          {c.subheading && <p style={{ fontSize:12, color:"#64748B", margin:"0 0 10px" }}>{c.subheading}</p>}
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+            <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+              {pairs.map((p,i) => <div key={i} style={{ padding:"8px 12px", borderRadius:10, background:"#EEF2FF", border:"1.5px solid #C7D2FE", fontSize:13, fontWeight:600, color:"#4338CA" }}>{p.left||"Item "+(i+1)}</div>)}
+            </div>
+            <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+              {[...pairs].sort(()=>0.5-Math.random()).map((p,i) => <div key={i} style={{ padding:"8px 12px", borderRadius:10, background:"#F5F3FF", border:"1.5px solid #DDD6FE", fontSize:13, fontWeight:600, color:"#6D28D9" }}>{p.right||"Match "+(i+1)}</div>)}
+            </div>
+          </div>
+        </div>
+      );
+    }
     case "blankoptions": {
       const words=(c.sentence||"").split(" ").filter(Boolean);
       const marked=c.markedWords||[];
@@ -282,14 +301,7 @@ function TextE({ content, onChange }) {
       <FC label="Text Style" style={ts} setStyle={v => onChange({ ...content, textStyle:v })} showBold={false} showItalic={false}/>
       {/* Toolbar */}
       <div style={{ display:"flex", gap:6, alignItems:"center", padding:"6px 10px", background:"#F8FAFC", borderRadius:"8px 8px 0 0", border:"1.5px solid #E2E8F0", borderBottom:"none", flexWrap:"wrap" }}>
-        {toolBtn("bold", "bold", "B", { fontWeight:900 })}
-        {toolBtn("italic", "italic", "I", { fontStyle:"italic" })}
-        {toolBtn("underline", "underline", "U", { textDecoration:"underline" })}
-        {toolBtn(false, "strikeThrough", "S", { textDecoration:"line-through" })}
-        <div style={{ width:1, height:18, background:"#E2E8F0" }}/>
-        {toolBtn(false, "justifyLeft", "⬅", {})}
-        {toolBtn(false, "justifyCenter", "↔", {})}
-        {toolBtn(false, "justifyRight", "➡", {})}
+       
         <div style={{ width:1, height:18, background:"#E2E8F0" }}/>
         <button onMouseDown={e => { e.preventDefault(); execCmd("insertUnorderedList"); }}
           style={{ padding:"4px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:activeFormats.ul?"#5B4EFF":"#fff", color:activeFormats.ul?"#fff":"#374151", cursor:"pointer", fontSize:13, fontWeight:700 }}>• List</button>
@@ -526,6 +538,45 @@ function CalloutE({ content, onChange }) {
       </div>
       <FC label="Text Style" style={ts} setStyle={v => onChange({ ...content, textStyle:v })}/>
       <textarea value={content.text||""} onChange={e => onChange({ ...content, text:e.target.value })} placeholder="Callout message..." style={{ ...inp(), minHeight:80, resize:"vertical", ...styled(ts) }}/>
+    </div>
+  );
+}
+
+
+function MatchingE({ content, onChange }) {
+  const pairs = content.pairs || [{left:"",right:""},{left:"",right:""}];
+  const updatePair = (i, side, val) => {
+    const np = [...pairs];
+    np[i] = { ...np[i], [side]: val };
+    onChange({ ...content, pairs: np });
+  };
+  const addPair = () => onChange({ ...content, pairs: [...pairs, { left:"", right:"" }] });
+  const removePair = (i) => onChange({ ...content, pairs: pairs.filter((_,j) => j !== i) });
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:12, paddingTop:12 }}>
+      <div>
+        <p style={lbl()}>Heading <span style={{ color:"#94A3B8", fontWeight:400 }}>· optional</span></p>
+        <input value={content.heading||""} onChange={e => onChange({ ...content, heading:e.target.value })} placeholder="e.g. Match the AI tools to their descriptions" style={inp()}/>
+      </div>
+      <div>
+        <p style={lbl()}>Subheading <span style={{ color:"#94A3B8", fontWeight:400 }}>· optional</span></p>
+        <input value={content.subheading||""} onChange={e => onChange({ ...content, subheading:e.target.value })} placeholder="e.g. Tap a left item then a right item to match" style={inp()}/>
+      </div>
+      <div>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
+          <p style={lbl()}>Pairs</p>
+          <button onClick={addPair} style={{ padding:"4px 12px", borderRadius:8, border:"none", background:"#5B4EFF", color:"#fff", fontSize:12, fontWeight:700, cursor:"pointer" }}>+ Add Pair</button>
+        </div>
+        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+          {pairs.map((pair, i) => (
+            <div key={i} style={{ display:"grid", gridTemplateColumns:"1fr 1fr auto", gap:8, alignItems:"center" }}>
+              <input value={pair.left||""} onChange={e => updatePair(i,"left",e.target.value)} placeholder={"Left item "+(i+1)} style={{ ...inp(), margin:0 }}/>
+              <input value={pair.right||""} onChange={e => updatePair(i,"right",e.target.value)} placeholder={"Right match "+(i+1)} style={{ ...inp(), margin:0 }}/>
+              <button onClick={() => removePair(i)} style={{ width:28, height:28, borderRadius:8, border:"none", background:"#FEF2F2", color:"#dc2626", fontSize:14, cursor:"pointer", fontWeight:700, flexShrink:0 }}>✕</button>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
