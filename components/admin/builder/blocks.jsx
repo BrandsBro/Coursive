@@ -215,15 +215,15 @@ function TextE({ content, onChange }) {
   const ts = content.textStyle||{fontSize:15};
   const editorRef = useRef(null);
 
-  const execCmd = (cmd) => {
+  const execCmd = (cmd, value=null) => {
     editorRef.current?.focus();
-    document.execCommand(cmd, false, null);
-    // Save HTML after command
+    document.execCommand(cmd, false, value);
     setTimeout(() => {
       if (editorRef.current) {
         onChange({ ...content, html: editorRef.current.innerHTML, text: editorRef.current.innerText });
       }
-    }, 0);
+      updateActiveFormats();
+    }, 10);
   };
 
   // Sync content into editor on mount only
@@ -282,9 +282,9 @@ function TextE({ content, onChange }) {
         {toolBtn("ul", "insertUnorderedList", "• List", {})}
         {toolBtn("ol", "insertOrderedList", "1. List", {})}
         <div style={{ width:1, height:18, background:"#E2E8F0" }}/>
-        {toolBtn(false, "h2", "H2", { fontSize:11 }, () => { editorRef.current?.focus(); document.execCommand("formatBlock", false, "h2"); setTimeout(updateActiveFormats, 10); })}
-        {toolBtn(false, "h3", "H3", { fontSize:11 }, () => { editorRef.current?.focus(); document.execCommand("formatBlock", false, "h3"); setTimeout(updateActiveFormats, 10); })}
-        {toolBtn(false, "p", "¶", { fontSize:11 }, () => { editorRef.current?.focus(); document.execCommand("formatBlock", false, "p"); setTimeout(updateActiveFormats, 10); })}
+        {toolBtn(false, "h2", "H2", { fontSize:11 }, () => execCmd("formatBlock", "h2"))}
+        {toolBtn(false, "h3", "H3", { fontSize:11 }, () => execCmd("formatBlock", "h3"))}
+        {toolBtn(false, "p", "¶", { fontSize:11 }, () => execCmd("formatBlock", "p"))}
         <span style={{ fontSize:10, color:"#94A3B8", marginLeft:"auto" }}>Select text to format</span>
       </div>
       {/* Editor */}
