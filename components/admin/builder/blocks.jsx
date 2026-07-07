@@ -243,9 +243,24 @@ function TextE({ content, onChange }) {
     }
   };
 
-  const toolBtn = (active, cmd, label, extraStyle) => (
-    <button onMouseDown={e => { e.preventDefault(); execCmd(cmd); }}
-      style={{ padding:"4px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:active?"#5B4EFF":"#fff", color:active?"#fff":"#374151", cursor:"pointer", fontSize:13, fontWeight:700, ...extraStyle }}>
+  const [activeFormats, setActiveFormats] = useState({});
+  const updateActiveFormats = () => {
+    setActiveFormats({
+      bold: document.queryCommandState("bold"),
+      italic: document.queryCommandState("italic"),
+      underline: document.queryCommandState("underline"),
+      ul: document.queryCommandState("insertUnorderedList"),
+      ol: document.queryCommandState("insertOrderedList"),
+    });
+  };
+  const toolBtn = (activeKey, cmd, label, extraStyle, customAction) => (
+    <button onMouseDown={e => {
+      e.preventDefault();
+      if (customAction) customAction();
+      else execCmd(cmd);
+      setTimeout(updateActiveFormats, 10);
+    }}
+      style={{ padding:"4px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:activeFormats[activeKey]?"#5B4EFF":"#fff", color:activeFormats[activeKey]?"#fff":"#374151", cursor:"pointer", fontSize:13, fontWeight:700, ...extraStyle }}>
       {label}
     </button>
   );
@@ -255,17 +270,21 @@ function TextE({ content, onChange }) {
       <FC label="Text Style" style={ts} setStyle={v => onChange({ ...content, textStyle:v })} showBold={false} showItalic={false}/>
       {/* Toolbar */}
       <div style={{ display:"flex", gap:6, alignItems:"center", padding:"6px 10px", background:"#F8FAFC", borderRadius:"8px 8px 0 0", border:"1.5px solid #E2E8F0", borderBottom:"none", flexWrap:"wrap" }}>
-        {toolBtn(false, "bold",          "B",  { fontWeight:900 })}
-        {toolBtn(false, "italic",        "I",  { fontStyle:"italic" })}
-        {toolBtn(false, "underline",     "U",  { textDecoration:"underline" })}
-        {toolBtn(false, "strikeThrough", "S",  { textDecoration:"line-through" })}
+        {toolBtn("bold", "bold", "B", { fontWeight:900 })}
+        {toolBtn("italic", "italic", "I", { fontStyle:"italic" })}
+        {toolBtn("underline", "underline", "U", { textDecoration:"underline" })}
+        {toolBtn(false, "strikeThrough", "S", { textDecoration:"line-through" })}
         <div style={{ width:1, height:18, background:"#E2E8F0" }}/>
-        {toolBtn(false, "justifyLeft",   "⬅", {})}
+        {toolBtn(false, "justifyLeft", "⬅", {})}
         {toolBtn(false, "justifyCenter", "↔", {})}
-        {toolBtn(false, "justifyRight",  "➡", {})}
+        {toolBtn(false, "justifyRight", "➡", {})}
         <div style={{ width:1, height:18, background:"#E2E8F0" }}/>
-        {toolBtn(false, "insertUnorderedList", "• List", {})}
-        {toolBtn(false, "insertOrderedList",   "1. List", {})}
+        {toolBtn("ul", "insertUnorderedList", "• List", {})}
+        {toolBtn("ol", "insertOrderedList", "1. List", {})}
+        <div style={{ width:1, height:18, background:"#E2E8F0" }}/>
+        {toolBtn(false, "h2", "H2", { fontSize:11 }, () => { editorRef.current?.focus(); document.execCommand("formatBlock", false, "h2"); setTimeout(updateActiveFormats, 10); })}
+        {toolBtn(false, "h3", "H3", { fontSize:11 }, () => { editorRef.current?.focus(); document.execCommand("formatBlock", false, "h3"); setTimeout(updateActiveFormats, 10); })}
+        {toolBtn(false, "p", "¶", { fontSize:11 }, () => { editorRef.current?.focus(); document.execCommand("formatBlock", false, "p"); setTimeout(updateActiveFormats, 10); })}
         <span style={{ fontSize:10, color:"#94A3B8", marginLeft:"auto" }}>Select text to format</span>
       </div>
       {/* Editor */}
@@ -274,6 +293,8 @@ function TextE({ content, onChange }) {
         contentEditable
         suppressContentEditableWarning
         onInput={handleInput}
+        onKeyUp={updateActiveFormats}
+        onMouseUp={updateActiveFormats}
         onPaste={e => {
           e.preventDefault();
           // Paste as rich text if available, else plain
