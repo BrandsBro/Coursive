@@ -36,8 +36,8 @@ export default async function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <style>{`
-          .logo-main { height: 64px !important; }
-          .logo-app { height: 64px !important; }
+          .logo-main { height: 60px !important; }
+          .logo-app { height: 60px !important; }
           @media (max-width: 768px) {
             .logo-main { height: 44px !important; }
             .logo-app { height: 44px !important; }
