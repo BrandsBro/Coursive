@@ -143,7 +143,7 @@ export default function LessonBuilder({ lessonId, lessonTitle, backTo }) {
   };
 
   return (
-    <div style={{ minHeight:"100vh", background:"#F1F5F9", display:"flex", flexDirection:"column" }}>
+    <div style={{ height:"100vh", background:"#F1F5F9", display:"flex", flexDirection:"column", overflow:"hidden" }}>
 
       {/* Top bar */}
       <div style={{ background:"#0f172a", padding:"0 20px", height:60, display:"flex", alignItems:"center", justifyContent:"space-between", flexShrink:0, position:"sticky", top:0, zIndex:50 }}>
