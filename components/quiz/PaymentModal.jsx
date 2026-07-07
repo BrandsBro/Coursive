@@ -4,7 +4,15 @@ import { useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+let stripePromise = null;
+const getStripe = async () => {
+  if (!stripePromise) {
+    const res = await fetch("/api/stripe/config");
+    const { publishableKey } = await res.json();
+    stripePromise = loadStripe(publishableKey);
+  }
+  return stripePromise;
+};
 
 const CARD_STYLE = {
   style: {
@@ -173,7 +181,7 @@ export default function PaymentModal({ plan, paymentType, email, name, onClose, 
             {paymentType==="recurring" ? "🔄 Auto-renew — Cancel anytime" : "One-time payment"}
           </p>
         </div>
-        <Elements stripe={stripePromise} options={{ appearance:{ theme:"stripe" } }}>
+        <Elements stripe={getStripe()} options={{ appearance:{ theme:"stripe" } }}>
           <CheckoutForm plan={plan} paymentType={paymentType} email={email} name={name} onSuccess={onSuccess} onClose={onClose} displayPrice={activeDisplayPrice}/>
         </Elements>
       </div>
