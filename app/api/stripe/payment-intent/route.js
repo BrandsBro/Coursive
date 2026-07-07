@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { getStripeKey } from "@/lib/stripe";
 
 // Stripe key loaded dynamically from settings
 
@@ -12,8 +11,7 @@ const PLANS = {
 
 export async function POST(req) {
   try {
-    const secretKey = await getStripeKey();
-    const stripe = new Stripe(secretKey);
+
     const { plan, email, name } = await req.json();
     const amount = PLANS[plan] || PLANS["4-Week Plan"];
 
