@@ -30,7 +30,7 @@ export default function HomeNav() {
     <>
       <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:100, padding:"0 20px", height:60, display:"flex", alignItems:"center", justifyContent:"space-between", background:"rgba(10,8,30,0.95)", backdropFilter:"blur(12px)", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
         <Link href="/" style={{ textDecoration:"none" }}>
-          <img src={branding.logoMain||"https://i.postimg.cc/HsMMTybQ/1course-Logo-White-Version.png"} alt="1Course" className="logo-main" style={{ objectFit:"contain" }}/>
+          <img src={branding.logoMain||"https://i.postimg.cc/HsMMTybQ/1course-Logo-White-Version.png"} alt="1Course" className="logo-main" style={{ objectFit:"contain", padding:5 }}/>
         </Link>
 
         {isMobile ? (

@@ -148,7 +148,7 @@ export default function AuthPage({ mode }) {
       {isMobile ? (
         <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"24px 20px" }}>
           <Link href="/" style={{ textDecoration:"none", marginBottom:28 }}>
-            <img src={branding.logoMain||"https://i.postimg.cc/HsMMTybQ/1course-Logo-White-Version.png"} alt="1Course" className="logo-main" style={{ objectFit:"contain" }}/>
+            <img src={branding.logoMain||"https://i.postimg.cc/HsMMTybQ/1course-Logo-White-Version.png"} alt="1Course" className="logo-main" style={{ objectFit:"contain", padding:5 }}/>
           </Link>
           <div style={{ width:"100%", maxWidth:400, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.09)", borderRadius:22, padding:"28px 24px" }}>
             {formContent}
