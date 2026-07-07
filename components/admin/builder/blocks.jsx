@@ -272,6 +272,13 @@ function TextE({ content, onChange }) {
 
   return (
     <div style={{ paddingTop:12 }}>
+      <style>{`
+        .rich-editor ul { list-style-type: disc !important; padding-left: 24px !important; margin: 8px 0 !important; }
+        .rich-editor ol { list-style-type: decimal !important; padding-left: 24px !important; margin: 8px 0 !important; }
+        .rich-editor li { display: list-item !important; margin: 4px 0 !important; }
+        .rich-editor h2 { font-size: 22px !important; font-weight: 800 !important; margin: 8px 0 !important; }
+        .rich-editor h3 { font-size: 18px !important; font-weight: 700 !important; margin: 6px 0 !important; }
+      `}</style>
       <FC label="Text Style" style={ts} setStyle={v => onChange({ ...content, textStyle:v })} showBold={false} showItalic={false}/>
       {/* Toolbar */}
       <div style={{ display:"flex", gap:6, alignItems:"center", padding:"6px 10px", background:"#F8FAFC", borderRadius:"8px 8px 0 0", border:"1.5px solid #E2E8F0", borderBottom:"none", flexWrap:"wrap" }}>
@@ -312,7 +319,7 @@ function TextE({ content, onChange }) {
           const text = e.clipboardData.getData("text/plain");
           document.execCommand("insertHTML", false, html || text);
         }}
-        style={{ ...inp(), minHeight:150, lineHeight:1.7, borderRadius:"0 0 9px 9px", outline:"none", cursor:"text", overflowY:"auto", ...styled(ts) }}
+        style={{ ...inp(), minHeight:150, lineHeight:1.7, borderRadius:"0 0 9px 9px", outline:"none", cursor:"text", overflowY:"auto", ...styled(ts) }} className="rich-editor"
       />
       <p style={{ fontSize:11, color:"#94A3B8", margin:"4px 0 0" }}>Tip: Select text → click B, I, U to format. Paste formatted text from Word/Google Docs works too.</p>
     </div>
@@ -770,6 +777,13 @@ function ReorderE({ content, onChange }) {
 function ContinueE({ content, onChange }) {
   return (
     <div style={{ paddingTop:12 }}>
+      <style>{`
+        .rich-editor ul { list-style-type: disc !important; padding-left: 24px !important; margin: 8px 0 !important; }
+        .rich-editor ol { list-style-type: decimal !important; padding-left: 24px !important; margin: 8px 0 !important; }
+        .rich-editor li { display: list-item !important; margin: 4px 0 !important; }
+        .rich-editor h2 { font-size: 22px !important; font-weight: 800 !important; margin: 8px 0 !important; }
+        .rich-editor h3 { font-size: 18px !important; font-weight: 700 !important; margin: 6px 0 !important; }
+      `}</style>
       <p style={lbl()}>Button Label</p>
       <input value={content.label||"Continue"} onChange={e => onChange({ ...content, label:e.target.value })} placeholder="Continue" style={inp()}/>
       <div style={{ marginTop:12, width:"100%", padding:"14px", borderRadius:14, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, textAlign:"center" }}>
