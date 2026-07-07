@@ -138,6 +138,13 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
   return (
     <div style={{ minHeight:"100vh", background:"#fff" }}>
       <style>{`
+        .lesson-content ul { list-style-type: disc !important; padding-left: 24px !important; margin: 8px 0 !important; }
+        .lesson-content ol { list-style-type: decimal !important; padding-left: 24px !important; margin: 8px 0 !important; }
+        .lesson-content li { display: list-item !important; margin: 4px 0 !important; }
+        .lesson-content h2 { font-size: 22px !important; font-weight: 800 !important; margin: 8px 0 !important; color: #0f172a; }
+        .lesson-content h3 { font-size: 18px !important; font-weight: 700 !important; margin: 6px 0 !important; color: #0f172a; }
+      `}</style>
+      <style>{`
         .lesson-nav { padding: 0 12px; }
         .lesson-back-text { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         @media (max-width: 640px) {
@@ -670,7 +677,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       const ts = c.textStyle || {};
       if (c.html) {
         return (
-          <div style={{ fontSize:ts.fontSize||15, textAlign:ts.align||"left", lineHeight:1.8, color:"#374151" }}
+          <div className="lesson-content" style={{ fontSize:ts.fontSize||15, textAlign:ts.align||"left", lineHeight:1.8, color:"#374151" }}
             dangerouslySetInnerHTML={{ __html: c.html }}/>
         );
       }
