@@ -653,7 +653,6 @@ function BlankOptionsE({ content, onChange }) {
           </div>
         </div>
       )}
-      )}
 
       <div>
         <p style={lbl()}>Success Text <span style={{ color:"#94A3B8", fontWeight:400 }}>· shown after correct</span></p>
