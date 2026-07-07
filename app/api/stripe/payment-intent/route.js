@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 // Stripe key loaded dynamically from settings
 
 const PLANS = {
