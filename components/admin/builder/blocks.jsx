@@ -629,33 +629,30 @@ function BlankOptionsE({ content, onChange }) {
         <input value={content.taskDesc||""} onChange={e => onChange({ ...content, taskDesc:e.target.value })} placeholder="e.g. Ask Kling to generate an image of a horse." style={inp()}/>
       </div>
 
-      <div>
-        <p style={lbl()}>How many blanks?</p>
-        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-          <button onClick={() => setCount(Math.max(1, blankCount-1))}
-            style={{ width:40, height:40, borderRadius:10, border:"2px solid #E2E8F0", background:"#fff", fontSize:20, fontWeight:800, cursor:"pointer" }}>−</button>
-          <span style={{ fontSize:18, fontWeight:800, color:"#374151", minWidth:32, textAlign:"center" }}>{blankCount}</span>
-          <button onClick={() => setCount(blankCount+1)}
-            style={{ width:40, height:40, borderRadius:10, border:"2px solid #6366f1", background:"#EEF2FF", color:"#6366f1", fontSize:20, fontWeight:800, cursor:"pointer" }}>+</button>
-        </div>
+      <div style={{ background:"#EEF2FF", borderRadius:10, padding:"10px 14px" }}>
+        <p style={{ fontSize:12, color:"#5B4EFF", fontWeight:700, margin:"0 0 4px" }}>💡 How to add blanks</p>
+        <p style={{ fontSize:12, color:"#6366f1", margin:0 }}>Wrap answers in brackets: <strong>(answer)</strong> → auto becomes a blank</p>
+        <p style={{ fontSize:11, color:"#94A3B8", margin:"4px 0 0" }}>Example: The sky is (blue) and the sun is (yellow)</p>
       </div>
-
       <div>
-        <p style={lbl()}>Correct answer for each blank</p>
-        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-          {Array.from({ length:blankCount }, (_,i) => (
-            <div key={i} style={{ display:"flex", alignItems:"center", gap:10 }}>
-              <span style={{ width:28, height:28, borderRadius:"50%", background:"#6366f1", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:800, flexShrink:0 }}>{i+1}</span>
-              <input value={blanks[i]?.correct||""} onChange={e => updateBlank(i, e.target.value)}
-                placeholder={`Answer for blank ${i+1} (e.g. white horse)`}
-                style={{ ...inp(), flex:1, margin:0 }}/>
-            </div>
-          ))}
-        </div>
+        <p style={lbl()}>Sentence <span style={{ color:"#94A3B8", fontWeight:400 }}>· wrap answers in ()</span></p>
+        <textarea value={sentence} onChange={e => onChange({ ...content, sentence:e.target.value })}
+          placeholder="e.g. The sky is (blue) and the sun is (yellow)"
+          style={{ ...inp(), minHeight:70, resize:"vertical" }}/>
       </div>
-
-      <div>
-        <p style={lbl()}>Full sentence <span style={{ color:"#94A3B8", fontWeight:400 }}>· use () for each blank ({blankCount} needed)</span></p>
+      {blankMatches.length > 0 && (
+        <div>
+          <p style={lbl()}>Auto-detected blanks ({blankMatches.length})</p>
+          <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+            {blankMatches.map((match, i) => (
+              <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 12px", background:"#F0FDF4", borderRadius:10, border:"1.5px solid #BBF7D0" }}>
+                <span style={{ width:24, height:24, borderRadius:"50%", background:"#22c55e", color:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, flexShrink:0 }}>{i+1}</span>
+                <span style={{ fontSize:13, fontWeight:700, color:"#166534" }}>{match}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
         <textarea value={sentence} onChange={e => onChange({ ...content, sentence:e.target.value })}
           placeholder={`e.g. A () in an open field, () lighting`}
           style={{ ...inp(), minHeight:70, resize:"vertical" }}/>
