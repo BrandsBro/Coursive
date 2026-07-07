@@ -33,9 +33,9 @@ export async function generateMetadata() {
 
 export default async function RootLayout({ children }) {
   const branding = await getBranding();
-  const logoMainDesktop = branding.logoMainSizeDesktop || 117;
+  const logoMainDesktop = branding.logoMainSizeDesktop || 64;
   const logoMainMobile = branding.logoMainSizeMobile || 60;
-  const logoAppDesktop = branding.logoAppSizeDesktop || 117;
+  const logoAppDesktop = branding.logoAppSizeDesktop || 64;
   const logoAppMobile = branding.logoAppSizeMobile || 60;
   return (
     <html lang="en" suppressHydrationWarning>
