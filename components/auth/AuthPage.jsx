@@ -147,7 +147,7 @@ export default function AuthPage({ mode }) {
       {isMobile ? (
         <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"24px 20px" }}>
           <Link href="/" style={{ textDecoration:"none", marginBottom:28 }}>
-            <img src={branding.logoMain||"https://i.postimg.cc/HsMMTybQ/1course-Logo-White-Version.png"} alt="1Course" style={{ height:36, objectFit:"contain" }}/>
+            <img src={branding.logoMain||"https://i.postimg.cc/HsMMTybQ/1course-Logo-White-Version.png"} alt="1Course" className="logo-main" style={{ objectFit:"contain" }}/>
           </Link>
           <div style={{ width:"100%", maxWidth:400, background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.09)", borderRadius:22, padding:"28px 24px" }}>
             {formContent}
@@ -160,7 +160,7 @@ export default function AuthPage({ mode }) {
               <div style={{ position:"absolute", top:-80, right:-60, width:250, height:250, borderRadius:"50%", background:"rgba(139,92,246,0.12)", filter:"blur(40px)", pointerEvents:"none" }}/>
               <div style={{ position:"relative", zIndex:1 }}>
                 <Link href="/" style={{ textDecoration:"none" }}>
-                  <img src={branding.logoMain||"https://i.postimg.cc/HsMMTybQ/1course-Logo-White-Version.png"} alt="1Course" style={{ height:36, objectFit:"contain", display:"block", marginBottom:36 }}/>
+                  <img src={branding.logoMain||"https://i.postimg.cc/HsMMTybQ/1course-Logo-White-Version.png"} alt="1Course" className="logo-main" style={{ objectFit:"contain", display:"block", marginBottom:36 }}/>
                 </Link>
                 <h2 style={{ color:"#fff", fontSize:30, fontWeight:900, margin:"0 0 10px", lineHeight:1.2 }}>
                   {isLogin ? "Welcome back!" : "Start your AI journey."}

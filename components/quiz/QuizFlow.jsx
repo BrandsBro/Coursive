@@ -143,7 +143,7 @@ export default function QuizFlow({
             )}
           </div>
           {/* Logo center */}
-          <img src={branding.logoApp||"https://i.postimg.cc/7Pd7vVJs/1course-Logo-Black-Version.png"} alt="1Course" style={{ height:28, objectFit:"contain" }}/>
+          <img src={branding.logoApp||"https://i.postimg.cc/7Pd7vVJs/1course-Logo-Black-Version.png"} alt="1Course" className="logo-app" style={{ objectFit:"contain" }}/>
           {/* Step counter */}
           <div style={{ width:80, textAlign:"right" }}>
             {endStep !== "sales" && (
