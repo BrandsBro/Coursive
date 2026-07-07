@@ -653,19 +653,6 @@ function BlankOptionsE({ content, onChange }) {
           </div>
         </div>
       )}
-        <textarea value={sentence} onChange={e => onChange({ ...content, sentence:e.target.value })}
-          placeholder={`e.g. A () in an open field, () lighting`}
-          style={{ ...inp(), minHeight:70, resize:"vertical" }}/>
-        <p style={{ fontSize:11, color:blankCountInSentence===blankCount?"#22c55e":"#f59e0b", margin:"4px 0 0", fontWeight:600 }}>
-          {blankCountInSentence===blankCount ? "✓ "+blankCount+" blank"+(blankCount>1?"s":"")+" found" : "⚠️ Found "+blankCountInSentence+" () but need "+blankCount}
-        </p>
-      </div>
-
-      {blankCountInSentence===blankCount && blanks.some(b=>b.correct) && (
-        <div style={{ padding:"12px 14px", borderRadius:10, background:"#EEF2FF", border:"1.5px solid #C7D2FE" }}>
-          <p style={{ fontSize:11, fontWeight:700, color:"#6366f1", margin:"0 0 4px" }}>PREVIEW</p>
-          <p style={{ fontSize:14, color:"#374151", margin:0, lineHeight:1.8 }}>{preview()}</p>
-        </div>
       )}
 
       <div>
