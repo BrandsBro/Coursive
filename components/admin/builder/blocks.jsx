@@ -217,13 +217,18 @@ function TextE({ content, onChange }) {
 
   const execCmd = (cmd, value=null) => {
     editorRef.current?.focus();
-    document.execCommand(cmd, false, value);
+    try {
+      const success = document.execCommand(cmd, false, value);
+      console.log("execCmd", cmd, value, "success:", success);
+    } catch(e) {
+      console.error("execCmd error:", e);
+    }
     setTimeout(() => {
       if (editorRef.current) {
         onChange({ ...content, html: editorRef.current.innerHTML, text: editorRef.current.innerText });
       }
       updateActiveFormats();
-    }, 10);
+    }, 50);
   };
 
   // Sync content into editor on mount only
