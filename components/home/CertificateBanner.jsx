@@ -1,18 +1,21 @@
 "use client";
 import { useProgress } from "@/hooks/useProgress";
-import { Award, ChevronRight } from "lucide-react";
+import { Check, ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 const COLORS = [
-  { color: "#10A37F", glow: "rgba(16,163,127,0.4)" },
-  { color: "#8B5CF6", glow: "rgba(139,92,246,0.4)" },
-  { color: "#E11D48", glow: "rgba(225,29,72,0.4)" },
-  { color: "#1D4ED8", glow: "rgba(29,78,216,0.4)" },
-  { color: "#F97316", glow: "rgba(249,115,22,0.4)" },
-  { color: "#0891b2", glow: "rgba(8,145,178,0.4)" },
-  { color: "#059669", glow: "rgba(5,150,105,0.4)" },
-  { color: "#7c3aed", glow: "rgba(124,58,237,0.4)" },
+  { color: "#10A37F", bg: "#e6f7f3" },
+  { color: "#8B5CF6", bg: "#f3f0ff" },
+  { color: "#E11D48", bg: "#fff0f3" },
+  { color: "#1D4ED8", bg: "#eff3ff" },
+  { color: "#F97316", bg: "#fff7ed" },
+  { color: "#0891b2", bg: "#ecfbff" },
+  { color: "#059669", bg: "#ecfdf5" },
+  { color: "#7c3aed", bg: "#f5f0ff" },
 ];
+
+const CERT_IMAGE =
+  "https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1783430088646-8c6ed8b4-813c-4514-a24c-a9561c8bed1d.webp";
 
 export default function CertificateBanner({ courses = [] }) {
   const { getCoursePercent } = useProgress();
@@ -30,129 +33,53 @@ export default function CertificateBanner({ courses = [] }) {
           courses.reduce((s, course) => {
             const total = course.units?.flatMap((u) => u.lessons).length || 0;
             return s + getCoursePercent(course.id, total);
-          }, 0) / courses.length,
+          }, 0) / courses.length
         );
 
   return (
     <div
       style={{
-        background:
-          "linear-gradient(135deg,#1a0533 0%,#2d1b69 45%,#1e3a5f 100%)",
-        borderRadius: 24,
-        padding: "20px",
-        position: "relative",
-        overflow: "hidden",
+        background: "#eef0fb",
+        borderRadius: 16,
+        padding: "18px 20px",
+        display: "flex",
+        alignItems: "center",
+        gap: 20,
+        flexWrap: "wrap",
       }}
     >
+      {/* Left: illustration + title + progress */}
       <div
         style={{
-          overflow: "hidden",
-          position: "absolute",
-          top: -60,
-          right: 80,
-          width: 220,
-          height: 220,
-          borderRadius: "50%",
-          background: "rgba(139,92,246,0.08)",
+          display: "flex",
+          alignItems: "center",
+          gap: 14,
+          flex: 1,
+          minWidth: 200,
         }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          bottom: -40,
-          left: 160,
-          width: 140,
-          height: 140,
-          borderRadius: "50%",
-          background: "rgba(99,102,241,0.07)",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: 10,
-          right: 280,
-          width: 6,
-          height: 6,
-          borderRadius: "50%",
-          background: "#a78bfa",
-          opacity: 0.8,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: 30,
-          right: 240,
-          width: 4,
-          height: 4,
-          borderRadius: "50%",
-          background: "#818cf8",
-          opacity: 0.6,
-        }}
-      />
-
-      <div className="cert-inner" style={{ position:"relative", zIndex:1, display:"flex", alignItems:"center", gap:20, flexWrap:"wrap" }}>
-        {/* Icon */}
-        <div
-          style={{
-            width: 52,
-            height: 52,
-            borderRadius: 16,
-            background: "rgba(167,139,250,0.2)",
-            border: "1px solid rgba(167,139,250,0.3)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-        >
-          <Award size={24} color="#a78bfa" />
-        </div>
-
-        {/* Text */}
-        <div style={{ flex: 1, minWidth: 160 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              marginBottom: 4,
-            }}
-          >
-            <span
-              style={{
-                background: "rgba(167,139,250,0.2)",
-                color: "#c4b5fd",
-                fontSize: 10,
-                fontWeight: 700,
-                padding: "2px 8px",
-                borderRadius: 999,
-                letterSpacing: 0.8,
-              }}
-            >
-              AI MASTERY PROGRAM
-            </span>
-          </div>
+      >
+        <img
+          src={CERT_IMAGE}
+          alt="Certificate"
+          style={{ width: 76, height: 76, objectFit: "contain", flexShrink: 0 }}
+        />
+        <div>
           <h2
             style={{
-              color: "#fff",
-              fontSize: 17,
-              fontWeight: 800,
-              margin: "0 0 2px",
+              fontSize: 15,
+              fontWeight: 700,
+              color: "#1a1a2e",
+              margin: "0 0 8px",
             }}
           >
-            AI Mastery Certificate
+            AI Mastery Certificate Program
           </h2>
-          <p className="cert-desc" style={{ color:"rgba(255,255,255,0.45)", fontSize:12, margin:"0 0 10px" }}>
-            Complete all courses · Earn your professional certificate
-          </p>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div
               style={{
-                flex: 1,
+                width: 110,
                 height: 5,
-                background: "rgba(255,255,255,0.1)",
+                background: "#d1d5db",
                 borderRadius: 999,
                 overflow: "hidden",
               }}
@@ -160,52 +87,118 @@ export default function CertificateBanner({ courses = [] }) {
               <div
                 style={{
                   height: "100%",
-                  borderRadius: 999,
-                  background: "linear-gradient(90deg,#a78bfa,#6366f1)",
                   width: `${overallPct}%`,
+                  background: "linear-gradient(90deg,#818cf8,#6366f1)",
+                  borderRadius: 999,
                   transition: "width 0.8s ease",
                 }}
               />
             </div>
-            <span
-              style={{
-                color: "#a78bfa",
-                fontSize: 11,
-                fontWeight: 700,
-                minWidth: 28,
-              }}
-            >
+            <span style={{ fontSize: 12, color: "#6366f1", fontWeight: 700 }}>
               {overallPct}%
             </span>
           </div>
         </div>
+      </div>
 
-        {/* Course badges */}
-        <div className="cert-badges" style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0, flexWrap:"wrap" }}>
-          {CERT.map((c) => {
-            const course = courses.find((x) => x.id === c.id);
-            const total = course ? course.units?.flatMap((u) => u.lessons).length || 0 : 0;
-            const pct = getCoursePercent(c.id, total);
-            const done = pct === 100;
-            return (
-              <Link key={c.id} href={`/courses/${c.id}`} style={{ textDecoration:"none" }}>
-                <div title={course?.title}>
-                  <div style={{ width:40, height:40, borderRadius:12, fontSize:12, fontWeight:700, display:"flex", alignItems:"center", justifyContent:"center", background:done ? c.color : "rgba(255,255,255,0.06)", border:done ? "none" : "1.5px solid rgba(255,255,255,0.12)", boxShadow:done ? `0 4px 16px ${c.glow}` : "none", transition:"all 0.3s", color:done?"#fff":"rgba(255,255,255,0.4)" }}>
-                    {pct > 0 ? `${pct}%` : "—"}
-                  </div>
-                  <p style={{ textAlign:"center", fontSize:9, color:done?"#a78bfa":"rgba(255,255,255,0.3)", margin:"4px 0 0", fontWeight:600, maxWidth:40, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
-                    {course?.title?.split(" ")[0] || ""}
-                  </p>
+      {/* Right: course badges */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          flexWrap: "wrap",
+        }}
+      >
+        {CERT.map((c) => {
+          const course = courses.find((x) => x.id === c.id);
+          const total =
+            course?.units?.flatMap((u) => u.lessons).length || 0;
+          const pct = getCoursePercent(c.id, total);
+          const done = pct === 100;
+
+          return (
+            <Link
+              key={c.id}
+              href={`/courses/${c.id}`}
+              style={{ textDecoration: "none" }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 4,
+                }}
+                title={course?.title}
+              >
+                <div
+                  style={{
+                    width: 54,
+                    height: 54,
+                    borderRadius: 14,
+                    background: done ? c.color : c.bg,
+                    border: `1.5px solid ${done ? c.color : "#e2e4f0"}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 22,
+                    position: "relative",
+                    transition: "all 0.3s",
+                  }}
+                >
+                  <span>{c.emoji}</span>
+                  {done && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: -6,
+                        right: -6,
+                        width: 20,
+                        height: 20,
+                        borderRadius: "50%",
+                        background: "#22c55e",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "2px solid white",
+                      }}
+                    >
+                      <Check size={11} color="white" strokeWidth={3} />
+                    </div>
+                  )}
                 </div>
-              </Link>
-            );
-          })}
-          <Link href="/courses" style={{ textDecoration:"none" }}>
-            <div style={{ width:44, height:44, borderRadius:13, border:"1.5px dashed rgba(255,255,255,0.15)", display:"flex", alignItems:"center", justifyContent:"center", background:"rgba(255,255,255,0.03)" }}>
-              <ChevronRight size={16} color="rgba(255,255,255,0.3)" />
-            </div>
-          </Link>
-        </div>
+                <span
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: done ? "#22c55e" : pct > 0 ? "#6366f1" : "#9ca3af",
+                  }}
+                >
+                  {done ? "Done" : `${pct}%`}
+                </span>
+              </div>
+            </Link>
+          );
+        })}
+
+        {/* View all arrow */}
+        <Link href="/courses" style={{ textDecoration: "none" }}>
+          <div
+            style={{
+              width: 54,
+              height: 54,
+              borderRadius: 14,
+              border: "1.5px dashed #c7cadf",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "rgba(99,102,241,0.04)",
+            }}
+          >
+            <ChevronRight size={18} color="#9ca3af" />
+          </div>
+        </Link>
       </div>
     </div>
   );
