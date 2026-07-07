@@ -298,20 +298,36 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
             background:"rgba(15,23,42,0.65)",
             backdropFilter:"blur(4px)",
           }}>
-          {/* Sheet — stopPropagation so tapping sheet doesn't close modal */}
+          <style>{`
+            .complete-sheet {
+              position: absolute;
+              bottom: 0; left: 0; right: 0;
+              background: #fff;
+              border-radius: 24px 24px 0 0;
+              box-shadow: 0 -8px 40px rgba(0,0,0,0.2);
+              padding: 12px 16px 40px;
+              box-sizing: border-box;
+            }
+            @media (min-width: 768px) {
+              .complete-sheet {
+                position: absolute;
+                top: 50%; left: 50%;
+                transform: translate(-50%, -50%);
+                bottom: auto; right: auto;
+                width: 100%;
+                max-width: 420px;
+                border-radius: 24px;
+                padding: 28px;
+              }
+            }
+          `}</style>
+          {/* Sheet */}
           <div
-            onClick={e => e.stopPropagation()}
-            style={{
-              position:"absolute",
-              bottom:0, left:0, right:0,
-              background:"#fff",
-              borderRadius:"24px 24px 0 0",
-              boxShadow:"0 -8px 40px rgba(0,0,0,0.2)",
-              padding:"12px 16px 40px",
-              boxSizing:"border-box",
-            }}>
-            {/* Drag handle */}
-            <div style={{ display:"flex", justifyContent:"center", marginBottom:16 }}>
+            className="complete-sheet"
+            onClick={e => e.stopPropagation()}>
+            {/* Drag handle - mobile only */}
+            <div className="drag-handle-mobile" style={{ display:"flex", justifyContent:"center", marginBottom:16 }}>
+              <style>{`.drag-handle-mobile { display: flex; } @media (min-width: 768px) { .drag-handle-mobile { display: none !important; } }`}</style>
               <div style={{ width:36, height:4, borderRadius:999, background:"#E2E8F0" }}/>
             </div>
             {/* Gradient card */}
