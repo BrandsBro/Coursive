@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   DndContext, closestCenter, PointerSensor, useSensor, useSensors
@@ -43,12 +43,6 @@ export default function LessonBuilder({ lessonId, lessonTitle, backTo }) {
     setBlocks((data || []).map(b => ({ ...b, content: b.content || {} })));
     setLoading(false);
   };
-
-  useEffect(() => {
-    if (leftPanelRef.current) {
-      leftPanelRef.current.scrollTop = leftPanelRef.current.scrollHeight;
-    }
-  }, [blocks.length]);
 
   useEffect(() => {
     if (leftPanelRef.current) {
@@ -186,7 +180,7 @@ export default function LessonBuilder({ lessonId, lessonTitle, backTo }) {
       <div style={{ flex:1, display:"flex", overflow:"hidden" }}>
 
         {!previewMode && (
-          <div style={{ flex:1, overflow:"auto", padding:"24px 28px", borderRight:"1px solid #E2E8F0" }}>
+          <div ref={leftPanelRef} style={{ flex:1, overflow:"auto", padding:"24px 28px 120px", borderRight:"1px solid #E2E8F0" }}>
             <div style={{ maxWidth:560, margin:"0 auto" }}>
               {loading ? (
                 <div style={{ textAlign:"center", padding:60, color:"#94A3B8" }}>
