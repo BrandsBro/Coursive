@@ -14,8 +14,38 @@ export default function AdminMedia() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [deleting, setDeleting] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [copied, setCopied] = useState(null);
 
   useEffect(() => { load(); }, []);
+
+  const handleUpload = async (files) => {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    for (const file of Array.from(files)) {
+      const type = file.type.startsWith("image/") ? "image" : file.type.startsWith("video/") ? "video" : "audio";
+      const path = `uploads/${Date.now()}-${file.name}`;
+      const { error } = await supabase.storage.from("lesson-media").upload(path, file, { upsert: true });
+      if (!error) {
+        const { data: urlData } = supabase.storage.from("lesson-media").getPublicUrl(path);
+        await supabase.from("media_library").insert({
+          filename: file.name,
+          url: urlData.publicUrl,
+          file_type: type,
+          mime_type: file.type,
+          size_bytes: file.size,
+        });
+      }
+    }
+    setUploading(false);
+    load();
+  };
+
+  const copyUrl = (url) => {
+    navigator.clipboard?.writeText(url);
+    setCopied(url);
+    setTimeout(() => setCopied(null), 2000);
+  };
 
   const load = async () => {
     setLoading(true);
