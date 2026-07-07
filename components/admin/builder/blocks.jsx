@@ -601,11 +601,6 @@ function BlankOptionsE({ content, onChange }) {
   useEffect(() => {
     onChange({ ...content, blanks, blankCount });
   }, [sentence]);
-  const blankCountInSentence = blankMatches.length;
-  };
-
-  const blankCountInSentence = (sentence.match(/\([^)]+\)/g)||[]).length;
-
   return (
     <div style={{ display:"flex", flexDirection:"column", gap:14, paddingTop:12 }}>
 
