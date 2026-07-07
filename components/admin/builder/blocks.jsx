@@ -589,29 +589,19 @@ function MatchingE({ content, onChange }) {
 }
 
 function BlankOptionsE({ content, onChange }) {
+function BlankOptionsE({ content, onChange }) {
   const [lib, setLib] = useState(false);
   const successImages = content.successImages||[];
-  const blankCount = content.blankCount||2;
-  const blanks = Array.from({ length:blankCount }, (_,i) => content.blanks?.[i]||{ correct:"" });
   const sentence = content.sentence||"";
-
-  const updateBlank = (i, val) => {
-    const nb = [...blanks]; nb[i] = { correct:val };
-    onChange({ ...content, blanks:nb });
-  };
-
-  const setCount = (n) => {
-    const nb = Array.from({ length:n }, (_,i) => content.blanks?.[i]||{ correct:"" });
-    onChange({ ...content, blankCount:n, blanks:nb });
-  };
-
-  // Preview: replace ___ with answers
-  const preview = () => {
-    let s = sentence; let i = 0;
-    return s.replace(/\([^)]+\)/g, () => {
-      const ans = blanks[i]?.correct || ("blank "+(i+1));
-      i++; return "["+ans+"]";
-    });
+  // Auto-detect blanks from (answer) syntax
+  const blankMatches = (sentence.match(/\(([^)]+)\)/g)||[]).map(m => m.replace(/^\(|\)$/g,"").trim());
+  const blankCount = blankMatches.length;
+  const blanks = blankMatches.map(m => ({ correct: m }));
+  // Auto-sync blanks when sentence changes
+  useEffect(() => {
+    onChange({ ...content, blanks, blankCount });
+  }, [sentence]);
+  const blankCountInSentence = blankMatches.length;
   };
 
   const blankCountInSentence = (sentence.match(/\([^)]+\)/g)||[]).length;
