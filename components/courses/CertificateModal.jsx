@@ -193,17 +193,7 @@ export default function CertificateModal({ course, userName: userNameProp, onClo
         <button onClick={onClose} style={{ background:"none", border:"none", color:"rgba(255,255,255,0.4)", fontSize:13, fontWeight:600, cursor:"pointer", textAlign:"center" }}>
           Continue learning →
         </button>
-        {/* Mobile bottom buttons */}
-        <div className="cert-modal-bottom-btns" style={{ display:"none", gap:10 }}>
-          <button onClick={handleDownload} disabled={downloading || !design}
-            style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"14px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
-            <Download size={16}/> {downloading ? "Generating..." : "Download PDF"}
-          </button>
-          <button onClick={handleShare}
-            style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.08)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
-            Share
-          </button>
-        </div>
+
       </div>
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }

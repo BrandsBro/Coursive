@@ -230,18 +230,7 @@ export default function CertificateGenerator({ course, userName, completedDate, 
           .cert-top-btns { display: none !important; }
         }
       `}</style>
-      {/* Mobile bottom buttons */}
-      <div className="cert-mobile-btns" style={{ display:"none" }}>
-        <style>{`@media (max-width: 768px) { .cert-mobile-btns { display: flex !important; gap: 10px; } }`}</style>
-        <button onClick={handleDownload} disabled={downloading || !design}
-          style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"14px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#7c3aed,#4f46e5)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
-          <Download size={16}/> {downloading ? "Generating..." : "Download PDF"}
-        </button>
-        <button onClick={handleShare}
-          style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"14px", borderRadius:12, border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.08)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
-          Share
-        </button>
-      </div>
+
     </div>
   );
 }
