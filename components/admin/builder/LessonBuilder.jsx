@@ -25,7 +25,6 @@ export default function LessonBuilder({ lessonId, lessonTitle, backTo }) {
   const [saved, setSaved] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
   const leftPanelRef = useRef(null);
-  const leftPanelRef = useRef(null);
   const [insertIdx, setInsertIdx] = useState(null);
   const [activeId, setActiveId] = useState(null);
   const [previewMode, setPreviewMode] = useState(false);
