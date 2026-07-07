@@ -16,6 +16,7 @@ export default function AdminMedia() {
   const [deleting, setDeleting] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [copied, setCopied] = useState(null);
+  const [dragOver, setDragOver] = useState(false);
 
   useEffect(() => { load(); }, []);
 
@@ -113,6 +114,29 @@ export default function AdminMedia() {
           </div>
         </div>
 
+        {/* Drag Drop Zone */}
+        <div
+          onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={e => { e.preventDefault(); setDragOver(false); handleUpload(e.dataTransfer.files); }}
+          style={{ border:`2px dashed ${dragOver?"#5B4EFF":"#E2E8F0"}`, borderRadius:16, padding:"20px", textAlign:"center", background:dragOver?"#EEF2FF":"#F8FAFC", transition:"all 0.2s", cursor:"pointer" }}
+          onClick={() => document.getElementById("media-upload-input").click()}>
+          <input id="media-upload-input" type="file" multiple accept="image/*,video/*,audio/*" style={{ display:"none" }} onChange={e => handleUpload(e.target.files)}/>
+          {uploading ? (
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, color:"#5B4EFF" }}>
+              <Loader size={18} style={{ animation:"spin 0.7s linear infinite" }}/> 
+              <span style={{ fontSize:13, fontWeight:700 }}>Uploading...</span>
+            </div>
+          ) : (
+            <div>
+              <div style={{ fontSize:28, marginBottom:6 }}>📂</div>
+              <p style={{ fontSize:13, fontWeight:700, color:dragOver?"#5B4EFF":"#64748B", margin:0 }}>
+                {dragOver ? "Drop to upload!" : "Drag & drop files here or click to browse"}
+              </p>
+              <p style={{ fontSize:11, color:"#94A3B8", margin:"4px 0 0" }}>Images, Videos, Audio</p>
+            </div>
+          )}
+        </div>
         {/* Grid */}
         {loading ? (
           <div style={{ padding:60, textAlign:"center" }}><Loader size={24} color="#94A3B8" className="bspin"/></div>
