@@ -238,7 +238,7 @@ export default function ProfilePage() {
               <h3 style={{ fontSize:17, fontWeight:800, color:"#0f172a", margin:"0 0 6px" }}>No certificates yet</h3>
               <p style={{ fontSize:13, color:"#94A3B8", margin:"0 0 20px" }}>Complete a course to earn your first certificate</p>
               <Link href="/courses" style={{ textDecoration:"none" }}>
-                <button style={{ padding:"10px 20px", borderRadius:10, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>Browse Courses →</button>
+                <button style={{ padding:"10px 20px", borderRadius:10, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>Explore AI tools →</button>
               </Link>
             </div>
           ) : (
@@ -332,7 +332,7 @@ export default function ProfilePage() {
             <div style={{ textAlign:"center", padding:"48px 20px", background:"#fff", borderRadius:20, border:"2px dashed #E2E8F0" }}>
               <div style={{ fontSize:48, marginBottom:12 }}>📚</div>
               <h3 style={{ fontSize:17, fontWeight:800, color:"#0f172a", margin:"0 0 6px" }}>No courses started yet</h3>
-              <Link href="/courses"><button style={{ marginTop:12, padding:"10px 20px", borderRadius:10, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>Browse Courses →</button></Link>
+              <Link href="/courses"><button style={{ marginTop:12, padding:"10px 20px", borderRadius:10, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>Explore AI tools →</button></Link>
             </div>
           )}
         </div>

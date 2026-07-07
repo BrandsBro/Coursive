@@ -4270,7 +4270,7 @@ export default function BrowseCourses({ courses = [] }) {
       <div>
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 18 }}>
           <div>
-            <h2 style={{ fontSize: 21, fontWeight: 900, color: "#0f172a", margin: "0 0 2px" }}>Browse Courses</h2>
+            <h2 style={{ fontSize: 21, fontWeight: 900, color: "#0f172a", margin: "0 0 2px" }}>Explore AI tools</h2>
             <p style={{ fontSize: 13, color: "#94A3B8", margin: 0 }}>Pick a course · Learn at your pace</p>
           </div>
           <Link href="/courses" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 700, color: "#5B4EFF", background: "#EEF0FF", padding: "9px 16px", borderRadius: 14 }}>
