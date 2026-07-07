@@ -15,6 +15,7 @@ const PERKS = [
 ];
 
 export default function AuthPage({ mode }) {
+  const branding = useBranding();
   const router = useRouter();
   const searchParams = useSearchParams();
   const isLogin = mode === "login";
