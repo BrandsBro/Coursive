@@ -4,17 +4,7 @@ import { useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from "@stripe/react-stripe-js";
 
-const getStripePromise = async () => {
-  try {
-    const res = await fetch("/api/stripe/mode");
-    const { mode } = await res.json();
-    if (mode === "live" && process.env.NEXT_PUBLIC_STRIPE_LIVE_PUBLISHABLE_KEY) {
-      return loadStripe(process.env.NEXT_PUBLIC_STRIPE_LIVE_PUBLISHABLE_KEY);
-    }
-  } catch(e) {}
-  return loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
-};
-const stripePromise = getStripePromise();
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 const CARD_STYLE = {
   style: {
