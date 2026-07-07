@@ -983,9 +983,12 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       return (
         <div style={{ padding:"14px 18px", borderRadius:12, background:"#F8FAFC", borderLeft:"4px solid "+color, display:"flex", gap:12 }}>
           <span style={{ fontSize:18, flexShrink:0 }}>{emoji}</span>
-          <p style={{ fontSize:ts.fontSize||14, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#374151", margin:0, lineHeight:1.65 }}>
-            {c.text}
-          </p>
+          <div>
+            {c.heading && <p style={{ fontSize:15, fontWeight:800, color:"#374151", margin:c.text?"0 0 4px":0 }}>{c.heading}</p>}
+            <p style={{ fontSize:ts.fontSize||14, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#374151", margin:0, lineHeight:1.65 }}>
+              {c.text}
+            </p>
+          </div>
         </div>
       );
     }
