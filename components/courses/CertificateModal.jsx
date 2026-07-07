@@ -199,7 +199,7 @@ export default function CertificateModal({ course, userName: userNameProp, onClo
         @keyframes spin { to { transform: rotate(360deg); } }
         @media (max-width: 768px) {
           .cert-preview-wrapper {
-            transform: scale(0.55);
+            transform: scale(0.8);
             transform-origin: top center;
             margin-bottom: -45%;
           }
