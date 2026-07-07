@@ -303,10 +303,30 @@ function TextE({ content, onChange }) {
         <button onMouseDown={e => { e.preventDefault(); execCmd("formatBlock", "p"); }}
           style={{ padding:"4px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:"#fff", color:"#374151", cursor:"pointer", fontSize:11 }}>¶ Normal</button>
         <div style={{ width:1, height:18, background:"#E2E8F0" }}/>
-        <button onMouseDown={e => { e.preventDefault(); execCmd("fontSize", "4"); }}
-          style={{ padding:"4px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:"#fff", color:"#374151", cursor:"pointer", fontSize:13, fontWeight:700 }}>A+</button>
-        <button onMouseDown={e => { e.preventDefault(); execCmd("fontSize", "2"); }}
-          style={{ padding:"4px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:"#fff", color:"#374151", cursor:"pointer", fontSize:11, fontWeight:700 }}>A-</button>
+        <button onMouseDown={e => {
+          e.preventDefault();
+          const sel = window.getSelection();
+          if (sel && !sel.isCollapsed) {
+            const range = sel.getRangeAt(0);
+            const span = document.createElement("span");
+            const currentSize = parseInt(window.getComputedStyle(range.startContainer.parentElement).fontSize) || 15;
+            span.style.fontSize = (currentSize + 2) + "px";
+            range.surroundContents(span);
+            setTimeout(() => { onChange({ ...content, html: editorRef.current.innerHTML, text: editorRef.current.innerText }); }, 10);
+          }
+        }} style={{ padding:"4px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:"#fff", color:"#374151", cursor:"pointer", fontSize:13, fontWeight:700 }}>A+</button>
+        <button onMouseDown={e => {
+          e.preventDefault();
+          const sel = window.getSelection();
+          if (sel && !sel.isCollapsed) {
+            const range = sel.getRangeAt(0);
+            const span = document.createElement("span");
+            const currentSize = parseInt(window.getComputedStyle(range.startContainer.parentElement).fontSize) || 15;
+            span.style.fontSize = Math.max(10, currentSize - 2) + "px";
+            range.surroundContents(span);
+            setTimeout(() => { onChange({ ...content, html: editorRef.current.innerHTML, text: editorRef.current.innerText }); }, 10);
+          }
+        }} style={{ padding:"4px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:"#fff", color:"#374151", cursor:"pointer", fontSize:11, fontWeight:700 }}>A-</button>
         <span style={{ fontSize:10, color:"#94A3B8", marginLeft:"auto" }}>Select text to format</span>
       </div>
       {/* Editor */}
