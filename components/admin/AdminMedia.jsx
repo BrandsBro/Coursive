@@ -88,9 +88,15 @@ export default function AdminMedia() {
             <h1 style={{ fontSize:24, fontWeight:900, color:"#0f172a", margin:0 }}>Media Library</h1>
             <p style={{ color:"#64748B", fontSize:14, marginTop:4 }}>{media.length} files · {fmt(totalSize)} used</p>
           </div>
-          <div style={{ display:"flex", alignItems:"center", gap:6, background:"#EEF2FF", borderRadius:12, padding:"8px 14px" }}>
-            <HardDrive size={16} color="#6366f1"/>
-            <span style={{ fontSize:13, fontWeight:700, color:"#6366f1" }}>{fmt(totalSize)}</span>
+          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:6, background:"#EEF2FF", borderRadius:12, padding:"8px 14px" }}>
+              <HardDrive size={16} color="#6366f1"/>
+              <span style={{ fontSize:13, fontWeight:700, color:"#6366f1" }}>{fmt(totalSize)}</span>
+            </div>
+            <label style={{ display:"flex", alignItems:"center", gap:6, padding:"10px 20px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
+              {uploading ? <><Loader size={14} style={{ animation:"spin 0.7s linear infinite" }}/> Uploading...</> : "⬆ Upload"}
+              <input type="file" multiple accept="image/*,video/*,audio/*" style={{ display:"none" }} onChange={e => handleUpload(e.target.files)} disabled={uploading}/>
+            </label>
           </div>
         </div>
 
@@ -132,7 +138,11 @@ export default function AdminMedia() {
                 </div>
                 <div style={{ padding:"8px 10px" }}>
                   <p style={{ fontSize:11, fontWeight:600, color:"#0f172a", margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{item.filename}</p>
-                  <p style={{ fontSize:10, color:"#94A3B8", margin:"2px 0 0" }}>{fmt(item.size_bytes)}</p>
+                  <p style={{ fontSize:10, color:"#94A3B8", margin:"2px 0 4px" }}>{fmt(item.size_bytes)}</p>
+                  <button onClick={() => copyUrl(item.url)}
+                    style={{ width:"100%", padding:"5px", borderRadius:7, border:"1.5px solid #C7D2FE", background:copied===item.url?"#22c55e":"#EEF2FF", color:copied===item.url?"#fff":"#5B4EFF", fontSize:11, fontWeight:700, cursor:"pointer" }}>
+                    {copied===item.url ? "✓ Copied!" : "Copy URL"}
+                  </button>
                 </div>
               </div>
             ))}
@@ -145,7 +155,7 @@ export default function AdminMedia() {
           </div>
         )}
       </div>
-      <style>{`.bspin{animation:bspin 0.7s linear infinite}@keyframes bspin{to{transform:rotate(360deg)}}`}</style>
+      <style>{`.bspin{animation:bspin 0.7s linear infinite}@keyframes bspin{to{transform:rotate(360deg)}} @keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </AdminLayout>
   );
 }
