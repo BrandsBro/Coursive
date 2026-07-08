@@ -26,6 +26,12 @@ export default function AdminMedia() {
     for (const file of Array.from(files)) {
       const type = file.type.startsWith("image/") ? "image" : file.type.startsWith("video/") ? "video" : "audio";
       const path = `uploads/${Date.now()}-${file.name}`;
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path, type, filename: file.name, size: file.size, mime: file.type })
+      });
+      // Upload directly to storage
       const { error } = await supabase.storage.from("lesson-media").upload(path, file, { upsert: true });
       if (!error) {
         const { data: urlData } = supabase.storage.from("lesson-media").getPublicUrl(path);
