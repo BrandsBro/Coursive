@@ -157,6 +157,7 @@ export default function QuizFlow({ blocks }) {
 
   const getMaxWidth = () => {
     if (currentBlock?.type === "question_challenge") return 400;
+    if (currentBlock?.type === "image_section") return 1200;
     return 600;
   };
 
