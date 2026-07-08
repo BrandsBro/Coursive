@@ -1,20 +1,28 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-// Stripe key loaded dynamically from settings
+import { createClient } from "@supabase/supabase-js";
 
-const PLANS = {
-  "1-Week Plan":  693,
-  "4-Week Plan":  1999,
-  "12-Week Plan": 3999,
-};
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+async function getPlanAmount(planName) {
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+    const { data } = await supabase.from("settings").select("value").eq("key","pricing").single();
+    const plans = data?.value?.plans || [];
+    const found = plans.find(p => p.name === planName);
+    if (found?.salePrice) return Math.round(parseFloat(found.salePrice) * 100);
+  } catch(e) {}
+  const PLANS = { "1-Week Plan":693, "4-Week Plan":1999, "12-Week Plan":3999 };
+  return PLANS[planName] || 1999;
+}
 
 export async function POST(req) {
   try {
-
     const { plan, email, name } = await req.json();
-    const amount = PLANS[plan] || PLANS["4-Week Plan"];
-
+    const amount = await getPlanAmount(plan);
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: "usd",
@@ -22,7 +30,6 @@ export async function POST(req) {
       metadata: { plan, email, name },
       ...(email && email.includes("@") ? { receipt_email: email } : {}),
     });
-
     return NextResponse.json({ clientSecret: paymentIntent.client_secret });
   } catch (e) {
     console.error("Payment intent error:", e);
