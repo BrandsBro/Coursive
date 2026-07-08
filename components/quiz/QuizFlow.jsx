@@ -89,28 +89,44 @@ export default function QuizFlow({ blocks }) {
   useEffect(() => { if (name) sessionStorage.setItem("quiz_name", name); }, [name]);
   useEffect(() => { if (endStep) sessionStorage.setItem("quiz_endstep", endStep); }, [endStep]);
 
-  const goNext = () => {
-    if (!isInEndSequence && currentBlock) {
-      const isQuestion = currentBlock.type === "question_choice" || currentBlock.type === "question_icon";
-      if (isQuestion && !answers[currentBlock.id]) {
-        setToast("Please select an option to continue");
-        return;
-      }
+const goNext = () => {
+  if (!isInEndSequence && currentBlock) {
+    const isQuestion = currentBlock.type === "question_choice" || currentBlock.type === "question_icon";
+    if (isQuestion && !answers[currentBlock.id]) {
+      setToast("Please select an option to continue");
+      return;
     }
-    if (isInEndSequence && endStep === "signup") {
-      if (!name.trim()) { setToast("Please enter your full name"); return; }
-      if (!email.trim() || !email.includes("@")) { setToast("Please enter a valid email address"); return; }
-    }
-    if (!isInEndSequence) {
-      if (currentIdx < visibleBlocks.length - 1) { setCurrentIdx(i => i + 1); }
-      else { setEndStep("loading"); }
-   } else {
-      const idx = END_SEQUENCE.indexOf(endStep);
-      if (idx < END_SEQUENCE.length - 1) { setEndStep(END_SEQUENCE[idx + 1]); }
-      else { router.push("/plan"); } // <-- Now sends them to checkout!
-    }
-  };
+  }
 
+  if (isInEndSequence && endStep === "signup") {
+    if (!name.trim()) {
+      setToast("Please enter your full name");
+      return;
+    }
+    if (!email.trim() || !email.includes("@")) {
+      setToast("Please enter a valid email address");
+      return;
+    }
+  }
+
+  if (!isInEndSequence) {
+    if (currentIdx < visibleBlocks.length - 1) {
+      setCurrentIdx(i => i + 1);
+    } else {
+      setEndStep("loading");
+    }
+  } else {
+    const idx = END_SEQUENCE.indexOf(endStep);
+    console.log("[QuizFlow] goNext -> endStep:", endStep, "idx:", idx, "length:", END_SEQUENCE.length);
+
+    if (idx < END_SEQUENCE.length - 1) {
+      setEndStep(END_SEQUENCE[idx + 1]);
+    } else {
+      console.log("[QuizFlow] Navigating to /plan now. name:", name, "email:", email);
+      router.push("/plan");
+    }
+  }
+};
   const goBack = () => {
     if (isInEndSequence) {
       const idx = END_SEQUENCE.indexOf(endStep);
