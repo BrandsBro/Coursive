@@ -1,7 +1,9 @@
 "use client";
 import "../legal.css";
+import { useBranding } from "@/lib/useBranding";
 
 export default function Page() {
+  const branding = useBranding();
   return (
     <div className="legal-page">
       <style>{`
@@ -38,7 +40,7 @@ export default function Page() {
       `}</style>
 
       <div className="legal-header">
-        <a href="/" className="legal-logo">✦ 1Course</a>
+        {branding.logoMain ? <img src={branding.logoMain} alt="1Course" className="logo-main" style={{ objectFit:"contain", padding:4 }}/> : <a href="/" className="legal-logo">✦ 1Course</a>}
       </div>
       
       <div className="legal-container">
