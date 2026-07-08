@@ -13,7 +13,7 @@ const FIXED_REVIEWS = [
   { name:"Ahmed K.", stars:5, title:"Changed my career", text:"Within 2 weeks I was using AI tools at work and my manager noticed. Highly recommend to everyone." },
 ];
 
-const END_SEQUENCE = ["loading", "summary", "comparison", "signup", "sales"];
+const END_SEQUENCE = ["loading", "summary", "comparison", "signup",];
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
@@ -104,10 +104,10 @@ export default function QuizFlow({ blocks }) {
     if (!isInEndSequence) {
       if (currentIdx < visibleBlocks.length - 1) { setCurrentIdx(i => i + 1); }
       else { setEndStep("loading"); }
-    } else {
+   } else {
       const idx = END_SEQUENCE.indexOf(endStep);
       if (idx < END_SEQUENCE.length - 1) { setEndStep(END_SEQUENCE[idx + 1]); }
-      else { router.push("/"); }
+      else { router.push("/plan"); } // <-- Now sends them to checkout!
     }
   };
 
