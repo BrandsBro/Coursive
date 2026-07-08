@@ -290,7 +290,49 @@ function QuizBlock({ block, answers, onChoice, onNext, isMobile }) {
       </div>
     );
   }
-
+if (block.type === "question_challenge") {
+  const options = (c.options || []);
+  const hasImages = options.some(o => o.imageUrl);
+  const labelColor = c.labelColor || "#5B4EFF";
+  const cols = options.length <= 3 ? options.length : 2;
+  return (
+    <div style={{ width:"100%", textAlign:"center" }}>
+      {c.challengeTitle && (
+        <h1 style={{ fontSize:30, fontWeight:900, color:"#0f172a", margin:"0 0 10px", letterSpacing:"0.5px" }}>
+          {c.challengeTitle}
+        </h1>
+      )}
+      {c.question && <p style={{ fontSize:15, color:"#64748B", margin:"0 0 28px" }}>{c.question}</p>}
+      <div style={{ display:"grid", gridTemplateColumns:`repeat(${cols},1fr)`, gap:16 }}>
+        {options.map((opt, i) => (
+          <button key={i}
+            onClick={()=>{ onChoice(block.id, opt.label, c.isSplit, i); setTimeout(onNext, 250); }}
+            style={{ padding:0, borderRadius:18, border:`2.5px solid ${answers[block.id]===opt.label ? labelColor : "transparent"}`,
+              background:"#F1F5F9", cursor:"pointer", overflow:"hidden", outline:"none",
+              WebkitTapHighlightColor:"transparent", display:"flex", flexDirection:"column",
+              boxShadow: answers[block.id]===opt.label ? `0 0 0 4px ${labelColor}25` : "none" }}
+            onMouseEnter={e=>{ e.currentTarget.style.borderColor=labelColor; }}
+            onMouseLeave={e=>{ if(answers[block.id]!==opt.label) e.currentTarget.style.borderColor="transparent"; }}>
+            {opt.imageUrl && (
+              <div style={{ height:240, overflow:"hidden", flexShrink:0, background:"#E2E8F0" }}>
+                <img src={opt.imageUrl} alt={opt.label} loading="eager"
+                  style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 10%", display:"block" }}/>
+              </div>
+            )}
+            <div style={{ padding:"13px 16px", background:labelColor, display:"flex",
+              alignItems:"center", justifyContent:"space-between", gap:10 }}>
+              <span style={{ fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", lineHeight:1.3 }}>{opt.label}</span>
+              <div style={{ width:28, height:28, borderRadius:"50%", background:"rgba(255,255,255,.2)",
+                display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                <ChevronRight size={14} color="#fff"/>
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
   if (block.type === "question_icon") {
     const options = (c.options || []);
     const selected = answers[block.id];

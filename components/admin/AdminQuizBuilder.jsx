@@ -17,6 +17,8 @@ const BLOCK_TYPES = [
   { type:"comparison",      icon:"⚖️", label:"Comparison",       desc:"With vs without 1Course",       color:"#dc2626", bg:"#FEF2F2" },
   { type:"signup",          icon:"👤", label:"Name + Email",     desc:"Capture user details",          color:"#15803d", bg:"#F0FDF4" },
   { type:"sales",           icon:"💰", label:"Sales Page",       desc:"Plan selection & payment",      color:"#b45309", bg:"#FFFBEB" },
+  { type:"question_challenge", icon:"🏆", label:"Challenge Choice",
+  desc:"Bold title + image cards", color:"#7c3aed", bg:"#F5F3FF" },
 ];
 
 // ─── Color Picker ─────────────────────────────────────────────────────────────
@@ -693,7 +695,70 @@ function BlockEditor({ type, content, onChange }) {
     } catch (e) { alert("Upload failed: " + e.message); }
     setUploading(false);
   };
-
+if (type === "question_challenge") {
+  const options = content.options || [{ label:"", imageUrl:"" }, { label:"", imageUrl:"" }];
+  const setOpt = (i, k, v) => { const a=[...options]; a[i]={...a[i],[k]:v}; u("options",a); };
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+      <Field label="Challenge title">
+        <input value={content.challengeTitle||""} onChange={e=>u("challengeTitle",e.target.value)}
+          placeholder="28-DAY AI CHALLENGE" style={{...inp(), fontWeight:700, letterSpacing:"0.4px"}}/>
+      </Field>
+      <Field label="Question">
+        <input value={content.question||""} onChange={e=>u("question",e.target.value)}
+          placeholder="How would you describe yourself?" style={inp()}/>
+      </Field>
+      <Field label="Label bar color">
+        <ColorPicker value={content.labelColor||"#5B4EFF"} onChange={v=>u("labelColor",v)}/>
+      </Field>
+      <Field label="This splits the path?">
+        <select value={content.isSplit||"no"} onChange={e=>u("isSplit",e.target.value)} style={inp()}>
+          <option value="no">No — show to all users</option>
+          <option value="yes">Yes — 1st = company, 2nd = myself</option>
+        </select>
+      </Field>
+      <Field label="Options">
+        <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+          {options.map((opt, i) => (
+            <div key={i} style={{ background:"#F8FAFC", borderRadius:12, padding:12, border:"1.5px solid #E2E8F0" }}>
+              <div style={{ display:"flex", gap:8, alignItems:"center", marginBottom:8 }}>
+                <div style={{ width:24, height:24, borderRadius:"50%", background:content.labelColor||"#5B4EFF", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:"#fff", flexShrink:0 }}>{i+1}</div>
+                <input value={opt.label||""} onChange={e=>setOpt(i,"label",e.target.value)}
+                  placeholder={`Option ${i+1}`} style={{...inp(), flex:1}}/>
+                {options.length > 2 && (
+                  <button onClick={()=>{ const a=[...options]; a.splice(i,1); u("options",a); }}
+                    style={{ width:28, height:28, borderRadius:7, border:"1.5px solid #FEE2E2", background:"#fff", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", color:"#EF4444", flexShrink:0 }}>
+                    <Trash2 size={12}/>
+                  </button>
+                )}
+              </div>
+              <div>
+                <p style={{ fontSize:10, fontWeight:700, color:"#94A3B8", margin:"0 0 6px", textTransform:"uppercase" }}>Option image · optional</p>
+                <div style={{ display:"flex", gap:6 }}>
+                  <button onClick={()=>{ const inp2=document.createElement("input"); inp2.type="file"; inp2.accept="image/*"; inp2.onchange=e=>handleOptionImageUpload(e.target.files[0],i); inp2.click(); }}
+                    style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 10px", borderRadius:8, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:11, fontWeight:600, color:"#374151", cursor:"pointer" }}>
+                    <Upload size={12}/> Upload
+                  </button>
+                  <input value={opt.imageUrl||""} onChange={e=>setOpt(i,"imageUrl",e.target.value)}
+                    placeholder="or paste URL..." style={{...inp(), flex:1, fontSize:11}}/>
+                </div>
+                {opt.imageUrl && (
+                  <div style={{ marginTop:6, borderRadius:8, overflow:"hidden", height:70 }}>
+                    <img src={opt.imageUrl} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 10%" }}/>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+          <button onClick={()=>u("options",[...options,{label:"",imageUrl:""}])}
+            style={{ padding:"8px", borderRadius:9, border:"1.5px dashed #E2E8F0", background:"#F8FAFC", color:"#94A3B8", fontSize:12, fontWeight:600, cursor:"pointer" }}>
+            + Add option
+          </button>
+        </div>
+      </Field>
+    </div>
+  );
+}
   if (type === "question_choice") {
     const options = content.options || ["", ""];
     const optionImages = content.optionImages || [];
@@ -921,6 +986,16 @@ function getDefaultContent(type) {
     case "comparison":      return { title: "Your Personalized A.I. Certificate Program", without: ["No time to get started", "No recognized credential", "A.I. feels hard to use", "Invisible to employers"], with: ["Clear, step-by-step path", "Shareable A.I. credential", "Reliable results from A.I.", "Stand out from other workers"] };
     case "signup":          return { heading: "Your A.I. Program is Ready!", subtext: "Enter your details to continue" };
     case "sales":           return { heading: "Your Personalized A.I. Certificate Program is Ready!", plans: ["1-Week Plan|6.93|13.86", "4-Week Plan|19.99|39.99", "12-Week Plan|39.99|79.99"], legalText: "" };
+    case "question_challenge": return {
+  challengeTitle: "28-DAY AI CHALLENGE",
+  question: "How would you describe yourself?",
+  options: [
+    { label: "I work for a company", imageUrl: "" },
+    { label: "I work for myself",    imageUrl: "" },
+  ],
+  labelColor: "#5B4EFF",
+  isSplit: "yes",
+};
     default: return {};
   }
 }
