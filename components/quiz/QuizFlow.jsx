@@ -156,10 +156,8 @@ export default function QuizFlow({ blocks }) {
   );
 
   const getMaxWidth = () => {
-    if (isInEndSequence) return 1200;
     if (currentBlock?.type === "question_challenge") return 400;
-    if (currentBlock?.type === "question_choice" || currentBlock?.type === "question_icon") return 600;
-    return 1200;
+    return 600;
   };
 
   return (
