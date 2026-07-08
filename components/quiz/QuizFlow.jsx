@@ -240,24 +240,41 @@ function QuizBlock({ block, answers, onChoice, onNext, isMobile }) {
               )}
 
               {/* Label — with image: allow wrapping on mobile */}
-              {optionImages[i] && (
-                <div style={{ padding: isMobile ? "10px 12px" : "14px 16px", background:labelColor, display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, flexShrink:0 }}>
-                  <span style={{
-                    fontSize: isMobile ? 12 : 15,
-                    fontWeight:700,
-                    color:textColor,
-                    textAlign:"left",
-                    wordBreak:"break-word",
-                    whiteSpace: isMobile ? "normal" : "nowrap",
-                    overflow:"hidden",
-                    textOverflow: isMobile ? "clip" : "ellipsis",
-                    flex:1,
-                  }}>{opt}</span>
-                  <div style={{ width: isMobile ? 22 : 30, height: isMobile ? 22 : 30, borderRadius:"50%", background:"rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                    <ChevronRight size={isMobile ? 11 : 15} color={textColor}/>
-                  </div>
-                </div>
-              )}
+           {optionImages[i] && (
+  <div style={{
+    padding: isMobile ? "10px 12px" : "14px 16px",
+    background: labelColor,
+    display:"flex",
+    alignItems:"center",
+    justifyContent:"space-between",
+    gap:8,
+    flexShrink:0,
+    minHeight: isMobile ? 52 : 56,   // ← same height both cards always
+  }}>
+    <span style={{
+      fontSize: isMobile ? 12 : 15,
+      fontWeight:700,
+      color:textColor,
+      textAlign:"left",
+      wordBreak:"break-word",
+      whiteSpace: isMobile ? "normal" : "nowrap",
+      overflow:"hidden",
+      textOverflow: isMobile ? "clip" : "ellipsis",
+      flex:1,
+      lineHeight:1.3,
+    }}>{opt}</span>
+    <div style={{
+      width: isMobile ? 22 : 30,
+      height: isMobile ? 22 : 30,
+      borderRadius:"50%",
+      background:"rgba(255,255,255,0.2)",
+      display:"flex", alignItems:"center", justifyContent:"center",
+      flexShrink:0,
+    }}>
+      <ChevronRight size={isMobile ? 11 : 15} color={textColor}/>
+    </div>
+  </div>
+)}
             </button>
           ))}
         </div>
