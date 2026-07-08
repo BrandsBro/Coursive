@@ -40,7 +40,7 @@ export default function Page() {
         }
       `}</style>
 
-      <div className="legal-header">
+      <div className="legal-header" style={{ display:"flex", alignItems:"center", justifyContent:"center" }}>
         {branding.logoMain ? <img src={branding.logoMain} alt="1Course" className="logo-main" style={{ objectFit:"contain", padding:4 }}/> : <a href="/" className="legal-logo">✦ 1Course</a>}
       </div>
       
