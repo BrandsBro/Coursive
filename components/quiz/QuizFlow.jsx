@@ -64,20 +64,17 @@ export default function QuizFlow({ blocks }) {
 
   const loadingRef = useRef(null);
 
-  // Preload next block images
+  // Preload all block images on mount
   useEffect(() => {
-    const nextBlock = visibleBlocks[currentIdx + 1];
-    if (!nextBlock) return;
-    const imgs = [...(nextBlock.content?.optionImages || []), ...(nextBlock.content?.optionImages || [])].filter(Boolean);
-    imgs.forEach(src => { const img = new Image(); img.src = src; });
-  }, [currentIdx]);
-
-  // Preload current block images immediately
-  useEffect(() => {
-    if (!currentBlock) return;
-    const imgs = (currentBlock.content?.optionImages || []).filter(Boolean);
-    imgs.forEach(src => { const img = new Image(); img.src = src; });
-  }, [currentBlock?.id]);
+    const allImgs = [];
+    visibleBlocks.forEach(block => {
+      const c = block.content || {};
+      (c.optionImages || []).forEach(src => src && allImgs.push(src));
+      if (c.imageUrl) allImgs.push(c.imageUrl);
+      if (c.headerImage) allImgs.push(c.headerImage);
+    });
+    allImgs.forEach(src => { const img = new Image(); img.src = src; });
+  }, [visibleBlocks.length]);
   const visibleBlocks = blocks.filter(b => b.path === "all" || b.path === path);
   const isInEndSequence = endStep !== null;
   const currentBlock = !isInEndSequence ? visibleBlocks[currentIdx] : null;
