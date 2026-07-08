@@ -77,20 +77,29 @@ export default function QuizFlow({ blocks }) {
   useEffect(() => { if (name) sessionStorage.setItem("quiz_name", name); }, [name]);
   useEffect(() => { if (endStep) sessionStorage.setItem("quiz_endstep", endStep); }, [endStep]);
 
-  const goNext = () => {
-    if (isInEndSequence && endStep === "signup") {
-      if (!name.trim()) { setToast("Please enter your full name"); return; }
-      if (!email.trim() || !email.includes("@")) { setToast("Please enter a valid email address"); return; }
+const goNext = () => {
+  // Block if current block is a question and no answer selected
+  if (!isInEndSequence && currentBlock) {
+    const isQuestion = currentBlock.type === "question_choice" || currentBlock.type === "question_icon";
+    if (isQuestion && !answers[currentBlock.id]) {
+      setToast("Please select an option to continue");
+      return;
     }
-    if (!isInEndSequence) {
-      if (currentIdx < visibleBlocks.length - 1) { setCurrentIdx(i => i + 1); }
-      else { setEndStep("loading"); }
-    } else {
-      const idx = END_SEQUENCE.indexOf(endStep);
-      if (idx < END_SEQUENCE.length - 1) { setEndStep(END_SEQUENCE[idx + 1]); }
-      else { router.push("/"); }
-    }
-  };
+  }
+
+  if (isInEndSequence && endStep === "signup") {
+    if (!name.trim()) { setToast("Please enter your full name"); return; }
+    if (!email.trim() || !email.includes("@")) { setToast("Please enter a valid email address"); return; }
+  }
+  if (!isInEndSequence) {
+    if (currentIdx < visibleBlocks.length - 1) { setCurrentIdx(i => i + 1); }
+    else { setEndStep("loading"); }
+  } else {
+    const idx = END_SEQUENCE.indexOf(endStep);
+    if (idx < END_SEQUENCE.length - 1) { setEndStep(END_SEQUENCE[idx + 1]); }
+    else { router.push("/"); }
+  }
+};
 
   const goBack = () => {
     if (isInEndSequence) {
@@ -118,9 +127,9 @@ export default function QuizFlow({ blocks }) {
     }
   }, [endStep]);
 
-  const showContinueBtn = !["question_choice", "loading", "sales"].includes(
-    isInEndSequence ? endStep : currentBlock?.type
-  );
+const showContinueBtn = !["question_choice", "question_icon", "loading", "sales"].includes(
+  isInEndSequence ? endStep : currentBlock?.type
+);
 
   return (
     <div style={{ minHeight:"100vh", background:"#fff", display:"flex", flexDirection:"column" }}>
