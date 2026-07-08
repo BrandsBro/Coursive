@@ -1,13 +1,15 @@
 "use client";
 import useIsMobile from "@/hooks/useIsMobile";
+import { useBranding } from "@/lib/useBranding";
 export default function HomeFooter() {
   const isMobile = useIsMobile();
+  const branding = useBranding();
   return (
     <footer style={{ borderTop:"1px solid rgba(255,255,255,0.06)", padding: isMobile ? "40px 20px 24px" : "48px 32px 32px" }}>
       <div style={{ maxWidth:1100, margin:"0 auto" }}>
         <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "2fr 1fr 1fr 1fr", gap: isMobile ? 24 : 40, marginBottom:40 }}>
           <div style={{ gridColumn: isMobile ? "1/-1" : "auto" }}>
-            <span style={{ fontSize:20, fontWeight:900, color:"#fff", fontStyle:"italic" }}>✦ 1Course</span>
+            {branding.logoMain ? <img src={branding.logoMain} alt="1Course" className="logo-main" style={{ objectFit:"contain", padding:4 }}/> : <span style={{ fontSize:20, fontWeight:900, color:"#fff", fontStyle:"italic" }}>✦ 1Course</span>}
             <p style={{ fontSize:13, color:"rgba(255,255,255,0.35)", marginTop:10, lineHeight:1.7, maxWidth:240 }}>The fastest way to master AI tools and earn your certificate.</p>
             <div style={{ display:"flex", gap:12, marginTop:14 }}>
               {["𝕏","in","📘","📸"].map((s,i) => (
