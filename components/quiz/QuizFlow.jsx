@@ -216,6 +216,7 @@ function QuizBlock({ block, answers, onChoice, onNext, isMobile }) {
               onMouseEnter={e => { e.currentTarget.style.borderColor = labelColor; }}
               onMouseLeave={e => { if (selected!==opt) e.currentTarget.style.borderColor = "transparent"; }}
             >
+              {/* Image with shimmer */}
               {optionImages[i] && (
                 <div style={{ position:"relative", width:"100%", height:imgH, background:"#E2E8F0", flexShrink:0, overflow:"hidden" }}>
                   <div className="quiz-shimmer" style={{ position:"absolute", inset:0, background:"linear-gradient(90deg,#E2E8F0 25%,#CBD5E1 50%,#E2E8F0 75%)", backgroundSize:"200% 100%" }}/>
@@ -227,6 +228,8 @@ function QuizBlock({ block, answers, onChoice, onNext, isMobile }) {
                   />
                 </div>
               )}
+
+              {/* Label — no image */}
               {!optionImages[i] && (
                 <div style={{ flex:1, display:"flex", alignItems:"center", padding: isMobile ? "13px 14px" : "18px 20px", background:"#F8FAFC" }}>
                   <span style={{ fontSize: isMobile ? 14 : 16, fontWeight:700, color: selected===opt ? labelColor : "#0f172a", flex:1, textAlign:"left" }}>{opt}</span>
@@ -235,9 +238,21 @@ function QuizBlock({ block, answers, onChoice, onNext, isMobile }) {
                   </div>
                 </div>
               )}
+
+              {/* Label — with image: allow wrapping on mobile */}
               {optionImages[i] && (
                 <div style={{ padding: isMobile ? "10px 12px" : "14px 16px", background:labelColor, display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, flexShrink:0 }}>
-                  <span style={{ fontSize: isMobile ? 12 : 15, fontWeight:700, color:textColor, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{opt}</span>
+                  <span style={{
+                    fontSize: isMobile ? 12 : 15,
+                    fontWeight:700,
+                    color:textColor,
+                    textAlign:"left",
+                    wordBreak:"break-word",
+                    whiteSpace: isMobile ? "normal" : "nowrap",
+                    overflow:"hidden",
+                    textOverflow: isMobile ? "clip" : "ellipsis",
+                    flex:1,
+                  }}>{opt}</span>
                   <div style={{ width: isMobile ? 22 : 30, height: isMobile ? 22 : 30, borderRadius:"50%", background:"rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                     <ChevronRight size={isMobile ? 11 : 15} color={textColor}/>
                   </div>
@@ -278,12 +293,13 @@ function QuizBlock({ block, answers, onChoice, onNext, isMobile }) {
     const c2 = block.content || {};
     const layout = c2.layout || "image-right";
     const bullets = (c2.bullets || []).filter(b => b && b.trim());
+
     const textContent = (
-      <div style={{ flex:1, display:"flex", flexDirection:"column", justifyContent:"center" }}>
+      <div style={{ flex:1, display:"flex", flexDirection:"column", justifyContent:"center", alignItems: isMobile ? "center" : "flex-start", textAlign: isMobile ? "center" : "left" }}>
         <h1 style={{ fontSize: isMobile ? 20 : 32, fontWeight:900, color:"#5B4EFF", margin:"0 0 8px", lineHeight:1.2 }}>{c2.heading}</h1>
         {c2.subtext && <p style={{ fontSize: isMobile ? 13 : 16, color:"#374151", margin:"0 0 14px", lineHeight:1.6 }}>{c2.subtext}</p>}
         {bullets.map((b,i) => (
-          <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding: isMobile ? "9px 12px" : "12px 16px", background:"#F8FAFC", borderRadius:12, marginBottom:8 }}>
+          <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding: isMobile ? "9px 12px" : "12px 16px", background:"#F8FAFC", borderRadius:12, marginBottom:8, width:"100%", justifyContent: isMobile ? "center" : "flex-start" }}>
             <div style={{ width: isMobile ? 22 : 28, height: isMobile ? 22 : 28, borderRadius:"50%", background:"#5B4EFF", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
               <Check size={isMobile ? 11 : 14} color="#fff"/>
             </div>
@@ -292,23 +308,30 @@ function QuizBlock({ block, answers, onChoice, onNext, isMobile }) {
         ))}
       </div>
     );
+
     const imageContent = c2.imageUrl ? (
-      <div style={{ flex:1, borderRadius:16, overflow:"hidden", minHeight: isMobile ? 180 : 280 }}>
+      <div style={{ flex:1, borderRadius:16, overflow:"hidden", minHeight: isMobile ? 180 : 280, width:"100%" }}>
         <img src={c2.imageUrl} alt="" loading="eager" fetchPriority="high" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}/>
       </div>
     ) : null;
 
-    // Mobile: always text top, image below
+    // Mobile: always text top centered, image below
     if (isMobile) {
       return (
-        <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:16 }}>
+        <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:16, alignItems:"center" }}>
           {textContent}
           {imageContent}
         </div>
       );
     }
+
     if (layout === "image-top") return <div style={{ width:"100%" }}>{imageContent && <div style={{ marginBottom:24 }}>{imageContent}</div>}{textContent}</div>;
-    if (layout === "fullwidth") return <div style={{ width:"100%" }}>{c2.imageUrl && <div style={{ borderRadius:16, overflow:"hidden", marginBottom:20 }}><img src={c2.imageUrl} alt="" loading="eager" style={{ width:"100%", display:"block" }}/></div>}{textContent}</div>;
+    if (layout === "fullwidth") return (
+      <div style={{ width:"100%" }}>
+        {c2.imageUrl && <div style={{ borderRadius:16, overflow:"hidden", marginBottom:20 }}><img src={c2.imageUrl} alt="" loading="eager" style={{ width:"100%", display:"block" }}/></div>}
+        {textContent}
+      </div>
+    );
     return (
       <div style={{ width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, alignItems:"center" }}>
         {layout === "image-left" ? <>{imageContent}{textContent}</> : <>{textContent}{imageContent}</>}
