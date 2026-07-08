@@ -11,6 +11,10 @@ const PUBLIC_ROUTES = [
   "/payment-success",
   "/reset-password",
   "/renew",
+  "/privacy",
+  "/terms-condition",
+  "/subscription-terms",
+  "/plan",
 ];
 
 const ADMIN_ROUTES = ["/admin"];
