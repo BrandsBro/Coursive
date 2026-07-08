@@ -15,7 +15,7 @@ export default async function DashboardPage() {
   ]);
   return (
     <SubscriptionGuard>
-    <div style={{ minHeight:"100vh", background:"#F8FAFC" }}>
+    <div style={{ minHeight:"100vh" }}>
       <style>{`
         .top-grid {
           display: grid;

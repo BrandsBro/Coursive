@@ -35,99 +35,113 @@ export default function CertificateBanner({ courses = [] }) {
         );
 
   return (
-    <div
-      style={{
-        background: "#eef0fb",
-        borderRadius: 16,
-        padding: "18px 20px",
-        display: "flex",
-        alignItems: "center",
-        gap: 20,
-        flexWrap: "wrap",
-      }}
-    >
-      {/* Left: illustration + title + progress */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 14,
-          flex: 1,
-          minWidth: 200,
-        }}
-      >
-        <img
-          src={CERT_IMAGE}
-          alt="Certificate"
-          style={{ width: 76, height: 76, objectFit: "contain", flexShrink: 0 }}
-        />
-        <div>
-          <h2
-            style={{
-              fontSize: 15,
-              fontWeight: 700,
-              color: "#1a1a2e",
-              margin: "0 0 8px",
-            }}
-          >
-            AI Mastery Certificate Program
-          </h2>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div
-              style={{
-                width: 110,
-                height: 5,
-                background: "#d1d5db",
-                borderRadius: 999,
-                overflow: "hidden",
-              }}
-            >
-              <div
-                style={{
-                  height: "100%",
-                  width: `${overallPct}%`,
-                  background: "linear-gradient(90deg,#818cf8,#6366f1)",
-                  borderRadius: 999,
-                  transition: "width 0.8s ease",
-                }}
-              />
-            </div>
-            <span style={{ fontSize: 12, color: "#6366f1", fontWeight: 700 }}>
-              {overallPct}%
-            </span>
+    <>
+      <style>{`
+        .cert-banner {
+          background: #eef0fb;
+          border-radius: 16px;
+          padding: 18px 20px;
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          flex-wrap: wrap;
+        }
+        .cert-left {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          flex: 1;
+          min-width: 200px;
+        }
+        .cert-text {
+          flex: 1;
+        }
+        .cert-heading {
+          font-weight: 700;
+          color: #1a1a2e;
+          margin: 0 0 8px;
+          font-size: clamp(15px, 2.2vw, 29px);
+          line-height: 1.2;
+        }
+        .cert-pct-label {
+          font-size: clamp(11px, 1.2vw, 14px);
+          color: #6366f1;
+          font-weight: 700;
+        }
+        .cert-progress-track {
+          width: 100%;
+          height: 5px;
+          background: #d1d5db;
+          border-radius: 999px;
+          overflow: hidden;
+        }
+        .cert-right {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+        .cert-image {
+          width: 200px;
+          height: 100px;
+          object-fit: cover;
+          flex-shrink: 0;
+          border-radius: 10px;
+        }
+        @media (max-width: 600px) {
+          .cert-image {
+          width: full;
+      }
+          .cert-banner {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+          }
+          .cert-left {
+            flex-direction: column;
+            align-items: center;
+            min-width: unset;
+            width: 100%;
+          }
+          .cert-text {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+          }
+          .cert-right {
+            display: none;
+          }
+        
+        }
+      `}</style>
+
+      <div className="cert-banner">
+        <div className="cert-left">
+          <img
+            src={CERT_IMAGE}
+            alt="Certificate"
+            className="cert-image"
+          />
+          <div className="cert-text">
+            <h2 className="cert-heading">
+              AI Mastery Certificate Program
+            </h2>
+          
           </div>
         </div>
-      </div>
 
-      {/* Right: exactly 5 course badges + arrow */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 8,
-          flexWrap: "wrap",
-        }}
-      >
-        {CERT.map((c) => {
-          const course = courses.find((x) => x.id === c.id);
-          const total = course?.units?.flatMap((u) => u.lessons).length || 0;
-          const pct = getCoursePercent(c.id, total);
-          const done = pct === 100;
+        <div className="cert-right">
+          {CERT.map((c) => {
+            const course = courses.find((x) => x.id === c.id);
+            const total = course?.units?.flatMap((u) => u.lessons).length || 0;
+            const pct = getCoursePercent(c.id, total);
+            const done = pct === 100;
 
-          return (
-            <Link
-              key={c.id}
-              href={`/courses/${c.id}`}
-              style={{ textDecoration: "none" }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 4,
-                }}
-                title={course?.title}
+            return (
+              <Link
+                key={c.id}
+                href={`/courses/${c.id}`}
+                style={{ textDecoration: "none" }}
               >
                 <div
                   style={{
@@ -144,6 +158,7 @@ export default function CertificateBanner({ courses = [] }) {
                     overflow: "hidden",
                     transition: "all 0.3s",
                   }}
+                  title={course?.title}
                 >
                   {c.image ? (
                     <img
@@ -179,30 +194,11 @@ export default function CertificateBanner({ courses = [] }) {
                     </div>
                   )}
                 </div>
-                <span
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 700,
-                    color: done ? "#22c55e" : pct > 0 ? "#6366f1" : "#9ca3af",
-                  }}
-                >
-                  {done ? "Done" : `${pct}%`}
-                </span>
-              </div>
-            </Link>
-          );
-        })}
+              </Link>
+            );
+          })}
 
-        {/* Arrow → all courses */}
-        <Link href="/courses" style={{ textDecoration: "none" }}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: 4,
-            }}
-          >
+          <Link href="/courses" style={{ textDecoration: "none" }}>
             <div
               style={{
                 width: 54,
@@ -218,12 +214,9 @@ export default function CertificateBanner({ courses = [] }) {
             >
               <ChevronRight size={20} color="#9ca3af" />
             </div>
-            <span style={{ fontSize: 9, fontWeight: 700, color: "#9ca3af" }}>
-              All
-            </span>
-          </div>
-        </Link>
+          </Link>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
