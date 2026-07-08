@@ -239,14 +239,14 @@ function QuizBlock({ block, answers, onChoice, onNext, isMobile }) {
               )}
 
               {/* Label — no image */}
-              {!optionImages[i] && (
-                <div style={{ flex:1, display:"flex", alignItems:"center", padding: isMobile ? "13px 14px" : "18px 20px", background:"#F8FAFC" }}>
-                  <span style={{ fontSize: isMobile ? 14 : 16, fontWeight:700, color: selected===opt ? labelColor : "#0f172a", flex:1, textAlign:"left" }}>{opt}</span>
-                  <div style={{ width:26, height:26, borderRadius:"50%", background: selected===opt ? labelColor : "#E2E8F0", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                    <ChevronRight size={13} color={selected===opt ? textColor : "#94A3B8"}/>
-                  </div>
-                </div>
-              )}
+             {!optionImages[i] && (
+  <div style={{ flex:1, display:"flex", alignItems:"center", padding: isMobile ? "13px 14px" : "18px 20px", background: selected===opt ? `${labelColor}15` : "#F8FAFC" }}>
+    <span style={{ fontSize: isMobile ? 14 : 16, fontWeight:700, color:"#0f172a", flex:1, textAlign:"left" }}>{opt}</span>
+    <div style={{ width:26, height:26, borderRadius:"50%", background: selected===opt ? labelColor : "#E2E8F0", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+      <ChevronRight size={13} color={selected===opt ? textColor : "#94A3B8"}/>
+    </div>
+  </div>
+)}
 
               {/* Label — with image: allow wrapping on mobile */}
            {optionImages[i] && (
