@@ -14,6 +14,12 @@ export default function PlanPage({ pricingData }) {
   const [timeLeft, setTimeLeft] = useState(10 * 60);
 
   useEffect(() => {
+    // Silently grab the user's info from the quiz flow to pass to the payment modal
+    if (typeof window !== "undefined") {
+      setEmail(sessionStorage.getItem("quiz_email") || "");
+      setName(sessionStorage.getItem("quiz_name") || "");
+    }
+
     const t = setInterval(() => setTimeLeft(p => Math.max(0, p - 1)), 1000);
     return () => clearInterval(t);
   }, []);
@@ -37,10 +43,6 @@ export default function PlanPage({ pricingData }) {
   ];
 
   const handleGetPlan = () => {
-    if (!name.trim() || !email.trim() || !email.includes("@")) {
-      alert("Please enter your name and email");
-      return;
-    }
     setShowPayment(true);
   };
 
@@ -63,7 +65,7 @@ export default function PlanPage({ pricingData }) {
       {/* Header */}
       <div style={{ padding:"14px 20px", borderBottom:"1px solid #F1F5F9", display:"flex", alignItems:"center", justifyContent:"center" }}>
         {branding.logoApp
-          ? <img src={branding.logoApp} alt="1Course" className="logo-app" style={{ objectFit:"contain", padding:4 }}/>
+          ? <img src={branding.logoApp} alt="1Course" className="logo-app" style={{ objectFit:"contain", padding:4, maxHeight:40 }}/>
           : <span style={{ fontSize:20, fontWeight:900, color:"#0f172a" }}>✦ 1Course</span>
         }
       </div>
@@ -99,20 +101,6 @@ export default function PlanPage({ pricingData }) {
           ))}
         </div>
 
-        {/* Name + Email */}
-        <div style={{ background:"#F8FAFC", borderRadius:16, border:"1.5px solid #E2E8F0", padding:"20px", marginBottom:16, display:"flex", flexDirection:"column", gap:12 }}>
-          <div>
-            <label style={{ display:"block", fontSize:11, fontWeight:700, color:"#374151", marginBottom:6, textTransform:"uppercase", letterSpacing:0.5 }}>Full Name</label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. John Smith"
-              style={{ width:"100%", padding:"12px 14px", borderRadius:10, border:"1.5px solid #E2E8F0", fontSize:14, outline:"none", boxSizing:"border-box" }}/>
-          </div>
-          <div>
-            <label style={{ display:"block", fontSize:11, fontWeight:700, color:"#374151", marginBottom:6, textTransform:"uppercase", letterSpacing:0.5 }}>Email Address</label>
-            <input value={email} onChange={e => setEmail(e.target.value)} placeholder="e.g. john@gmail.com" type="email"
-              style={{ width:"100%", padding:"12px 14px", borderRadius:10, border:"1.5px solid #E2E8F0", fontSize:14, outline:"none", boxSizing:"border-box" }}/>
-          </div>
-        </div>
-
         {/* Legal */}
         {getLegalText() && (
           <p style={{ fontSize:11, color:"#94A3B8", lineHeight:1.7, margin:"0 0 16px", textAlign:"center" }} dangerouslySetInnerHTML={{ __html: getLegalText() }}/>
@@ -138,7 +126,11 @@ export default function PlanPage({ pricingData }) {
           email={email}
           name={name}
           onClose={() => setShowPayment(false)}
-          onSuccess={() => { setShowPayment(false); router.push("/payment-success"); }}
+          onSuccess={() => { 
+            setShowPayment(false); 
+            sessionStorage.clear(); // Clear quiz data after successful payment
+            router.push("/payment-success"); 
+          }}
         />
       )}
     </div>
