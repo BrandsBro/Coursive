@@ -72,7 +72,6 @@ export default function QuizFlow({ blocks }) {
       if (!name.trim()) { setToast("Please enter your full name"); return; }
       if (!email.trim() || !email.includes("@")) { setToast("Please enter a valid email address"); return; }
     }
-
     if (!isInEndSequence) {
       if (currentIdx < visibleBlocks.length - 1) {
         setCurrentIdx(i => i + 1);
@@ -134,17 +133,14 @@ export default function QuizFlow({ blocks }) {
       {/* Top bar */}
       <div style={{ position:"sticky", top:0, background:"#fff", zIndex:50 }}>
         <div style={{ padding:"14px 20px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-          {/* Back button */}
           <div style={{ width:80 }}>
             {(currentIdx > 0 || isInEndSequence) && endStep !== "loading" && endStep !== "sales" && (
               <button onClick={goBack} style={{ display:"flex", alignItems:"center", gap:4, background:"none", border:"none", color:"#374151", fontSize:16, fontWeight:600, cursor:"pointer" }}>
-                <ArrowLeft size={18}/> 
+                <ArrowLeft size={18}/>
               </button>
             )}
           </div>
-          {/* Logo center */}
           <img src={branding.logoApp||"https://i.postimg.cc/7Pd7vVJs/1course-Logo-Black-Version.png"} alt="1Course" className="logo-app" style={{ objectFit:"contain", padding:5 }}/>
-          {/* Step counter */}
           <div style={{ width:80, textAlign:"right" }}>
             {endStep !== "sales" && (
               <span style={{ fontSize:13, fontWeight:700, color:"#94A3B8" }}>
@@ -156,7 +152,6 @@ export default function QuizFlow({ blocks }) {
             )}
           </div>
         </div>
-        {/* Progress bar */}
         {endStep !== "sales" && (
           <div style={{ height:3, background:"#F1F5F9", width:"100%" }}>
             <div style={{ height:"100%", background:"linear-gradient(to right,#5B4EFF,#8B5CF6)", width:`${progress}%`, transition:"width 0.4s ease" }}/>
@@ -165,7 +160,7 @@ export default function QuizFlow({ blocks }) {
       </div>
 
       {/* Content */}
-      <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"32px 20px 120px", maxWidth:650, margin:"0 auto", width:"100%" }}>
+      <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"32px 12px 120px", maxWidth:650, margin:"0 auto", width:"100%" }}>
         {showResume && (
           <div style={{ width:"100%", background:"#EEF2FF", border:"1.5px solid #C7D2FE", borderRadius:16, padding:"16px 20px", marginBottom:24, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <div>
@@ -207,33 +202,127 @@ function QuizBlock({ block, answers, onChoice, onNext }) {
     const optionImages = c.optionImages || [];
     const hasImages = optionImages.some(Boolean);
     const selected = answers[block.id];
+    const labelColor = c.labelColor || "#5B4EFF";
+    const textColor = c.textColor || "#ffffff";
 
     return (
       <div style={{ width:"100%", textAlign:"center" }}>
         <h1 style={{ fontSize:28, fontWeight:900, color:"#0f172a", margin:"0 0 8px", lineHeight:1.2 }}>{c.question || "Question"}</h1>
         {c.subtitle && <p style={{ fontSize:15, color:"#64748B", margin:"0 0 32px" }}>{c.subtitle}</p>}
-        <div style={{ display:"grid", gridTemplateColumns: hasImages && options.length === 2 ? "1fr 1fr" : "1fr", gap:12, alignItems:"stretch" }}>
+
+        <div style={{
+          display:"grid",
+          gridTemplateColumns: hasImages && options.length === 2 ? "1fr 1fr" : "1fr",
+          gap:20,
+          alignItems:"stretch",
+        }}>
           {options.map((opt, i) => (
             <button key={i}
               onClick={() => { onChoice(block.id, opt, c.isSplit, i); setTimeout(onNext, 250); }}
-              style={{ padding: optionImages[i] ? "0" : "18px 24px", borderRadius:16, border:`2px solid ${selected===opt?"#5B4EFF":"#E2E8F0"}`, background: selected===opt?"#EEF2FF":"#F8FAFC", cursor:"pointer", overflow:"hidden", transition:"all 0.15s", textAlign:"left", boxShadow: selected===opt?"0 4px 14px rgba(91,78,255,0.2)":"none", display:"flex", flexDirection:"column" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor="#5B4EFF"; e.currentTarget.style.background="#EEF2FF"; }}
-              onMouseLeave={e => { if (selected!==opt) { e.currentTarget.style.borderColor="#E2E8F0"; e.currentTarget.style.background="#F8FAFC"; } }}
+              style={{
+                padding:0,
+                borderRadius:20,
+                border:`2.5px solid ${selected===opt ? labelColor : "transparent"}`,
+                background:"#F1F5F9",
+                cursor:"pointer",
+                overflow:"hidden",
+                outline:"none",
+                WebkitTapHighlightColor:"transparent",
+                transition:"border-color 0.15s, box-shadow 0.15s",
+                display:"flex",
+                flexDirection:"column",
+                boxShadow: selected===opt ? `0 0 0 4px ${labelColor}25` : "none",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = labelColor; }}
+              onMouseLeave={e => { if (selected!==opt) e.currentTarget.style.borderColor = "transparent"; }}
             >
+              {/* Image with skeleton */}
               {optionImages[i] && (
-                <div style={{ overflow:"hidden", flexShrink:0 }}>
-                  <img src={optionImages[i]} alt={opt} style={{ width:"100%", display:"block", objectFit:"cover" }}/>
+                <div style={{ position:"relative", width:"100%", height:260, background:"#E2E8F0", flexShrink:0, overflow:"hidden" }}>
+                  <div className="quiz-shimmer" style={{
+                    position:"absolute", inset:0,
+                    background:"linear-gradient(90deg,#E2E8F0 25%,#CBD5E1 50%,#E2E8F0 75%)",
+                    backgroundSize:"200% 100%",
+                  }}/>
+                  <img
+                    src={optionImages[i]}
+                    alt={opt}
+                    loading="eager"
+                    fetchPriority="high"
+                    onLoad={e => {
+                      e.target.style.opacity = 1;
+                      const shimmer = e.target.previousSibling;
+                      if (shimmer) shimmer.style.display = "none";
+                    }}
+                    style={{
+                      position:"absolute",
+                      inset:0,
+                      width:"100%",
+                      height:"100%",
+                      objectFit:"cover",
+                      objectPosition:"center 10%",
+                      display:"block",
+                      opacity:0,
+                      transition:"opacity 0.35s ease",
+                    }}
+                  />
                 </div>
               )}
-              <div style={{ padding: optionImages[i] ? "14px 16px" : "0", display:"flex", alignItems:"center", justifyContent:"space-between", gap:10 }}>
-                <span style={{ fontSize:16, fontWeight:700, color:selected===opt?"#5B4EFF":"#0f172a" }}>{opt}</span>
-                <div style={{ width:28, height:28, borderRadius:"50%", background:selected===opt?"#5B4EFF":"#E2E8F0", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                  {selected===opt ? <Check size={14} color="#fff"/> : <ChevronRight size={14} color="#94A3B8"/>}
+
+              {/* Label bar — no image */}
+              {!optionImages[i] && (
+                <div style={{ flex:1, display:"flex", alignItems:"center", padding:"18px 20px", background:"#F8FAFC" }}>
+                  <span style={{ fontSize:16, fontWeight:700, color: selected===opt ? labelColor : "#0f172a", flex:1, textAlign:"left" }}>{opt}</span>
+                  <div style={{ width:28, height:28, borderRadius:"50%", background: selected===opt ? labelColor : "#E2E8F0", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <ChevronRight size={14} color={selected===opt ? textColor : "#94A3B8"}/>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* Label bar — with image */}
+              {optionImages[i] && (
+                <div style={{
+                  padding:"14px 16px",
+                  background: labelColor,
+                  display:"flex",
+                  alignItems:"center",
+                  justifyContent:"space-between",
+                  gap:10,
+                  flexShrink:0,
+                }}>
+                  <span style={{
+                    fontSize:15,
+                    fontWeight:700,
+                    color: textColor,
+                    whiteSpace:"nowrap",
+                    overflow:"hidden",
+                    textOverflow:"ellipsis",
+                  }}>{opt}</span>
+                  <div style={{
+                    width:30,
+                    height:30,
+                    borderRadius:"50%",
+                    background:"rgba(255,255,255,0.2)",
+                    display:"flex",
+                    alignItems:"center",
+                    justifyContent:"center",
+                    flexShrink:0,
+                  }}>
+                    <ChevronRight size={15} color={textColor}/>
+                  </div>
+                </div>
+              )}
             </button>
           ))}
         </div>
+
+        <style>{`
+          .quiz-shimmer { animation: quizShimmer 1.4s infinite; }
+          @keyframes quizShimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+          }
+        `}</style>
       </div>
     );
   }
@@ -249,7 +338,7 @@ function QuizBlock({ block, answers, onChoice, onNext }) {
           {options.map((opt, i) => (
             <button key={i}
               onClick={() => { onChoice(block.id, opt.label, c.isSplit, i); setTimeout(onNext, 250); }}
-              style={{ display:"flex", alignItems:"center", gap:16, padding:"18px 24px", borderRadius:16, border:`2px solid ${selected===opt.label?"#5B4EFF":"#E2E8F0"}`, background: selected===opt.label?"#EEF2FF":"#F8FAFC", cursor:"pointer", transition:"all 0.15s", textAlign:"left", boxShadow: selected===opt.label?"0 4px 14px rgba(91,78,255,0.2)":"none" }}
+              style={{ display:"flex", alignItems:"center", gap:16, padding:"18px 24px", borderRadius:16, border:`2px solid ${selected===opt.label?"#5B4EFF":"#E2E8F0"}`, background: selected===opt.label?"#EEF2FF":"#F8FAFC", cursor:"pointer", transition:"all 0.15s", textAlign:"left", outline:"none", WebkitTapHighlightColor:"transparent", boxShadow: selected===opt.label?"0 4px 14px rgba(91,78,255,0.2)":"none" }}
               onMouseEnter={e => { e.currentTarget.style.borderColor="#5B4EFF"; e.currentTarget.style.background="#EEF2FF"; }}
               onMouseLeave={e => { if (selected!==opt.label) { e.currentTarget.style.borderColor="#E2E8F0"; e.currentTarget.style.background="#F8FAFC"; } }}
             >
@@ -307,7 +396,6 @@ function QuizBlock({ block, answers, onChoice, onNext }) {
       );
     }
 
-    // image-left or image-right
     return (
       <div style={{ width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, alignItems:"center" }}>
         {layout === "image-left" ? <>{imageContent}{textContent}</> : <>{textContent}{imageContent}</>}
@@ -533,7 +621,6 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
         <div style={{ width:"100%", textAlign:"center", paddingBottom:40 }}>
           <h1 style={{ fontSize:24, fontWeight:900, color:"#0f172a", margin:"0 0 4px" }}>Your Personalized A.I. Certificate Program is Ready!</h1>
           <p style={{ fontSize:14, color:"#5B4EFF", fontWeight:700, margin:"0 0 24px" }}>Become the Master of A.I.</p>
-
           <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:20 }}>
             {plans.map((plan) => (
               <div key={plan.name} onClick={() => setSelectedPlan(plan.name)}
@@ -556,9 +643,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
               </div>
             ))}
           </div>
-
           <p style={{ fontSize:13, color:"#64748B", margin:"0 0 20px" }}>People using plan for 3 months achieve twice as many results as for 1 month</p>
-          {/* Legal text for selected plan */}
           {pricingData && (() => {
             const planData = pricingData.plans?.find(p => p.name === selectedPlan);
             if (!planData?.legalText) return null;
