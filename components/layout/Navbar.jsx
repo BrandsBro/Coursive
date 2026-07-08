@@ -73,7 +73,7 @@ export default function Navbar() {
   return (
     <>
       <nav style={{ position:"sticky", top:0, zIndex:50, width:"100%", background:"#fff", borderBottom:"1px solid #F1F5F9", boxShadow:"0 1px 4px rgba(0,0,0,0.04)" }}>
-        <div style={{ maxWidth:1152, margin:"0 auto", padding:"0 16px", height:60, display:"flex", alignItems:"center", justifyContent:"space-between", gap:12 }}>
+        <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 16px", height:60, display:"flex", alignItems:"center", justifyContent:"space-between", gap:12 }}>
 
           {/* Logo */}
           <Link href="/home" style={{ textDecoration:"none", flexShrink:0 }}>
