@@ -77,29 +77,27 @@ export default function QuizFlow({ blocks }) {
   useEffect(() => { if (name) sessionStorage.setItem("quiz_name", name); }, [name]);
   useEffect(() => { if (endStep) sessionStorage.setItem("quiz_endstep", endStep); }, [endStep]);
 
-const goNext = () => {
-  // Block if current block is a question and no answer selected
-  if (!isInEndSequence && currentBlock) {
-    const isQuestion = currentBlock.type === "question_choice" || currentBlock.type === "question_icon";
-    if (isQuestion && !answers[currentBlock.id]) {
-      setToast("Please select an option to continue");
-      return;
+  const goNext = () => {
+    if (!isInEndSequence && currentBlock) {
+      const isQuestion = currentBlock.type === "question_choice" || currentBlock.type === "question_icon";
+      if (isQuestion && !answers[currentBlock.id]) {
+        setToast("Please select an option to continue");
+        return;
+      }
     }
-  }
-
-  if (isInEndSequence && endStep === "signup") {
-    if (!name.trim()) { setToast("Please enter your full name"); return; }
-    if (!email.trim() || !email.includes("@")) { setToast("Please enter a valid email address"); return; }
-  }
-  if (!isInEndSequence) {
-    if (currentIdx < visibleBlocks.length - 1) { setCurrentIdx(i => i + 1); }
-    else { setEndStep("loading"); }
-  } else {
-    const idx = END_SEQUENCE.indexOf(endStep);
-    if (idx < END_SEQUENCE.length - 1) { setEndStep(END_SEQUENCE[idx + 1]); }
-    else { router.push("/"); }
-  }
-};
+    if (isInEndSequence && endStep === "signup") {
+      if (!name.trim()) { setToast("Please enter your full name"); return; }
+      if (!email.trim() || !email.includes("@")) { setToast("Please enter a valid email address"); return; }
+    }
+    if (!isInEndSequence) {
+      if (currentIdx < visibleBlocks.length - 1) { setCurrentIdx(i => i + 1); }
+      else { setEndStep("loading"); }
+    } else {
+      const idx = END_SEQUENCE.indexOf(endStep);
+      if (idx < END_SEQUENCE.length - 1) { setEndStep(END_SEQUENCE[idx + 1]); }
+      else { router.push("/"); }
+    }
+  };
 
   const goBack = () => {
     if (isInEndSequence) {
@@ -108,9 +106,23 @@ const goNext = () => {
     } else if (currentIdx > 0) { setCurrentIdx(i => i - 1); }
   };
 
-  const handleChoice = (blockId, value, isSplit, optionIndex) => {
+  const handleChoice = (blockId, value, isSplit, optionIndex, skipNext = false) => {
     setAnswers(prev => ({ ...prev, [blockId]: value }));
     if (isSplit === "yes") { setPath(optionIndex === 0 ? "company" : "myself"); }
+    if (!skipNext) {
+      setTimeout(() => {
+        setCurrentIdx(prev => {
+          const vb = blocks.filter(b => b.path === "all" || b.path === (optionIndex === 0 && isSplit === "yes" ? "company" : isSplit === "yes" ? "myself" : path));
+          if (prev < vb.length - 1) return prev + 1;
+          return prev;
+        });
+        setEndStep(prev => {
+          const vb = blocks.filter(b => b.path === "all" || b.path === path);
+          if (currentIdx >= vb.length - 1) return "loading";
+          return prev;
+        });
+      }, 280);
+    }
   };
 
   useEffect(() => {
@@ -127,9 +139,16 @@ const goNext = () => {
     }
   }, [endStep]);
 
-const showContinueBtn = !["question_choice", "question_icon", "loading", "sales"].includes(
-  isInEndSequence ? endStep : currentBlock?.type
-);
+  const showContinueBtn = !["question_choice", "question_challenge", "question_icon", "loading", "sales"].includes(
+    isInEndSequence ? endStep : currentBlock?.type
+  );
+
+  const getMaxWidth = () => {
+    if (isInEndSequence) return 1200;
+    if (currentBlock?.type === "question_challenge") return 400;
+    if (currentBlock?.type === "question_choice" || currentBlock?.type === "question_icon") return 600;
+    return 1200;
+  };
 
   return (
     <div style={{ minHeight:"100vh", background:"#fff", display:"flex", flexDirection:"column" }}>
@@ -162,7 +181,12 @@ const showContinueBtn = !["question_choice", "question_icon", "loading", "sales"
         )}
       </div>
 
-      <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding: isMobile ? "20px 12px 100px" : "32px 20px 120px", maxWidth:650, margin:"0 auto", width:"100%" }}>
+      <div style={{
+        flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+        padding: isMobile ? "20px 12px 100px" : "32px 20px 120px",
+        maxWidth: getMaxWidth(),
+        margin:"0 auto", width:"100%"
+      }}>
         {showResume && (
           <div style={{ width:"100%", background:"#EEF2FF", border:"1.5px solid #C7D2FE", borderRadius:14, padding:"12px 14px", marginBottom:16, display:"flex", alignItems:"center", justifyContent:"space-between", gap:10 }}>
             <div>
@@ -201,9 +225,19 @@ const showContinueBtn = !["question_choice", "question_icon", "loading", "sales"
   );
 }
 
+// ─── QuizBlock ─────────────────────────────────────────────────────────────────
 function QuizBlock({ block, answers, onChoice, onNext, isMobile }) {
   const c = block.content || {};
+  const clicked = useRef(false);
 
+  const handleSelect = (blockId, value, isSplit, idx) => {
+    if (clicked.current) return;
+    clicked.current = true;
+    onChoice(blockId, value, isSplit, idx);
+    setTimeout(() => { clicked.current = false; }, 600);
+  };
+
+  // ── question_choice ──────────────────────────────────────────────────────────
   if (block.type === "question_choice") {
     const options = (c.options || []).filter(Boolean);
     const optionImages = c.optionImages || [];
@@ -220,12 +254,22 @@ function QuizBlock({ block, answers, onChoice, onNext, isMobile }) {
         <div style={{ display:"grid", gridTemplateColumns: hasImages && options.length === 2 ? "1fr 1fr" : "1fr", gap: isMobile ? 10 : 20, alignItems:"stretch" }}>
           {options.map((opt, i) => (
             <button key={i}
-              onClick={() => { onChoice(block.id, opt, c.isSplit, i); setTimeout(onNext, 250); }}
-              style={{ padding:0, borderRadius: isMobile ? 14 : 20, border:`2.5px solid ${selected===opt ? labelColor : "transparent"}`, background:"#F1F5F9", cursor:"pointer", overflow:"hidden", outline:"none", WebkitTapHighlightColor:"transparent", transition:"border-color 0.15s, box-shadow 0.15s", display:"flex", flexDirection:"column", boxShadow: selected===opt ? `0 0 0 4px ${labelColor}25` : "none" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = labelColor; }}
-              onMouseLeave={e => { if (selected!==opt) e.currentTarget.style.borderColor = "transparent"; }}
+              onClick={() => handleSelect(block.id, opt, c.isSplit, i)}
+              style={{
+                padding: 0,
+                borderRadius: isMobile ? 14 : 20,
+                border: `2.5px solid ${selected === opt ? labelColor : "transparent"}`,
+                background: "#F1F5F9",
+                cursor: "pointer",
+                overflow: "hidden",
+                outline: "none",
+                WebkitTapHighlightColor: "transparent",
+                transition: "border-color 0.15s, box-shadow 0.15s",
+                display: "flex",
+                flexDirection: "column",
+                boxShadow: selected === opt ? `0 0 0 4px ${labelColor}25` : "none",
+              }}
             >
-              {/* Image with shimmer */}
               {optionImages[i] && (
                 <div style={{ position:"relative", width:"100%", height:imgH, background:"#E2E8F0", flexShrink:0, overflow:"hidden" }}>
                   <div className="quiz-shimmer" style={{ position:"absolute", inset:0, background:"linear-gradient(90deg,#E2E8F0 25%,#CBD5E1 50%,#E2E8F0 75%)", backgroundSize:"200% 100%" }}/>
@@ -237,102 +281,154 @@ function QuizBlock({ block, answers, onChoice, onNext, isMobile }) {
                   />
                 </div>
               )}
-
-              {/* Label — no image */}
-             {!optionImages[i] && (
-  <div style={{ flex:1, display:"flex", alignItems:"center", padding: isMobile ? "13px 14px" : "18px 20px", background: selected===opt ? `${labelColor}15` : "#F8FAFC" }}>
-    <span style={{ fontSize: isMobile ? 14 : 16, fontWeight:700, color:"#0f172a", flex:1, textAlign:"left" }}>{opt}</span>
-    <div style={{ width:26, height:26, borderRadius:"50%", background: selected===opt ? labelColor : "#E2E8F0", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-      <ChevronRight size={13} color={selected===opt ? textColor : "#94A3B8"}/>
-    </div>
-  </div>
-)}
-
-              {/* Label — with image: allow wrapping on mobile */}
-           {optionImages[i] && (
-  <div style={{
-    padding: isMobile ? "10px 12px" : "14px 16px",
-    background: labelColor,
-    display:"flex",
-    alignItems:"center",
-    justifyContent:"space-between",
-    gap:8,
-    flexShrink:0,
-    minHeight: isMobile ? 52 : 56,   // ← same height both cards always
-  }}>
-    <span style={{
-      fontSize: isMobile ? 12 : 15,
-      fontWeight:700,
-      color:textColor,
-      textAlign:"left",
-      wordBreak:"break-word",
-      whiteSpace: isMobile ? "normal" : "nowrap",
-      overflow:"hidden",
-      textOverflow: isMobile ? "clip" : "ellipsis",
-      flex:1,
-      lineHeight:1.3,
-    }}>{opt}</span>
-    <div style={{
-      width: isMobile ? 22 : 30,
-      height: isMobile ? 22 : 30,
-      borderRadius:"50%",
-      background:"rgba(255,255,255,0.2)",
-      display:"flex", alignItems:"center", justifyContent:"center",
-      flexShrink:0,
-    }}>
-      <ChevronRight size={isMobile ? 11 : 15} color={textColor}/>
-    </div>
-  </div>
-)}
+              {!optionImages[i] && (
+                <div style={{ flex:1, display:"flex", alignItems:"center", padding: isMobile ? "13px 14px" : "18px 20px", background: selected === opt ? `${labelColor}15` : "#F8FAFC" }}>
+                  <span style={{ fontSize: isMobile ? 14 : 16, fontWeight:700, color:"#0f172a", flex:1, textAlign:"left" }}>{opt}</span>
+                  <div style={{ width:26, height:26, borderRadius:"50%", background: selected === opt ? labelColor : "#E2E8F0", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <ChevronRight size={13} color={selected === opt ? textColor : "#94A3B8"}/>
+                  </div>
+                </div>
+              )}
+              {optionImages[i] && (
+                <div style={{
+                  padding: isMobile ? "10px 12px" : "14px 16px",
+                  background: labelColor,
+                  display:"flex", alignItems:"center", justifyContent:"space-between", gap:8,
+                  flexShrink:0, minHeight: isMobile ? 52 : 56,
+                }}>
+                  <span style={{
+                    fontSize: isMobile ? 12 : 15, fontWeight:700, color:textColor, textAlign:"left",
+                    wordBreak:"break-word", whiteSpace: isMobile ? "normal" : "nowrap",
+                    overflow:"hidden", textOverflow: isMobile ? "clip" : "ellipsis",
+                    flex:1, lineHeight:1.3,
+                  }}>{opt}</span>
+                  <div style={{ width: isMobile ? 22 : 30, height: isMobile ? 22 : 30, borderRadius:"50%", background:"rgba(255,255,255,0.2)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                    <ChevronRight size={isMobile ? 11 : 15} color={textColor}/>
+                  </div>
+                </div>
+              )}
             </button>
           ))}
         </div>
       </div>
     );
   }
-if (block.type === "question_challenge") {
-  const options = (c.options || []);
-  const hasImages = options.some(o => o.imageUrl);
-  const labelColor = c.labelColor || "#5B4EFF";
-  const cols = options.length <= 3 ? options.length : 2;
-  return (
-    <div style={{ width:"100%", textAlign:"center" }}>
-      {c.challengeTitle && (
-        <h1 style={{ fontSize:30, fontWeight:900, color:"#0f172a", margin:"0 0 10px", letterSpacing:"0.5px" }}>
-          {c.challengeTitle}
-        </h1>
-      )}
-      {c.question && <p style={{ fontSize:15, color:"#64748B", margin:"0 0 28px" }}>{c.question}</p>}
-      <div style={{ display:"grid", gridTemplateColumns:`repeat(${cols},1fr)`, gap:16 }}>
-        {options.map((opt, i) => (
-          <button key={i}
-            onClick={()=>{ onChoice(block.id, opt.label, c.isSplit, i); setTimeout(onNext, 250); }}
-            style={{ padding:0, borderRadius:18, border:`2.5px solid ${answers[block.id]===opt.label ? labelColor : "transparent"}`,
-              background:"#F1F5F9", cursor:"pointer", overflow:"hidden", outline:"none",
-              WebkitTapHighlightColor:"transparent", display:"flex", flexDirection:"column",
-              boxShadow: answers[block.id]===opt.label ? `0 0 0 4px ${labelColor}25` : "none" }}
-            onMouseEnter={e=>{ e.currentTarget.style.borderColor=labelColor; }}
-            onMouseLeave={e=>{ if(answers[block.id]!==opt.label) e.currentTarget.style.borderColor="transparent"; }}>
-            {opt.imageUrl && (
-              <div style={{ height:240, overflow:"hidden", flexShrink:0, background:"#E2E8F0" }}>
-                <img src={opt.imageUrl} alt={opt.label} loading="eager"
-                  style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 10%", display:"block" }}/>
-              </div>
-            )}
-            <div style={{ padding:"13px 16px", background:labelColor, display:"flex",
-              alignItems:"center", justifyContent:"space-between", gap:10 }}>
-              <span style={{ fontSize:15, fontWeight:700, color:"#fff", textAlign:"left", lineHeight:1.3 }}>{opt.label}</span>
-              <div style={{ width:28, height:28, borderRadius:"50%", background:"rgba(255,255,255,.2)",
-                display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                <ChevronRight size={14} color="#fff"/>
-              </div>
-            </div>
-          </button>
-        ))}
+
+  // ── question_challenge ───────────────────────────────────────────────────────
+  if (block.type === "question_challenge") {
+    const options = (c.options || []).filter(Boolean);
+    const optionImages = c.optionImages || [];
+    const labelColor = c.labelColor || "#5B4EFF";
+    const cols = options.length <= 3 ? options.length : 2;
+    const cardH = isMobile ? 160 : 200;
+    const imgH  = isMobile ? 180 : 220;
+
+    return (
+      <div style={{ width:"100%", textAlign:"center" }}>
+        {c.challengeTitle && (
+          <h1 style={{ fontSize: isMobile ? 22 : 28, fontWeight:900, color:"#0f172a", margin:"0 0 10px", letterSpacing:"0.5px" }}>
+            {c.challengeTitle}
+          </h1>
+        )}
+        {c.question && (
+          <p style={{ fontSize: isMobile ? 14 : 17, color:"#64748B", margin: isMobile ? "0 0 60px" : "0 0 16px" }}>{c.question}</p>
+        )}
+        <div style={{
+          display:"grid",
+          gridTemplateColumns:`repeat(${cols}, 1fr)`,
+          gap: isMobile ? 16 : 32,
+          maxWidth: isMobile ? "92%" : 480,
+          margin:"0 auto",
+          paddingTop: isMobile ? 0 : 90,
+        }}>
+          {options.map((opt, i) => {
+            const label = typeof opt === "object" ? opt.label : opt;
+            const imgUrl = optionImages[i] || (typeof opt === "object" ? opt.imageUrl : "");
+            const selected = answers[block.id] === label;
+
+            return (
+              <button key={i}
+                onClick={() => handleSelect(block.id, label, c.isSplit, i)}
+                style={{
+                  position: "relative",
+                  padding: 0,
+                  height: cardH,
+                  borderRadius: isMobile ? 16 : 20,
+                  border: `2.5px solid ${selected ? labelColor : "#E2E8F0"}`,
+                  background: "#F1F5F9",
+                  cursor: "pointer",
+                  outline: "none",
+                  WebkitTapHighlightColor: "transparent",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "flex-end",
+                  overflow: "visible",
+                  boxShadow: selected ? `0 0 0 4px ${labelColor}25` : "none",
+                  transition: "border-color 0.15s, box-shadow 0.15s",
+                }}
+              >
+                {imgUrl && (
+                  <>
+                    <div className="quiz-shimmer" style={{
+                      position:"absolute", bottom:0, left:"50%", transform:"translateX(-50%)",
+                      width:"100%", height:imgH,
+                      background:"linear-gradient(90deg,#E2E8F0 25%,#CBD5E1 50%,#E2E8F0 75%)",
+                      backgroundSize:"200% 100%",
+                      borderRadius: isMobile ? 14 : 18,
+                      zIndex:1,
+                    }}/>
+                    <img
+                      src={imgUrl} alt={label}
+                      loading="eager" fetchPriority="high" decoding="async"
+                      onLoad={e => { e.target.style.opacity=1; const s=e.target.previousSibling; if(s) s.style.display="none"; }}
+                      style={{
+                        position:"absolute",
+                        bottom: isMobile ? 48 : 52,
+                        left:"50%",
+                        transform:"translateX(-50%)",
+                        width:"100%",
+                        height:imgH,
+                        objectFit:"cover",
+                        objectPosition:"center top",
+                        display:"block",
+                        opacity:0,
+                        transition:"opacity 0.3s ease",
+                        zIndex:2,
+                        pointerEvents:"none",
+                      }}
+                    />
+                  </>
+                )}
+                <div style={{
+                  position:"relative",
+                  zIndex:3,
+                  padding: isMobile ? "10px 12px" : "12px 16px",
+                  background: labelColor,
+                  display:"flex", alignItems:"center", justifyContent:"space-between", gap:8,
+                  flexShrink:0, minHeight: isMobile ? 48 : 52,
+                  borderRadius: `0 0 ${isMobile ? 14 : 18}px ${isMobile ? 14 : 18}px`,
+                }}>
+                  <span style={{
+                    fontSize: isMobile ? 12 : 15, fontWeight:700, color:"#fff", textAlign:"left",
+                    flex:1, lineHeight:1.3,
+                  }}>{label}</span>
+                  <div style={{
+                    width: isMobile ? 24 : 28, height: isMobile ? 24 : 28,
+                    borderRadius:"50%", background:"rgba(255,255,255,0.2)",
+                    display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0
+                  }}>
+                    <ChevronRight size={isMobile ? 12 : 14} color="#fff"/>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
+
+  // ── question_icon ────────────────────────────────────────────────────────────
   if (block.type === "question_icon") {
     const options = (c.options || []);
     const selected = answers[block.id];
@@ -343,13 +439,20 @@ if (block.type === "question_challenge") {
         <div style={{ display:"flex", flexDirection:"column", gap: isMobile ? 8 : 12 }}>
           {options.map((opt, i) => (
             <button key={i}
-              onClick={() => { onChoice(block.id, opt.label, c.isSplit, i); setTimeout(onNext, 250); }}
-              style={{ display:"flex", alignItems:"center", gap: isMobile ? 12 : 16, padding: isMobile ? "12px 14px" : "18px 24px", borderRadius: isMobile ? 12 : 16, border:`2px solid ${selected===opt.label?"#5B4EFF":"#E2E8F0"}`, background: selected===opt.label?"#EEF2FF":"#F8FAFC", cursor:"pointer", transition:"all 0.15s", textAlign:"left", outline:"none", WebkitTapHighlightColor:"transparent", boxShadow: selected===opt.label?"0 4px 14px rgba(91,78,255,0.2)":"none" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor="#5B4EFF"; e.currentTarget.style.background="#EEF2FF"; }}
-              onMouseLeave={e => { if (selected!==opt.label) { e.currentTarget.style.borderColor="#E2E8F0"; e.currentTarget.style.background="#F8FAFC"; } }}
+              onClick={() => handleSelect(block.id, opt.label, c.isSplit, i)}
+              style={{
+                display:"flex", alignItems:"center", gap: isMobile ? 12 : 16,
+                padding: isMobile ? "12px 14px" : "18px 24px",
+                borderRadius: isMobile ? 12 : 16,
+                border:`2px solid ${selected === opt.label ? "#5B4EFF" : "#E2E8F0"}`,
+                background: selected === opt.label ? "#EEF2FF" : "#F8FAFC",
+                cursor:"pointer", transition:"all 0.15s", textAlign:"left",
+                outline:"none", WebkitTapHighlightColor:"transparent",
+                boxShadow: selected === opt.label ? "0 4px 14px rgba(91,78,255,0.2)" : "none",
+              }}
             >
               <span style={{ fontSize: isMobile ? 24 : 32, width: isMobile ? 36 : 48, textAlign:"center", flexShrink:0 }}>{opt.emoji||"•"}</span>
-              <span style={{ fontSize: isMobile ? 14 : 16, fontWeight:700, color:selected===opt.label?"#5B4EFF":"#0f172a" }}>{opt.label}</span>
+              <span style={{ fontSize: isMobile ? 14 : 16, fontWeight:700, color: selected === opt.label ? "#5B4EFF" : "#0f172a" }}>{opt.label}</span>
             </button>
           ))}
         </div>
@@ -357,6 +460,7 @@ if (block.type === "question_challenge") {
     );
   }
 
+  // ── image_section ────────────────────────────────────────────────────────────
   if (block.type === "image_section") {
     const c2 = block.content || {};
     const layout = c2.layout || "image-right";
@@ -383,7 +487,6 @@ if (block.type === "question_challenge") {
       </div>
     ) : null;
 
-    // Mobile: always text top centered, image below
     if (isMobile) {
       return (
         <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:16, alignItems:"center" }}>
@@ -392,7 +495,6 @@ if (block.type === "question_challenge") {
         </div>
       );
     }
-
     if (layout === "image-top") return <div style={{ width:"100%" }}>{imageContent && <div style={{ marginBottom:24 }}>{imageContent}</div>}{textContent}</div>;
     if (layout === "fullwidth") return (
       <div style={{ width:"100%" }}>
@@ -410,6 +512,7 @@ if (block.type === "question_challenge") {
   return null;
 }
 
+// ─── EndBlock ──────────────────────────────────────────────────────────────────
 function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, blocks, showToast, isMobile }) {
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState("4-Week Plan");
@@ -436,6 +539,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
   const handleGetPlan = () => { if (!name || !email) { showToast("Please go back and fill in your name and email"); return; } setShowPayment(true); };
   const handlePaymentSuccess = () => { setShowPayment(false); sessionStorage.clear(); router.push("/payment-success"); };
 
+  // ── loading ──────────────────────────────────────────────────────────────────
   if (step === "loading") {
     const reviewIdx = Math.floor((loadingPct / 100) * FIXED_REVIEWS.length);
     const review = FIXED_REVIEWS[Math.min(reviewIdx, FIXED_REVIEWS.length-1)];
@@ -473,6 +577,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
     );
   }
 
+  // ── summary ──────────────────────────────────────────────────────────────────
   if (step === "summary") {
     return (
       <div style={{ width:"100%" }}>
@@ -506,6 +611,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
     );
   }
 
+  // ── comparison ───────────────────────────────────────────────────────────────
   if (step === "comparison") {
     const withoutItems = ["No time to get started","No recognized credential","A.I. feels hard to use","Invisible to employers"];
     const withItems = ["Clear, step-by-step path","Shareable A.I. credential","Reliable results from A.I.","Stand out from other workers"];
@@ -541,6 +647,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
     );
   }
 
+  // ── signup ───────────────────────────────────────────────────────────────────
   if (step === "signup") {
     return (
       <div style={{ width:"100%", maxWidth:480, margin:"0 auto" }}>
@@ -583,6 +690,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
     );
   }
 
+  // ── sales ────────────────────────────────────────────────────────────────────
   if (step === "sales") {
     const plans = pricingData?.plans ? pricingData.plans.map(p => ({
       name:p.name, price:p.salePrice, originalPrice:p.regularPrice,
