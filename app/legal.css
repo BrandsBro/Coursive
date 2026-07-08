@@ -1,0 +1,14 @@
+
+.legal-page { min-height:100vh; background:#F8FAFC; font-family:system-ui,-apple-system,sans-serif; }
+.legal-header { background:#0f172a; padding:20px 24px; text-align:center; }
+.legal-logo { font-size:22px; font-weight:900; color:#fff; font-style:italic; text-decoration:none; }
+.legal-container { max-width:800px; margin:0 auto; padding:40px 24px 80px; }
+.legal-h1 { font-size:28px; font-weight:900; color:#0f172a; margin:0 0 4px; }
+.legal-date { font-size:13px; color:#94A3B8; margin:0 0 32px; }
+.lh2 { font-size:18px; font-weight:800; color:#0f172a; margin:32px 0 10px; padding-top:16px; border-top:2px solid #E2E8F0; }
+.lp { font-size:15px; color:#374151; line-height:1.85; margin:0 0 14px; }
+.lul { padding-left:22px; margin:0 0 14px; }
+.lli { font-size:15px; color:#374151; line-height:1.85; margin-bottom:8px; }
+.lcontact { background:#EEF2FF; border:1.5px solid #C7D2FE; border-radius:16px; padding:24px; margin-top:40px; font-size:14px; color:#4338CA; line-height:1.9; }
+.lcontact a { color:#5B4EFF; }
+.lcontact strong { font-weight:800; }

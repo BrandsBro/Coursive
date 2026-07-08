@@ -1,4 +1,15 @@
 "use client";
+import "./legal.css";
+export default function Page() {
+  return (
+    <div className="legal-page">
+      <div className="legal-header">
+        <a href="/" className="legal-logo">✦ 1Course</a>
+      </div>
+      <div className="legal-container">
+        <h1 className="legal-h1">Privacy Policy</h1>
+        <p className="legal-date">Last Updated: July 8, 2026</p>
+        "use client";
 export default function Page() {
   return (
     <div style={{ minHeight:"100vh", background:"#F8FAFC", fontFamily:"system-ui,-apple-system,sans-serif" }}>
@@ -143,6 +154,16 @@ export default function Page() {
           <p style={{ fontSize:14, color:"#4338CA", margin:"0 0 4px" }}>5830 East 2nd Street, Casper, Wyoming 82609</p>
           <p style={{ fontSize:14, color:"#4338CA", margin:"0 0 4px" }}>Email: <a href="mailto:support@1course.io" style={{ color:"#5B4EFF" }}>support@1course.io</a></p>
           <p style={{ fontSize:12, color:"#6366f1", margin:"12px 0 0" }}>© CARTIX LLC 2026. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+        <div className="lcontact">
+          <p><strong>Cartix LLC (1Course)</strong></p>
+          <p>5830 East 2nd Street, Casper, Wyoming 82609</p>
+          <p>Email: <a href="mailto:support@1course.io">support@1course.io</a></p>
+          <p>© CARTIX LLC 2026. All rights reserved.</p>
         </div>
       </div>
     </div>
