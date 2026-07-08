@@ -28,37 +28,38 @@ export default function HomeNav() {
 
   return (
     <>
-      <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:100, background:"rgba(10,8,30,0.95)", backdropFilter:"blur(12px)", borderBottom:"1px solid rgba(255,255,255,0.06)" }}><div style={{ maxWidth:1200, margin:"0 auto", padding:"0 20px", height:60, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-        <Link href="/" style={{ textDecoration:"none" }}>
-          <img src={branding.logoMain||"https://i.postimg.cc/HsMMTybQ/1course-Logo-White-Version.png"} alt="1Course" className="logo-main" style={{ objectFit:"contain", padding:5 }}/>
-        </Link>
+      <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:100, background:"rgba(10,8,30,0.95)", backdropFilter:"blur(12px)", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+        <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 20px", height:60, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <Link href="/" style={{ textDecoration:"none" }}>
+            <img src={branding.logoMain||"https://i.postimg.cc/HsMMTybQ/1course-Logo-White-Version.png"} alt="1Course" className="logo-main" style={{ objectFit:"contain", padding:5 }}/>
+          </Link>
 
-        {isMobile ? (
-          <button onClick={() => setMenuOpen(!menuOpen)} style={{ background:"none", border:"none", color:"#fff", fontSize:24, cursor:"pointer", padding:4 }}>
-            {menuOpen ? "✕" : "☰"}
-          </button>
-        ) : (
-          <div style={{ display:"flex", alignItems:"center", gap:24 }}>
-            {links.map(item => (
-              <span key={item.label} onClick={() => scrollTo(item.id)}
-                style={{ color:"rgba(255,255,255,0.6)", fontSize:13, fontWeight:500, cursor:"pointer" }}
-                onMouseEnter={e=>e.currentTarget.style.color="#fff"}
-                onMouseLeave={e=>e.currentTarget.style.color="rgba(255,255,255,0.6)"}>
-                {item.label}
-              </span>
-            ))}
-          </div>
-        )}
+          {isMobile ? (
+            <button onClick={() => setMenuOpen(!menuOpen)} style={{ background:"none", border:"none", color:"#fff", fontSize:24, cursor:"pointer", padding:4 }}>
+              {menuOpen ? "✕" : "☰"}
+            </button>
+          ) : (
+            <div style={{ display:"flex", alignItems:"center", gap:24 }}>
+              {links.map(item => (
+                <span key={item.label} onClick={() => scrollTo(item.id)}
+                  style={{ color:"rgba(255,255,255,0.6)", fontSize:13, fontWeight:500, cursor:"pointer" }}
+                  onMouseEnter={e=>e.currentTarget.style.color="#fff"}
+                  onMouseLeave={e=>e.currentTarget.style.color="rgba(255,255,255,0.6)"}>
+                  {item.label}
+                </span>
+              ))}
+            </div>
+          )}
 
-        {!isMobile && (
-          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-            <Link href="/login" style={{ padding:"8px 16px", borderRadius:10, border:"1px solid rgba(255,255,255,0.15)", background:"transparent", color:"rgba(255,255,255,0.7)", fontSize:13, fontWeight:600, textDecoration:"none" }}>Log in</Link>
-            <Link href="/quiz" style={{ padding:"8px 16px", borderRadius:10, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:13, fontWeight:700, textDecoration:"none" }}>Start now</Link>
-          </div>
-        )}
+          {!isMobile && (
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <Link href="/login" style={{ padding:"8px 16px", borderRadius:10, border:"1px solid rgba(255,255,255,0.15)", background:"transparent", color:"rgba(255,255,255,0.7)", fontSize:13, fontWeight:600, textDecoration:"none" }}>Log in</Link>
+              <Link href="/quiz" style={{ padding:"8px 16px", borderRadius:10, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:13, fontWeight:700, textDecoration:"none" }}>Start now</Link>
+            </div>
+          )}
+        </div>
       </nav>
 
-</div>
       {/* Mobile menu */}
       {isMobile && menuOpen && (
         <div style={{ position:"fixed", top:60, left:0, right:0, zIndex:99, background:"rgba(10,8,30,0.98)", borderBottom:"1px solid rgba(255,255,255,0.08)", padding:"16px 20px", display:"flex", flexDirection:"column", gap:4 }}>
