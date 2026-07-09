@@ -67,13 +67,16 @@ export default function QuizFlow({ blocks }) {
   // Preload all block images on mount
   useEffect(() => {
     const allImgs = [];
-    (blocks || []).forEach(block => {
+    (blocks || []).forEach((block, idx) => {
       const c = block.content || {};
-      (c.optionImages || []).forEach(src => src && allImgs.push(src));
-      if (c.imageUrl) allImgs.push(c.imageUrl);
-      if (c.headerImage) allImgs.push(c.headerImage);
+      const srcs = [...(c.optionImages || []), c.imageUrl, c.headerImage].filter(Boolean);
+      srcs.forEach(src => {
+        const img = new Image();
+        // First block loads with high priority
+        if (idx === 0) img.fetchPriority = "high";
+        img.src = src;
+      });
     });
-    allImgs.forEach(src => { const img = new Image(); img.src = src; });
   }, []);
   const visibleBlocks = blocks.filter(b => b.path === "all" || b.path === path);
   const isInEndSequence = endStep !== null;
