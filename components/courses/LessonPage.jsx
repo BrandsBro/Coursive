@@ -286,8 +286,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
         )}
       </div>
 
-      {/* Portaled modals — rendered directly into document.body so parent
-          CSS transforms/overflow can never clip or misposition them */}
+      {/* Portaled modals */}
       {showComplete && typeof document !== "undefined" && createPortal(
         <div
           onClick={() => setShowComplete(false)}
@@ -305,7 +304,7 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
               background: #fff;
               border-radius: 24px 24px 0 0;
               box-shadow: 0 -8px 40px rgba(0,0,0,0.2);
-              padding: 12px 16px 40px;
+              padding: 12px 16px calc(40px + env(safe-area-inset-bottom, 0px));
               box-sizing: border-box;
             }
             @media (min-width: 768px) {
@@ -321,16 +320,11 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
               }
             }
           `}</style>
-          {/* Sheet */}
-          <div
-            className="complete-sheet"
-            onClick={e => e.stopPropagation()}>
-            {/* Drag handle - mobile only */}
+          <div className="complete-sheet" onClick={e => e.stopPropagation()}>
             <div className="drag-handle-mobile" style={{ display:"flex", justifyContent:"center", marginBottom:16 }}>
               <style>{`.drag-handle-mobile { display: flex; } @media (min-width: 768px) { .drag-handle-mobile { display: none !important; } }`}</style>
               <div style={{ width:36, height:4, borderRadius:999, background:"#E2E8F0" }}/>
             </div>
-            {/* Gradient card */}
             <div style={{
               background:"linear-gradient(135deg,#7c3aed,#4f46e5)",
               borderRadius:18,
@@ -346,7 +340,6 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
                 {nextLesson ? "Great work — keep going!" : "You finished the entire course!"}
               </p>
             </div>
-            {/* Up next */}
             {nextLesson && (
               <div style={{
                 background:"#F8FAFC",
@@ -420,17 +413,21 @@ function renderInline(text) {
   });
 }
 
+/* ─────────────────────────────────────────────
+   BlankOptionsBlock — fully mobile-responsive
+───────────────────────────────────────────── */
 function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFillShowAnswer, onDone, onClose }) {
   const blanks = c.blanks || [];
   const sentence = c.sentence || "";
   const parts = sentence.split(/\(\s*[^)]*\s*\)/);
   const blankMatches = (sentence.match(/\(\s*[^)]+\s*\)/g) || []);
   const blankCount = parts.length - 1;
-  const derivedBlanks = blankMatches.map((m, i) => blanks[i]?.correct ? blanks[i] : { correct: m.replace(/^\(\s*|\s*\)$/g,'').trim() });
+  const derivedBlanks = blankMatches.map((m, i) =>
+    blanks[i]?.correct ? blanks[i] : { correct: m.replace(/^\(\s*|\s*\)$/g,"").trim() }
+  );
 
   const options = useMemo(() => {
-    return [...derivedBlanks.map(b => b.correct).filter(Boolean)]
-      .sort(() => Math.random() - 0.5);
+    return [...derivedBlanks.map(b => b.correct).filter(Boolean)].sort(() => Math.random() - 0.5);
   }, []);
 
   const [filled, setFilled] = useState(Array(blankCount).fill(null));
@@ -465,43 +462,196 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
   };
 
   return (
-    <div style={{ position:"fixed", inset:0, background:"#fff", zIndex:200, display:"flex", flexDirection:"column" }}>
-      <div style={{ padding:"14px 20px", borderBottom:"1px solid #F1F5F9", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-        <button onClick={() => onDone && onDone()} style={{ width:32, height:32, borderRadius:"50%", border:"1.5px solid #E2E8F0", background:"#fff", cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", color:"#64748B" }}>✕</button>
+    <div style={{ position:"fixed", inset:0, background:"#fff", zIndex:200, display:"flex", flexDirection:"column", overscrollBehavior:"contain" }}>
+      <style>{`
+        @keyframes blankBlink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.4; }
+        }
+        .blank-slot {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 72px;
+          max-width: 140px;
+          padding: 6px 10px;
+          margin: 0 3px;
+          border-radius: 10px;
+          border-width: 2px;
+          border-style: solid;
+          font-weight: 700;
+          font-size: 14px;
+          text-align: center;
+          vertical-align: middle;
+          cursor: pointer;
+          transition: all 0.15s;
+          box-sizing: border-box;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        @media (min-width: 480px) {
+          .blank-slot {
+            min-width: 80px;
+            max-width: 180px;
+            font-size: 15px;
+            padding: 7px 12px;
+          }
+        }
+        .blank-slot-active {
+          animation: blankBlink 1.2s ease-in-out infinite;
+        }
+        .bo-sentence {
+          font-size: 15px;
+          line-height: 2.6;
+          color: #0f172a;
+          font-weight: 500;
+          word-break: break-word;
+        }
+        @media (min-width: 480px) {
+          .bo-sentence { font-size: 16px; }
+        }
+        .bo-options-grid {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          justify-content: center;
+        }
+        .bo-option-btn {
+          padding: 10px 18px;
+          border-radius: 12px;
+          border-width: 2px;
+          border-style: solid;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.15s;
+          white-space: nowrap;
+        }
+        @media (min-width: 480px) {
+          .bo-option-btn {
+            padding: 12px 22px;
+            font-size: 14px;
+          }
+        }
+        .bo-check-btn {
+          width: 100%;
+          padding: 14px;
+          border-radius: 14px;
+          border: none;
+          font-size: 15px;
+          font-weight: 800;
+          cursor: pointer;
+          box-shadow: 0 4px 0 #16a34a;
+          transition: transform 0.1s;
+        }
+        .bo-check-btn:active { transform: scale(0.98); }
+      `}</style>
+
+      {/* Header */}
+      <div style={{
+        padding:"14px 20px",
+        borderBottom:"1px solid #F1F5F9",
+        display:"flex",
+        alignItems:"center",
+        justifyContent:"space-between",
+        flexShrink:0,
+      }}>
+        <button
+          onClick={() => onDone && onDone()}
+          style={{ width:32, height:32, borderRadius:"50%", border:"1.5px solid #E2E8F0", background:"#fff", cursor:"pointer", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center", color:"#64748B" }}>
+          ✕
+        </button>
+        {/* Progress dots */}
         <div style={{ display:"flex", gap:6 }}>
-          {Array.from({length:blankCount},(_,i) => (
-            <div key={i} onClick={() => !isChecked && setActiveBlank(i)} style={{ width:filled[i]?28:24, height:8, borderRadius:999, background:filled[i]?"#5B4EFF":activeBlank===i?"#C7D2FE":"#E2E8F0", transition:"all 0.2s", cursor:"pointer" }}/>
+          {Array.from({ length: blankCount }, (_, i) => (
+            <div
+              key={i}
+              onClick={() => !isChecked && setActiveBlank(i)}
+              style={{
+                width: filled[i] ? 28 : 22,
+                height: 8,
+                borderRadius: 999,
+                background: filled[i]
+                  ? "#5B4EFF"
+                  : activeBlank === i
+                  ? "#C7D2FE"
+                  : "#E2E8F0",
+                transition: "all 0.2s",
+                cursor: "pointer",
+              }}
+            />
           ))}
         </div>
         <div style={{ width:32 }}/>
       </div>
 
-      <div style={{ flex:1, overflowY:"auto", display:"flex", flexDirection:"column" }}>
-        <div style={{ maxWidth:600, margin:"0 auto", width:"100%", padding:"32px 24px", flex:1 }}>
-          {c.taskTitle && <h2 style={{ fontSize:22, fontWeight:800, color:"#0f172a", margin:"0 0 8px" }}>{c.taskTitle}</h2>}
-          {c.taskDesc && <p style={{ fontSize:15, color:"#374151", margin:"0 0 28px", lineHeight:1.65 }}>{c.taskDesc}</p>}
+      {/* Scrollable body */}
+      <div style={{ flex:1, overflowY:"auto", WebkitOverflowScrolling:"touch" }}>
+        <div style={{ maxWidth:600, margin:"0 auto", padding:"24px 20px 16px" }}>
+          {c.taskTitle && (
+            <h2 style={{ fontSize:20, fontWeight:800, color:"#0f172a", margin:"0 0 6px", lineHeight:1.25 }}>
+              {c.taskTitle}
+            </h2>
+          )}
+          {c.taskDesc && (
+            <p style={{ fontSize:14, color:"#374151", margin:"0 0 20px", lineHeight:1.65 }}>
+              {c.taskDesc}
+            </p>
+          )}
 
-          <div style={{ fontSize:16, fontWeight:500, color:"#0f172a", lineHeight:3.5, marginBottom:8 }}>
+          {/* Sentence with blanks */}
+          <div className="bo-sentence" style={{ marginBottom:8 }}>
             {parts.map((part, i) => (
               <span key={i}>
                 {part}
                 {i < blankCount && (() => {
                   const val = filled[i];
                   const isActive = activeBlank === i && !isChecked;
-                  const ok = isChecked && val === derivedBlanks[i]?.correct;
+                  const ok   = isChecked && val === derivedBlanks[i]?.correct;
                   const wrong = isChecked && val !== derivedBlanks[i]?.correct;
+
+                  let borderColor = "#D1D5DB";
+                  let bg = "#F9FAFB";
+                  let color = "#94A3B8";
+                  let shadow = "0 2px 0 #D1D5DB";
+
+                  if (isActive && !val) {
+                    borderColor = "#5B4EFF"; bg = "#EEF2FF"; color = "#5B4EFF";
+                    shadow = "0 0 0 3px rgba(91,78,255,0.18)";
+                  } else if (val && !isChecked) {
+                    borderColor = "#374151"; bg = "#F9FAFB"; color = "#111827";
+                    shadow = "0 2px 6px rgba(0,0,0,0.08)";
+                  } else if (ok) {
+                    borderColor = "#22c55e"; bg = "#F0FDF4"; color = "#166534"; shadow = "none";
+                  } else if (wrong) {
+                    borderColor = "#ef4444"; bg = "#FEF2F2"; color = "#991B1B"; shadow = "none";
+                  } else if (isActive && val) {
+                    borderColor = "#5B4EFF"; bg = "#EEF2FF"; color = "#4338CA";
+                    shadow = "0 0 0 3px rgba(91,78,255,0.18)";
+                  }
+
                   return (
-                    <span onClick={() => !isChecked && (val ? clearBlank(i) : setActiveBlank(i))}
-                      style={{ display:"inline-block", minWidth:80, maxWidth:"90vw", padding:"8px 12px", margin:"0 4px", borderRadius:14, border:`2.5px solid ${isActive?"#5B4EFF":ok?"#22c55e":wrong?"#ef4444":val?"#374151":"#D1D5DB"}`, background:isActive?"#EEF2FF":ok?"#F0FDF4":wrong?"#FEF2F2":val?"#F9FAFB":"#F9FAFB", color:isActive?"#5B4EFF":ok?"#166534":wrong?"#991B1B":val?"#111827":"#94A3B8", fontWeight:700, fontSize:18, textAlign:"center", verticalAlign:"middle", cursor:!isChecked?"pointer":"default", boxShadow:isActive?"0 0 0 4px rgba(91,78,255,0.2), 0 4px 12px rgba(91,78,255,0.15)":val?"0 2px 8px rgba(0,0,0,0.08)":"0 2px 0 #D1D5DB", transition:"all 0.2s", transform:isActive?"scale(1.05)":"scale(1)", animation:isActive&&!val?"blink 1s ease-in-out infinite":"none", position:"relative" }}>
+                    <span
+                      key={i}
+                      className={`blank-slot${isActive && !val ? " blank-slot-active" : ""}`}
+                      onClick={() => !isChecked && (val ? clearBlank(i) : setActiveBlank(i))}
+                      style={{ borderColor, background:bg, color, boxShadow:shadow }}
+                    >
                       {val ? (
-                        <span style={{ display:"flex", alignItems:"center", gap:6 }}>
-                          {val}
-                          {!isChecked && <span onClick={e => { e.stopPropagation(); clearBlank(i); }} style={{ width:18, height:18, borderRadius:"50%", background:"rgba(0,0,0,0.15)", display:"inline-flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:900, cursor:"pointer", flexShrink:0 }}>✕</span>}
+                        <span style={{ display:"flex", alignItems:"center", gap:4 }}>
+                          <span style={{ overflow:"hidden", textOverflow:"ellipsis", maxWidth:100 }}>{val}</span>
+                          {!isChecked && (
+                            <span
+                              onClick={e => { e.stopPropagation(); clearBlank(i); }}
+                              style={{ width:16, height:16, borderRadius:"50%", background:"rgba(0,0,0,0.15)", display:"inline-flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:900, cursor:"pointer", flexShrink:0 }}>
+                              ✕
+                            </span>
+                          )}
                         </span>
                       ) : (
-                        isActive ? <span style={{ opacity:0.5 }}>_ _ _</span> : <span style={{ opacity:0.2 }}>_ _ _</span>
+                        <span style={{ opacity: isActive ? 0.6 : 0.3, letterSpacing:2 }}>_ _</span>
                       )}
-                      {isActive && !val && <span style={{ position:"absolute", bottom:-6, left:"50%", transform:"translateX(-50%)", width:6, height:6, borderRadius:"50%", background:"#5B4EFF", display:"block" }}/>}
                     </span>
                   );
                 })()}
@@ -510,37 +660,63 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
           </div>
 
           {!isChecked && activeBlank !== null && (
-            <p style={{ fontSize:13, color:"#94A3B8", margin:"0 0 8px" }}>
+            <p style={{ fontSize:12, color:"#94A3B8", margin:"4px 0 0" }}>
               Tap an option below to fill blank {activeBlank + 1}
             </p>
           )}
 
+          {/* Success state */}
           {isChecked && allCorrect && (
             <div style={{ marginTop:16 }}>
-              {(c.successImages||[]).filter(Boolean).map((url,i) => <img key={i} src={url} alt="" style={{ width:"100%", borderRadius:16, marginBottom:12, objectFit:"contain" }}/>)}
-              {c.successText && <p style={{ fontSize:14, color:"#374151", margin:"0 0 12px", lineHeight:1.65 }}>{c.successText}</p>}
+              {(c.successImages||[]).filter(Boolean).map((url,i) => (
+                <img
+                  key={i}
+                  src={url}
+                  alt=""
+                  loading="eager"
+                  style={{ width:"100%", borderRadius:16, marginBottom:12, objectFit:"contain", display:"block" }}
+                />
+              ))}
+              {c.successText && (
+                <p style={{ fontSize:14, color:"#374151", margin:"0 0 12px", lineHeight:1.65 }}>{c.successText}</p>
+              )}
               <div style={{ padding:"14px 18px", borderRadius:14, background:"#F0FDF4", border:"1.5px solid #BBF7D0", marginBottom:16 }}>
                 <p style={{ fontSize:15, fontWeight:700, color:"#166534", margin:0 }}>🎉 Correct!</p>
               </div>
-              <button onClick={() => onDone && onDone()} style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer" }}>
+              <button
+                onClick={() => onDone && onDone()}
+                style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer" }}>
                 Continue →
               </button>
             </div>
           )}
 
+          {/* Wrong state */}
           {isChecked && !allCorrect && (
             <div style={{ marginTop:16 }}>
               <div style={{ padding:"14px 18px", borderRadius:14, border:"2px solid #f59e0b", background:"#FFFBEB", marginBottom:12 }}>
                 <p style={{ fontSize:15, fontWeight:700, color:"#92400e", margin:"0 0 2px" }}>⚠️ Almost right</p>
-                <p style={{ fontSize:13, color:"#92400e", margin:0 }}>Review and try again</p>
+                <p style={{ fontSize:13, color:"#92400e", margin:0 }}>Review the highlighted blanks and try again</p>
               </div>
               <div style={{ display:"flex", gap:10 }}>
-                <button onClick={() => setFillShowAnswer(p => ({...p, ["bo_"+idx]: true}))} style={{ flex:1, padding:"12px", borderRadius:12, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:14, fontWeight:600, color:"#374151", cursor:"pointer" }}>See answer</button>
-                <button onClick={reset} style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"#5B4EFF", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>🔄 Try again</button>
+                <button
+                  onClick={() => setFillShowAnswer(p => ({...p, ["bo_"+idx]: true}))}
+                  style={{ flex:1, padding:"12px", borderRadius:12, border:"1.5px solid #E5E7EB", background:"#fff", fontSize:14, fontWeight:600, color:"#374151", cursor:"pointer" }}>
+                  See answer
+                </button>
+                <button
+                  onClick={reset}
+                  style={{ flex:1, padding:"12px", borderRadius:12, border:"none", background:"#5B4EFF", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
+                  🔄 Try again
+                </button>
               </div>
               {showAns && (
                 <div style={{ marginTop:10, padding:"14px 16px", borderRadius:12, background:"#F9FAFB", border:"1.5px solid #E5E7EB" }}>
-                  {derivedBlanks.map((b,i) => <p key={i} style={{ fontSize:14, margin:"0 0 4px", fontWeight:600 }}>Blank {i+1}: <strong>{b.correct}</strong></p>)}
+                  {derivedBlanks.map((b,i) => (
+                    <p key={i} style={{ fontSize:14, margin:"0 0 4px", fontWeight:600 }}>
+                      Blank {i+1}: <strong>{b.correct}</strong>
+                    </p>
+                  ))}
                 </div>
               )}
             </div>
@@ -548,28 +724,50 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
         </div>
       </div>
 
+      {/* Bottom: options + check button */}
       {!isChecked && (
-        <div style={{ borderTop:"1px solid #F1F5F9", padding:"20px 24px 32px", background:"#fff" }}>
+        <div style={{
+          borderTop:"1px solid #F1F5F9",
+          padding:"16px 20px",
+          paddingBottom:"calc(16px + env(safe-area-inset-bottom, 0px))",
+          background:"#fff",
+          flexShrink:0,
+        }}>
           <div style={{ maxWidth:600, margin:"0 auto" }}>
-            <div style={{ display:"flex", flexWrap:"wrap", gap:10, justifyContent:"center", marginBottom:16 }}>
+            <div className="bo-options-grid" style={{ marginBottom:14 }}>
               {options.map((opt, i) => {
                 const isUsed = filled.includes(opt);
                 const isSelected = filled[activeBlank] === opt;
                 return (
-                  <button key={i} onClick={() => !isUsed && pickOption(opt)}
-                    style={{ padding:"12px 24px", borderRadius:14, border:`2px solid ${isSelected?"#5B4EFF":isUsed?"#F1F5F9":"#E5E7EB"}`, background:isSelected?"#EEF2FF":isUsed?"#F9FAFB":"#fff", color:isSelected?"#4338CA":isUsed?"#CBD5E1":"#111827", fontSize:15, fontWeight:600, cursor:isUsed?"not-allowed":"pointer", boxShadow:isSelected?"0 4px 12px rgba(91,78,255,0.2)":isUsed?"none":"0 2px 0 #D1D5DB", transition:"all 0.15s", opacity:isUsed?0.5:1 }}>
+                  <button
+                    key={i}
+                    className="bo-option-btn"
+                    onClick={() => !isUsed && pickOption(opt)}
+                    style={{
+                      borderColor: isSelected ? "#5B4EFF" : isUsed ? "#F1F5F9" : "#E5E7EB",
+                      background: isSelected ? "#EEF2FF" : isUsed ? "#F9FAFB" : "#fff",
+                      color: isSelected ? "#4338CA" : isUsed ? "#CBD5E1" : "#111827",
+                      boxShadow: isSelected ? "0 4px 12px rgba(91,78,255,0.2)" : isUsed ? "none" : "0 2px 0 #D1D5DB",
+                      opacity: isUsed ? 0.5 : 1,
+                      cursor: isUsed ? "not-allowed" : "pointer",
+                    }}>
                     {opt}
                   </button>
                 );
               })}
             </div>
             {allFilled ? (
-              <button onClick={() => setChecked(p => ({...p, ["bo_"+idx]: true}))}
-                style={{ width:"100%", padding:"16px", borderRadius:16, border:"none", background:"#22c55e", color:"#fff", fontSize:16, fontWeight:800, cursor:"pointer", boxShadow:"0 4px 0 #16a34a", transition:"transform 0.1s" }}>
+              <button
+                className="bo-check-btn"
+                onClick={() => setChecked(p => ({...p, ["bo_"+idx]: true}))}
+                style={{ background:"#22c55e", color:"#fff" }}>
                 Check ✓
               </button>
             ) : (
-              <button disabled style={{ width:"100%", padding:"16px", borderRadius:16, border:"none", background:"#E5E7EB", color:"#9CA3AF", fontSize:16, fontWeight:800, cursor:"not-allowed" }}>
+              <button
+                disabled
+                className="bo-check-btn"
+                style={{ background:"#E5E7EB", color:"#9CA3AF", boxShadow:"none", cursor:"not-allowed" }}>
                 Check
               </button>
             )}
@@ -580,6 +778,9 @@ function BlankOptionsBlock({ c, idx, checked, setChecked, fillShowAnswer, setFil
   );
 }
 
+/* ─────────────────────────────────────────
+   MatchingBlock (unchanged)
+───────────────────────────────────────── */
 function MatchingBlock({ c, idx, checked, setChecked }) {
   const pairs = c.pairs || [];
   const isChecked = checked["match_"+idx];
@@ -648,7 +849,6 @@ function MatchingBlock({ c, idx, checked, setChecked }) {
       {!c.heading && !c.subheading && <p style={{ fontSize:13, color:"#64748B", margin:"0 0 16px" }}>Tap a left item then a right item to match them</p>}
 
       <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:16 }}>
-        {/* Left column */}
         <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
           {leftItems.map((item, i) => {
             const matchedRight = getMatchedRight(i);
@@ -665,8 +865,6 @@ function MatchingBlock({ c, idx, checked, setChecked }) {
             );
           })}
         </div>
-
-        {/* Right column */}
         <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
           {rightItems.map((item, i) => {
             const isMatched = isRightMatched(i);
@@ -691,11 +889,9 @@ function MatchingBlock({ c, idx, checked, setChecked }) {
           Check ✓
         </button>
       )}
-
       {!isChecked && !allMatched && (
         <p style={{ textAlign:"center", fontSize:12, color:"#94A3B8" }}>{Object.keys(matches).length}/{pairs.length} matched</p>
       )}
-
       {isChecked && (
         <div>
           <div style={{ padding:"14px 18px", borderRadius:14, background:score===pairs.length?"#F0FDF4":"#FEF2F2", border:`1.5px solid ${score===pairs.length?"#BBF7D0":"#FECACA"}`, marginBottom:12 }}>
@@ -712,6 +908,9 @@ function MatchingBlock({ c, idx, checked, setChecked }) {
   );
 }
 
+/* ─────────────────────────────────────────
+   ReorderBlock (unchanged)
+───────────────────────────────────────── */
 function ReorderBlock({ c, idx, checked, setChecked }) {
   const correctOrder = (c.items||[]).filter(Boolean);
   const shuffled = useMemo(() => [...correctOrder].sort(() => Math.random() - 0.5), []);
@@ -806,6 +1005,9 @@ function ReorderBlock({ c, idx, checked, setChecked }) {
   );
 }
 
+/* ─────────────────────────────────────────
+   ContentBlock
+───────────────────────────────────────── */
 function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fillInputs, setFillInputs, fillChecked, setFillChecked, fillShowAnswer, setFillShowAnswer }) {
   const c = block.content || block;
 
@@ -842,7 +1044,13 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       if (!c.src) return null;
       return (
         <figure style={{ margin:0, textAlign:c.align||"center" }}>
-          <img src={c.src} alt={c.alt||""} style={{ width:c.size==="small"?"50%":c.size==="medium"?"75%":"100%", borderRadius:20, display:"inline-block", boxShadow:"0 4px 20px rgba(0,0,0,0.08)" }}/>
+          <img
+            src={c.src}
+            alt={c.alt||""}
+            loading="lazy"
+            decoding="async"
+            style={{ width:c.size==="small"?"50%":c.size==="medium"?"75%":"100%", borderRadius:20, display:"inline-block", boxShadow:"0 4px 20px rgba(0,0,0,0.08)" }}
+          />
           {c.caption && (
             <figcaption style={{ textAlign:(c.captionStyle||{}).align||"center", fontSize:(c.captionStyle||{}).fontSize||13, color:"#94A3B8", marginTop:10, fontStyle:"italic" }}>
               {c.caption}
@@ -861,8 +1069,18 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       return (
         <div>
           <div style={{ borderRadius:20, overflow:"hidden", aspectRatio:"16/9", background:"#000" }}>
-            {ytId ? <iframe width="100%" height="100%" src={"https://www.youtube.com/embed/"+ytId} style={{ border:"none", display:"block" }} allowFullScreen/>
-              : c.src ? <video src={c.src} controls style={{ width:"100%", height:"100%" }}/> : null}
+            {ytId ? (
+              <iframe
+                width="100%"
+                height="100%"
+                src={"https://www.youtube.com/embed/"+ytId}
+                style={{ border:"none", display:"block" }}
+                loading="lazy"
+                allowFullScreen
+              />
+            ) : c.src ? (
+              <video src={c.src} controls style={{ width:"100%", height:"100%" }} preload="metadata"/>
+            ) : null}
           </div>
           {c.caption && <p style={{ textAlign:"center", fontSize:13, color:"#94A3B8", marginTop:10, fontStyle:"italic" }}>{c.caption}</p>}
         </div>
@@ -883,7 +1101,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
               {c.caption && <p style={{ fontSize:13, color:"#64748B", margin:0 }}>{c.caption}</p>}
             </div>
           </div>
-          <audio src={c.src} controls style={{ width:"100%", height:42 }}/>
+          <audio src={c.src} controls style={{ width:"100%", height:42 }} preload="metadata"/>
         </div>
       );
     }
@@ -1043,7 +1261,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
             </p>
           )}
           {c.headerImage && (
-            <img src={c.headerImage} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:16, objectFit:"contain" }}/>
+            <img src={c.headerImage} alt="" loading="lazy" decoding="async" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:16, objectFit:"contain" }}/>
           )}
           {multiMode && !isChecked && (
             <div style={{ display:"inline-block", padding:"4px 12px", borderRadius:999, background:"#EEF2FF", color:"#6366f1", fontSize:12, fontWeight:700, marginBottom:12 }}>
@@ -1072,7 +1290,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
                     <span style={{ fontSize:os.fontSize||14, color:"#374151", fontWeight:500, lineHeight:1.4, flex:1 }}>{opt}</span>
                   </div>
                   {c.optionImages?.[i] && isSel && (
-                    <img src={c.optionImages[i]} alt="" style={{ width:"100%", borderRadius:10, marginTop:8, objectFit:"contain", display:"block" }}/>
+                    <img src={c.optionImages[i]} alt="" loading="eager" style={{ width:"100%", borderRadius:10, marginTop:8, objectFit:"contain", display:"block" }}/>
                   )}
                 </button>
               );
@@ -1087,7 +1305,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
           {isChecked && (
             <div>
               {isCorrect && c.successImage && (
-                <img src={c.successImage} alt="" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12, objectFit:"contain" }}/>
+                <img src={c.successImage} alt="" loading="eager" style={{ width:"100%", borderRadius:16, display:"block", marginBottom:12, objectFit:"contain" }}/>
               )}
               {isCorrect && c.successText && (
                 <p style={{ fontSize:14, color:"#374151", margin:"0 0 12px", lineHeight:1.65 }}>{c.successText}</p>
