@@ -20,9 +20,10 @@ export function useProgress() {
 
   // Load all progress once user is known
   useEffect(() => {
+    if (!authChecked) return;
     if (!userId) { setProgress({}); setLoaded(true); return; }
     loadAll();
-  }, [userId]);
+  }, [userId, authChecked]);
 
   const loadAll = async () => {
     const [{ data: lessons }, { data: certs }, { data: chalDays }, { data: chalJoins }] = await Promise.all([
