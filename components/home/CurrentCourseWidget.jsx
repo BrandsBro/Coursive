@@ -11,7 +11,14 @@ export default function CurrentCourseWidget({ courses = [] }) {
     </div>
   );
 
-  const { getCoursePercent, getCompletedLessons } = useProgress();
+  const { getCoursePercent, getCompletedLessons, loaded } = useProgress();
+
+  if (!loaded) return (
+    <div style={{ background:"#fff", borderRadius:20, border:"1px solid #E5E7EB", padding:"24px", boxShadow:"0 2px 12px rgba(0,0,0,0.06)", minHeight:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
+      <div style={{ width:32, height:32, borderRadius:"50%", border:"3px solid #E2E8F0", borderTopColor:"#6366f1", animation:"spin 0.7s linear infinite" }}/>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    </div>
+  );
 
   const activeCourse = courses.find(c => {
     const total = c.units.flatMap(u => u.lessons).length;
