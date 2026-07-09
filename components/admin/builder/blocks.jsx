@@ -544,7 +544,7 @@ function CalloutE({ content, onChange }) {
         <input value={content.heading||""} onChange={e => onChange({ ...content, heading:e.target.value })} placeholder="Callout heading..." style={inp()}/>
       </div>
       <FC label="Text Style" style={ts} setStyle={v => onChange({ ...content, textStyle:v })}/>
-      <textarea value={content.text||""} onChange={e => onChange({ ...content, text:e.target.value })} placeholder="Callout message..." style={{ ...inp(), minHeight:80, resize:"vertical", ...styled(ts) }}/>
+      <CalloutRichEditor content={content} onChange={onChange}/>
     </div>
   );
 }
