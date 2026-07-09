@@ -27,7 +27,8 @@ export default function AdminCourses({ courses: initial }) {
     if (!file) return;
     setUploading(true);
     const { supabase } = await import("@/lib/supabase");
-    const path = `courses/${Date.now()}-${file.name}`;
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const path = `courses/${Date.now()}-${safeName}`;
     const { error } = await supabase.storage.from("lesson-media").upload(path, file, { upsert:true });
     if (!error) {
       const { data } = supabase.storage.from("lesson-media").getPublicUrl(path);
