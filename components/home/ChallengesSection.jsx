@@ -57,8 +57,7 @@ export default function ChallengesSection({ challenges = [] }) {
 
                   {/* Info */}
                   <div style={{ padding:"12px 14px 14px" }}>
-                    <h3 style={{ fontSize:14, fontWeight:800, color:"#0f172a", margin:"0 0 2px", lineHeight:1.3 }}>{ch.title}</h3>
-                    <p style={{ fontSize:12, color:"#94A3B8", margin:"0 0 10px" }}>{ch.subtitle}</p>
+                    <h3 style={{ fontSize:14, fontWeight:800, color:"#0f172a", margin:"0 0 10px", lineHeight:1.3 }}>{ch.title}</h3>
 
                     {pct > 0 ? (
                       <>
