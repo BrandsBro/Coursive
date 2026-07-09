@@ -280,6 +280,15 @@ export async function POST(req) {
       type: paymentType,
     });
 
+    // Fire Meta CAPI Purchase event
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}api/meta/event`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eventName: "Purchase", email, value: amount / 100, currency: "USD" }),
+      });
+    } catch(e) { console.error("Meta CAPI error:", e); }
+
     const isExistingUser = !!existingProfile;
     const triggerKey = isExistingUser ? "auto_renewal" : "after_payment";
     let emailSubject = isExistingUser
