@@ -320,7 +320,7 @@ export async function POST(req) {
       <!-- Amount highlight -->
       <div style="background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:1.5px solid #BBF7D0;border-radius:14px;padding:16px 20px;text-align:center;margin-bottom:24px">
         <p style="margin:0;font-size:13px;color:#166534;font-weight:600">AMOUNT PAID</p>
-        <p style="margin:4px 0 0;font-size:36px;font-weight:900;color:#15803D">$\${(amount/100).toFixed(2)}</p>
+        <p style="margin:4px 0 0;font-size:36px;font-weight:900;color:#15803D">${(amount/100).toFixed(2)}</p>
       </div>
 
       <!-- Details -->
@@ -330,7 +330,7 @@ export async function POST(req) {
             <span style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.5px">Customer</span>
           </td>
           <td style="padding:12px 0;border-bottom:1px solid #F1F5F9">
-            <span style="font-size:14px;font-weight:700;color:#0f172a">\${name}</span>
+            <span style="font-size:14px;font-weight:700;color:#0f172a">${name}</span>
           </td>
         </tr>
         <tr>
@@ -338,7 +338,7 @@ export async function POST(req) {
             <span style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.5px">Email</span>
           </td>
           <td style="padding:12px 0;border-bottom:1px solid #F1F5F9">
-            <a href="mailto:\${email}" style="font-size:14px;font-weight:600;color:#5B4EFF;text-decoration:none">\${email}</a>
+            <a href="mailto:${email}" style="font-size:14px;font-weight:600;color:#5B4EFF;text-decoration:none">${email}</a>
           </td>
         </tr>
         <tr>
@@ -346,7 +346,7 @@ export async function POST(req) {
             <span style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.5px">Plan</span>
           </td>
           <td style="padding:12px 0;border-bottom:1px solid #F1F5F9">
-            <span style="display:inline-block;background:#EEF2FF;color:#5B4EFF;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px">\${plan}</span>
+            <span style="display:inline-block;background:#EEF2FF;color:#5B4EFF;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px">${plan}</span>
           </td>
         </tr>
         <tr>
@@ -354,7 +354,7 @@ export async function POST(req) {
             <span style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.5px">Type</span>
           </td>
           <td style="padding:12px 0">
-            <span style="font-size:14px;font-weight:600;color:#374151">\${paymentType}</span>
+            <span style="font-size:14px;font-weight:600;color:#374151">${paymentType}</span>
           </td>
         </tr>
       </table>
