@@ -1,5 +1,2 @@
-export const dynamic = "force-dynamic";
-import NotificationCenter from "@/components/admin/NotificationCenter";
-export default function NotificationsPage() {
-  return <NotificationCenter />;
-}
+import AdminNotificationSettings from "@/components/admin/AdminNotificationSettings";
+export default function Page() { return <AdminNotificationSettings />; }
