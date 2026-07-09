@@ -50,7 +50,7 @@ export default async function RootLayout({ children }) {
         <noscript><img height="1" width="1" style={{display:"none"}} src="https://www.facebook.com/tr?id=1707573550631351&ev=PageView&noscript=1"/></noscript>
         <style>{`
           .logo-main { height: 60px !important; }
-          .logo-app { height: 60px !important; }
+          .logo-app { height: 45px !important; }
           @media (max-width: 768px) {
             .logo-main { height: 44px !important; }
             .logo-app { height: 44px !important; }
