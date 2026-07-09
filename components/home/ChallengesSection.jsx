@@ -10,7 +10,6 @@ export default function ChallengesSection({ challenges = [] }) {
   return (
     <>
       <div>
-        {/* Header */}
         <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:18 }}>
           <div>
             <h2 style={{ fontSize:21, fontWeight:900, color:"#0f172a", margin:"0 0 2px" }}>Daily Challenges</h2>
@@ -21,7 +20,6 @@ export default function ChallengesSection({ challenges = [] }) {
           </Link>
         </div>
 
-        {/* Grid */}
         <div className="ch-grid">
           {visible.map((ch, index) => {
             const pct = getChallengeDayPercent(ch.id, ch.days);
@@ -35,7 +33,6 @@ export default function ChallengesSection({ challenges = [] }) {
                 className={index >= 2 ? "hide-mobile" : ""}
               >
                 <div className="ch-card">
-                  {/* Thumbnail */}
                   <div className="ch-thumb" style={{
                     borderRadius:"12px 12px 0 0",
                     overflow:"hidden",
@@ -55,7 +52,6 @@ export default function ChallengesSection({ challenges = [] }) {
                     </div>
                   </div>
 
-                  {/* Info */}
                   <div style={{ padding:"12px 14px 14px" }}>
                     <h3 style={{ fontSize:14, fontWeight:800, color:"#0f172a", margin:"0 0 10px", lineHeight:1.3 }}>{ch.title}</h3>
 
@@ -72,7 +68,8 @@ export default function ChallengesSection({ challenges = [] }) {
                     ) : (
                       <div style={{ display:"flex", alignItems:"center", gap:5, background:"#FFF7ED", border:"1.5px solid #FED7AA", borderRadius:10, padding:"8px 12px" }}>
                         <Flame size={13} color="#f97316" fill="#f97316"/>
-                        <span style={{ fontSize:12, fontWeight:700, color:"#c2410c" }}>
+                        {/* no inline fontSize — controlled by CSS class */}
+                        <span className="ch-btn" style={{ fontWeight:700, color:"#c2410c" }}>
                           {joined ? "Continue challenge" : "Start challenge"}
                         </span>
                       </div>
@@ -104,6 +101,9 @@ export default function ChallengesSection({ challenges = [] }) {
           transform: translateY(-3px);
           box-shadow: 0 8px 24px rgba(0,0,0,0.08);
         }
+        .ch-btn {
+          font-size: 12px;
+        }
         @media (max-width: 768px) {
           .ch-grid {
             grid-template-columns: repeat(2, 1fr) !important;
@@ -115,6 +115,9 @@ export default function ChallengesSection({ challenges = [] }) {
           .ch-thumb {
             height: 80px !important;
             font-size: 24px !important;
+          }
+          .ch-btn {
+            font-size: 9px;
           }
         }
       `}</style>
