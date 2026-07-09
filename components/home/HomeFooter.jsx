@@ -28,7 +28,7 @@ export default function HomeFooter() {
           {/* Logo & Description Column */}
           <div style={{ gridColumn: isMobile ? "1/-1" : "auto" }}>
             {branding.logoMain ? (
-              {branding.logoMain && <img src={branding.logoMain} alt="1Course" className="logo-main" style={{ objectFit: "contain", padding: 4, maxHeight: 40 }} />
+              <img src={branding.logoMain} alt="1Course" className="logo-main" style={{ objectFit: "contain", padding: 4, maxHeight: 40 }} />
             ) : (
               <span style={{ fontSize: 20, fontWeight: 900, color: "#fff", fontStyle: "italic" }}>✦ 1Course</span>
             )}
