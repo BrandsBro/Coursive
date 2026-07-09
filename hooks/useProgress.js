@@ -23,7 +23,11 @@ export function useProgress() {
   // Load all progress once user is known
   useEffect(() => {
     if (!authChecked) return;
-    if (!userId) { setProgress({}); setLoaded(true); return; }
+    if (!userId) {
+      // Only set loaded if we're sure user is not logged in
+      const timer = setTimeout(() => { setProgress({}); setLoaded(true); }, 100);
+      return () => clearTimeout(timer);
+    }
     loadAll();
   }, [userId, authChecked]);
 
