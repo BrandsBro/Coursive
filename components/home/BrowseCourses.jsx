@@ -20,18 +20,16 @@ export default function BrowseCourses({ courses = [] }) {
   return (
     <>
       <div>
-        {/* Header */}
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:18 }}>
+        <div className="browse-header" style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:18 }}>
           <div>
             <h2 style={{ fontSize:21, fontWeight:900, color:"#0f172a", margin:"0 0 2px" }}>Explore AI tools</h2>
             <p style={{ fontSize:13, color:"#94A3B8", margin:0 }}>Pick a course · Learn at your pace</p>
           </div>
-          <Link href="/courses" style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:5, fontSize:13, fontWeight:600, color:"#6366f1", background:"#EEF0FF", padding:"9px 18px", borderRadius:14, flexShrink:0 }}>
+          <Link href="/courses" style={{ textDecoration:"none", display:"flex", alignItems:"center", gap:5, fontSize:13, fontWeight:600, color:"#6366f1", background:"#EEF0FF", padding:"9px 18px", borderRadius:14 }}>
             View All <ArrowRight size={14} />
           </Link>
         </div>
 
-        {/* Grid */}
         <div className="courses-grid">
           {visible.map((course, index) => {
             const s = STYLES[course.id] || { g:"linear-gradient(135deg,#6366f1,#8b5cf6)", e:"📚", a:"#6366f1" };
@@ -39,18 +37,13 @@ export default function BrowseCourses({ courses = [] }) {
             const pct = getCoursePercent(course.id, total);
 
             return (
-              <Link
-                key={course.id}
-                href={"/courses/" + course.id}
-                style={{ textDecoration:"none", display:"block" }}
-                className={index >= 2 ? "hide-mobile" : ""}
-              >
+              <Link key={course.id} href={"/courses/" + course.id} style={{ textDecoration:"none", display:"block" }} className={index >= 2 ? "hide-mobile" : ""}>
                 <div className="course-card">
                   {/* Thumbnail */}
-                  <div style={{
+                  <div className="course-thumb" style={{
                     borderRadius:"12px 12px 0 0",
                     overflow:"hidden",
-                    height:140,
+                    height:130,
                     background: course.imageUrl ? `url(${course.imageUrl}) center/cover` : s.g,
                     display:"flex",
                     alignItems:"center",
@@ -76,7 +69,7 @@ export default function BrowseCourses({ courses = [] }) {
                         borderRadius:999,
                         background: pct > 0 ? s.a : "#6366f1",
                         width: pct > 0 ? `${pct}%` : "100%",
-                        opacity: pct > 0 ? 1 : 0.2,
+                        opacity: pct > 0 ? 1 : 0.25,
                         transition:"width 0.6s",
                       }} />
                     </div>
@@ -114,6 +107,15 @@ export default function BrowseCourses({ courses = [] }) {
           }
           .hide-mobile {
             display: none !important;
+          }
+          .browse-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 10px !important;
+          }
+          .course-thumb {
+            height: 80px !important;
+            font-size: 32px !important;
           }
         }
       `}</style>

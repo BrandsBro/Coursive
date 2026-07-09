@@ -36,7 +36,7 @@ export default function ChallengesSection({ challenges = [] }) {
               >
                 <div className="ch-card">
                   {/* Thumbnail */}
-                  <div style={{
+                  <div className="ch-thumb" style={{
                     borderRadius:"12px 12px 0 0",
                     overflow:"hidden",
                     height:130,
@@ -111,6 +111,10 @@ export default function ChallengesSection({ challenges = [] }) {
           }
           .hide-mobile {
             display: none !important;
+          }
+          .ch-thumb {
+            height: 80px !important;
+            font-size: 24px !important;
           }
         }
       `}</style>
