@@ -80,8 +80,11 @@ export default function ChallengesList({ challenges = [] }) {
       <style>{`
         .challenges-list-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
         @media (max-width: 1024px) { .challenges-list-grid { grid-template-columns:repeat(2,1fr); gap:14px; } }
-        @media (max-width: 640px) { .challenges-list-grid { grid-template-columns:repeat(2,1fr); gap:12px; } }
+        @media (max-width: 640px)  { .challenges-list-grid { grid-template-columns:repeat(2,1fr); gap:12px; } }
+        .ch-card { background:#fff; border-radius:20px; overflow:hidden; border:1px solid #F0F0F0; box-shadow:0 2px 8px rgba(0,0,0,0.05); transition:all 0.2s ease; cursor:pointer; height:100%; display:flex; flex-direction:column; }
+        .ch-card:hover { transform:translateY(-4px); box-shadow:0 16px 40px rgba(0,0,0,0.12); }
       `}</style>
+
       <div className="challenges-list-grid">
         {filtered.map((challenge, i) => {
           const s        = CARD_STYLES[i % CARD_STYLES.length];
@@ -90,79 +93,64 @@ export default function ChallengesList({ challenges = [] }) {
           const daysDone = Math.round((percent / 100) * challenge.days);
 
           return (
-            <Link key={challenge.id} href={`/challenges/${challenge.id}${joined?"?joined=true":""}`}
+            <Link key={challenge.id} href={`/challenges/${challenge.id}${joined ? "?joined=true" : ""}`}
               style={{ textDecoration:"none", display:"block", height:"100%" }}>
-              <div
-                style={{ background:"#fff", borderRadius:20, overflow:"hidden", border:"1px solid #F0F0F0", boxShadow:"0 2px 8px rgba(0,0,0,0.05)", transition:"all 0.2s ease", cursor:"pointer", height:"100%", display:"flex", flexDirection:"column" }}
-                onMouseEnter={e => { e.currentTarget.style.transform="translateY(-4px)"; e.currentTarget.style.boxShadow="0 16px 40px rgba(0,0,0,0.12)"; }}
-                onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,0.05)"; }}
-              >
-                {/* Hero — title + subtitle overlaid */}
+              <div className="ch-card">
+
+                {/* ── Thumbnail (clean — no text) ── */}
                 <div style={{
-                  background: challenge.imageUrl ? `url(${challenge.imageUrl}) center/cover` : s.grad,
-                  height: 200,
+                  background: challenge.imageUrl
+                    ? `url(${challenge.imageUrl}) center/cover`
+                    : s.grad,
+                  height: 160,
                   position: "relative",
                   overflow: "hidden",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  padding: "16px 18px",
+                  flexShrink: 0,
                 }}>
                   {/* Decorative circles */}
                   <div style={{ position:"absolute", top:-40, right:-40, width:140, height:140, borderRadius:"50%", background:"rgba(255,255,255,0.09)" }} />
                   <div style={{ position:"absolute", bottom:-24, left:40, width:96, height:96, borderRadius:"50%", background:"rgba(255,255,255,0.06)" }} />
 
-                  {/* Dark gradient overlay for text readability */}
-                  <div style={{
-                    position: "absolute", inset: 0,
-                    background: "linear-gradient(to top, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)",
-                  }} />
+                  {/* Emoji top-left */}
+                  {!challenge.imageUrl && (
+                    <span style={{ position:"absolute", top:14, left:16, fontSize:36, lineHeight:1, filter:"drop-shadow(0 2px 6px rgba(0,0,0,0.2))", zIndex:1 }}>
+                      {challenge.emoji}
+                    </span>
+                  )}
 
-                  {/* Top row: emoji + enrolled badge */}
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", position:"relative", zIndex:1 }}>
-                    {!challenge.imageUrl && (
-                      <span style={{ fontSize:38, lineHeight:1, filter:"drop-shadow(0 2px 6px rgba(0,0,0,0.2))" }}>
-                        {challenge.emoji}
-                      </span>
-                    )}
-                    {joined && (
-                      <div style={{ background:"rgba(255,255,255,0.92)", borderRadius:10, padding:"4px 10px", display:"flex", alignItems:"center", gap:5, marginLeft:"auto" }}>
-                        <CheckCircle2 size={12} color="#22C55E" />
-                        <span style={{ fontSize:11, fontWeight:700, color:"#15803D" }}>Enrolled</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Bottom: pills + title + subtitle */}
-                  <div style={{ position:"relative", zIndex:1 }}>
-                    {/* Pills */}
-                    <div style={{ display:"flex", gap:6, marginBottom:8 }}>
-                      <span style={{ background:"rgba(255,255,255,0.22)", backdropFilter:"blur(4px)", color:"#fff", fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:999 }}>
-                        {challenge.days} DAYS
-                      </span>
-                      <span style={{ background:"rgba(255,255,255,0.22)", backdropFilter:"blur(4px)", color:"#fff", fontSize:10, fontWeight:700, padding:"2px 8px", borderRadius:999 }}>
-                        {challenge.level.toUpperCase()}
-                      </span>
+                  {/* Enrolled badge top-right */}
+                  {joined && (
+                    <div style={{ position:"absolute", top:10, right:10, zIndex:1, background:"rgba(255,255,255,0.92)", borderRadius:10, padding:"4px 10px", display:"flex", alignItems:"center", gap:5 }}>
+                      <CheckCircle2 size={12} color="#22C55E" />
+                      <span style={{ fontSize:11, fontWeight:700, color:"#15803D" }}>Enrolled</span>
                     </div>
-
-                    {/* Title */}
-                    <h3 style={{ fontSize:15, fontWeight:800, color:"#fff", margin:"0 0 4px", lineHeight:1.3,
-                      textShadow:"0 1px 6px rgba(0,0,0,0.3)" }}>
-                      {challenge.title}
-                    </h3>
-
-                    {/* Subtitle */}
-                    <p style={{ fontSize:12, color:"rgba(255,255,255,0.82)", margin:0, lineHeight:1.45,
-                      textShadow:"0 1px 4px rgba(0,0,0,0.2)" }}>
-                      {challenge.subtitle}
-                    </p>
-                  </div>
+                  )}
                 </div>
 
-                {/* Body — progress + CTA only */}
-                <div style={{ padding:"16px 18px 18px", flex:1, display:"flex", flexDirection:"column" }}>
+                {/* ── Body (all text lives here) ── */}
+                <div style={{ padding:"14px 16px 16px", flex:1, display:"flex", flexDirection:"column" }}>
 
-                  {/* Progress or tags */}
+                  {/* Pills */}
+                  <div style={{ display:"flex", gap:6, marginBottom:10 }}>
+                    <span style={{ background:s.tagBg, color:s.tag, fontSize:10, fontWeight:700, padding:"3px 8px", borderRadius:999 }}>
+                      {challenge.days} DAYS
+                    </span>
+                    <span style={{ background:s.tagBg, color:s.tag, fontSize:10, fontWeight:700, padding:"3px 8px", borderRadius:999 }}>
+                      {challenge.level.toUpperCase()}
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h3 style={{ fontSize:15, fontWeight:800, color:"#0f172a", margin:"0 0 4px", lineHeight:1.3 }}>
+                    {challenge.title}
+                  </h3>
+
+                  {/* Subtitle */}
+                  <p style={{ fontSize:12, color:"#64748B", margin:"0 0 14px", lineHeight:1.5 }}>
+                    {challenge.subtitle}
+                  </p>
+
+                  {/* Progress or meta tags */}
                   {joined && percent > 0 ? (
                     <div style={{ marginBottom:14 }}>
                       <div style={{ display:"flex", justifyContent:"space-between", marginBottom:5 }}>
@@ -200,6 +188,7 @@ export default function ChallengesList({ challenges = [] }) {
                       <ArrowRight size={13} color="#fff" />
                     </div>
                   </div>
+
                 </div>
               </div>
             </Link>
