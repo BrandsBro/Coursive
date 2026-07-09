@@ -131,14 +131,7 @@ export default function ChallengesList({ challenges = [] }) {
                 <div style={{ padding:"14px 16px 16px", flex:1, display:"flex", flexDirection:"column" }}>
 
                   {/* Pills */}
-                  <div style={{ display:"flex", gap:6, marginBottom:10 }}>
-                    <span style={{ background:s.tagBg, color:s.tag, fontSize:10, fontWeight:700, padding:"3px 8px", borderRadius:999 }}>
-                      {challenge.days} DAYS
-                    </span>
-                    <span style={{ background:s.tagBg, color:s.tag, fontSize:10, fontWeight:700, padding:"3px 8px", borderRadius:999 }}>
-                      {challenge.level.toUpperCase()}
-                    </span>
-                  </div>
+                
 
                   {/* Title */}
                   <h3 style={{ fontSize:15, fontWeight:800, color:"#0f172a", margin:"0 0 4px", lineHeight:1.3 }}>
@@ -146,10 +139,7 @@ export default function ChallengesList({ challenges = [] }) {
                   </h3>
 
                   {/* Subtitle */}
-                  <p style={{ fontSize:12, color:"#64748B", margin:"0 0 14px", lineHeight:1.5 }}>
-                    {challenge.subtitle}
-                  </p>
-
+              
                   {/* Progress or meta tags */}
                   {joined && percent > 0 ? (
                     <div style={{ marginBottom:14 }}>
