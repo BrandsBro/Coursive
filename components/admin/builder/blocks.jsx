@@ -100,7 +100,7 @@ export function BlockPreview({ block }) {
       const map={ info:["💡","#0891b2","#EFF6FF"], warning:["⚠️","#d97706","#FFFBEB"], success:["✅","#059669","#ECFDF5"], error:["❌","#dc2626","#FEF2F2"] };
       const [emoji,color,bg]=map[c.style||"info"];
       const ts=c.textStyle||{};
-      return <div style={{ padding:"14px 18px", borderRadius:12, background:bg, borderLeft:`4px solid ${color}`, display:"flex", gap:12 }}><span style={{ fontSize:18, flexShrink:0 }}>{emoji}</span><div><p style={{ fontSize:ts.fontSize||14, fontWeight:"800", color:"#374151", margin:c.text?"0 0 4px":0 }}>{c.heading}</p><p style={{ fontSize:ts.fontSize||14, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#374151", margin:0, lineHeight:1.65 }}>{c.text||"Callout text"}</p></div></div>;
+      return <div style={{ padding:"14px 18px", borderRadius:12, background:bg, borderLeft:`4px solid ${color}`, display:"flex", gap:12 }}><span style={{ fontSize:18, flexShrink:0 }}>{emoji}</span><div style={{ flex:1 }}><p style={{ fontSize:ts.fontSize||14, fontWeight:"800", color:"#374151", margin:c.text||c.bullets?.length?"0 0 4px":0 }}>{c.heading}</p><p style={{ fontSize:ts.fontSize||14, fontWeight:ts.bold?"700":"400", fontStyle:ts.italic?"italic":"normal", textAlign:ts.align||"left", color:"#374151", margin:c.bullets?.length?"0 0 8px":0, lineHeight:1.65 }}>{c.text||(!c.bullets?.length&&"Callout text")}</p>{(c.bullets||[]).filter(Boolean).map((b,i)=><div key={i} style={{ display:"flex", gap:6, marginBottom:4 }}><span style={{ color, flexShrink:0 }}>•</span><span style={{ fontSize:ts.fontSize||14, color:"#374151", lineHeight:1.6 }}>{b}</span></div>)}</div></div>;
     }
     
     case "multiplechoice": {
