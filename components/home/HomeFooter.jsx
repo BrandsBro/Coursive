@@ -61,7 +61,7 @@ export default function HomeFooter() {
               links: [
                 { label: "Privacy Policy", url: "/privacy" },
                 { label: "Subscription Terms", url: "/subscription-terms" },
-                  { label: "Refund Policy", url: "/refund" },
+                  { label: "Refund Policy", url: "/refund-policy" },
                 { label: "Terms & Conditions", url: "/terms-condition" },
               ],
             },
