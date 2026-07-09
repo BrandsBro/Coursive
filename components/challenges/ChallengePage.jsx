@@ -110,64 +110,24 @@ export default function ChallengePage({ challenge }) {
   if (phase === "detail") {
     return (
       <div className="min-h-screen bg-white">
-        {/* Hero image with overlaid text */}
-        <div style={{
-          position: "relative",
-          width: "100%",
-          height: 280,
-          background: challenge.gradientBg,
-          overflow: "hidden",
-        }}>
-          {/* Back button */}
-          <button
-            onClick={() => router.push('/challenges')}
-            style={{
-              position: "absolute", top: 14, left: 14, zIndex: 10,
-              width: 36, height: 36, borderRadius: "50%",
-              background: "rgba(255,255,255,0.2)",
-              backdropFilter: "blur(8px)",
-              border: "1px solid rgba(255,255,255,0.3)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer",
-            }}>
-            <ChevronLeft size={20} color="#fff"/>
-          </button>
-
-          {/* Emoji — top right area */}
-          <div style={{
-            position: "absolute", top: "50%", right: 32,
-            transform: "translateY(-60%)",
-            fontSize: 90,
-            filter: "drop-shadow(0 6px 18px rgba(0,0,0,0.18))",
-            lineHeight: 1,
-            userSelect: "none",
-          }}>
-            {challenge.emoji}
-          </div>
-
-          {/* Gradient overlay at bottom for text readability */}
-          <div style={{
-            position: "absolute", bottom: 0, left: 0, right: 0, height: "65%",
-            background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%)",
-          }}/>
-
-          {/* Title + subtitle over image */}
-          <div style={{
-            position: "absolute", bottom: 22, left: 20, right: 20, zIndex: 2,
-          }}>
-            <h2 style={{ fontSize: 22, fontWeight: 900, color: "#fff", margin: "0 0 4px", lineHeight: 1.25,
-              textShadow: "0 1px 6px rgba(0,0,0,0.25)" }}>
-              {challenge.title}
-            </h2>
-            <p style={{ fontSize: 14, color: "rgba(255,255,255,0.85)", margin: 0,
-              textShadow: "0 1px 4px rgba(0,0,0,0.2)" }}>
-              {challenge.subtitle}
-            </p>
+        <div className="sticky top-0 z-40 bg-white border-b border-gray-100">
+          <div className="max-w-2xl mx-auto flex items-center px-5 h-14">
+            <button onClick={() => router.push('/challenges')} className="p-2 hover:bg-gray-100 rounded-xl mr-4">
+              <ChevronLeft size={20} className="text-gray-700"/>
+            </button>
+            <h1 className="flex-1 text-center font-bold text-gray-900 text-base pr-10 truncate">{challenge.title}</h1>
           </div>
         </div>
 
-        {/* Body content */}
-        <div className="max-w-2xl mx-auto px-5 pb-32 pt-6">
+        <div className="max-w-2xl mx-auto px-5 pb-32">
+          <div className="w-full rounded-2xl flex items-center justify-center mt-6 mb-6"
+            style={{ height:220, background:challenge.gradientBg, fontSize:80 }}>
+            <span style={{ filter:"drop-shadow(0 4px 12px rgba(0,0,0,0.15))" }}>{challenge.emoji}</span>
+          </div>
+
+          <h2 className="text-2xl font-bold text-gray-900 mb-1">{challenge.title}</h2>
+          <p className="text-gray-500 text-base mb-6">{challenge.subtitle}</p>
+
           <h3 className="text-lg font-bold text-gray-900 mb-3">Challenge details</h3>
           <div className="grid grid-cols-2 gap-3 mb-8">
             <div className="border border-gray-200 rounded-2xl p-4">

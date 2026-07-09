@@ -46,7 +46,7 @@ export default function CoursesList({ courses = [] }) {
         {/* Hero */}
         <div style={{
           background:"linear-gradient(135deg,#0f172a 0%,#1e1b4b 55%,#0f2744 100%)",
-          borderRadius:24, padding:"36px 40px", position:"relative", overflow:"hidden",
+          borderRadius:24, padding:"36px 40px", position:"relative", 
         }}>
           <div style={{ position:"absolute", top:-60, right:80, width:220, height:220, borderRadius:"50%", background:"rgba(99,102,241,0.08)" }} />
           <div style={{ position:"absolute", bottom:-40, left:100, width:140, height:140, borderRadius:"50%", background:"rgba(139,92,246,0.07)" }} />
@@ -153,6 +153,11 @@ export default function CoursesList({ courses = [] }) {
         .cl-card {
           cursor: pointer;
           transition: transform 0.18s;
+          background: #fff;
+  
+          border-radius: 14px;
+          border: 1.5px solid #E5E7EB;
+          overflow: hidden;
         }
         .cl-card:hover {
           transform: translateY(-3px);
@@ -176,15 +181,14 @@ function MiniCard({ course, getCoursePercent }) {
 
         {/* Thumbnail */}
         <div style={{
-          borderRadius:14,
-          overflow:"hidden",
+        
           height:130,
           background: course.imageUrl ? `url(${course.imageUrl}) center/cover` : s.g,
           display:"flex",
           alignItems:"center",
           justifyContent:"center",
           fontSize:44,
-          marginBottom:12,
+   
           position:"relative",
         }}>
           {!course.imageUrl && s.e}
@@ -194,7 +198,7 @@ function MiniCard({ course, getCoursePercent }) {
             </div>
           )}
         </div>
-
+<div style={{ padding: "12px 14px 14px" }}>
         {/* Info */}
         <h3 style={{ fontSize:14, fontWeight:800, color:"#0f172a", margin:"0 0 3px", lineHeight:1.3 }}>
           {course.title}
@@ -214,7 +218,7 @@ function MiniCard({ course, getCoursePercent }) {
             transition:"width 0.6s",
           }} />
         </div>
-
+</div>
       </div>
     </Link>
   );
