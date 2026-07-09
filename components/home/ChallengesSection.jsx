@@ -47,7 +47,7 @@ export default function ChallengesSection({ challenges = [] }) {
                     <div style={{ position:"absolute", top:-30, right:-30, width:100, height:100, borderRadius:"50%", background:"rgba(255,255,255,0.08)" }}/>
                     {!ch.imageUrl && <span style={{ fontSize:32, position:"relative", zIndex:1 }}>{ch.emoji}</span>}
                     <div style={{ marginLeft:"auto", background:"rgba(255,255,255,0.2)", borderRadius:999, padding:"4px 10px", display:"flex", alignItems:"center", gap:4, position:"relative", zIndex:1 }}>
-                      <Zap size={10} color="#fff" fill="#fff"/>
+                      <Zap size={10} color="#fff" fill="#000"/>
                       <span style={{ color:"#fff", fontSize:10, fontWeight:800 }}>{ch.days} DAYS</span>
                     </div>
                   </div>
