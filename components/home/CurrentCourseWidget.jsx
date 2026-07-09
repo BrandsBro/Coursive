@@ -14,10 +14,23 @@ export default function CurrentCourseWidget({ courses = [] }) {
   const { getCoursePercent, getCompletedLessons, loaded } = useProgress();
 
   if (!loaded) return (
-    <div style={{ background:"#fff", borderRadius:20, border:"1px solid #E5E7EB", padding:"24px", boxShadow:"0 2px 12px rgba(0,0,0,0.06)", minHeight:200, display:"flex", alignItems:"center", justifyContent:"center" }}>
-      <div style={{ width:32, height:32, borderRadius:"50%", border:"3px solid #E2E8F0", borderTopColor:"#6366f1", animation:"spin 0.7s linear infinite" }}/>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-    </div>
+    <>
+      <style>{`.sk{background:linear-gradient(90deg,#F1F5F9 25%,#E2E8F0 50%,#F1F5F9 75%);background-size:200% 100%;animation:sk 1.2s infinite}@keyframes sk{to{background-position:-200% 0}}`}</style>
+      <div style={{ background:"#fff", borderRadius:20, border:"1px solid #E5E7EB", padding:"24px", boxShadow:"0 2px 12px rgba(0,0,0,0.06)" }}>
+        <div style={{ display:"flex", gap:18, alignItems:"flex-start", marginBottom:20 }}>
+          <div className="sk" style={{ width:88, height:88, borderRadius:14, flexShrink:0 }}/>
+          <div style={{ flex:1 }}>
+            <div className="sk" style={{ height:22, borderRadius:8, marginBottom:10, width:"70%" }}/>
+            <div className="sk" style={{ height:14, borderRadius:6, width:"90%" }}/>
+          </div>
+        </div>
+        <div className="sk" style={{ height:8, borderRadius:999, marginBottom:20 }}/>
+        <div style={{ display:"flex", gap:12 }}>
+          <div className="sk" style={{ flex:1, height:42, borderRadius:12 }}/>
+          <div className="sk" style={{ flex:2, height:42, borderRadius:12 }}/>
+        </div>
+      </div>
+    </>
   );
 
   const activeCourse = courses.find(c => {
