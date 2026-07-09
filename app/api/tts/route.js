@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
 function cleanText(text) {
   return text
@@ -18,13 +19,48 @@ function cleanText(text) {
     .replace(/\bMidjourney\b/g, "Mid-journey");
 }
 
+function getCacheKey(text) {
+  // Simple hash of text for cache key
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    const char = text.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return `tts-cache/${Math.abs(hash)}.mp3`;
+}
+
 export async function POST(req) {
   try {
     const { text } = await req.json();
     if (!text) return NextResponse.json({ error: "No text" }, { status: 400 });
-
+    
     const cleaned = cleanText(text.slice(0, 5000));
+    const cacheKey = getCacheKey(cleaned);
 
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+
+    // Check cache first
+    const { data: cachedFile } = await supabase.storage
+      .from("lesson-media")
+      .download(cacheKey);
+
+    if (cachedFile) {
+      // Return cached audio
+      const buffer = await cachedFile.arrayBuffer();
+      return new NextResponse(buffer, {
+        headers: {
+          "Content-Type": "audio/mpeg",
+          "Cache-Control": "public, max-age=86400",
+          "X-Cache": "HIT",
+        },
+      });
+    }
+
+    // Generate new audio from ElevenLabs
     const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb", {
       method: "POST",
       headers: {
@@ -35,10 +71,7 @@ export async function POST(req) {
         text: cleaned,
         model_id: "eleven_multilingual_v2",
         output_format: "mp3_44100_128",
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.75,
-        },
+        voice_settings: { stability: 0.5, similarity_boost: 0.75 },
       }),
     });
 
@@ -49,10 +82,22 @@ export async function POST(req) {
     }
 
     const audioBuffer = await response.arrayBuffer();
+
+    // Save to cache in background
+    supabase.storage
+      .from("lesson-media")
+      .upload(cacheKey, audioBuffer, {
+        contentType: "audio/mpeg",
+        upsert: true,
+      })
+      .then(() => console.log("TTS cached:", cacheKey))
+      .catch(e => console.error("TTS cache error:", e));
+
     return new NextResponse(audioBuffer, {
       headers: {
         "Content-Type": "audio/mpeg",
-        "Cache-Control": "public, max-age=3600",
+        "Cache-Control": "public, max-age=86400",
+        "X-Cache": "MISS",
       },
     });
   } catch (e) {
