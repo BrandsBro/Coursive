@@ -36,11 +36,8 @@ export default function HomeFooter() {
               The fastest way to master AI tools and earn your certificate.
             </p>
             <div style={{ display: "flex", gap: 12, marginTop: 14 }}>
-              {["𝕏", "in", "📘", "📸"].map((s, i) => (
-                <a key={i} href="#" style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, textDecoration: "none", color: "#fff" }}>
-                  {s}
-                </a>
-              ))}
+              <a href="https://www.facebook.com/1coursellc/" target="_blank" rel="noopener noreferrer" style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, textDecoration: "none", color: "#fff" }}>📘</a>
+              <a href="https://www.instagram.com/1courseai/" target="_blank" rel="noopener noreferrer" style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(255,255,255,0.06)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, textDecoration: "none", color: "#fff" }}>📸</a>
             </div>
           </div>
 
