@@ -1,9 +1,20 @@
 "use client";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Play } from "lucide-react";
 import { useProgress } from "@/hooks/useProgress";
 
 export default function CurrentCourseWidget({ courses = [] }) {
+  const { getCoursePercent, getCompletedLessons, loaded } = useProgress();
+  const [readyToShow, setReadyToShow] = useState(false);
+
+  useEffect(() => {
+    if (loaded) {
+      const t = setTimeout(() => setReadyToShow(true), 300);
+      return () => clearTimeout(t);
+    }
+  }, [loaded]);
+
   if (!courses || courses.length === 0) return (
     <div style={{ background:"#fff", borderRadius:20, border:"1px solid #E5E7EB", padding:"40px 24px", textAlign:"center" }}>
       <div style={{ fontSize:32, marginBottom:8 }}>📚</div>
@@ -11,9 +22,7 @@ export default function CurrentCourseWidget({ courses = [] }) {
     </div>
   );
 
-  const { getCoursePercent, getCompletedLessons, loaded } = useProgress();
-
-  if (!loaded) return (
+  if (!readyToShow) return (
     <>
       <style>{`.sk{background:linear-gradient(90deg,#F1F5F9 25%,#E2E8F0 50%,#F1F5F9 75%);background-size:200% 100%;animation:sk 1.2s infinite}@keyframes sk{to{background-position:-200% 0}}`}</style>
       <div style={{ background:"#fff", borderRadius:20, border:"1px solid #E5E7EB", padding:"24px", boxShadow:"0 2px 12px rgba(0,0,0,0.06)" }}>
@@ -52,15 +61,8 @@ export default function CurrentCourseWidget({ courses = [] }) {
   const done  = getCompletedLessons(activeCourse.id).length;
 
   const Thumbnail = ({ size = 88, radius = 14 }) => (
-    <div style={{
-      width:size, height:size, borderRadius:radius, flexShrink:0,
-      overflow:"hidden", background:grad,
-      display:"flex", alignItems:"center", justifyContent:"center",
-      fontSize: size * 0.42,
-    }}>
-      {imageUrl
-        ? <img src={imageUrl} alt={activeCourse.title} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}/>
-        : emoji}
+    <div style={{ width:size, height:size, borderRadius:radius, flexShrink:0, overflow:"hidden", background:grad, display:"flex", alignItems:"center", justifyContent:"center", fontSize: size * 0.42 }}>
+      {imageUrl ? <img src={imageUrl} alt={activeCourse.title} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}/> : emoji}
     </div>
   );
 
@@ -77,12 +79,8 @@ export default function CurrentCourseWidget({ courses = [] }) {
         <div style={{ display:"flex", gap:18, alignItems:"flex-start", marginBottom:20 }}>
           <Thumbnail size={88} radius={14}/>
           <div style={{ flex:1, minWidth:0 }}>
-            <h3 style={{ fontSize:"clamp(18px,3.5vw,22px)", fontWeight:800, color:"#111827", margin:"0 0 6px", lineHeight:1.2 }}>
-              {activeCourse.title}
-            </h3>
-            <p className="course-desc" style={{ fontSize:13, color:"#6B7280", margin:0, lineHeight:1.5 }}>
-              {activeCourse.description}
-            </p>
+            <h3 style={{ fontSize:"clamp(18px,3.5vw,22px)", fontWeight:800, color:"#111827", margin:"0 0 6px", lineHeight:1.2 }}>{activeCourse.title}</h3>
+            <p className="course-desc" style={{ fontSize:13, color:"#6B7280", margin:0, lineHeight:1.5 }}>{activeCourse.description}</p>
           </div>
         </div>
         <div style={{ marginBottom:20 }}>
@@ -94,9 +92,7 @@ export default function CurrentCourseWidget({ courses = [] }) {
         </div>
         <div style={{ display:"flex", gap:12 }}>
           <Link href="/courses" style={{ textDecoration:"none", flex:1 }}>
-            <div style={{ padding:"11px 16px", borderRadius:12, background:`${accent}18`, textAlign:"center", fontSize:13, fontWeight:700, color:accent, cursor:"pointer" }}>
-              Other courses
-            </div>
+            <div style={{ padding:"11px 16px", borderRadius:12, background:`${accent}18`, textAlign:"center", fontSize:13, fontWeight:700, color:accent, cursor:"pointer" }}>Other courses</div>
           </Link>
           <Link href={`/courses/${activeCourse.id}`} style={{ textDecoration:"none", flex:2 }}>
             <div style={{ padding:"11px 16px", borderRadius:12, background:accent, textAlign:"center", fontSize:13, fontWeight:700, color:"#fff", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:6 }}>
