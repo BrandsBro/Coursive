@@ -1,5 +1,5 @@
 "use client";
-import "../legal.css;
+import "../legal.css";
 import { useBranding } from "@/lib/useBranding";
 
 export default function Page() {
