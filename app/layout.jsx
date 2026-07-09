@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/AuthContext";
+import { BrandingProvider } from "@/lib/BrandingContext";
 import { createClient } from "@supabase/supabase-js";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -32,6 +33,7 @@ export async function generateMetadata() {
 }
 
 export default async function RootLayout({ children }) {
+  const branding = await getBranding();
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -59,7 +61,9 @@ export default async function RootLayout({ children }) {
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <AuthProvider>
-          {children}
+          <BrandingProvider initialBranding={branding}>
+            {children}
+          </BrandingProvider>
         </AuthProvider>
       </body>
     </html>
