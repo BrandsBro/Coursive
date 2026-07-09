@@ -60,7 +60,7 @@ export default function CurrentCourseWidget({ courses = [] }) {
             <h3 style={{ fontSize:"clamp(18px,3.5vw,22px)", fontWeight:800, color:"#111827", margin:"0 0 6px", lineHeight:1.2 }}>
               {activeCourse.title}
             </h3>
-            <p className="course-desc" style={{ fontSize:13, color:"#6B7280", margin:0, lineHeight:1.5, display:"none" }}>
+            <p className="course-desc" style={{ fontSize:13, color:"#6B7280", margin:0, lineHeight:1.5 }}>
               {activeCourse.description}
             </p>
           </div>
