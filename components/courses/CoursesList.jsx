@@ -2,20 +2,19 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Search, BookOpen, Clock, Trophy, Play, CheckCircle2 } from "lucide-react";
-
+import { Search, BookOpen } from "lucide-react";
 import { useProgress } from "@/hooks/useProgress";
 
 const CATS = ["All", "Design", "Productivity", "Video", "No Code"];
 
 const S = {
-  "canva-ai":             { g:"linear-gradient(135deg,#ec4899,#8b5cf6)", e:"🎨", a:"#8b5cf6", al:"rgba(139,92,246,0.12)" },
-  "midjourney":           { g:"linear-gradient(135deg,#6366f1,#0ea5e9)", e:"🖼️", a:"#6366f1", al:"rgba(99,102,241,0.12)" },
-  "communicating-with-ai":{ g:"linear-gradient(135deg,#f97316,#fbbf24)", e:"💬", a:"#f97316", al:"rgba(249,115,22,0.12)" },
-  "kling":                { g:"linear-gradient(135deg,#ec4899,#f43f5e)", e:"🎬", a:"#ec4899", al:"rgba(236,72,153,0.12)" },
-  "lovable":              { g:"linear-gradient(135deg,#10b981,#06b6d4)", e:"💻", a:"#10b981", al:"rgba(16,185,129,0.12)" },
-  "chatgpt":              { g:"linear-gradient(135deg,#10a37f,#0ea5e9)", e:"🤖", a:"#10a37f", al:"rgba(16,163,127,0.12)" },
-  "notion-ai":            { g:"linear-gradient(135deg,#6b7280,#374151)", e:"📓", a:"#6b7280", al:"rgba(107,114,128,0.12)" },
+  "canva-ai":             { g:"linear-gradient(135deg,#ec4899,#8b5cf6)", e:"🎨", a:"#8b5cf6" },
+  "midjourney":           { g:"linear-gradient(135deg,#6366f1,#0ea5e9)", e:"🖼️", a:"#6366f1" },
+  "communicating-with-ai":{ g:"linear-gradient(135deg,#f97316,#fbbf24)", e:"💬", a:"#f97316" },
+  "kling":                { g:"linear-gradient(135deg,#ec4899,#f43f5e)", e:"🎬", a:"#ec4899" },
+  "lovable":              { g:"linear-gradient(135deg,#10b981,#06b6d4)", e:"💻", a:"#10b981" },
+  "chatgpt":              { g:"linear-gradient(135deg,#10a37f,#0ea5e9)", e:"🤖", a:"#10a37f" },
+  "notion-ai":            { g:"linear-gradient(135deg,#6b7280,#374151)", e:"📓", a:"#6b7280" },
 };
 
 export default function CoursesList({ courses = [] }) {
@@ -121,7 +120,7 @@ export default function CoursesList({ courses = [] }) {
                 const total = c.units.flatMap(u => u.lessons).length;
                 const pct = getCoursePercent(c.id, total);
                 return pct > 0 && pct < 100;
-              }).map(course => <MiniCard key={course.id} course={course} getCoursePercent={getCoursePercent} isHighlighted />)}
+              }).map(course => <MiniCard key={course.id} course={course} getCoursePercent={getCoursePercent} />)}
             </div>
           </div>
         )}
@@ -149,7 +148,14 @@ export default function CoursesList({ courses = [] }) {
         .cl-grid {
           display: grid;
           grid-template-columns: repeat(5, 1fr);
-          gap: 14px;
+          gap: 16px;
+        }
+        .cl-card {
+          cursor: pointer;
+          transition: transform 0.18s;
+        }
+        .cl-card:hover {
+          transform: translateY(-3px);
         }
         @media (max-width: 1280px) { .cl-grid { grid-template-columns: repeat(4, 1fr); } }
         @media (max-width: 1024px) { .cl-grid { grid-template-columns: repeat(3, 1fr); gap:12px; } }
@@ -159,112 +165,56 @@ export default function CoursesList({ courses = [] }) {
   );
 }
 
-function MiniCard({ course, getCoursePercent, isHighlighted }) {
-  const s = S[course.id] || { g:"linear-gradient(135deg,#6366f1,#8b5cf6)", e:"📚", a:"#6366f1", al:"rgba(99,102,241,0.12)" };
-  const total     = course.units.flatMap(u => u.lessons).length;
-  const pct       = getCoursePercent(course.id, total);
-  const isDone    = pct === 100;
-  const isStarted = pct > 0;
+function MiniCard({ course, getCoursePercent }) {
+  const s = S[course.id] || { g:"linear-gradient(135deg,#6366f1,#8b5cf6)", e:"📚", a:"#6366f1" };
+  const total = course.units.flatMap(u => u.lessons).length;
+  const pct   = getCoursePercent(course.id, total);
 
   return (
-    <Link href={`/courses/${course.id}`} style={{ textDecoration:"none", display:"block", height:"100%" }}>
-      <div
-        style={{
-          background:"#fff", borderRadius:18, overflow:"hidden", cursor:"pointer",
-          border:`1.5px solid ${isHighlighted || isStarted ? s.a + "40" : "#F1F5F9"}`,
-          boxShadow: isHighlighted || isStarted ? `0 4px 20px ${s.a}18` : "0 2px 8px rgba(0,0,0,0.05)",
-          transition:"all 0.2s", height:"100%", display:"flex", flexDirection:"column",
-        }}
-        onMouseEnter={e => {
-          e.currentTarget.style.transform = "translateY(-5px)";
-          e.currentTarget.style.boxShadow = `0 16px 36px ${s.a}28`;
-          e.currentTarget.style.borderColor = `${s.a}55`;
-        }}
-        onMouseLeave={e => {
-          e.currentTarget.style.transform = "translateY(0)";
-          e.currentTarget.style.boxShadow = isHighlighted || isStarted ? `0 4px 20px ${s.a}18` : "0 2px 8px rgba(0,0,0,0.05)";
-          e.currentTarget.style.borderColor = isHighlighted || isStarted ? `${s.a}40` : "#F1F5F9";
-        }}
-      >
-        {/* Hero */}
+    <Link href={`/courses/${course.id}`} style={{ textDecoration:"none", display:"block" }}>
+      <div className="cl-card">
+
+        {/* Thumbnail */}
         <div style={{
+          borderRadius:14,
+          overflow:"hidden",
+          height:130,
           background: course.imageUrl ? `url(${course.imageUrl}) center/cover` : s.g,
-          height:120, display:"flex", alignItems:"center", justifyContent:"space-between",
-          padding:"14px 16px", position:"relative", overflow:"hidden", flexShrink:0,
+          display:"flex",
+          alignItems:"center",
+          justifyContent:"center",
+          fontSize:44,
+          marginBottom:12,
+          position:"relative",
         }}>
-          <div style={{ position:"absolute", top:-24, right:-24, width:90, height:90, borderRadius:"50%", background:"rgba(255,255,255,0.09)" }} />
-          <div style={{ position:"absolute", bottom:-16, left:30, width:60, height:60, borderRadius:"50%", background:"rgba(255,255,255,0.06)" }} />
-          {!course.imageUrl && (
-            <span style={{ fontSize:40, position:"relative", zIndex:1, filter:"drop-shadow(0 3px 8px rgba(0,0,0,0.2))" }}>
-              {s.e}
-            </span>
+          {!course.imageUrl && s.e}
+          {pct === 100 && (
+            <div style={{ position:"absolute", top:8, right:8, background:"#22C55E", color:"#fff", fontSize:8, fontWeight:700, padding:"2px 7px", borderRadius:999 }}>
+              ✓ DONE
+            </div>
           )}
-          <div style={{ position:"relative", zIndex:1, display:"flex", flexDirection:"column", alignItems:"flex-end", gap:5, marginLeft:"auto" }}>
-            <span style={{ background:"rgba(255,255,255,0.22)", color:"#fff", fontSize:9, fontWeight:700, padding:"2px 8px", borderRadius:999, letterSpacing:0.5 }}>
-              {course.level}
-            </span>
-            {isDone && (
-              <div style={{ background:"rgba(34,197,94,0.9)", borderRadius:999, padding:"2px 8px", display:"flex", alignItems:"center", gap:3 }}>
-                <CheckCircle2 size={9} color="#fff" />
-                <span style={{ color:"#fff", fontSize:9, fontWeight:700 }}>Complete</span>
-              </div>
-            )}
-            {isStarted && !isDone && (
-              <div style={{ background:"rgba(255,255,255,0.18)", borderRadius:999, padding:"2px 8px" }}>
-                <span style={{ color:"#fff", fontSize:9, fontWeight:700 }}>{pct}%</span>
-              </div>
-            )}
-          </div>
         </div>
 
-        {/* Body */}
-        <div style={{ padding:"13px 14px 14px", flex:1, display:"flex", flexDirection:"column" }}>
-          <h3 style={{ fontSize:13, fontWeight:800, color:"#0f172a", margin:"0 0 3px", lineHeight:1.3 }}>
-            {course.title}
-          </h3>
-          <p style={{
-            fontSize:11, color:"#64748B", margin:"0 0 10px", lineHeight:1.5,
-            overflow:"hidden", display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical",
-          }}>
-            {course.description}
-          </p>
+        {/* Info */}
+        <h3 style={{ fontSize:14, fontWeight:800, color:"#0f172a", margin:"0 0 3px", lineHeight:1.3 }}>
+          {course.title}
+        </h3>
+        <p style={{ fontSize:12, color:"#94A3B8", margin:"0 0 10px" }}>
+          {total} lessons • {course.hours} hours
+        </p>
 
-          {/* Meta pills */}
-          <div style={{ display:"flex", gap:4, marginBottom:10, flexWrap:"wrap" }}>
-            {[
-              { icon:<BookOpen size={9} color={s.a} />, text:`${total} lessons` },
-              { icon:<Clock    size={9} color={s.a} />, text:`${course.hours}h` },
-              { icon:<Trophy  size={9} color={s.a} />, text:course.category },
-            ].map((m, i) => (
-              <div key={i} style={{ display:"flex", alignItems:"center", gap:3, background:s.al, borderRadius:6, padding:"3px 7px" }}>
-                {m.icon}
-                <span style={{ fontSize:10, fontWeight:600, color:s.a }}>{m.text}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Progress or CTA */}
-          <div style={{ marginTop:"auto" }}>
-            {isStarted ? (
-              <div>
-                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
-                  <span style={{ fontSize:10, color:"#94A3B8" }}>{isDone ? "Completed!" : "In progress"}</span>
-                  <span style={{ fontSize:10, fontWeight:700, color:s.a }}>{pct}%</span>
-                </div>
-                <div style={{ background:"#F1F5F9", borderRadius:999, height:4, overflow:"hidden" }}>
-                  <div style={{ height:4, borderRadius:999, background:s.g, width:`${pct}%`, transition:"width 0.6s" }} />
-                </div>
-              </div>
-            ) : (
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", background:s.al, borderRadius:10, padding:"8px 11px" }}>
-                <span style={{ fontSize:12, fontWeight:700, color:s.a }}>Start course</span>
-                <div style={{ width:22, height:22, borderRadius:"50%", background:s.g, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                  <Play size={10} color="#fff" fill="#fff" />
-                </div>
-              </div>
-            )}
-          </div>
+        {/* Progress bar */}
+        <div style={{ background:"#E5E7EB", borderRadius:999, height:5, overflow:"hidden" }}>
+          <div style={{
+            height:"100%",
+            borderRadius:999,
+            background: pct > 0 ? s.a : "#6366f1",
+            width: pct > 0 ? `${pct}%` : "100%",
+            opacity: pct > 0 ? 1 : 0.25,
+            transition:"width 0.6s",
+          }} />
         </div>
+
       </div>
     </Link>
   );
