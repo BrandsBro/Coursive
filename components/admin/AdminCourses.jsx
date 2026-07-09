@@ -1,4 +1,8 @@
 "use client";
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical } from "lucide-react";
 
 import { useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
@@ -21,6 +25,21 @@ export default function AdminCourses({ courses: initial }) {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY);
   const [loading, setLoading] = useState(false);
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
+
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIdx = courses.findIndex(c => c.id === active.id);
+    const newIdx = courses.findIndex(c => c.id === over.id);
+    const newOrder = arrayMove(courses, oldIdx, newIdx);
+    setCourses(newOrder);
+    // Save order to Supabase
+    const { supabase } = await import("@/lib/supabase");
+    for (let i = 0; i < newOrder.length; i++) {
+      await supabase.from("courses").update({ order_index: i }).eq("id", newOrder[i].id);
+    }
+  };
   const [uploading, setUploading] = useState(false);
 
   const handleImageUpload = async (file) => {
@@ -97,7 +116,11 @@ export default function AdminCourses({ courses: initial }) {
         {/* Course list */}
         <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
           {courses.map(course => (
-            <div key={course.id} style={{ background:"#fff", borderRadius:16, border:"1.5px solid #F1F5F9", padding:"14px 18px", display:"flex", alignItems:"center", gap:14, transition:"all 0.15s" }}
+<DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={courses.map(c => c.id)} strategy={verticalListSortingStrategy}>
+                {courses.map(course => <SortableCourseRow key={course.id} course={course} onEdit={openEdit} onDelete={handleDelete} confirmDelete={confirmDelete} setConfirmDelete={setConfirmDelete}/>)}
+              </SortableContext>
+            </DndContext>
               onMouseEnter={e => { e.currentTarget.style.borderColor="#E0E7FF"; e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,0.06)"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor="#F1F5F9"; e.currentTarget.style.boxShadow="none"; }}>
               <div style={{ width:46, height:46, borderRadius:13, background:course.imageUrl?`url(${course.imageUrl}) center/cover`:`linear-gradient(135deg,${course.gradientFrom},${course.gradientTo})`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22, flexShrink:0 }}>
