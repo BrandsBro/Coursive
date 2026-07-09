@@ -72,7 +72,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav style={{ position:"sticky", top:0, zIndex:50, width:"100%", borderRadius:"10px", borderBottom:"1px solid #F1F5F9", }}>
+      <nav style={{ position:"sticky", top:0, zIndex:50,background:"white", width:"100%", borderRadius:"10px", borderBottom:"1px solid #F1F5F9", }}>
         <div style={{ maxWidth:1200, margin:"0 auto", padding:"0 16px", height:60, display:"flex", alignItems:"center", justifyContent:"space-between", gap:12 }}>
 
           {/* Logo */}
@@ -182,6 +182,7 @@ export default function Navbar() {
           .hidden-mobile { display: flex !important; }
         }
       `}</style>
+      
     </>
   );
 }
