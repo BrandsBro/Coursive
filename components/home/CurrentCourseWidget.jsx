@@ -21,26 +21,26 @@ export default function CurrentCourseWidget({ courses = [] }) {
 
   const imageUrl = activeCourse.imageUrl || activeCourse.image_url || activeCourse.image || null;
   const gradFrom = activeCourse.gradientFrom || activeCourse.gradient_from || "#6366f1";
-  const gradTo = activeCourse.gradientTo || activeCourse.gradient_to || "#8b5cf6";
-  const grad = `linear-gradient(135deg,${gradFrom},${gradTo})`;
-  const accent = gradFrom;
-  const emoji = activeCourse.emoji || "📚";
+  const gradTo   = activeCourse.gradientTo   || activeCourse.gradient_to   || "#8b5cf6";
+  const grad     = `linear-gradient(135deg,${gradFrom},${gradTo})`;
+  const accent   = gradFrom;
+  const emoji    = activeCourse.emoji || "📚";
 
   const allLessons = activeCourse.units.flatMap(u => u.lessons);
   const total = allLessons.length;
-  const pct = getCoursePercent(activeCourse.id, total);
-  const done = getCompletedLessons(activeCourse.id).length;
+  const pct   = getCoursePercent(activeCourse.id, total);
+  const done  = getCompletedLessons(activeCourse.id).length;
 
   const Thumbnail = ({ size = 88, radius = 14 }) => (
     <div style={{
       width:size, height:size, borderRadius:radius, flexShrink:0,
-      background: imageUrl ? undefined : grad,
-      backgroundImage: imageUrl ? `url(${imageUrl})` : undefined,
-      backgroundSize:"cover", backgroundPosition:"center",
+      overflow:"hidden", background:grad,
       display:"flex", alignItems:"center", justifyContent:"center",
       fontSize: size * 0.42,
     }}>
-      {!imageUrl && emoji}
+      {imageUrl
+        ? <img src={imageUrl} alt={activeCourse.title} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}/>
+        : emoji}
     </div>
   );
 
@@ -118,7 +118,7 @@ export default function CurrentCourseWidget({ courses = [] }) {
         .ccw-mobile { display: none; }
         @media (max-width: 768px) {
           .ccw-desktop { display: none !important; }
-          .ccw-mobile { display: block !important; }
+          .ccw-mobile  { display: block !important; }
         }
       `}</style>
     </>
