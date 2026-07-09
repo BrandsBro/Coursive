@@ -228,14 +228,12 @@ export default function LessonPage({ course, lesson, content, mode, challengeId,
                   {activeTaskIdx !== idx ? (
                     <button onClick={() => setActiveTaskIdx(idx)}
                       style={{ width:"100%", padding:"18px 20px", borderRadius:16, border:"2px solid #E2E8F0", background:"#F8FAFC", cursor:"pointer", textAlign:"left", display:"flex", alignItems:"center", gap:14 }}>
-                      <div style={{ width:44, height:44, borderRadius:12, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-                        <span style={{ fontSize:22 }}>🔤</span>
-                      </div>
+                   
                       <div>
                         <p style={{ fontSize:15, fontWeight:800, color:"#0f172a", margin:"0 0 2px" }}>{c.taskTitle||"Fill in the blanks"}</p>
                         <p style={{ fontSize:13, color:"#94A3B8", margin:0 }}>{c.taskDesc||"Tap to start the task"}</p>
                       </div>
-                      <div style={{ marginLeft:"auto", padding:"8px 16px", borderRadius:10, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:13, fontWeight:700 }}>Start →</div>
+                      <div style={{ marginLeft:"auto", padding:"8px 16px", borderRadius:10, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:13, fontWeight:700 }}>Start</div>
                     </button>
                   ) : (
                     <BlankOptionsBlock c={c} idx={idx}
