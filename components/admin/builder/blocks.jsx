@@ -550,6 +550,62 @@ function CalloutE({ content, onChange }) {
 }
 
 
+function CalloutRichEditor({ content, onChange, ts }) {
+  const editorRef = useRef(null);
+  const [activeFormats, setActiveFormats] = useState({});
+
+  useEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.innerHTML = content.html || content.text || "";
+    }
+  }, []);
+
+  const execCmd = (cmd, value=null) => {
+    editorRef.current?.focus();
+    document.execCommand(cmd, false, value);
+    setTimeout(() => {
+      if (editorRef.current) onChange({ ...content, html: editorRef.current.innerHTML, text: editorRef.current.innerText });
+      updateActiveFormats();
+    }, 50);
+  };
+
+  const updateActiveFormats = () => {
+    setActiveFormats({
+      bold: document.queryCommandState("bold"),
+      italic: document.queryCommandState("italic"),
+      underline: document.queryCommandState("underline"),
+      ul: document.queryCommandState("insertUnorderedList"),
+      ol: document.queryCommandState("insertOrderedList"),
+    });
+  };
+
+  const btn = (active, cmd, label, extra={}) => (
+    <button onMouseDown={e => { e.preventDefault(); execCmd(cmd); }}
+      style={{ padding:"4px 10px", borderRadius:6, border:"1.5px solid #E2E8F0", background:activeFormats[cmd]||active?"#5B4EFF":"#fff", color:activeFormats[cmd]||active?"#fff":"#374151", cursor:"pointer", fontSize:13, fontWeight:700, ...extra }}>
+      {label}
+    </button>
+  );
+
+  return (
+    <div>
+      <style>{`.callout-editor ul{list-style-type:disc!important;padding-left:24px!important;margin:8px 0!important}.callout-editor ol{list-style-type:decimal!important;padding-left:24px!important;margin:8px 0!important}.callout-editor li{display:list-item!important}`}</style>
+      <div style={{ display:"flex", gap:6, padding:"6px 10px", background:"#F8FAFC", borderRadius:"8px 8px 0 0", border:"1.5px solid #E2E8F0", borderBottom:"none", flexWrap:"wrap" }}>
+        {btn(false,"bold","B",{fontWeight:900})}
+        {btn(false,"italic","I",{fontStyle:"italic"})}
+        {btn(false,"underline","U",{textDecoration:"underline"})}
+        <div style={{ width:1, height:18, background:"#E2E8F0" }}/>
+        {btn(false,"insertUnorderedList","• List")}
+        {btn(false,"insertOrderedList","1. List")}
+      </div>
+      <div ref={editorRef} contentEditable suppressContentEditableWarning
+        onInput={() => { if(editorRef.current) onChange({ ...content, html: editorRef.current.innerHTML, text: editorRef.current.innerText }); }}
+        onKeyUp={updateActiveFormats} onMouseUp={updateActiveFormats}
+        className="callout-editor"
+        style={{ ...inp(), minHeight:80, lineHeight:1.7, borderRadius:"0 0 9px 9px", outline:"none", cursor:"text" }}/>
+    </div>
+  );
+}
+
 function MatchingE({ content, onChange }) {
   const pairs = content.pairs || [{left:"",right:""},{left:"",right:""}];
   const updatePair = (i, side, val) => {
