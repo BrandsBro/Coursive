@@ -82,8 +82,7 @@ export async function middleware(req) {
       .maybeSingle();
     if (sub) {
       const isExpired = new Date(sub.expires_at) < new Date();
-      const isCancelled = sub.status === "cancelled" && isExpired;
-      if (isExpired || isCancelled) {
+      if (isExpired) {
         return NextResponse.redirect(new URL("/expired", req.url));
       }
     }
