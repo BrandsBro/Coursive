@@ -124,13 +124,9 @@ export default function AdminCourses({ courses: initial }) {
                 {!course.imageUrl && course.emoji}
               </div>
               <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:3 }}>
-                  <h3 style={{ fontSize:14, fontWeight:700, color:"#0f172a", margin:0 }}>{course.title}</h3>
-                  <span style={{ fontSize:10, fontWeight:600, padding:"2px 7px", borderRadius:999, background:"#F0F9FF", color:"#0369A1" }}>{course.category}</span>
-                  <span style={{ fontSize:10, fontWeight:600, padding:"2px 7px", borderRadius:999, background:"#F0FDF4", color:"#15803D" }}>{course.level}</span>
-                </div>
+                <h3 style={{ fontSize:14, fontWeight:700, color:"#0f172a", margin:"0 0 3px" }}>{course.title}</h3>
                 <p style={{ fontSize:11, color:"#94A3B8", margin:0 }}>
-                  {course.id} &nbsp;·&nbsp; {course.units.flatMap(u=>u.lessons).length} lessons &nbsp;·&nbsp; {course.hours}h
+                  {course.units.flatMap(u=>u.lessons).length} lessons &nbsp;·&nbsp; {course.hours}h
                 </p>
               </div>
               <div style={{ display:"flex", gap:6, flexShrink:0 }}>
