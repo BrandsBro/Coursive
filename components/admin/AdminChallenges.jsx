@@ -32,6 +32,21 @@ export default function AdminChallenges({ challenges: initial }) {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(EMPTY);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const handleImageUpload = async (file) => {
+    if (!file) return;
+    setUploading(true);
+    const { supabase } = await import("@/lib/supabase");
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const path = `challenges/${Date.now()}-${safeName}`;
+    const { error } = await supabase.storage.from("lesson-media").upload(path, file, { upsert:true });
+    if (!error) {
+      const { data } = supabase.storage.from("lesson-media").getPublicUrl(path);
+      update("image_url", data.publicUrl);
+    }
+    setUploading(false);
+  };
   const [deleteId, setDeleteId] = useState(null);
 
   const update = (k, v) => setForm(p => ({ ...p, [k]: v }));
@@ -166,6 +181,17 @@ export default function AdminChallenges({ challenges: initial }) {
                 <div style={{ display:"grid", gridTemplateColumns:"1fr auto", gap:12 }}>
                   <Field label="Challenge ID" hint="e.g. ai-side-gigs">
                     <input value={form.id} onChange={e => update("id", e.target.value.toLowerCase().replace(/\s/g,"-"))} disabled={!!editing} placeholder="challenge-id" style={inputSt(!!editing)} />
+                  </Field>
+                  <Field label="Cover Image">
+                    <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                      <input value={form.image_url||""} onChange={e => update("image_url", e.target.value)} placeholder="https://... or upload" style={{ ...inputSt(), flex:1 }}/>
+                      <label style={{ display:"flex", alignItems:"center", gap:6, padding:"9px 14px", borderRadius:10, border:"1.5px dashed #C7D2FE", background:"#EEF2FF", color:"#5B4EFF", fontSize:12, fontWeight:700, cursor:"pointer", whiteSpace:"nowrap", flexShrink:0 }}>
+                        {uploading ? "⏳" : "⬆ Upload"}
+                        <input type="file" accept="image/*" style={{ display:"none" }} onChange={e => handleImageUpload(e.target.files[0])}/>
+                      </label>
+                      {form.image_url && <button onClick={() => update("image_url", "")} style={{ padding:"9px 10px", borderRadius:10, border:"1.5px solid #FEE2E2", background:"#fff", color:"#ef4444", cursor:"pointer", fontSize:12, flexShrink:0 }}>✕</button>}
+                    </div>
+                    {form.image_url && <img src={form.image_url} alt="" style={{ width:"100%", height:80, objectFit:"cover", borderRadius:10, marginTop:8 }}/>}
                   </Field>
                   <Field label="Emoji">
                     <input value={form.emoji} onChange={e => update("emoji", e.target.value)} placeholder="🚀" style={{ ...inputSt(), width:70, textAlign:"center", fontSize:22 }} />
