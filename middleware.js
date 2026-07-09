@@ -72,20 +72,28 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // 5. Check subscription expiry for logged in users
+  // 5. Check subscription expiry - use cookie cache to avoid DB hit every request
   if (session && !isPublic && !isAdmin && pathname !== "/expired") {
-    const { data: sub } = await supabase
-      .from("subscriptions")
-      .select("expires_at, status")
-      .eq("user_id", session.user.id)
-      .order("expires_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (sub) {
-      const isExpired = new Date(sub.expires_at) < new Date();
-      if (isExpired) {
-        return NextResponse.redirect(new URL("/expired", req.url));
+    const cachedExpiry = req.cookies.get("sub_expires")?.value;
+    let isExpired = false;
+    if (cachedExpiry) {
+      isExpired = new Date(cachedExpiry) < new Date();
+    } else {
+      const { data: sub } = await supabase
+        .from("subscriptions")
+        .select("expires_at, status")
+        .eq("user_id", session.user.id)
+        .order("expires_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (sub) {
+        isExpired = new Date(sub.expires_at) < new Date();
+        res.cookies.set("sub_expires", sub.expires_at, { maxAge: 300, path: "/" });
       }
+    }
+    if (isExpired) {
+      res.cookies.delete("sub_expires");
+      return NextResponse.redirect(new URL("/expired", req.url));
     }
   }
 
