@@ -116,6 +116,7 @@ export default function AdminCourses({ courses: initial }) {
         {/* Course list */}
         <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
           {courses.map(course => (
+            <div key={course.id} style={{ background:"#fff", borderRadius:16, border:"1.5px solid #F1F5F9", padding:"14px 18px", display:"flex", alignItems:"center", gap:14, transition:"all 0.15s" }}
 
               onMouseEnter={e => { e.currentTarget.style.borderColor="#E0E7FF"; e.currentTarget.style.boxShadow="0 2px 8px rgba(0,0,0,0.06)"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor="#F1F5F9"; e.currentTarget.style.boxShadow="none"; }}>
