@@ -15,6 +15,7 @@ const PUBLIC_ROUTES = [
   "/terms-condition",
   "/subscription-terms",
   "/plan",
+  "/refund-policy",
 ];
 
 const ADMIN_ROUTES = ["/admin"];
