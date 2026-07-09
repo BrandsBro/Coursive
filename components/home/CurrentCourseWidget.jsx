@@ -94,8 +94,7 @@ export default function CurrentCourseWidget({ courses = [] }) {
           <div style={{ display:"flex", gap:14, alignItems:"center", marginBottom:16 }}>
             <Thumbnail size={60} radius={10}/>
             <div style={{ flex:1, minWidth:0 }}>
-              <h3 style={{ fontSize:15, fontWeight:800, color:"#111827", margin:"0 0 3px", lineHeight:1.3 }}>{activeCourse.title}</h3>
-              <p style={{ fontSize:12, color:"#6B7280", margin:0 }}>{activeCourse.description}</p>
+              <h3 style={{ fontSize:15, fontWeight:800, color:"#111827", margin:0, lineHeight:1.3 }}>{activeCourse.title}</h3>
             </div>
           </div>
           <div style={{ marginBottom:16 }}>
