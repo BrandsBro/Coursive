@@ -6,6 +6,7 @@ export function useProgress() {
   const [userId, setUserId] = useState(null);
   const [progress, setProgress] = useState({});
   const [loaded, setLoaded] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   // Get current user
   useEffect(() => {
