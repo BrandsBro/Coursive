@@ -77,7 +77,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/home" style={{ textDecoration:"none", flexShrink:0 }}>
-            <img src={branding.logoApp} alt="1Course" className="logo-app" style={{ objectFit:"contain", padding:5 }}/>
+            {branding.logoApp && <img src={branding.logoApp} alt="1Course" className="logo-app" style={{ objectFit:"contain", padding:5 }}/>
           </Link>
 
           {/* Desktop nav links */}
