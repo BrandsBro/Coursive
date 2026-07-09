@@ -190,7 +190,7 @@ const goNext = () => {
               </button>
             )}
           </div>
-          {branding.logoApp && <img src={branding.logoApp} alt="1Course" className="logo-app" style={{ objectFit:"contain", padding:4, maxHeight: isMobile ? 30 : 40 }}/>
+          {branding.logoApp && <img src={branding.logoApp} alt="1Course" className="logo-app" style={{ objectFit:"contain", padding:4, maxHeight: isMobile ? 30 : 40 }}/>}
           <div style={{ width:56, textAlign:"right" }}>
             {endStep !== "sales" && (
               <span style={{ fontSize: isMobile ? 11 : 13, fontWeight:700, color:"#94A3B8" }}>
