@@ -112,8 +112,9 @@ const goNext = () => {
     }
     // Save lead to database
     try {
-      fetch("/api/leads/save", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ name: name.trim(), email: email.trim() }) });
-    } catch(e) {}
+      fetch("/api/leads/save", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ name: name.trim(), email: email.trim() }) })
+        .then(r => r.json()).then(d => console.log("Lead saved:", d)).catch(e => console.error("Lead error:", e));
+    } catch(e) { console.error("Lead catch:", e); }
   }
 
   if (!isInEndSequence) {
