@@ -849,58 +849,36 @@ function MatchingBlock({ c, idx, checked, setChecked }) {
       <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
         {leftItems.map((item, i) => {
           const rightItem = rightItems[i];
-            const matchedRight = getMatchedRight(i);
-            const isMatched = matchedRight !== null;
-            const correct = isChecked && isMatched && isCorrect(i, matchedRight);
-            const wrong = isChecked && isMatched && !isCorrect(i, matchedRight);
-            const isSelected = selectedLeft === i;
-            return (
-              <button key={i} className="match-item" onClick={() => handleLeft(i)}
-                style={{ padding:item.leftImage?"0":"10px 12px", borderRadius:12, border:`2px solid ${correct?"#22c55e":wrong?"#ef4444":isSelected?"#5B4EFF":isMatched?"#7c3aed":"#E2E8F0"}`, background:correct?"#F0FDF4":wrong?"#FEF2F2":isSelected?"#EEF2FF":isMatched?"#F5F3FF":"#fff", cursor:isChecked?"default":"pointer", textAlign:"left", overflow:"hidden", display:"flex", flexDirection:"column", width:"100%", position:"relative" }}>
+          const matchedRight = getMatchedRight(i);
+          const isLeftMatched = matchedRight !== null;
+          const leftCorrect = isChecked && isLeftMatched && isCorrect(i, matchedRight);
+          const leftWrong = isChecked && isLeftMatched && !isCorrect(i, matchedRight);
+          const isLeftSelected = selectedLeft === i;
+          const isRMatched = isRightMatched(i);
+          const leftIdx2 = isRMatched ? getLeftForRight(i) : null;
+          const rCorrect = isChecked && isRMatched && isCorrect(leftIdx2, i);
+          const rWrong = isChecked && isRMatched && !isCorrect(leftIdx2, i);
+          const isRSelected = selectedRight === i;
+          return (
+            <div key={i} style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+              <button className="match-item" onClick={() => handleLeft(i)}
+                style={{ padding:item.leftImage?"0":"10px 12px", borderRadius:12, border:`2px solid ${leftCorrect?"#22c55e":leftWrong?"#ef4444":isLeftSelected?"#5B4EFF":isLeftMatched?"#7c3aed":"#E2E8F0"}`, background:leftCorrect?"#F0FDF4":leftWrong?"#FEF2F2":isLeftSelected?"#EEF2FF":isLeftMatched?"#F5F3FF":"#fff", cursor:isChecked?"default":"pointer", overflow:"hidden", display:"flex", flexDirection:"column", width:"100%", position:"relative", minHeight:48 }}>
                 {item.leftImage && <img src={item.leftImage} alt="" style={{ width:"100%", aspectRatio:"1/1", objectFit:"cover", display:"block" }}/>}
-                {item.left && <span style={{ display:"block", padding:"8px 12px", fontSize:13, fontWeight:700, color:correct?"#166534":wrong?"#991B1B":isSelected?"#4338CA":isMatched?"#6D28D9":"#374151" }}>{item.left}</span>}
+                {item.left && <span style={{ display:"block", padding:"8px 12px", fontSize:13, fontWeight:700, color:leftCorrect?"#166534":leftWrong?"#991B1B":isLeftSelected?"#4338CA":isLeftMatched?"#6D28D9":"#374151" }}>{item.left}</span>}
                 {!item.left && !item.leftImage && <span style={{ display:"block", padding:"10px 12px", fontSize:13, fontWeight:700, color:"#374151" }}>Item {i+1}</span>}
-                {isMatched && <span style={{ position:"absolute", top:6, right:6, fontSize:10 }}>{correct?"✓":wrong?"✗":"🔗"}</span>}
+                {isLeftMatched && <span style={{ position:"absolute", top:4, right:6, fontSize:11 }}>{leftCorrect?"✓":leftWrong?"✗":"🔗"}</span>}
               </button>
-            );
-          })}
-        </div>
-        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-          {rightItems.map((item, i) => {
-            const isMatched = isRightMatched(i);
-            const leftIdx = isMatched ? getLeftForRight(i) : null;
-            const correct = isChecked && isMatched && isCorrect(leftIdx, i);
-            const wrong = isChecked && isMatched && !isCorrect(leftIdx, i);
-            const isSelected = selectedRight === i;
-            return (
-              <button key={i} className="match-item" onClick={() => handleRight(i)}
-                style={{ padding:item.rightImage?"0":"10px 12px", borderRadius:12, border:`2px solid ${correct?"#22c55e":wrong?"#ef4444":isSelected?"#5B4EFF":isMatched?"#7c3aed":"#E2E8F0"}`, background:correct?"#F0FDF4":wrong?"#FEF2F2":isSelected?"#EEF2FF":isMatched?"#F5F3FF":"#fff", cursor:isChecked?"default":"pointer", textAlign:"left", overflow:"hidden", display:"flex", flexDirection:"column", width:"100%", position:"relative" }}>
-                {item.rightImage && <img src={item.rightImage} alt="" style={{ width:"100%", aspectRatio:"1/1", objectFit:"cover", display:"block" }}/>}
-                {item.right && <span style={{ display:"block", padding:"8px 12px", fontSize:13, fontWeight:700, color:correct?"#166534":wrong?"#991B1B":isSelected?"#4338CA":isMatched?"#6D28D9":"#374151" }}>{item.right}</span>}
-                {!item.right && !item.rightImage && <span style={{ display:"block", padding:"10px 12px", fontSize:13, fontWeight:700, color:"#374151" }}>Match {i+1}</span>}
-                {isMatched && <span style={{ position:"absolute", top:6, right:6, fontSize:10 }}>{correct?"✓":wrong?"✗":"🔗"}</span>}
+              <button className="match-item" onClick={() => handleRight(i)}
+                style={{ padding:rightItem?.rightImage?"0":"10px 12px", borderRadius:12, border:`2px solid ${rCorrect?"#22c55e":rWrong?"#ef4444":isRSelected?"#5B4EFF":isRMatched?"#7c3aed":"#E2E8F0"}`, background:rCorrect?"#F0FDF4":rWrong?"#FEF2F2":isRSelected?"#EEF2FF":isRMatched?"#F5F3FF":"#fff", cursor:isChecked?"default":"pointer", overflow:"hidden", display:"flex", flexDirection:"column", width:"100%", position:"relative", minHeight:48 }}>
+                {rightItem?.rightImage && <img src={rightItem.rightImage} alt="" style={{ width:"100%", aspectRatio:"1/1", objectFit:"cover", display:"block" }}/>}
+                {rightItem?.right && <span style={{ display:"block", padding:"8px 12px", fontSize:13, fontWeight:700, color:rCorrect?"#166534":rWrong?"#991B1B":isRSelected?"#4338CA":isRMatched?"#6D28D9":"#374151" }}>{rightItem.right}</span>}
+                {!rightItem?.right && !rightItem?.rightImage && <span style={{ display:"block", padding:"10px 12px", fontSize:13, fontWeight:700, color:"#374151" }}>Match {i+1}</span>}
+                {isRMatched && <span style={{ position:"absolute", top:4, right:6, fontSize:11 }}>{rCorrect?"✓":rWrong?"✗":"🔗"}</span>}
               </button>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
-
-      {!isChecked && allMatched && (
-        <button onClick={() => setChecked(p => ({ ...p, ["match_"+idx]: true }))}
-          style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>
-          Check ✓
-        </button>
-      )}
-      {!isChecked && !allMatched && (
-        <p style={{ textAlign:"center", fontSize:12, color:"#94A3B8" }}>{Object.keys(matches).length}/{pairs.length} matched</p>
-      )}
-      {isChecked && (
-        <div>
-          <div style={{ padding:"14px 18px", borderRadius:14, background:score===pairs.length?"#F0FDF4":"#FEF2F2", border:`1.5px solid ${score===pairs.length?"#BBF7D0":"#FECACA"}`, marginBottom:12 }}>
-            <p style={{ fontSize:15, fontWeight:800, color:score===pairs.length?"#166534":"#DC2626", margin:0 }}>
-              {score===pairs.length?"🎉 Perfect! All matched correctly!":score+"/"+pairs.length+" correct"}
-            </p>
-          </div>
           <button onClick={reset} style={{ width:"100%", padding:"12px", borderRadius:12, border:"none", background:"#5B4EFF", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
             🔄 Try Again
           </button>
