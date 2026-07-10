@@ -111,6 +111,7 @@ const goNext = () => {
       return;
     }
     // Save lead to database
+    console.log("Saving lead:", name, email);
     try {
       fetch("/api/leads/save", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ name: name.trim(), email: email.trim() }) })
         .then(r => r.json()).then(d => console.log("Lead saved:", d)).catch(e => console.error("Lead error:", e));
