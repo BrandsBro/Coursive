@@ -110,6 +110,10 @@ const goNext = () => {
       setToast("Please enter a valid email address");
       return;
     }
+    // Save lead to database
+    try {
+      fetch("/api/leads/save", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ name: name.trim(), email: email.trim() }) });
+    } catch(e) {}
   }
 
   if (!isInEndSequence) {
