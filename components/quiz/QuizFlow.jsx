@@ -245,7 +245,7 @@ const goNext = () => {
         <div style={{ position:"fixed", bottom:0, left:0, right:0, padding: isMobile ? "10px 14px" : "16px 20px", background:"#fff", borderTop:"1px solid #F1F5F9" }}>
           <div style={{ maxWidth:600, margin:"0 auto" }}>
             <button onClick={goNext} style={{ width:"100%", padding: isMobile ? "13px" : "16px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize: isMobile ? 14 : 16, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 16px rgba(91,78,255,0.4)" }}>
-              CONTINUE
+              NEXT STEP
             </button>
           </div>
         </div>
