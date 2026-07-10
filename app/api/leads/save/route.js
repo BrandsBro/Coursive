@@ -11,9 +11,9 @@ export async function POST(req) {
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
 
-    // Try insert, ignore duplicate email errors
-    const { error } = await supabase.from("leads").insert({ name, email });
-    if (error) console.error("Lead insert error:", error);
+    const { data, error } = await supabase.from("leads").insert({ name, email }).select();
+    console.log("Lead insert result:", data, error);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
     return NextResponse.json({ ok: true });
   } catch(e) {
