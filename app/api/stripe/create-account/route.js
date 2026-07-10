@@ -290,6 +290,11 @@ export async function POST(req) {
     } catch(e) { console.error("Meta CAPI error:", e); }
 
 
+    // Mark lead as converted
+    try {
+      await supabase.from("leads").update({ converted: true }).eq("email", email);
+    } catch(e) {}
+
     // Send admin notifications
     try {
       const { data: notifSettings } = await supabase
