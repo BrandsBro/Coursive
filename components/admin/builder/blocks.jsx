@@ -15,7 +15,7 @@ export const BLOCK_DEFS = {
   multiplechoice: { icon:"🔘", label:"Multiple Choice", desc:"Radio style quiz with explanation", color:"#7c3aed", bg:"#F5F3FF", default:{ heading:"", subheading:"", headerImage:"", question:"", options:["","",""], optionImages:["","",""], correct:[], explanation:"", successImage:"", successText:"", headingStyle:{}, subheadingStyle:{}, questionStyle:{}, optionStyle:{}, explanationStyle:{} }, preview:c=>c.question||"No question" },
   reorder: { icon:"↕️", label:"Reorder", desc:"Drag items into correct order", color:"#0d9488", bg:"#F0FDFA", default:{ question:"", items:["","","",""], itemStyle:{} }, preview:c=>c.question||"No question" },
   continueblock: { icon:"▶️", label:"Continue",       desc:"Stop point — hides content below", color:"#5B4EFF", bg:"#EEF2FF", default:{ label:"Continue" },                                                                    preview:()=>"── Continue button ──" },
-  matching: { icon:"🔗", label:"Matching", desc:"Match left to right", color:"#7c3aed", bg:"#F5F3FF", default:{ heading:"", subheading:"", pairs:[{left:"",right:""},{left:"",right:""}] }, preview:c=>c.heading||"Matching exercise" },
+  matching: { icon:"🔗", label:"Matching", desc:"Match left to right", color:"#7c3aed", bg:"#F5F3FF", default:{ heading:"", subheading:"", pairs:[{left:"",leftImage:"",right:"",rightImage:""},{left:"",leftImage:"",right:"",rightImage:""}] }, preview:c=>c.heading||"Matching exercise" },
   blankoptions: { icon:"🔤", label:"Blank + Options",desc:"Pick word from sentence",color:"#0891b2", bg:"#E0F2FE", default:{ sentence:"", markedWords:[], blanks:[], explanation:"", taskTitle:"", taskDesc:"", successText:"", successImages:[], sentenceStyle:{} },                         preview:c=>c.sentence||"No sentence" },
 };
 
@@ -630,12 +630,51 @@ function MatchingE({ content, onChange }) {
           <p style={lbl()}>Pairs</p>
           <button onClick={addPair} style={{ padding:"4px 12px", borderRadius:8, border:"none", background:"#5B4EFF", color:"#fff", fontSize:12, fontWeight:700, cursor:"pointer" }}>+ Add Pair</button>
         </div>
-        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
           {pairs.map((pair, i) => (
-            <div key={i} style={{ display:"grid", gridTemplateColumns:"1fr 1fr auto", gap:8, alignItems:"center" }}>
-              <input value={pair.left||""} onChange={e => updatePair(i,"left",e.target.value)} placeholder={"Left item "+(i+1)} style={{ ...inp(), margin:0 }}/>
-              <input value={pair.right||""} onChange={e => updatePair(i,"right",e.target.value)} placeholder={"Right match "+(i+1)} style={{ ...inp(), margin:0 }}/>
-              <button onClick={() => removePair(i)} style={{ width:28, height:28, borderRadius:8, border:"none", background:"#FEF2F2", color:"#dc2626", fontSize:14, cursor:"pointer", fontWeight:700, flexShrink:0 }}>✕</button>
+            <div key={i} style={{ background:"#F8FAFC", borderRadius:12, padding:"12px", border:"1.5px solid #E2E8F0" }}>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:8 }}>
+                <span style={{ fontSize:12, fontWeight:700, color:"#6366f1" }}>Pair {i+1}</span>
+                <button onClick={() => removePair(i)} style={{ width:24, height:24, borderRadius:6, border:"none", background:"#FEF2F2", color:"#dc2626", fontSize:12, cursor:"pointer", fontWeight:700 }}>✕</button>
+              </div>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                <div>
+                  <p style={{ fontSize:10, fontWeight:700, color:"#94A3B8", margin:"0 0 4px" }}>LEFT</p>
+                  <input value={pair.left||""} onChange={e => updatePair(i,"left",e.target.value)} placeholder={"Text (optional)"} style={{ ...inp(), margin:"0 0 6px" }}/>
+                  <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+                    <input value={pair.leftImage||""} onChange={e => updatePair(i,"leftImage",e.target.value)} placeholder="Image URL (optional)" style={{ ...inp(), margin:0, fontSize:11 }}/>
+                    <label style={{ flexShrink:0, padding:"6px 8px", borderRadius:8, border:"1.5px dashed #C7D2FE", background:"#EEF2FF", color:"#5B4EFF", fontSize:11, fontWeight:700, cursor:"pointer" }}>
+                      ⬆
+                      <input type="file" accept="image/*" style={{ display:"none" }} onChange={async e => {
+                        const file = e.target.files[0]; if(!file) return;
+                        const { supabase } = await import("@/lib/supabase");
+                        const path = `matching/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
+                        const { error } = await supabase.storage.from("lesson-media").upload(path, file, { upsert:true });
+                        if(!error) { const { data } = supabase.storage.from("lesson-media").getPublicUrl(path); updatePair(i,"leftImage",data.publicUrl); }
+                      }}/>
+                    </label>
+                  </div>
+                  {pair.leftImage && <img src={pair.leftImage} alt="" style={{ width:"100%", height:60, objectFit:"cover", borderRadius:8, marginTop:6 }}/>}
+                </div>
+                <div>
+                  <p style={{ fontSize:10, fontWeight:700, color:"#94A3B8", margin:"0 0 4px" }}>RIGHT</p>
+                  <input value={pair.right||""} onChange={e => updatePair(i,"right",e.target.value)} placeholder={"Text (optional)"} style={{ ...inp(), margin:"0 0 6px" }}/>
+                  <div style={{ display:"flex", gap:6, alignItems:"center" }}>
+                    <input value={pair.rightImage||""} onChange={e => updatePair(i,"rightImage",e.target.value)} placeholder="Image URL (optional)" style={{ ...inp(), margin:0, fontSize:11 }}/>
+                    <label style={{ flexShrink:0, padding:"6px 8px", borderRadius:8, border:"1.5px dashed #C7D2FE", background:"#EEF2FF", color:"#5B4EFF", fontSize:11, fontWeight:700, cursor:"pointer" }}>
+                      ⬆
+                      <input type="file" accept="image/*" style={{ display:"none" }} onChange={async e => {
+                        const file = e.target.files[0]; if(!file) return;
+                        const { supabase } = await import("@/lib/supabase");
+                        const path = `matching/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
+                        const { error } = await supabase.storage.from("lesson-media").upload(path, file, { upsert:true });
+                        if(!error) { const { data } = supabase.storage.from("lesson-media").getPublicUrl(path); updatePair(i,"rightImage",data.publicUrl); }
+                      }}/>
+                    </label>
+                  </div>
+                  {pair.rightImage && <img src={pair.rightImage} alt="" style={{ width:"100%", height:60, objectFit:"cover", borderRadius:8, marginTop:6 }}/>}
+                </div>
+              </div>
             </div>
           ))}
         </div>
