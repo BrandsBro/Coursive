@@ -856,7 +856,7 @@ function MatchingBlock({ c, idx, checked, setChecked }) {
             const isSelected = selectedLeft === i;
             return (
               <button key={i} className="match-item" onClick={() => handleLeft(i)}
-                style={{ padding:item.leftImage?"0":"10px 12px", borderRadius:12, border:`2px solid ${correct?"#22c55e":wrong?"#ef4444":isSelected?"#5B4EFF":isMatched?"#7c3aed":"#E2E8F0"}`, background:correct?"#F0FDF4":wrong?"#FEF2F2":isSelected?"#EEF2FF":isMatched?"#F5F3FF":"#fff", cursor:isChecked?"default":"pointer", textAlign:"left", overflow:"hidden", display:"flex", flexDirection:"column", width:"100%" }}>
+                style={{ padding:item.leftImage?"0":"10px 12px", borderRadius:12, border:`2px solid ${correct?"#22c55e":wrong?"#ef4444":isSelected?"#5B4EFF":isMatched?"#7c3aed":"#E2E8F0"}`, background:correct?"#F0FDF4":wrong?"#FEF2F2":isSelected?"#EEF2FF":isMatched?"#F5F3FF":"#fff", cursor:isChecked?"default":"pointer", textAlign:"left", overflow:"hidden", display:"flex", flexDirection:"column", width:"100%", position:"relative" }}>
                 {item.leftImage && <img src={item.leftImage} alt="" style={{ width:"100%", aspectRatio:"1/1", objectFit:"cover", display:"block" }}/>}
                 {item.left && <span style={{ display:"block", padding:"8px 12px", fontSize:13, fontWeight:700, color:correct?"#166534":wrong?"#991B1B":isSelected?"#4338CA":isMatched?"#6D28D9":"#374151" }}>{item.left}</span>}
                 {!item.left && !item.leftImage && <span style={{ display:"block", padding:"10px 12px", fontSize:13, fontWeight:700, color:"#374151" }}>Item {i+1}</span>}

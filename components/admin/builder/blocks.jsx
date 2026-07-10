@@ -150,10 +150,20 @@ export function BlockPreview({ block }) {
           {c.subheading && <p style={{ fontSize:12, color:"#64748B", margin:"0 0 10px" }}>{c.subheading}</p>}
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
             <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
-              {pairs.map((p,i) => <div key={i} style={{ padding:"8px 12px", borderRadius:10, background:"#EEF2FF", border:"1.5px solid #C7D2FE", fontSize:13, fontWeight:600, color:"#4338CA" }}>{p.left||"Item "+(i+1)}</div>)}
+              {pairs.map((p,i) => (
+                <div key={i} style={{ borderRadius:10, background:"#EEF2FF", border:"1.5px solid #C7D2FE", overflow:"hidden" }}>
+                  {p.leftImage && <img src={p.leftImage} alt="" style={{ width:"100%", aspectRatio:"1/1", objectFit:"cover", display:"block" }}/>}
+                  <p style={{ padding:"8px 12px", fontSize:13, fontWeight:600, color:"#4338CA", margin:0 }}>{p.left||(!p.leftImage&&"Item "+(i+1))}</p>
+                </div>
+              ))}
             </div>
             <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
-              {[...pairs].sort(()=>0.5-Math.random()).map((p,i) => <div key={i} style={{ padding:"8px 12px", borderRadius:10, background:"#F5F3FF", border:"1.5px solid #DDD6FE", fontSize:13, fontWeight:600, color:"#6D28D9" }}>{p.right||"Match "+(i+1)}</div>)}
+              {[...pairs].sort(()=>0.5-Math.random()).map((p,i) => (
+                <div key={i} style={{ borderRadius:10, background:"#F5F3FF", border:"1.5px solid #DDD6FE", overflow:"hidden" }}>
+                  {p.rightImage && <img src={p.rightImage} alt="" style={{ width:"100%", aspectRatio:"1/1", objectFit:"cover", display:"block" }}/>}
+                  <p style={{ padding:"8px 12px", fontSize:13, fontWeight:600, color:"#6D28D9", margin:0 }}>{p.right||(!p.rightImage&&"Match "+(i+1))}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
