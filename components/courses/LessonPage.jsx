@@ -846,9 +846,9 @@ function MatchingBlock({ c, idx, checked, setChecked }) {
       {c.subheading && <p style={{ fontSize:13, color:"#64748B", margin:"0 0 16px" }}>{c.subheading}</p>}
       {!c.heading && !c.subheading && <p style={{ fontSize:13, color:"#64748B", margin:"0 0 16px" }}>Tap a left item then a right item to match them</p>}
 
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:16 }}>
-        <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
-          {leftItems.map((item, i) => {
+      <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
+        {leftItems.map((item, i) => {
+          const rightItem = rightItems[i];
             const matchedRight = getMatchedRight(i);
             const isMatched = matchedRight !== null;
             const correct = isChecked && isMatched && isCorrect(i, matchedRight);
@@ -1226,7 +1226,7 @@ function ContentBlock({ block, idx, answers, setAnswers, checked, setChecked, fi
       return <BlankOptionsBlock c={c} idx={idx} checked={checked} setChecked={setChecked} fillShowAnswer={fillShowAnswer} setFillShowAnswer={setFillShowAnswer}/>;
 
     case "matching":
-      return <MatchingBlock c={c} idx={idx} checked={checked} setChecked={setChecked}/>;
+      return <MatchingBlock key={c.id||idx} c={c} idx={idx} checked={checked} setChecked={setChecked}/>;
     case "reorder":
       return <ReorderBlock c={c} idx={idx} checked={checked} setChecked={setChecked}/>;
 
