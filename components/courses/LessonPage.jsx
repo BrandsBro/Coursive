@@ -879,6 +879,22 @@ function MatchingBlock({ c, idx, checked, setChecked }) {
           );
         })}
       </div>
+      {!isChecked && allMatched && (
+        <button onClick={() => setChecked(p => ({ ...p, ["match_"+idx]: true }))}
+          style={{ width:"100%", padding:"14px", borderRadius:14, border:"none", background:"#22c55e", color:"#fff", fontSize:15, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 0 #16a34a" }}>
+          Check ✓
+        </button>
+      )}
+      {!isChecked && !allMatched && (
+        <p style={{ textAlign:"center", fontSize:12, color:"#94A3B8" }}>{Object.keys(matches).length}/{pairs.length} matched</p>
+      )}
+      {isChecked && (
+        <div>
+          <div style={{ padding:"14px 18px", borderRadius:14, background:score===pairs.length?"#F0FDF4":"#FEF2F2", border:`1.5px solid ${score===pairs.length?"#BBF7D0":"#FECACA"}`, marginBottom:12 }}>
+            <p style={{ fontSize:15, fontWeight:800, color:score===pairs.length?"#166534":"#DC2626", margin:0 }}>
+              {score===pairs.length?"🎉 Perfect! All matched correctly!":score+"/"+pairs.length+" correct"}
+            </p>
+          </div>
           <button onClick={reset} style={{ width:"100%", padding:"12px", borderRadius:12, border:"none", background:"#5B4EFF", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
             🔄 Try Again
           </button>
