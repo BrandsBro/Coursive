@@ -3,7 +3,7 @@ import { useBranding } from "@/lib/useBranding";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Award, Palette, BookOpen, Trophy, Users, TrendingUp, HardDrive, Settings, ChevronRight, LogOut, MessageSquare, ClipboardList, Mail, CreditCard, Bell } from "lucide-react";
+import { LayoutDashboard, Award, Palette, BookOpen, Trophy, Users, TrendingUp, HardDrive, Settings, ChevronRight, LogOut, MessageSquare, ClipboardList, Mail, CreditCard, Bell , UserX} from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const NAV = [
