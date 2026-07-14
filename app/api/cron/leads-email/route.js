@@ -42,21 +42,21 @@ export async function GET(req) {
     const minutesAgo = (now - createdAt) / 1000 / 60;
 
     if (minutesAgo >= 30 && !lead.email1_sent && t1) {
-      const html = buildEmailHtml(t1, lead.name || "there");
+      const html = buildEmailHtml(t1, lead.name || "there", lead.email);
       await resend.emails.send({ from:"1Course <noreply@1course.io>", to:lead.email, subject:t1.subject, html });
       await supabase.from("leads").update({ email1_sent: true }).eq("id", lead.id);
       sent++;
     }
 
     if (minutesAgo >= 1440 && !lead.email2_sent && t2) {
-      const html = buildEmailHtml(t2, lead.name || "there");
+      const html = buildEmailHtml(t2, lead.name || "there", lead.email);
       await resend.emails.send({ from:"1Course <noreply@1course.io>", to:lead.email, subject:t2.subject, html });
       await supabase.from("leads").update({ email2_sent: true }).eq("id", lead.id);
       sent++;
     }
 
     if (minutesAgo >= 4320 && !lead.email3_sent && t3) {
-      const html = buildEmailHtml(t3, lead.name || "there");
+      const html = buildEmailHtml(t3, lead.name || "there", lead.email);
       await resend.emails.send({ from:"1Course <noreply@1course.io>", to:lead.email, subject:t3.subject, html });
       await supabase.from("leads").update({ email3_sent: true }).eq("id", lead.id);
       sent++;
@@ -66,7 +66,7 @@ export async function GET(req) {
   return NextResponse.json({ ok: true, sent, total: leads?.length || 0 });
 }
 
-function buildEmailHtml(template, name) {
+function buildEmailHtml(template, name, email) {
   const c = template.content || {};
   return `<!DOCTYPE html><html><body style="margin:0;padding:0;background:${c.bgColor||"#0a081e"};font-family:-apple-system,sans-serif">
     <div style="max-width:520px;margin:0 auto">

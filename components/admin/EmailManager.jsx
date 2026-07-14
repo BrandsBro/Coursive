@@ -562,7 +562,7 @@ function generatePreviewHtml(c, name, email, password) {
           <p style="margin:0;font-weight:900;font-size:20px;color:#fff;background:rgba(91,78,255,0.2);padding:10px;border-radius:8px;text-align:center;font-family:monospace">${password}</p>
         </div>
         <div style="text-align:center">
-          <a href="#" style="display:inline-block;padding:14px 28px;background:${c.buttonColor};color:${c.buttonTextColor};text-decoration:none;border-radius:12px;font-weight:700">${c.buttonText}</a>
+          <a href="https://1course.io/plan?name=John&email=john@example.com" style="display:inline-block;padding:14px 28px;background:${c.buttonColor};color:${c.buttonTextColor};text-decoration:none;border-radius:12px;font-weight:700">${c.buttonText}</a>
         </div>
       </div>
       <div style="padding:16px 28px;border-top:1px solid rgba(255,255,255,0.08);text-align:center">

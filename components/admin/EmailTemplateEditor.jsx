@@ -163,6 +163,11 @@ export default function EmailTemplateEditor({ templateId }) {
           <input value={template.name || ""} onChange={(e) => u("name", e.target.value)} style={{ fontSize: 15, fontWeight: 800, color: "#0f172a", border: "none", outline: "none", background: "transparent", width: "100%" }} />
         </div>
         <input value={template.subject || ""} onChange={(e) => u("subject", e.target.value)} placeholder="Subject line..." style={{ padding: "7px 12px", borderRadius: 9, border: "1.5px solid #E2E8F0", fontSize: 13, width: 380, outline: "none", flexShrink: 0 }} />
+        {template.trigger?.startsWith("lead_followup") && (
+          <div style={{ background:"#EEF2FF", border:"1.5px solid #C7D2FE", borderRadius:10, padding:"10px 14px", marginBottom:8 }}>
+            <p style={{ fontSize:12, fontWeight:600, color:"#4338CA", margin:0 }}>💡 For lead emails, the button URL is automatically set to <strong>https://1course.io/plan?name={"{name}"}&email={"{email}"}</strong> — no need to set it manually.</p>
+          </div>
+        )}
         <select value={template.trigger || "manual"} onChange={(e) => u("trigger", e.target.value)} style={{ padding: "7px 10px", borderRadius: 9, border: "1.5px solid #E2E8F0", fontSize: 12, outline: "none", flexShrink: 0 }}>
           {TRIGGER_TYPES.map((t) => (<option key={t.value} value={t.value}>{t.icon} {t.label}</option>))}
         </select>
