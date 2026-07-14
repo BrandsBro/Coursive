@@ -21,7 +21,7 @@ async function getPlanAmount(planName) {
 
 export async function POST(req) {
   try {
-    const { plan, email, name } = await req.json();
+    const { plan, email, name, discountCode, discountAmount } = await req.json();
     const amount = await getPlanAmount(plan);
     // Apply discount
     let finalAmount = amount;
