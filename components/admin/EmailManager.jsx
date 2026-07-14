@@ -179,7 +179,7 @@ function LeadEmailsTab({ templates, save, router }) {
                 {/* Info */}
                 <div style={{ flex:1, minWidth:0 }}>
                   <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:3 }}>
-                    <input value={template.name} onChange={e => {
+                    <input defaultValue={template.name} onBlur={e => {
                       const updated = templates.map(t => t.id === template.id ? { ...t, name: e.target.value } : t);
                       save(updated);
                     }} style={{ fontSize:15, fontWeight:800, color:"#0f172a", border:"none", outline:"none", background:"transparent", width:"100%", padding:0, fontFamily:"inherit" }}/>
@@ -383,7 +383,7 @@ export default function EmailManager() {
                     {/* Info */}
                     <div style={{ flex:1, minWidth:0 }}>
                       <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:3 }}>
-                        <input value={template.name} onChange={e => {
+                        <input defaultValue={template.name} onBlur={e => {
                       const updated = templates.map(t => t.id === template.id ? { ...t, name: e.target.value } : t);
                       save(updated);
                     }} style={{ fontSize:15, fontWeight:800, color:"#0f172a", border:"none", outline:"none", background:"transparent", width:"100%", padding:0, fontFamily:"inherit" }}/>
