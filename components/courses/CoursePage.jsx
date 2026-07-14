@@ -111,7 +111,7 @@ export default function CoursePage({ course, allCourses }) {
           key={completedLessons.length}
           course={course}
           completedLessons={completedLessons}
-          onViewCertificate={() => setShowCertificate(true)}
+          onViewCertificate={() => { setShowCertificate(true); markCertificateEarned(course.id); }}
         />
       </div>
 
