@@ -132,7 +132,7 @@ const goNext = () => {
       setEndStep(END_SEQUENCE[idx + 1]);
     } else {
       console.log("[QuizFlow] Navigating to /plan now. name:", name, "email:", email);
-      router.push("/plan");
+      router.push(`/plan?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`);
     }
   }
 };

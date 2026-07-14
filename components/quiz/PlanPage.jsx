@@ -1,4 +1,5 @@
 "use client";
+import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useBranding } from "@/lib/useBranding";
 import PaymentModal from "@/components/quiz/PaymentModal";
@@ -30,9 +31,10 @@ export default function PlanPage({ pricingData }) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const e = sessionStorage.getItem("quiz_email") || "";
-      const n = sessionStorage.getItem("quiz_name")  || "";
-      // Redirect to quiz if no email (user came directly)
+      // Try URL params first, then sessionStorage
+      const params = new URLSearchParams(window.location.search);
+      const e = params.get("email") || sessionStorage.getItem("quiz_email") || "";
+      const n = params.get("name")  || sessionStorage.getItem("quiz_name")  || "";
       if (!e) { window.location.href = "/quiz"; return; }
       setEmail(e);
       setName(n);
