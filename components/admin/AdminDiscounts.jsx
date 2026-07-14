@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Plus, Trash2, Copy, Check, Tag } from "lucide-react";
+import { Plus, Trash2, Copy, Check, Tag, Edit2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const EMPTY = { code:"", type:"percentage", value:"", max_uses:"", expires_at:"", active:true };
@@ -11,6 +11,7 @@ export default function AdminDiscounts() {
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(EMPTY);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(null);
 
@@ -26,18 +27,35 @@ export default function AdminDiscounts() {
   const save = async () => {
     if (!form.code.trim() || !form.value) return;
     setSaving(true);
-    await supabase.from("discounts").insert({
-      code: form.code.toUpperCase().trim(),
-      type: form.type,
-      value: parseFloat(form.value),
-      max_uses: form.max_uses ? parseInt(form.max_uses) : null,
-      expires_at: form.expires_at || null,
-      active: true,
-    });
+    if (editingId) {
+      await supabase.from("discounts").update({
+        code: form.code.toUpperCase().trim(),
+        type: form.type,
+        value: parseFloat(form.value),
+        max_uses: form.max_uses ? parseInt(form.max_uses) : null,
+        expires_at: form.expires_at || null,
+      }).eq("id", editingId);
+    } else {
+      await supabase.from("discounts").insert({
+        code: form.code.toUpperCase().trim(),
+        type: form.type,
+        value: parseFloat(form.value),
+        max_uses: form.max_uses ? parseInt(form.max_uses) : null,
+        expires_at: form.expires_at || null,
+        active: true,
+      });
+    }
     setForm(EMPTY);
     setShowForm(false);
+    setEditingId(null);
     await load();
     setSaving(false);
+  };
+
+  const openEdit = (d) => {
+    setForm({ code:d.code, type:d.type, value:String(d.value), max_uses:d.max_uses||"", expires_at:d.expires_at?d.expires_at.split("T")[0]:"", active:d.active });
+    setEditingId(d.id);
+    setShowForm(true);
   };
 
   const toggleActive = async (id, active) => {
@@ -139,7 +157,11 @@ export default function AdminDiscounts() {
                       </button>
                     </td>
                     <td style={{ padding:"14px 16px" }}>
-                      <button onClick={() => deleteDiscount(d.id)}
+                      <button onClick={() => openEdit(d)}
+                        style={{ width:32, height:32, borderRadius:8, border:"1.5px solid #E2E8F0", background:"#fff", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", color:"#6366f1", marginRight:4 }}>
+                        <Edit2 size={14}/>
+                      </button>
+                    <button onClick={() => deleteDiscount(d.id)}
                         style={{ width:32, height:32, borderRadius:8, border:"1.5px solid #FEE2E2", background:"#fff", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", color:"#ef4444" }}>
                         <Trash2 size={14}/>
                       </button>
@@ -157,7 +179,7 @@ export default function AdminDiscounts() {
             <div style={{ background:"#fff", borderRadius:24, width:"100%", maxWidth:440, boxShadow:"0 32px 80px rgba(0,0,0,0.2)" }}>
               <div style={{ background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", padding:"24px 28px", borderRadius:"24px 24px 0 0", display:"flex", alignItems:"center", gap:12 }}>
                 <Tag size={20} color="#fff"/>
-                <h2 style={{ color:"#fff", fontSize:18, fontWeight:900, margin:0 }}>New Discount Code</h2>
+                <h2 style={{ color:"#fff", fontSize:18, fontWeight:900, margin:0 }}>{editingId ? "Edit Discount Code" : "New Discount Code"}</h2>
               </div>
               <div style={{ padding:"24px 28px", display:"flex", flexDirection:"column", gap:14 }}>
                 <div>
@@ -191,13 +213,13 @@ export default function AdminDiscounts() {
                   </div>
                 </div>
                 <div style={{ display:"flex", gap:10, marginTop:8 }}>
-                  <button onClick={() => setShowForm(false)}
+                  <button onClick={() => { setShowForm(false); setEditingId(null); setForm(EMPTY); }}
                     style={{ flex:1, padding:"12px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:13, fontWeight:600, color:"#374151", cursor:"pointer" }}>
                     Cancel
                   </button>
                   <button onClick={save} disabled={saving || !form.code || !form.value}
                     style={{ flex:2, padding:"12px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer", opacity:saving||!form.code||!form.value?0.6:1 }}>
-                    {saving ? "Creating..." : "Create Code"}
+                    {saving ? "Saving..." : editingId ? "Save Changes" : "Create Code"}
                   </button>
                 </div>
               </div>
