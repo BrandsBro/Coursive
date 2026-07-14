@@ -30,8 +30,12 @@ export default function PlanPage({ pricingData }) {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setEmail(sessionStorage.getItem("quiz_email") || "");
-      setName(sessionStorage.getItem("quiz_name")  || "");
+      const e = sessionStorage.getItem("quiz_email") || "";
+      const n = sessionStorage.getItem("quiz_name")  || "";
+      // Redirect to quiz if no email (user came directly)
+      if (!e) { window.location.href = "/quiz"; return; }
+      setEmail(e);
+      setName(n);
     }
     const t = setInterval(() => setTimeLeft(p => Math.max(0, p - 1)), 1000);
     return () => clearInterval(t);
