@@ -27,10 +27,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
   const [error, setError] = useState("");
 
   const planInfo = PLANS[plan] || PLANS["4-Week Plan"];
-  const discountedPrice = discountAmount && discountAmount > 0
-    ? `$${((parseFloat((propDisplayPrice || planInfo.price).replace("$","")) * 100 - discountAmount) / 100).toFixed(2)}`
-    : null;
-  const displayPrice = discountedPrice || propDisplayPrice || planInfo.price;
+  const displayPrice = propDisplayPrice || planInfo.price;
 
   const handlePay = async () => {
     if (!stripe || !elements) return;
