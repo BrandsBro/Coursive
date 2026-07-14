@@ -233,17 +233,20 @@ export default function PlanPage({ pricingData }) {
                   <span style={{ fontSize: t.origPrice, color:"#94A3B8", textDecoration:"line-through" }}>
                     ${plan.originalPrice}
                   </span>
-                  {couponData && plan.name === selectedPlan ? (
-                    <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end" }}>
-                      <span style={{ fontSize:11, color:"#94A3B8", textDecoration:"line-through" }}>${plan.price}</span>
-                      <span style={{ fontSize: t.salePrice, fontWeight:900, color:"#22c55e" }}>
-                        ${(couponData.finalAmount/100).toFixed(2)}
-                      </span>
-                    </div>
-                  ) : (
-                    <span style={{ fontSize: t.salePrice, fontWeight:900, color:"#5B4EFF" }}>
-                      ${plan.price}
-                    </span>
+                  {couponData ? (() => {
+                    const planAmount = Math.round(parseFloat(plan.price) * 100);
+                    const disc = couponData.discount?.type === "percentage"
+                      ? Math.round(planAmount * couponData.discount.value / 100)
+                      : Math.round(couponData.discount?.value * 100 || 0);
+                    const final = Math.max(planAmount - disc, 0) / 100;
+                    return (
+                      <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end" }}>
+                        <span style={{ fontSize:11, color:"#94A3B8", textDecoration:"line-through" }}>${plan.price}</span>
+                        <span style={{ fontSize: t.salePrice, fontWeight:900, color:"#22c55e" }}>${final.toFixed(2)}</span>
+                      </div>
+                    );
+                  })() : (
+                    <span style={{ fontSize: t.salePrice, fontWeight:900, color:"#5B4EFF" }}>${plan.price}</span>
                   )}
                 </div>
               </div>
@@ -285,8 +288,19 @@ export default function PlanPage({ pricingData }) {
           email={email}
           name={name}
           discountCode={couponData ? couponCode : null}
-          discountAmount={couponData?.discountAmount || 0}
-          displayPrice={couponData ? `$${(couponData.finalAmount/100).toFixed(2)}` : null}
+          discountAmount={couponData ? (() => {
+            const planAmount = Math.round(parseFloat(plans.find(p=>p.name===selectedPlan)?.price||0) * 100);
+            return couponData.discount?.type === "percentage"
+              ? Math.round(planAmount * couponData.discount.value / 100)
+              : Math.round(couponData.discount?.value * 100 || 0);
+          })() : 0}
+          displayPrice={couponData ? (() => {
+            const planAmount = Math.round(parseFloat(plans.find(p=>p.name===selectedPlan)?.price||0) * 100);
+            const disc = couponData.discount?.type === "percentage"
+              ? Math.round(planAmount * couponData.discount.value / 100)
+              : Math.round(couponData.discount?.value * 100 || 0);
+            return `$${(Math.max(planAmount - disc, 0)/100).toFixed(2)}`;
+          })() : null}
           onClose={() => setShowPayment(false)}
           onSuccess={() => {
             setShowPayment(false);
