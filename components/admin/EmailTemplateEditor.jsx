@@ -122,7 +122,14 @@ export default function EmailTemplateEditor({ templateId }) {
     const { data } = await supabase.from("settings").select("*").eq("key", "email_templates").single();
     if (data?.value) {
       const t = data.value.find((t) => t.id === templateId);
-      if (t) { if (!t.blocks) t.blocks = DEFAULT_BLOCKS; setTemplate(t); }
+      if (t) { 
+        if (!t.blocks) t.blocks = DEFAULT_BLOCKS; 
+        setTemplate(t); 
+      } else {
+        // Template not found - create new one with this ID
+        const newT = { id: templateId, name:"New Template", subject:"", trigger:"lead_followup_custom", active:false, blocks: DEFAULT_BLOCKS, content:{} };
+        setTemplate(newT);
+      }
     }
     setLoading(false);
   };
