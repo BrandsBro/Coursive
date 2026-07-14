@@ -141,7 +141,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
   );
 }
 
-export default function PaymentModal({ plan, paymentType, email, name, onClose, onSuccess, isRenewal=false }) {
+export default function PaymentModal({ plan, paymentType, email, name, onClose, onSuccess, isRenewal=false, discountCode, discountAmount=0 }) {
   const [pricingSettings, setPricingSettings] = useState(null);
 
   useEffect(() => {
