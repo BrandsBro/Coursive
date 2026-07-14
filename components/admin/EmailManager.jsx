@@ -182,7 +182,9 @@ function LeadEmailsTab({ templates, save, router }) {
                     <input defaultValue={template.name} onBlur={e => {
                       const updated = templates.map(t => t.id === template.id ? { ...t, name: e.target.value } : t);
                       save(updated);
-                    }} style={{ fontSize:15, fontWeight:800, color:"#0f172a", border:"none", outline:"none", background:"transparent", width:"100%", padding:0, fontFamily:"inherit" }}/>
+                    }} placeholder="Template name..." style={{ fontSize:15, fontWeight:800, color:"#0f172a", border:"1.5px solid transparent", borderRadius:6, outline:"none", background:"transparent", width:"100%", padding:"2px 6px", fontFamily:"inherit", cursor:"text" }}
+                    onFocus={e => e.target.style.borderColor="#C7D2FE"}
+                    onBlur={e => { e.target.style.borderColor="transparent"; const updated = templates.map(t => t.id === template.id ? { ...t, name: e.target.value } : t); save(updated); }}/>
                     <span style={{ fontSize:11, fontWeight:700, padding:"2px 8px", borderRadius:999, background:template.active?"#F0FDF4":"#F8FAFC", color:template.active?"#16a34a":"#94A3B8" }}>
                       {template.active ? "Active" : "Paused"}
                     </span>
