@@ -20,7 +20,7 @@ const PLANS = {
   "12-Week Plan": { price:"$39.99", recurringPrice:"$32.99", label:"12-Week AI Program", weeks:12 },
 };
 
-function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, displayPrice: propDisplayPrice }) {
+function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, displayPrice: propDisplayPrice, discountCode, discountAmount=0 }) {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -177,7 +177,7 @@ export default function PaymentModal({ plan, paymentType, email, name, onClose, 
           </p>
         </div>
         <Elements stripe={stripePromise} options={{ appearance:{ theme:"stripe" } }}>
-          <CheckoutForm plan={plan} paymentType={paymentType} email={email} name={name} onSuccess={onSuccess} onClose={onClose} displayPrice={activeDisplayPrice}/>
+          <CheckoutForm plan={plan} paymentType={paymentType} email={email} name={name} onSuccess={onSuccess} onClose={onClose} displayPrice={activeDisplayPrice} discountCode={discountCode} discountAmount={discountAmount}/>
         </Elements>
       </div>
     </div>
