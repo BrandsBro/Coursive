@@ -25,6 +25,25 @@ export default function PlanPage({ pricingData }) {
 
   const [selectedPlan, setSelectedPlan] = useState("4-Week Plan");
   const [showPayment,  setShowPayment]  = useState(false);
+  const [couponCode,   setCouponCode]   = useState("");
+  const [couponData,   setCouponData]   = useState(null);
+  const [couponError,  setCouponError]  = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setCouponLoading(true); setCouponError(""); setCouponData(null);
+    const plan = plans.find(p => p.name === selectedPlan);
+    const amount = Math.round(parseFloat(plan?.price || 0) * 100);
+    const res = await fetch("/api/discount/validate", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ code: couponCode, amount })
+    });
+    const data = await res.json();
+    if (data.ok) setCouponData(data);
+    else setCouponError(data.error || "Invalid code");
+    setCouponLoading(false);
+  };
   const [email,        setEmail]        = useState("");
   const [name,         setName]         = useState("");
   const [timeLeft,     setTimeLeft]     = useState(10 * 60);
