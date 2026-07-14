@@ -15,6 +15,10 @@ const TRIGGER_TYPES = [
   { value: "manual", label: "Manual", icon: "✉️" },
   { value: "password_changed", label: "Password Changed", icon: "🔐" },
   { value: "forgot_password", label: "Forgot Password", icon: "🔑" },
+  { value: "lead_followup_1", label: "Lead Follow-up 1 (30 min)", icon: "📬" },
+  { value: "lead_followup_2", label: "Lead Follow-up 2 (24 hrs)", icon: "📭" },
+  { value: "lead_followup_3", label: "Lead Follow-up 3 (3 days)", icon: "📮" },
+  { value: "lead_followup_custom", label: "Lead Follow-up (Custom)", icon: "📧" },
 ];
 
 const BLOCK_TYPES = [
@@ -162,6 +166,21 @@ export default function EmailTemplateEditor({ templateId }) {
         <select value={template.trigger || "manual"} onChange={(e) => u("trigger", e.target.value)} style={{ padding: "7px 10px", borderRadius: 9, border: "1.5px solid #E2E8F0", fontSize: 12, outline: "none", flexShrink: 0 }}>
           {TRIGGER_TYPES.map((t) => (<option key={t.value} value={t.value}>{t.icon} {t.label}</option>))}
         </select>
+        {template.trigger?.startsWith("lead_followup") && (
+          <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:8 }}>
+            <span style={{ fontSize:12, color:"#64748B", fontWeight:600 }}>Send after:</span>
+            <input type="number" min="1" value={template.delayMinutes||30}
+              onChange={e => u("delayMinutes", parseInt(e.target.value))}
+              style={{ width:70, padding:"5px 8px", borderRadius:8, border:"1.5px solid #E2E8F0", fontSize:12, outline:"none" }}/>
+            <select value={template.delayUnit||"minutes"}
+              onChange={e => u("delayUnit", e.target.value)}
+              style={{ padding:"5px 8px", borderRadius:8, border:"1.5px solid #E2E8F0", fontSize:12, outline:"none" }}>
+              <option value="minutes">Minutes</option>
+              <option value="hours">Hours</option>
+              <option value="days">Days</option>
+            </select>
+          </div>
+        )}
         <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
           <input value={testEmail} onChange={(e) => setTestEmail(e.target.value)} placeholder="test@email.com" style={{ padding: "7px 10px", borderRadius: 9, border: "1.5px solid #E2E8F0", fontSize: 12, width: 150, outline: "none" }} />
           <button onClick={sendTest} disabled={!testEmail || sending} style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 12px", borderRadius: 9, border: "1.5px solid #E2E8F0", background: "#fff", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>

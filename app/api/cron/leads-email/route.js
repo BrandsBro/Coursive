@@ -17,9 +17,20 @@ export async function GET(req) {
   const { data: settingsRow } = await supabase.from("settings").select("value").eq("key","email_templates").single();
   const templates = settingsRow?.value || [];
 
-  const t1 = templates.find(t => t.trigger === "lead_followup_1" && t.active);
-  const t2 = templates.find(t => t.trigger === "lead_followup_2" && t.active);
-  const t3 = templates.find(t => t.trigger === "lead_followup_3" && t.active);
+  // Get all active lead followup templates sorted by delay
+  const leadTemplates = templates
+    .filter(t => t.trigger?.startsWith("lead_followup") && t.active)
+    .map(t => {
+      let delayMinutes = t.delayMinutes || 30;
+      if (t.delayUnit === "hours") delayMinutes = delayMinutes * 60;
+      if (t.delayUnit === "days") delayMinutes = delayMinutes * 60 * 24;
+      return { ...t, delayMinutes };
+    })
+    .sort((a, b) => a.delayMinutes - b.delayMinutes);
+
+  const t1 = leadTemplates[0];
+  const t2 = leadTemplates[1];
+  const t3 = leadTemplates[2];
 
   const now = new Date();
   const { data: leads } = await supabase.from("leads").select("*").eq("converted", false);
