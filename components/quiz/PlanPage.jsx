@@ -274,6 +274,7 @@ export default function PlanPage({ pricingData }) {
           name={name}
           discountCode={couponData ? couponCode : null}
           discountAmount={couponData?.discountAmount || 0}
+          displayPrice={couponData ? `$${(couponData.finalAmount/100).toFixed(2)}` : null}
           onClose={() => setShowPayment(false)}
           onSuccess={() => {
             setShowPayment(false);
