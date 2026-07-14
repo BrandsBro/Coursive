@@ -23,8 +23,18 @@ export async function POST(req) {
   try {
     const { plan, email, name } = await req.json();
     const amount = await getPlanAmount(plan);
+    // Apply discount
+    let finalAmount = amount;
+    if (discountCode && discountAmount) {
+      finalAmount = Math.max(amount - discountAmount, 50);
+      // Increment coupon usage
+      const { createClient } = await import("@supabase/supabase-js");
+      const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+      await sb.from("discounts").update({ uses: sb.rpc("increment_uses", { code: discountCode }) }).eq("code", discountCode.toUpperCase());
+    }
+
     const paymentIntent = await stripe.paymentIntents.create({
-      amount,
+      amount: finalAmount,
       currency: "usd",
       payment_method_types: ["card"],
       metadata: { plan, email, name },
