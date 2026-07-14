@@ -58,7 +58,7 @@ export async function GET(req) {
     }
   }
 
-  return NextResponse.json({ ok: true, sent, total: leads?.length || 0 });
+  return NextResponse.json({ ok: true, sent, total: leads?.length || 0, templates: leadTemplates.length, templateIds: leadTemplates.map(t=>t.id) });
 }
 
 function buildEmailHtml(template, name, email) {
