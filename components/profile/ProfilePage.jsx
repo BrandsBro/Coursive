@@ -243,7 +243,7 @@ export default function ProfilePage() {
             </div>
           ) : (
             <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))", gap:16 }}>
-              {completedCourses.filter(c => hasCertificate(c.id)).map(course => {
+              {completedCourses.map(course => {
                 const s = COURSE_STYLES[course.id] || { g:"linear-gradient(135deg,#6366f1,#8b5cf6)", e:"📚", a:"#6366f1" };
                 return (
                   <div key={course.id} style={{ background:"#fff", borderRadius:20, overflow:"hidden", border:"1.5px solid #DCFCE7", boxShadow:"0 4px 20px rgba(34,197,94,0.1)" }}>
