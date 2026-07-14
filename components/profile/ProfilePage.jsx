@@ -232,7 +232,7 @@ export default function ProfilePage() {
 
       {tab === "Certificates" && (
         <div>
-          {certsEarned === 0 ? (
+          {completedCourses.length === 0 ? (
             <div style={{ textAlign:"center", padding:"48px 20px", background:"#fff", borderRadius:20, border:"2px dashed #E2E8F0" }}>
               <div style={{ fontSize:48, marginBottom:12 }}>🏆</div>
               <h3 style={{ fontSize:17, fontWeight:800, color:"#0f172a", margin:"0 0 6px" }}>No certificates yet</h3>
