@@ -38,7 +38,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
       const res = await fetch("/api/stripe/payment-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, email, name, paymentType }),
+        body: JSON.stringify({ plan, email, name, paymentType, discountCode, discountAmount }),
       });
       const { clientSecret, error: apiError } = await res.json();
       if (apiError) throw new Error(apiError);
