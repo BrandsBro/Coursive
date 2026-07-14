@@ -202,6 +202,12 @@ function LeadEmailsTab({ templates, save, router }) {
                     style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", borderRadius:10, border:"1.5px solid #E2E8F0", background:"#fff", fontSize:12, fontWeight:700, color:"#374151", cursor:"pointer" }}>
                     <Edit2 size={12}/> Edit Email
                   </button>
+                  <button onClick={async () => {
+                    const copy = { ...template, id:`lead_${Date.now()}`, name:`${template.name} (Copy)`, active:false };
+                    await save([...templates, copy]);
+                  }} style={{ width:34, height:34, borderRadius:9, border:"1.5px solid #E2E8F0", background:"#fff", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", color:"#64748B" }}>
+                    <Copy size={14}/>
+                  </button>
                   <button onClick={() => {
                     if (!confirm("Delete this email?")) return;
                     save(templates.filter(t => t.id !== template.id));
