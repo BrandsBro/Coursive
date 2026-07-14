@@ -138,7 +138,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
   );
 }
 
-export default function PaymentModal({ plan, paymentType, email, name, onClose, onSuccess, isRenewal=false, discountCode, discountAmount=0 }) {
+export default function PaymentModal({ plan, paymentType, email, name, onClose, onSuccess, isRenewal=false, discountCode, discountAmount=0, displayPrice: propDisplayPrice=null }) {
   const [pricingSettings, setPricingSettings] = useState(null);
 
   useEffect(() => {
@@ -162,7 +162,7 @@ export default function PaymentModal({ plan, paymentType, email, name, onClose, 
   const activePlans = dynamicPlans || PLANS;
   const design = pricingSettings || {};
   const activePlanInfo = (dynamicPlans && dynamicPlans[plan]) || PLANS[plan] || PLANS["4-Week Plan"];
-  const activeDisplayPrice = activePlanInfo.price;
+  const activeDisplayPrice = propDisplayPrice || activePlanInfo.price;
   return (
     <div style={{ position:"fixed", inset:0, zIndex:200, background:"rgba(15,23,42,0.6)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
       <div style={{ background:"#fff", borderRadius:24, padding:"28px 24px", width:"100%", maxWidth:440, boxShadow:"0 32px 80px rgba(0,0,0,0.3)", position:"relative", maxHeight:"90vh", overflowY:"auto" }}>
