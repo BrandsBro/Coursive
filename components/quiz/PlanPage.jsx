@@ -152,6 +152,30 @@ export default function PlanPage({ pricingData }) {
           </div>
         </div>
 
+        {/* Coupon field */}
+        <div style={{ margin:"12px 0" }}>
+          <div style={{ display:"flex", gap:8 }}>
+            <input value={couponCode} onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCouponData(null); setCouponError(""); }}
+              onKeyDown={e => e.key === "Enter" && applyCoupon()}
+              placeholder="Have a coupon code?" maxLength={20}
+              style={{ flex:1, padding:"11px 14px", borderRadius:12, border:`1.5px solid ${couponData?"#22c55e":couponError?"#ef4444":"#E2E8F0"}`, fontSize:13, outline:"none", textTransform:"uppercase", letterSpacing:1, background:"#fff" }}/>
+            <button onClick={applyCoupon} disabled={couponLoading || !couponCode.trim()}
+              style={{ padding:"11px 16px", borderRadius:12, border:"none", background:"#0f172a", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", flexShrink:0, opacity:!couponCode.trim()?0.5:1 }}>
+              {couponLoading ? "..." : "Apply"}
+            </button>
+          </div>
+          {couponError && <p style={{ fontSize:12, color:"#ef4444", margin:"6px 0 0", fontWeight:600 }}>❌ {couponError}</p>}
+          {couponData && (
+            <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:8, padding:"10px 14px", background:"#F0FDF4", border:"1.5px solid #BBF7D0", borderRadius:12 }}>
+              <span style={{ fontSize:18 }}>🎉</span>
+              <div>
+                <p style={{ fontSize:13, fontWeight:700, color:"#166534", margin:0 }}>{couponData.label} applied!</p>
+                <p style={{ fontSize:11, color:"#166534", margin:"2px 0 0" }}>Discount: -${(couponData.discountAmount/100).toFixed(2)}</p>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Plans */}
         <div style={{ display:"flex", flexDirection:"column", gap: isMobile ? 8 : 10, marginBottom: isMobile ? 14 : 20 }}>
           {plans.map((plan) => (
@@ -232,29 +256,7 @@ export default function PlanPage({ pricingData }) {
           GET MY PLAN →
         </button>
 
-        {/* Coupon field */}
-        <div style={{ margin:"16px 0" }}>
-          <div style={{ display:"flex", gap:8 }}>
-            <input value={couponCode} onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCouponData(null); setCouponError(""); }}
-              onKeyDown={e => e.key === "Enter" && applyCoupon()}
-              placeholder="Have a coupon code?" maxLength={20}
-              style={{ flex:1, padding:"11px 14px", borderRadius:12, border:`1.5px solid ${couponData?"#22c55e":couponError?"#ef4444":"#E2E8F0"}`, fontSize:13, outline:"none", textTransform:"uppercase", letterSpacing:1, background:"#fff" }}/>
-            <button onClick={applyCoupon} disabled={couponLoading || !couponCode.trim()}
-              style={{ padding:"11px 16px", borderRadius:12, border:"none", background:"#0f172a", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", flexShrink:0, opacity:!couponCode.trim()?0.5:1 }}>
-              {couponLoading ? "..." : "Apply"}
-            </button>
-          </div>
-          {couponError && <p style={{ fontSize:12, color:"#ef4444", margin:"6px 0 0", fontWeight:600 }}>❌ {couponError}</p>}
-          {couponData && (
-            <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:8, padding:"10px 14px", background:"#F0FDF4", border:"1.5px solid #BBF7D0", borderRadius:12 }}>
-              <span style={{ fontSize:18 }}>🎉</span>
-              <div>
-                <p style={{ fontSize:13, fontWeight:700, color:"#166534", margin:0 }}>{couponData.label} applied!</p>
-                <p style={{ fontSize:11, color:"#166534", margin:"2px 0 0" }}>Discount: -${(couponData.discountAmount/100).toFixed(2)}</p>
-              </div>
-            </div>
-          )}
-        </div>
+
         {/* Trust badges */}
         <div style={{ display:"flex", justifyContent:"center", gap: t.trustGap, marginTop:8, flexWrap:"wrap" }}>
           {["🔒 Secure payment","✅ Cancel anytime","🚀 Instant access"].map((b, i) => (
