@@ -54,7 +54,6 @@ export default function PlanPage({ pricingData }) {
       const params = new URLSearchParams(window.location.search);
       const e = params.get("email") || sessionStorage.getItem("quiz_email") || "";
       const n = params.get("name")  || sessionStorage.getItem("quiz_name")  || "";
-      if (!e) { window.location.href = "/quiz"; return; }
       setEmail(e);
       setName(n);
     }
