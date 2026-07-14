@@ -36,29 +36,25 @@ export async function GET(req) {
   for (const lead of leads || []) {
     const createdAt = new Date(lead.created_at);
     const minutesAgo = (now - createdAt) / 1000 / 60;
+    const emailsSent = lead.emails_sent || [];
 
-    // Email 1
-    if (leadTemplates[0] && minutesAgo >= leadTemplates[0].delayMinutes && !lead.email1_sent) {
-      const html = buildEmailHtml(leadTemplates[0], lead.name || "there", lead.email);
-      await resend.emails.send({ from:"1Course <noreply@1course.io>", to:lead.email, subject:leadTemplates[0].subject, html });
-      await supabase.from("leads").update({ email1_sent: true }).eq("id", lead.id);
-      sent++;
-    }
-
-    // Email 2
-    if (leadTemplates[1] && minutesAgo >= leadTemplates[1].delayMinutes && !lead.email2_sent) {
-      const html = buildEmailHtml(leadTemplates[1], lead.name || "there", lead.email);
-      await resend.emails.send({ from:"1Course <noreply@1course.io>", to:lead.email, subject:leadTemplates[1].subject, html });
-      await supabase.from("leads").update({ email2_sent: true }).eq("id", lead.id);
-      sent++;
-    }
-
-    // Email 3
-    if (leadTemplates[2] && minutesAgo >= leadTemplates[2].delayMinutes && !lead.email3_sent) {
-      const html = buildEmailHtml(leadTemplates[2], lead.name || "there", lead.email);
-      await resend.emails.send({ from:"1Course <noreply@1course.io>", to:lead.email, subject:leadTemplates[2].subject, html });
-      await supabase.from("leads").update({ email3_sent: true }).eq("id", lead.id);
-      sent++;
+    for (const template of leadTemplates) {
+      const alreadySent = emailsSent.includes(template.id);
+      if (!alreadySent && minutesAgo >= template.delayMinutes) {
+        try {
+          const html = buildEmailHtml(template, lead.name || "there", lead.email);
+          await resend.emails.send({ from:"1Course <noreply@1course.io>", to:lead.email, subject:template.subject, html });
+          const updatedSent = [...emailsSent, template.id];
+          await supabase.from("leads").update({ 
+            emails_sent: updatedSent,
+            email1_sent: updatedSent.length >= 1,
+            email2_sent: updatedSent.length >= 2,
+            email3_sent: updatedSent.length >= 3,
+          }).eq("id", lead.id);
+          emailsSent.push(template.id);
+          sent++;
+        } catch(e) { console.error("Email send error:", e); }
+      }
     }
   }
 
