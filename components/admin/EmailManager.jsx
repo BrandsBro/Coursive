@@ -14,6 +14,9 @@ const TRIGGER_TYPES = [
   { value:"cancellation",      label:"On Cancellation",        icon:"❌", desc:"Sent when user cancels subscription", color:"#64748B" },
   { value:"welcome_reminder",  label:"3 Day Welcome Reminder", icon:"👋", desc:"Sent 3 days after signup", color:"#0369a1" },
   { value:"manual",            label:"Manual / One-time",      icon:"✉️", desc:"Send manually to selected users", color:"#ec4899" },
+  { value:"lead_followup_1",   label:"Lead Follow-up 1",        icon:"📬", desc:"Sent to unconverted leads after 30 minutes", color:"#5B4EFF" },
+  { value:"lead_followup_2",   label:"Lead Follow-up 2",        icon:"📭", desc:"Sent to unconverted leads after 24 hours", color:"#f97316" },
+  { value:"lead_followup_3",   label:"Lead Follow-up 3",        icon:"📮", desc:"Sent to unconverted leads after 3 days", color:"#0f172a" },
 ];
 
 const DEFAULT_TEMPLATES = [
@@ -87,6 +90,104 @@ const DEFAULT_TEMPLATES = [
     }
   },
 ];
+
+
+function LeadEmailsTab() {
+  const [settings, setSettings] = useState({
+    email1_enabled: true, email1_delay: 30, email1_subject: "You're so close to mastering AI 🚀",
+    email1_body: "Hi {name}, you started our AI quiz but didn't get your plan yet. Thousands of students are already mastering AI tools — don't get left behind!",
+    email2_enabled: true, email2_delay: 1440, email2_subject: "AI is changing everything — are you ready? 💡",
+    email2_body: "Hi {name}, yesterday you showed interest in learning AI tools. Companies are actively hiring people with AI skills — and 1Course makes it easy to get certified fast.",
+    email3_enabled: true, email3_delay: 4320, email3_subject: "Last chance — your AI course is waiting 🎓",
+    email3_body: "Hi {name}, 3 days ago you took our AI quiz. We built a personalized learning plan just for you — and it's still waiting.",
+  });
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [stats, setStats] = useState({ total:0, email1:0, email2:0, email3:0 });
+
+  useEffect(() => {
+    supabase.from("settings").select("value").eq("key","lead_email_settings").single()
+      .then(({ data }) => { if (data?.value) setSettings(data.value); });
+    supabase.from("leads").select("id,email1_sent,email2_sent,email3_sent,converted")
+      .then(({ data }) => {
+        if (data) setStats({
+          total: data.filter(l => !l.converted).length,
+          email1: data.filter(l => l.email1_sent).length,
+          email2: data.filter(l => l.email2_sent).length,
+          email3: data.filter(l => l.email3_sent).length,
+        });
+      });
+  }, []);
+
+  const save = async () => {
+    setSaving(true);
+    await supabase.from("settings").upsert({ key:"lead_email_settings", value:settings });
+    setSaved(true); setTimeout(() => setSaved(false), 2000);
+    setSaving(false);
+  };
+
+  const emails = [
+    { num:1, icon:"📬", color:"#5B4EFF", bg:"#EEF2FF", label:"Email 1 — First Touch", delayLabel:"30 minutes after quiz" },
+    { num:2, icon:"📭", color:"#f97316", bg:"#FFF7ED", label:"Email 2 — Follow Up", delayLabel:"24 hours after quiz" },
+    { num:3, icon:"📮", color:"#0f172a", bg:"#F8FAFC", label:"Email 3 — Last Chance", delayLabel:"3 days after quiz" },
+  ];
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:20 }}>
+      <div style={{ background:"#EEF2FF", border:"1.5px solid #C7D2FE", borderRadius:14, padding:"14px 18px" }}>
+        <p style={{ fontSize:13, fontWeight:600, color:"#4338CA", margin:0 }}>📬 These emails are sent automatically to leads who filled the quiz but didn't purchase. Edit the content and timing here.</p>
+      </div>
+      {/* Stats */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }}>
+        {[
+          { label:"Unconverted Leads", value:stats.total, color:"#6366f1" },
+          { label:"Email 1 Sent", value:stats.email1, color:"#5B4EFF" },
+          { label:"Email 2 Sent", value:stats.email2, color:"#f97316" },
+          { label:"Email 3 Sent", value:stats.email3, color:"#0f172a" },
+        ].map((s,i) => (
+          <div key={i} style={{ background:"#fff", borderRadius:14, padding:"16px", border:"1.5px solid #F1F5F9" }}>
+            <p style={{ fontSize:24, fontWeight:900, color:s.color, margin:0 }}>{s.value}</p>
+            <p style={{ fontSize:11, color:"#94A3B8", margin:"4px 0 0", fontWeight:600 }}>{s.label}</p>
+          </div>
+        ))}
+      </div>
+      {/* Email editors */}
+      {emails.map(({ num, icon, color, bg, label, delayLabel }) => (
+        <div key={num} style={{ background:"#fff", borderRadius:20, border:"1.5px solid #F1F5F9", overflow:"hidden" }}>
+          <div style={{ background:bg, padding:"14px 20px", display:"flex", alignItems:"center", justifyContent:"space-between", borderBottom:"1.5px solid #F1F5F9" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <span style={{ fontSize:22 }}>{icon}</span>
+              <div>
+                <p style={{ fontSize:14, fontWeight:800, color, margin:0 }}>{label}</p>
+                <p style={{ fontSize:12, color:"#94A3B8", margin:0 }}>⏰ Sent {delayLabel}</p>
+              </div>
+            </div>
+            <button onClick={() => setSettings(s => ({ ...s, [`email${num}_enabled`]: !s[`email${num}_enabled`] }))}
+              style={{ width:44, height:24, borderRadius:999, border:"none", background:settings[`email${num}_enabled`]?"#22c55e":"#E2E8F0", cursor:"pointer", position:"relative" }}>
+              <div style={{ width:18, height:18, borderRadius:"50%", background:"#fff", position:"absolute", top:3, left:settings[`email${num}_enabled`]?22:3, transition:"left 0.2s", boxShadow:"0 1px 4px rgba(0,0,0,0.2)" }}/>
+            </button>
+          </div>
+          <div style={{ padding:"20px", display:"flex", flexDirection:"column", gap:12 }}>
+            <div>
+              <p style={{ fontSize:11, fontWeight:700, color:"#94A3B8", margin:"0 0 6px", textTransform:"uppercase" }}>Subject Line</p>
+              <input value={settings[`email${num}_subject`]||""} onChange={e => setSettings(s => ({ ...s, [`email${num}_subject`]: e.target.value }))}
+                style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #E2E8F0", fontSize:13, outline:"none", boxSizing:"border-box" }}/>
+            </div>
+            <div>
+              <p style={{ fontSize:11, fontWeight:700, color:"#94A3B8", margin:"0 0 6px", textTransform:"uppercase" }}>Email Body <span style={{ fontWeight:400, textTransform:"none" }}>· use {"{name}"} for personalization</span></p>
+              <textarea value={settings[`email${num}_body`]||""} onChange={e => setSettings(s => ({ ...s, [`email${num}_body`]: e.target.value }))}
+                style={{ width:"100%", padding:"10px 14px", borderRadius:10, border:"1.5px solid #E2E8F0", fontSize:13, outline:"none", boxSizing:"border-box", minHeight:80, resize:"vertical" }}/>
+            </div>
+          </div>
+        </div>
+      ))}
+      <button onClick={save} disabled={saving}
+        style={{ padding:"14px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
+        {saving ? "Saving..." : saved ? "✓ Saved!" : "Save Lead Email Settings"}
+      </button>
+    </div>
+  );
+}
 
 export default function EmailManager() {
   const router = useRouter();
@@ -192,7 +293,7 @@ export default function EmailManager() {
 
         {/* Tabs */}
         <div style={{ display:"flex", background:"#F1F5F9", borderRadius:12, padding:4 }}>
-          {[["templates","📧 Templates"],["automations","⚡ Automation Flow"],["settings","⚙️ Settings"]].map(([v,l]) => (
+          {[["templates","📧 Templates"],["automations","⚡ Automation Flow"],["leads","📬 Lead Emails"],["settings","⚙️ Settings"]].map(([v,l]) => (
             <button key={v} onClick={() => setTab(v)}
               style={{ flex:1, padding:"10px", borderRadius:9, border:"none", background:tab===v?"#fff":"transparent", fontWeight:700, fontSize:13, color:tab===v?"#0f172a":"#94A3B8", cursor:"pointer" }}>
               {l}
@@ -361,6 +462,10 @@ export default function EmailManager() {
         )}
       </div>
 
+      {/* Lead Emails Tab */}
+      {tab === "leads" && (
+        <LeadEmailsTab />
+      )}
       {/* Preview Modal */}
       {previewTemplate && (
         <div style={{ position:"fixed", inset:0, zIndex:200, background:"rgba(15,23,42,0.6)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }} onClick={() => setPreviewTemplate(null)}>
