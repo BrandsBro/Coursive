@@ -179,7 +179,19 @@ export default function PlanPage({ pricingData }) {
         {/* Plans */}
         <div style={{ display:"flex", flexDirection:"column", gap: isMobile ? 8 : 10, marginBottom: isMobile ? 14 : 20 }}>
           {plans.map((plan) => (
-            <div key={plan.name} onClick={() => { setSelectedPlan(plan.name); setCouponData(null); setCouponError(""); }}
+            <div key={plan.name} onClick={async () => {
+              setSelectedPlan(plan.name);
+              if (couponCode.trim()) {
+                const amount = Math.round(parseFloat(plan.price) * 100);
+                const res = await fetch("/api/discount/validate", {
+                  method:"POST", headers:{"Content-Type":"application/json"},
+                  body: JSON.stringify({ code: couponCode, amount })
+                });
+                const data = await res.json();
+                if (data.ok) setCouponData(data);
+                else { setCouponData(null); setCouponError(data.error || "Invalid"); }
+              }
+            }}
               style={{
                 padding:      t.cardPad,
                 borderRadius: 14,
