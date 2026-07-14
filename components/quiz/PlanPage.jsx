@@ -197,9 +197,18 @@ export default function PlanPage({ pricingData }) {
                   <span style={{ fontSize: t.origPrice, color:"#94A3B8", textDecoration:"line-through" }}>
                     ${plan.originalPrice}
                   </span>
-                  <span style={{ fontSize: t.salePrice, fontWeight:900, color:"#5B4EFF" }}>
-                    ${plan.price}
-                  </span>
+                  {couponData && plan.name === selectedPlan ? (
+                    <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end" }}>
+                      <span style={{ fontSize:11, color:"#94A3B8", textDecoration:"line-through" }}>${plan.price}</span>
+                      <span style={{ fontSize: t.salePrice, fontWeight:900, color:"#22c55e" }}>
+                        ${(couponData.finalAmount/100).toFixed(2)}
+                      </span>
+                    </div>
+                  ) : (
+                    <span style={{ fontSize: t.salePrice, fontWeight:900, color:"#5B4EFF" }}>
+                      ${plan.price}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -223,31 +232,31 @@ export default function PlanPage({ pricingData }) {
           GET MY PLAN →
         </button>
 
-        {/* Trust badges */}
-        <div style={{ display:"flex", justifyContent:"center", gap: t.trustGap, marginTop:14, flexWrap:"wrap" }}>
-          {/* Coupon field */}
-          <div style={{ marginBottom:16 }}>
-            <div style={{ display:"flex", gap:8 }}>
-              <input value={couponCode} onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCouponData(null); setCouponError(""); }}
-                onKeyDown={e => e.key === "Enter" && applyCoupon()}
-                placeholder="Coupon code" maxLength={20}
-                style={{ flex:1, padding:"11px 14px", borderRadius:12, border:`1.5px solid ${couponData?"#22c55e":couponError?"#ef4444":"#E2E8F0"}`, fontSize:13, outline:"none", textTransform:"uppercase", letterSpacing:1 }}/>
-              <button onClick={applyCoupon} disabled={couponLoading || !couponCode.trim()}
-                style={{ padding:"11px 16px", borderRadius:12, border:"none", background:"#0f172a", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", flexShrink:0 }}>
-                {couponLoading ? "..." : "Apply"}
-              </button>
-            </div>
-            {couponError && <p style={{ fontSize:12, color:"#ef4444", margin:"6px 0 0", fontWeight:600 }}>❌ {couponError}</p>}
-            {couponData && (
-              <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:6, padding:"8px 12px", background:"#F0FDF4", border:"1.5px solid #BBF7D0", borderRadius:10 }}>
-                <span style={{ fontSize:16 }}>🎉</span>
-                <div>
-                  <p style={{ fontSize:13, fontWeight:700, color:"#166534", margin:0 }}>{couponData.label} applied!</p>
-                  <p style={{ fontSize:11, color:"#166534", margin:0 }}>New price: ${(couponData.finalAmount/100).toFixed(2)}</p>
-                </div>
-              </div>
-            )}
+        {/* Coupon field */}
+        <div style={{ margin:"16px 0" }}>
+          <div style={{ display:"flex", gap:8 }}>
+            <input value={couponCode} onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCouponData(null); setCouponError(""); }}
+              onKeyDown={e => e.key === "Enter" && applyCoupon()}
+              placeholder="Have a coupon code?" maxLength={20}
+              style={{ flex:1, padding:"11px 14px", borderRadius:12, border:`1.5px solid ${couponData?"#22c55e":couponError?"#ef4444":"#E2E8F0"}`, fontSize:13, outline:"none", textTransform:"uppercase", letterSpacing:1, background:"#fff" }}/>
+            <button onClick={applyCoupon} disabled={couponLoading || !couponCode.trim()}
+              style={{ padding:"11px 16px", borderRadius:12, border:"none", background:"#0f172a", color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", flexShrink:0, opacity:!couponCode.trim()?0.5:1 }}>
+              {couponLoading ? "..." : "Apply"}
+            </button>
           </div>
+          {couponError && <p style={{ fontSize:12, color:"#ef4444", margin:"6px 0 0", fontWeight:600 }}>❌ {couponError}</p>}
+          {couponData && (
+            <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:8, padding:"10px 14px", background:"#F0FDF4", border:"1.5px solid #BBF7D0", borderRadius:12 }}>
+              <span style={{ fontSize:18 }}>🎉</span>
+              <div>
+                <p style={{ fontSize:13, fontWeight:700, color:"#166534", margin:0 }}>{couponData.label} applied!</p>
+                <p style={{ fontSize:11, color:"#166534", margin:"2px 0 0" }}>Discount: -${(couponData.discountAmount/100).toFixed(2)}</p>
+              </div>
+            </div>
+          )}
+        </div>
+        {/* Trust badges */}
+        <div style={{ display:"flex", justifyContent:"center", gap: t.trustGap, marginTop:8, flexWrap:"wrap" }}>
           {["🔒 Secure payment","✅ Cancel anytime","🚀 Instant access"].map((b, i) => (
             <span key={i} style={{ fontSize: t.trustFont, color:"#64748B" }}>{b}</span>
           ))}
