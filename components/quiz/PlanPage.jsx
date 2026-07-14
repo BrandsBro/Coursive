@@ -179,7 +179,7 @@ export default function PlanPage({ pricingData }) {
         {/* Plans */}
         <div style={{ display:"flex", flexDirection:"column", gap: isMobile ? 8 : 10, marginBottom: isMobile ? 14 : 20 }}>
           {plans.map((plan) => (
-            <div key={plan.name} onClick={() => setSelectedPlan(plan.name)}
+            <div key={plan.name} onClick={() => { setSelectedPlan(plan.name); setCouponData(null); setCouponError(""); }}
               style={{
                 padding:      t.cardPad,
                 borderRadius: 14,
