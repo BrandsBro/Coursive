@@ -159,11 +159,8 @@ export default function SettingsPage() {
       {showManage && (
         <div onClick={() => setShowManage(false)} style={{ position:"fixed", inset:0, zIndex:200, background:"rgba(15,23,42,0.6)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
           <div onClick={e => e.stopPropagation()} style={{ background:"#fff", borderRadius:24, width:"100%", maxWidth:420, boxShadow:"0 32px 80px rgba(0,0,0,0.3)", overflow:"hidden" }}>
-            <div style={{ background:"linear-gradient(135deg,#f97316,#ef4444)", padding:"28px 28px 24px", textAlign:"center" }}>
-              <div style={{ fontSize:44, marginBottom:8 }}>⚠️</div>
-              <h2 style={{ color:"#fff", fontSize:20, fontWeight:900, margin:"0 0 6px" }}>Manage Subscription</h2>
-              <p style={{ color:"rgba(255,255,255,0.8)", fontSize:13, margin:0 }}>You still have {daysLeft} days of access remaining</p>
-            </div>
+            <div style={{ padding:"24px 28px 0" }}>
+              <h2 style={{ fontSize:20, fontWeight:900, color:"#0f172a", margin:"0 0 12px" }}>Manage Subscription</h2>
             <div style={{ padding:"24px 28px" }}>
               <div style={{ background:"#FFF7ED", border:"1.5px solid #FED7AA", borderRadius:12, padding:"14px 16px", marginBottom:20 }}>
                 <p style={{ fontSize:13, color:"#9a3412", margin:0, lineHeight:1.6 }}>
