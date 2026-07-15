@@ -117,7 +117,7 @@ export default function AdminLeads() {
                     <td style={{ padding:"12px 16px", fontSize:12, color:"#94A3B8" }}>
                       {showBD
                         ? new Date(lead.created_at).toLocaleString("en-US", { timeZone:"Asia/Dhaka", month:"short", day:"numeric", year:"numeric", hour:"2-digit", minute:"2-digit" })
-                        : new Date(lead.created_at).toLocaleString("en-US", { timeZone:"America/Chicago", month:"short", day:"numeric", year:"numeric", hour:"2-digit", minute:"2-digit" })}
+                        : new Date(lead.created_at).toLocaleString("en-US", { timeZone:"America/New_York", month:"short", day:"numeric", year:"numeric", hour:"2-digit", minute:"2-digit" })}
                     </td>
                   </tr>
                 ))}
