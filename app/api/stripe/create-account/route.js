@@ -437,10 +437,7 @@ export async function POST(req) {
     if (emailError) console.error("Email error:", emailError);
     else console.log("Email sent to:", email);
 
-    const response = NextResponse.json({ success: true });
-    // Clear subscription cache cookie so middleware re-checks
-    response.cookies.set("sub_expires", "", { maxAge: 0, path: "/" });
-    return response;
+    return NextResponse.json({ success: true });
   } catch (e) {
     console.error("Create account error:", e);
     return NextResponse.json({ error: e.message }, { status: 500 });
