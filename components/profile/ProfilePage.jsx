@@ -121,12 +121,12 @@ export default function ProfilePage() {
     <div style={{ maxWidth:900, margin:"0 auto", display:"flex", flexDirection:"column", gap:24 }}>
 
       {/* Hero */}
-      <div style={{ background:"linear-gradient(135deg,#1e1b4b,#312e81,#1e3a5f)", borderRadius:24, padding:"28px 32px", position:"relative", overflow:"hidden" }}>
+      <div style={{ background:"linear-gradient(135deg,#1e1b4b,#312e81,#1e3a5f)", borderRadius:24, padding: isMobile ? "20px 16px" : "28px 32px", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:-60, right:40, width:220, height:220, borderRadius:"50%", background:"rgba(139,92,246,0.08)" }}/>
         <div style={{ position:"absolute", bottom:-40, left:100, width:150, height:150, borderRadius:"50%", background:"rgba(99,102,241,0.07)" }}/>
-        <div style={{ position:"relative", zIndex:1, display:"flex", alignItems:"center", gap:20 }}>
+        <div style={{ position:"relative", zIndex:1, display:"flex", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? 14 : 20, flexDirection: isMobile ? "column" : "row" }}>
           {/* Avatar */}
-          <div style={{ width:80, height:80, borderRadius:24, background:"linear-gradient(135deg,#7c3aed,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, fontWeight:900, color:"#fff", boxShadow:"0 8px 24px rgba(124,58,237,0.4)", flexShrink:0 }}>
+          <div style={{ width: isMobile ? 60 : 80, height: isMobile ? 60 : 80, borderRadius:24, background:"linear-gradient(135deg,#7c3aed,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center", fontSize: isMobile ? 22 : 28, fontWeight:900, color:"#fff", boxShadow:"0 8px 24px rgba(124,58,237,0.4)", flexShrink:0 }}>
             {initials}
           </div>
           <div style={{ flex:1 }}>
@@ -170,7 +170,7 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-          <button onClick={signOut} style={{ display:"flex", alignItems:"center", gap:6, background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:12, padding:"9px 16px", color:"rgba(255,255,255,0.6)", fontSize:13, fontWeight:600, cursor:"pointer" }}>
+          <button onClick={signOut} style={{ display:"flex", alignItems:"center", gap:6, background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:12, padding:"9px 16px", color:"rgba(255,255,255,0.6)", fontSize:13, fontWeight:600, cursor:"pointer", alignSelf: isMobile ? "flex-start" : "auto" }}>
             <LogOut size={14}/> Sign out
           </button>
         </div>
