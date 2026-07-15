@@ -9,6 +9,7 @@ export default function AdminLeads() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("unconverted");
+  const [showBD, setShowBD] = useState(false);
 
   useEffect(() => { load(); }, []);
 
@@ -64,6 +65,10 @@ export default function AdminLeads() {
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name or email..."
               style={{ width:"100%", paddingLeft:36, paddingRight:14, paddingTop:10, paddingBottom:10, borderRadius:12, border:"1.5px solid #E2E8F0", fontSize:13, outline:"none", boxSizing:"border-box" }}/>
           </div>
+          <button onClick={() => setShowBD(b => !b)}
+            style={{ padding:"8px 14px", borderRadius:10, border:"1.5px solid #E2E8F0", background:showBD?"#5B4EFF":"#fff", color:showBD?"#fff":"#374151", fontSize:12, fontWeight:700, cursor:"pointer" }}>
+            🌍 {showBD ? "BD Time" : "US Time"}
+          </button>
           <div style={{ display:"flex", gap:4, background:"#F1F5F9", borderRadius:10, padding:3 }}>
             {[["unconverted","Not Purchased"],["converted","Converted"],["all","All"]].map(([v,l]) => (
               <button key={v} onClick={() => setFilter(v)}
@@ -87,7 +92,7 @@ export default function AdminLeads() {
             <table style={{ width:"100%", borderCollapse:"collapse" }}>
               <thead>
                 <tr style={{ background:"#F8FAFC" }}>
-                  {["Name","Email","Status","Date"].map(h => (
+                  {["Name","Email","Status", showBD ? "Date (BD)" : "Date (US)"].map(h => (
                     <th key={h} style={{ padding:"12px 16px", fontSize:11, fontWeight:700, color:"#94A3B8", textAlign:"left", textTransform:"uppercase", letterSpacing:0.5 }}>{h}</th>
                   ))}
                 </tr>
@@ -109,7 +114,9 @@ export default function AdminLeads() {
                       </span>
                     </td>
                     <td style={{ padding:"12px 16px", fontSize:12, color:"#94A3B8" }}>
-                      {new Date(lead.created_at).toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" })}
+                      {showBD
+                        ? new Date(lead.created_at).toLocaleString("en-US", { timeZone:"Asia/Dhaka", month:"short", day:"numeric", year:"numeric", hour:"2-digit", minute:"2-digit" })
+                        : new Date(lead.created_at).toLocaleString("en-US", { timeZone:"America/New_York", month:"short", day:"numeric", year:"numeric", hour:"2-digit", minute:"2-digit" })}
                     </td>
                   </tr>
                 ))}
