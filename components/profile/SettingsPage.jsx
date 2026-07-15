@@ -16,6 +16,7 @@ export default function SettingsPage() {
   const [cancelling, setCancelling] = useState(false);
   const [cancelled, setCancelled] = useState(false);
   const [showRenew, setShowRenew] = useState(false);
+  const [upgradePlan, setUpgradePlan] = useState(null);
 
   const email = user?.email || "";
   const displayName = user?.user_metadata?.full_name || email?.split("@")[0] || "Learner";
@@ -93,15 +94,36 @@ export default function SettingsPage() {
                     ))}
                   </div>
 
-                  <div style={{ display:"flex", gap:10 }}>
-                    <button onClick={() => setShowRenew(true)}
-                      style={{ flex:2, padding:"13px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
-                      {isActive ? "🚀 Extend Plan" : "🔄 Renew Access"}
-                    </button>
-                    {isActive && sub.status !== "cancelled" && (
-                      <button onClick={() => setShowManage(true)}
-                        style={{ flex:1, padding:"13px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", color:"#64748B", fontSize:13, fontWeight:600, cursor:"pointer" }}>
-                        Manage
+                  <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                    <div style={{ display:"flex", gap:10 }}>
+                      <button onClick={() => setShowRenew(true)}
+                        style={{ flex:2, padding:"13px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
+                        {isActive ? "🚀 Extend Plan" : "🔄 Renew Access"}
+                      </button>
+                      {isActive && sub.status !== "cancelled" && (
+                        <button onClick={() => setShowManage(true)}
+                          style={{ flex:1, padding:"13px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", color:"#64748B", fontSize:13, fontWeight:600, cursor:"pointer" }}>
+                          Manage
+                        </button>
+                      )}
+                    </div>
+                    {/* Upgrade options */}
+                    {isActive && sub.plan === "1-Week Plan" && (
+                      <div style={{ display:"flex", gap:10 }}>
+                        <button onClick={() => { setUpgradePlan("4-Week Plan"); setShowRenew(true); }}
+                          style={{ flex:1, padding:"11px", borderRadius:12, border:"1.5px solid #5B4EFF", background:"#EEF2FF", color:"#5B4EFF", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                          ⬆ Upgrade to 4-Week
+                        </button>
+                        <button onClick={() => { setUpgradePlan("12-Week Plan"); setShowRenew(true); }}
+                          style={{ flex:1, padding:"11px", borderRadius:12, border:"1.5px solid #7c3aed", background:"#F5F3FF", color:"#7c3aed", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                          ⬆ Upgrade to 12-Week
+                        </button>
+                      </div>
+                    )}
+                    {isActive && sub.plan === "4-Week Plan" && (
+                      <button onClick={() => { setUpgradePlan("12-Week Plan"); setShowRenew(true); }}
+                        style={{ width:"100%", padding:"11px", borderRadius:12, border:"1.5px solid #7c3aed", background:"#F5F3FF", color:"#7c3aed", fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                        ⬆ Upgrade to 12-Week Plan
                       </button>
                     )}
                   </div>
@@ -170,13 +192,13 @@ export default function SettingsPage() {
       {/* Renew Modal */}
       {showRenew && (
         <PaymentModal
-          plan={sub?.plan || "4-Week Plan"}
+          plan={upgradePlan || sub?.plan || "4-Week Plan"}
           paymentType="one_time"
           email={email}
           name={displayName}
           isRenewal={true}
-          onClose={() => setShowRenew(false)}
-          onSuccess={() => { setShowRenew(false); window.location.reload(); }}
+          onClose={() => { setShowRenew(false); setUpgradePlan(null); }}
+          onSuccess={() => { setShowRenew(false); setUpgradePlan(null); window.location.reload(); }}
         />
       )}
     </div>
