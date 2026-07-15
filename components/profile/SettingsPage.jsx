@@ -199,7 +199,7 @@ export default function SettingsPage() {
               </p>
             </div>
             <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-              <button onClick={() => { setShowConfirmCancel(false); }}
+              <button onClick={() => { setShowConfirmCancel(false); setShowManage(false); }}
                 style={{ padding:"14px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
                 Keep My Subscription
               </button>
