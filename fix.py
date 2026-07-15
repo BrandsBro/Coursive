@@ -1,12 +1,6 @@
 # fix.py
 content = open('app/api/stripe/create-account/route.js').read()
-
-# Fix the escaped dollar signs - they should be ${} not ${}
-content = content.replace('$\\${(amount/100).toFixed(2)}', '${(amount/100).toFixed(2)}')
-content = content.replace('\\${name}', '${name}')
-content = content.replace('\\${email}', '${email}')
-content = content.replace('\\${plan}', '${plan}')
-content = content.replace('\\${paymentType}', '${paymentType}')
-
-open('app/api/stripe/create-account/route.js', 'w').write(content)
-print("Done!")
+import re
+for i, line in enumerate(content.split('\n')):
+    if any(x in line.lower() for x in ['timezone', 'locale', 'utc', 'toiso']):
+        print(f"Line {i+1}: {line.strip()}")

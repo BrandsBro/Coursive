@@ -285,7 +285,7 @@ export async function POST(req) {
       await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}api/meta/event`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ eventName: "Purchase", email, value: amount / 100, currency: "USD" }),
+        body: JSON.stringify({ eventName: "Purchase", email, value: parseFloat(amount), currency: "USD" }),
       });
     } catch(e) { console.error("Meta CAPI error:", e); }
 
@@ -325,7 +325,7 @@ export async function POST(req) {
       <!-- Amount highlight -->
       <div style="background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:1.5px solid #BBF7D0;border-radius:14px;padding:16px 20px;text-align:center;margin-bottom:24px">
         <p style="margin:0;font-size:13px;color:#166534;font-weight:600">AMOUNT PAID</p>
-        <p style="margin:4px 0 0;font-size:36px;font-weight:900;color:#15803D">${(amount/100).toFixed(2)}</p>
+        <p style="margin:4px 0 0;font-size:36px;font-weight:900;color:#15803D">$${parseFloat(amount).toFixed(2)}</p>
       </div>
 
       <!-- Details -->
