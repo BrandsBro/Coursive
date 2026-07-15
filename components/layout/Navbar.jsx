@@ -134,6 +134,7 @@ export default function Navbar() {
                   </div>
                   <div style={{ padding:"6px" }}>
                     <DropItem icon={<User size={14}/>} label="Profile" onClick={() => router.push("/profile")}/>
+                    <DropItem icon={<Settings size={14}/>} label="Settings" onClick={() => router.push("/settings")}/>
                     {isAdmin && <DropItem icon={<Shield size={14}/>} label="Admin Panel" onClick={() => router.push("/admin")} accent/>}
                     <DropItem icon={<Search size={14}/>} label="Search" onClick={() => setShowSearch(true)}/>
                     <div style={{ height:1, background:"#F3F4F6", margin:"4px 0" }}/>
