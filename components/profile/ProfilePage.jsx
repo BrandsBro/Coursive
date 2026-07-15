@@ -124,13 +124,13 @@ export default function ProfilePage() {
       <div style={{ background:"linear-gradient(135deg,#1e1b4b,#312e81,#1e3a5f)", borderRadius:24, padding: isMobile ? "20px 16px" : "28px 32px", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:-60, right:40, width:220, height:220, borderRadius:"50%", background:"rgba(139,92,246,0.08)" }}/>
         <div style={{ position:"absolute", bottom:-40, left:100, width:150, height:150, borderRadius:"50%", background:"rgba(99,102,241,0.07)" }}/>
-        <div style={{ position:"relative", zIndex:1, display:"flex", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? 14 : 20, flexDirection: isMobile ? "column" : "row" }}>
+        <div style={{ position:"relative", zIndex:1, display:"flex", alignItems: isMobile ? "center" : "center", gap: isMobile ? 14 : 20, flexDirection: isMobile ? "column" : "row", textAlign: isMobile ? "center" : "left" }}>
           {/* Avatar */}
-          <div style={{ width: isMobile ? 60 : 80, height: isMobile ? 60 : 80, borderRadius:24, background:"linear-gradient(135deg,#7c3aed,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center", fontSize: isMobile ? 22 : 28, fontWeight:900, color:"#fff", boxShadow:"0 8px 24px rgba(124,58,237,0.4)", flexShrink:0 }}>
+          <div style={{ width: isMobile ? 70 : 80, height: isMobile ? 70 : 80, borderRadius:24, background:"linear-gradient(135deg,#7c3aed,#4f46e5)", display:"flex", alignItems:"center", justifyContent:"center", fontSize: isMobile ? 26 : 28, fontWeight:900, color:"#fff", boxShadow:"0 8px 24px rgba(124,58,237,0.4)", flexShrink:0 }}>
             {initials}
           </div>
           <div style={{ flex:1 }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:4, flexWrap:"wrap" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:4, flexWrap:"wrap", justifyContent: isMobile ? "center" : "flex-start" }}>
               {editName ? (
                 <div style={{ display:"flex", gap:8, alignItems:"center" }}>
                   <input value={newName} onChange={e=>setNewName(e.target.value)} style={{ padding:"6px 12px", borderRadius:10, border:"1.5px solid rgba(255,255,255,0.3)", background:"rgba(255,255,255,0.1)", color:"#fff", fontSize:16, fontWeight:700, outline:"none" }}/>
@@ -155,8 +155,8 @@ export default function ProfilePage() {
                 </div>
               )}
             </div>
-            <p style={{ color:"rgba(255,255,255,0.45)", fontSize:13, margin:"0 0 12px" }}>{email} · Member since {memberSince}</p>
-            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+            <p style={{ color:"rgba(255,255,255,0.45)", fontSize:13, margin:"0 0 12px", textAlign: isMobile ? "center" : "left" }}>{email} · Member since {memberSince}</p>
+            <div style={{ display:"flex", alignItems:"center", gap:8, justifyContent: isMobile ? "center" : "flex-start", flexWrap:"wrap" }}>
               <div style={{ display:"flex", alignItems:"center", gap:5, background:"rgba(249,115,22,0.2)", borderRadius:10, padding:"4px 10px" }}>
                 <Flame size={14} color="#fb923c" fill="#fb923c"/>
                 <span style={{ color:"#fb923c", fontWeight:700, fontSize:13 }}>{streak} day streak</span>
@@ -170,7 +170,7 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-          <button onClick={signOut} style={{ display:"flex", alignItems:"center", gap:6, background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:12, padding:"9px 16px", color:"rgba(255,255,255,0.6)", fontSize:13, fontWeight:600, cursor:"pointer", alignSelf: isMobile ? "flex-start" : "auto" }}>
+          <button onClick={signOut} style={{ display:"flex", alignItems:"center", gap:6, background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.12)", borderRadius:12, padding:"9px 16px", color:"rgba(255,255,255,0.6)", fontSize:13, fontWeight:600, cursor:"pointer", alignSelf: isMobile ? "center" : "auto" }}>
             <LogOut size={14}/> Sign out
           </button>
         </div>
