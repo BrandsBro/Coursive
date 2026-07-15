@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import ChangePassword from "@/components/profile/ChangePassword";
 import PaymentModal from "@/components/quiz/PaymentModal";
-import { Shield, CreditCard, ChevronRight, ArrowLeft } from "lucide-react";
+import { Shield, CreditCard, ArrowLeft } from "lucide-react";
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -14,9 +14,16 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [showManage, setShowManage] = useState(false);
   const [cancelling, setCancelling] = useState(false);
-  const [cancelled, setCancelled] = useState(false);
   const [showRenew, setShowRenew] = useState(false);
   const [upgradePlan, setUpgradePlan] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   const email = user?.email || "";
   const displayName = user?.user_metadata?.full_name || email?.split("@")[0] || "Learner";
@@ -34,82 +41,78 @@ export default function SettingsPage() {
   const handleCancel = async () => {
     setCancelling(true);
     await supabase.from("subscriptions").update({ status: "cancelled" }).eq("id", sub.id);
-    setCancelled(true);
     setSub(prev => ({ ...prev, status: "cancelled" }));
     setShowManage(false);
     setCancelling(false);
   };
 
   return (
-    <div style={{ maxWidth:700, margin:"0 auto", padding:"24px 16px" }}>
+    <div style={{ maxWidth:700, margin:"0 auto", padding: isMobile ? "16px 12px" : "24px 16px" }}>
       {/* Header */}
-      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:28 }}>
-        <Link href="/profile" style={{ textDecoration:"none", display:"flex", alignItems:"center", justifyContent:"center", width:36, height:36, borderRadius:10, border:"1.5px solid #E2E8F0", background:"#fff" }}>
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom: isMobile ? 20 : 28 }}>
+        <Link href="/profile" style={{ textDecoration:"none", display:"flex", alignItems:"center", justifyContent:"center", width:36, height:36, borderRadius:10, border:"1.5px solid #E2E8F0", background:"#fff", flexShrink:0 }}>
           <ArrowLeft size={16} color="#374151"/>
         </Link>
         <div>
-          <h1 style={{ fontSize:22, fontWeight:900, color:"#0f172a", margin:0 }}>Settings</h1>
+          <h1 style={{ fontSize: isMobile ? 18 : 22, fontWeight:900, color:"#0f172a", margin:0 }}>Settings</h1>
           <p style={{ fontSize:13, color:"#94A3B8", margin:0 }}>Manage your account and security</p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display:"flex", background:"#F1F5F9", borderRadius:12, padding:4, marginBottom:24 }}>
-        {[["account", CreditCard, "Account & Subscription"], ["security", Shield, "Security"]].map(([key, Icon, label]) => (
+      <div style={{ display:"flex", background:"#F1F5F9", borderRadius:12, padding:4, marginBottom:20 }}>
+        {[["account", CreditCard, isMobile ? "Account" : "Account & Subscription"], ["security", Shield, "Security"]].map(([key, Icon, label]) => (
           <button key={key} onClick={() => setTab(key)}
-            style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:"10px", borderRadius:9, border:"none", background:tab===key?"#fff":"transparent", fontWeight:700, fontSize:13, color:tab===key?"#0f172a":"#94A3B8", cursor:"pointer", boxShadow:tab===key?"0 1px 4px rgba(0,0,0,0.08)":"none" }}>
-            <Icon size={15}/> {label}
+            style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", gap:6, padding: isMobile ? "9px 6px" : "10px", borderRadius:9, border:"none", background:tab===key?"#fff":"transparent", fontWeight:700, fontSize: isMobile ? 12 : 13, color:tab===key?"#0f172a":"#94A3B8", cursor:"pointer", boxShadow:tab===key?"0 1px 4px rgba(0,0,0,0.08)":"none" }}>
+            <Icon size={14}/> {label}
           </button>
         ))}
       </div>
 
       {/* Account Tab */}
       {tab === "account" && (
-        <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+        <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
           {loading ? (
             <div style={{ padding:40, textAlign:"center", color:"#94A3B8" }}>Loading...</div>
           ) : sub ? (
             <>
-              {/* Plan card */}
               <div style={{ background:"#fff", borderRadius:20, border:"1.5px solid #F1F5F9", overflow:"hidden" }}>
-                <div style={{ background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", padding:"24px 28px" }}>
+                <div style={{ background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", padding: isMobile ? "20px 20px" : "24px 28px" }}>
                   <p style={{ color:"rgba(255,255,255,0.7)", fontSize:12, fontWeight:700, margin:"0 0 4px", textTransform:"uppercase", letterSpacing:1 }}>Current Plan</p>
-                  <h2 style={{ color:"#fff", fontSize:24, fontWeight:900, margin:"0 0 4px" }}>{sub.plan}</h2>
+                  <h2 style={{ color:"#fff", fontSize: isMobile ? 20 : 24, fontWeight:900, margin:"0 0 4px" }}>{sub.plan}</h2>
                   <p style={{ color:"rgba(255,255,255,0.7)", fontSize:13, margin:0 }}>
                     {isActive ? `${daysLeft} days remaining` : sub.status === "cancelled" ? "Cancelled — access until expiry" : "Expired"}
                   </p>
                 </div>
-                <div style={{ padding:"20px 28px" }}>
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16, marginBottom:20 }}>
+                <div style={{ padding: isMobile ? "16px" : "20px 28px" }}>
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap: isMobile ? 10 : 16, marginBottom:16 }}>
                     {[
                       ["Status", isActive ? "✅ Active" : sub.status === "cancelled" ? "⏸ Cancelled" : "❌ Expired"],
                       ["Amount Paid", `$${parseFloat(sub.amount_paid||0).toFixed(2)}`],
                       ["Started", new Date(sub.started_at).toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" })],
                       ["Expires", new Date(sub.expires_at).toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" })],
                     ].map(([k,v]) => (
-                      <div key={k} style={{ background:"#F8FAFC", borderRadius:10, padding:"12px 14px" }}>
-                        <p style={{ fontSize:11, color:"#94A3B8", fontWeight:700, margin:"0 0 4px", textTransform:"uppercase" }}>{k}</p>
-                        <p style={{ fontSize:14, fontWeight:700, color:"#0f172a", margin:0 }}>{v}</p>
+                      <div key={k} style={{ background:"#F8FAFC", borderRadius:10, padding: isMobile ? "10px 12px" : "12px 14px" }}>
+                        <p style={{ fontSize:10, color:"#94A3B8", fontWeight:700, margin:"0 0 3px", textTransform:"uppercase" }}>{k}</p>
+                        <p style={{ fontSize: isMobile ? 13 : 14, fontWeight:700, color:"#0f172a", margin:0 }}>{v}</p>
                       </div>
                     ))}
                   </div>
-
                   <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
                     <div style={{ display:"flex", gap:10 }}>
                       <button onClick={() => setShowRenew(true)}
-                        style={{ flex:2, padding:"13px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
+                        style={{ flex:2, padding: isMobile ? "12px" : "13px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize: isMobile ? 13 : 14, fontWeight:700, cursor:"pointer" }}>
                         {isActive ? "🚀 Extend Plan" : "🔄 Renew Access"}
                       </button>
                       {isActive && sub.status !== "cancelled" && (
                         <button onClick={() => setShowManage(true)}
-                          style={{ flex:1, padding:"13px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", color:"#64748B", fontSize:13, fontWeight:600, cursor:"pointer" }}>
+                          style={{ flex:1, padding: isMobile ? "12px" : "13px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", color:"#64748B", fontSize: isMobile ? 12 : 13, fontWeight:600, cursor:"pointer" }}>
                           Manage
                         </button>
                       )}
                     </div>
-                    {/* Upgrade options */}
                     {isActive && sub.plan === "1-Week Plan" && (
-                      <div style={{ display:"flex", gap:10 }}>
+                      <div style={{ display:"flex", gap:10, flexDirection: isMobile ? "column" : "row" }}>
                         <button onClick={() => { setUpgradePlan("4-Week Plan"); setShowRenew(true); }}
                           style={{ flex:1, padding:"11px", borderRadius:12, border:"1.5px solid #5B4EFF", background:"#EEF2FF", color:"#5B4EFF", fontSize:13, fontWeight:700, cursor:"pointer" }}>
                           ⬆ Upgrade to 4-Week
@@ -129,11 +132,9 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
-
-              {/* Info box */}
               <div style={{ background:"#EEF2FF", border:"1.5px solid #C7D2FE", borderRadius:14, padding:"14px 18px" }}>
                 <p style={{ fontSize:13, color:"#4338CA", margin:0, lineHeight:1.6 }}>
-                  💡 Need help with your subscription? Contact us at <a href="mailto:support@1course.io" style={{ color:"#5B4EFF", fontWeight:700 }}>support@1course.io</a>
+                  💡 Need help? Contact us at <a href="mailto:support@1course.io" style={{ color:"#5B4EFF", fontWeight:700 }}>support@1course.io</a>
                 </p>
               </div>
             </>
@@ -150,16 +151,16 @@ export default function SettingsPage() {
 
       {/* Security Tab */}
       {tab === "security" && (
-        <div style={{ background:"#fff", borderRadius:20, border:"1.5px solid #F1F5F9", padding:24 }}>
+        <div style={{ background:"#fff", borderRadius:20, border:"1.5px solid #F1F5F9", padding: isMobile ? 16 : 24 }}>
           <ChangePassword/>
         </div>
       )}
 
-      {/* Manage Subscription Modal */}
+      {/* Manage Modal */}
       {showManage && (
-        <div onClick={() => setShowManage(false)} style={{ position:"fixed", inset:0, zIndex:200, background:"rgba(15,23,42,0.6)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
-          <div onClick={e => e.stopPropagation()} style={{ background:"#fff", borderRadius:24, width:"100%", maxWidth:420, boxShadow:"0 32px 80px rgba(0,0,0,0.3)", overflow:"hidden" }}>
-            <div style={{ padding:"24px 28px" }}>
+        <div onClick={() => setShowManage(false)} style={{ position:"fixed", inset:0, zIndex:200, background:"rgba(15,23,42,0.6)", backdropFilter:"blur(4px)", display:"flex", alignItems: isMobile ? "flex-end" : "center", justifyContent:"center", padding: isMobile ? 0 : 20 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background:"#fff", borderRadius: isMobile ? "20px 20px 0 0" : 24, width:"100%", maxWidth: isMobile ? "100%" : 420, boxShadow:"0 32px 80px rgba(0,0,0,0.3)", overflow:"hidden" }}>
+            <div style={{ padding: isMobile ? "24px 20px" : "24px 28px" }}>
               <h2 style={{ fontSize:20, fontWeight:900, color:"#0f172a", margin:"0 0 12px" }}>Manage Subscription</h2>
               <div style={{ background:"#FFF7ED", border:"1.5px solid #FED7AA", borderRadius:12, padding:"14px 16px", marginBottom:20 }}>
                 <p style={{ fontSize:13, color:"#9a3412", margin:0, lineHeight:1.6 }}>
