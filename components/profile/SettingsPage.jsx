@@ -16,6 +16,7 @@ export default function SettingsPage() {
   const [cancelling, setCancelling] = useState(false);
   const [showRenew, setShowRenew] = useState(false);
   const [upgradePlan, setUpgradePlan] = useState(null);
+  const [showConfirmCancel, setShowConfirmCancel] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -176,11 +177,36 @@ export default function SettingsPage() {
                   style={{ padding:"13px", borderRadius:12, border:"1.5px solid #E2E8F0", background:"#fff", color:"#374151", fontSize:13, fontWeight:600, cursor:"pointer" }}>
                   Keep My Subscription
                 </button>
-                <button onClick={handleCancel} disabled={cancelling}
+                <button onClick={() => setShowConfirmCancel(true)}
                   style={{ padding:"11px", borderRadius:12, border:"none", background:"transparent", color:"#94A3B8", fontSize:12, cursor:"pointer", textDecoration:"underline" }}>
-                  {cancelling ? "Cancelling..." : "Cancel subscription"}
+                  Cancel subscription
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Cancel Modal */}
+      {showConfirmCancel && (
+        <div onClick={() => setShowConfirmCancel(false)} style={{ position:"fixed", inset:0, zIndex:300, background:"rgba(15,23,42,0.7)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background:"#fff", borderRadius:24, width:"100%", maxWidth:380, boxShadow:"0 32px 80px rgba(0,0,0,0.3)", padding:"28px 24px" }}>
+            <div style={{ textAlign:"center", marginBottom:20 }}>
+              <div style={{ fontSize:48, marginBottom:12 }}>😢</div>
+              <h2 style={{ fontSize:18, fontWeight:900, color:"#0f172a", margin:"0 0 8px" }}>Are you sure?</h2>
+              <p style={{ fontSize:14, color:"#64748B", margin:0, lineHeight:1.6 }}>
+                You'll lose access to all your courses on <strong style={{ color:"#0f172a" }}>{new Date(sub?.expires_at).toLocaleDateString("en-US", { month:"long", day:"numeric" })}</strong>.
+              </p>
+            </div>
+            <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+              <button onClick={() => { setShowConfirmCancel(false); }}
+                style={{ padding:"14px", borderRadius:12, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>
+                Keep My Subscription
+              </button>
+              <button onClick={() => { setShowConfirmCancel(false); handleCancel(); }} disabled={cancelling}
+                style={{ padding:"13px", borderRadius:12, border:"1.5px solid #FEE2E2", background:"#fff", color:"#ef4444", fontSize:13, fontWeight:600, cursor:"pointer" }}>
+                {cancelling ? "Cancelling..." : "Yes, cancel my subscription"}
+              </button>
             </div>
           </div>
         </div>
