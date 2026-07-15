@@ -135,8 +135,8 @@ export default function SettingsPage() {
 
       {/* Manage Subscription Modal */}
       {showManage && (
-        <div style={{ position:"fixed", inset:0, zIndex:200, background:"rgba(15,23,42,0.6)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
-          <div style={{ background:"#fff", borderRadius:24, width:"100%", maxWidth:420, boxShadow:"0 32px 80px rgba(0,0,0,0.3)", overflow:"hidden" }}>
+        <div onClick={() => setShowManage(false)} style={{ position:"fixed", inset:0, zIndex:200, background:"rgba(15,23,42,0.6)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
+          <div onClick={e => e.stopPropagation()} style={{ background:"#fff", borderRadius:24, width:"100%", maxWidth:420, boxShadow:"0 32px 80px rgba(0,0,0,0.3)", overflow:"hidden" }}>
             <div style={{ background:"linear-gradient(135deg,#f97316,#ef4444)", padding:"28px 28px 24px", textAlign:"center" }}>
               <div style={{ fontSize:44, marginBottom:8 }}>⚠️</div>
               <h2 style={{ color:"#fff", fontSize:20, fontWeight:900, margin:"0 0 6px" }}>Manage Subscription</h2>
