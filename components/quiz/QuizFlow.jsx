@@ -676,7 +676,7 @@ if (step === "comparison") {
             style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%) translateY(-26%)", height:charH, objectFit:"contain", zIndex:2 }}/>
           <div style={{ borderRadius:16, border:"2px solid #FCA5A5", background:"#FFF5F5", padding: isMobile ? "40px 12px 14px" : "40px 16px 18px", textAlign:"left", position:"relative", zIndex:1 }}>
             <p style={{ fontSize: isMobile ? 11 : 12, color:"#64748B", margin:"0 0 2px" }}>You without</p>
-            <p style={{ fontSize: isMobile ? 15 : 17, fontWeight:900, color:"#0f172a", margin:"0 0 10px" }}>Coursiv</p>
+            <p style={{ fontSize: isMobile ? 15 : 17, fontWeight:900, color:"#0f172a", margin:"0 0 10px" }}>1Course</p>
             <div style={{ borderTop:"1.5px solid #FCA5A5", marginBottom:10 }}/>
             <p style={{ fontSize: isMobile ? 12 : 13, fontWeight:800, color:"#0f172a", margin:"0 0 10px" }}>Struggles:</p>
             {withoutItems.map((item, i) => (
@@ -695,7 +695,7 @@ if (step === "comparison") {
             style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%) translateY(-26%)", height:charH, objectFit:"contain", zIndex:2 }}/>
           <div style={{ borderRadius:16, border:"2px solid #86EFAC", background:"#F0FDF4", padding: isMobile ? "40px 12px 14px" : "40px 16px 18px", textAlign:"left", position:"relative", zIndex:1 }}>
             <p style={{ fontSize: isMobile ? 11 : 12, color:"#64748B", margin:"0 0 2px" }}>You with</p>
-            <p style={{ fontSize: isMobile ? 15 : 17, fontWeight:900, color:"#0f172a", margin:"0 0 10px" }}>Coursiv:</p>
+            <p style={{ fontSize: isMobile ? 15 : 17, fontWeight:900, color:"#0f172a", margin:"0 0 10px" }}>1Course:</p>
             <div style={{ borderTop:"1.5px solid #86EFAC", marginBottom:10 }}/>
             <p style={{ fontSize: isMobile ? 12 : 13, fontWeight:800, color:"#0f172a", margin:"0 0 10px" }}>Solutions:</p>
             {withItems.map((item, i) => (
