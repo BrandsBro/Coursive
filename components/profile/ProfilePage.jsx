@@ -22,7 +22,7 @@ const COURSE_STYLES = {
 };
 
 const DAYS = ["M","T","W","T","F","S","S"];
-const TABS = ["Overview","Certificates","Courses","Challenges","Subscription","Security"];
+const TABS = ["Overview","Certificates","Courses","Challenges"];
 
 export default function ProfilePage() {
   const { user } = useAuth();
