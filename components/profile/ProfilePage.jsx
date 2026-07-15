@@ -24,11 +24,17 @@ const COURSE_STYLES = {
 const DAYS = ["M","T","W","T","F","S","S"];
 const TABS = ["Overview","Certificates","Courses","Challenges"];
 
+function useIsMobile() {
+  const [m, setM] = useState(false);
+  useEffect(() => { const c = () => setM(window.innerWidth < 640); c(); window.addEventListener("resize",c); return () => window.removeEventListener("resize",c); }, []);
+  return m;
+}
 export default function ProfilePage() {
   const { user } = useAuth();
   const { getCoursePercent, getCompletedLessons, hasCertificate, hasJoinedChallenge } = useProgress();
   const { streak, longestStreak, weeklyActivity } = useStreak();
   const [tab, setTab] = useState("Overview");
+  const isMobile = useIsMobile();
   const [profile, setProfile] = useState(null);
   const [sub, setSub] = useState(null);
   const [certCourse, setCertCourse] = useState(null);
@@ -171,7 +177,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Stats */}
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:12 }}>
+      <div style={{ display:"grid", gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(4,1fr)", gap:isMobile?10:12 }}>
         {[
           { icon:<BookOpen size={18}/>, value:totalLessons,     label:"Lessons done",     color:"#6366f1", bg:"#EEF2FF" },
           { icon:<Trophy size={18}/>,   value:certsEarned,      label:"Certificates",     color:"#f59e0b", bg:"#FFFBEB" },
