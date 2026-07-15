@@ -556,7 +556,13 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
   const [paymentType] = useState("one_time");
   const [timeLeft, setTimeLeft] = useState(10 * 60);
   const [pricingData, setPricingData] = useState(null);
-
+const [sliderPos, setSliderPos] = useState(0);
+  useEffect(() => {
+  if (step === "summary") {
+    const t = setTimeout(() => setSliderPos(15), 300);
+    return () => clearTimeout(t);
+  }
+}, [step]);
   useEffect(() => {
     if (step === "sales") {
       supabase.from("settings").select("value").eq("key","pricing").single().then(({ data }) => { if (data?.value) setPricingData(data.value); });
@@ -623,7 +629,8 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
           <p style={{ fontSize: isMobile ? 12 : 14, fontWeight:700, color:"#0f172a", margin:"0 0 6px", textAlign:"center" }}>A.I. Skills</p>
           <p style={{ fontSize: isMobile ? 32 : 48, fontWeight:900, color:"#0f172a", margin:"0 0 10px", textAlign:"center" }}>Low</p>
           <div style={{ height: isMobile ? 10 : 12, borderRadius:999, background:"linear-gradient(to right,#ef4444,#f59e0b,#22c55e)", position:"relative", marginBottom:8 }}>
-            <div style={{ position:"absolute", left:"15%", top:-4, width:18, height:18, borderRadius:"50%", background:"#fff", border:"3px solid #374151", transform:"translateX(-50%)" }}/>
+            <div style={{ position:"absolute", left:`${sliderPos}%`,
+transition:"left 1.8s cubic-bezier(0.25,0.46,0.45,0.94)", top:-4, width:18, height:18, borderRadius:"50%", background:"#fff", border:"3px solid #374151", transform:"translateX(-50%)" }}/>
           </div>
           <div style={{ display:"flex", justifyContent:"space-between" }}>
             {["Low","Medium","High"].map(l => <span key={l} style={{ fontSize:11, color:"#64748B" }}>{l}</span>)}
@@ -648,41 +655,62 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
   }
 
   // ── comparison ───────────────────────────────────────────────────────────────
-  if (step === "comparison") {
-    const withoutItems = ["No time to get started","No recognized credential","A.I. feels hard to use","Invisible to employers"];
-    const withItems = ["Clear, step-by-step path","Shareable A.I. credential","Reliable results from A.I.","Stand out from other workers"];
-    return (
-      <div style={{ width:"100%", textAlign:"center" }}>
-        <h2 style={{ fontSize: isMobile ? 17 : 22, fontWeight:900, color:"#0f172a", margin:"0 0 6px" }}>Your Personalized A.I. Certificate Program</h2>
-        <p style={{ fontSize: isMobile ? 12 : 14, color:"#64748B", margin:"0 0 2px" }}>We expect you to earn your A.I. Certificate</p>
-        <p style={{ fontSize: isMobile ? 12 : 15, fontWeight:800, color:"#0f172a", margin:"0 0 18px", textDecoration:"underline" }}>
-          by {new Date(Date.now() + 28*24*60*60*1000).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})}
-        </p>
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap: isMobile ? 8 : 12 }}>
-          {[
-            { prefix:"You without", title:"1Course", label:"Struggles:", items:withoutItems, border:"#FEE2E2", headBg:"#FEF2F2", titleColor:"#991B1B", itemBorder:"#FEE2E2" },
-            { prefix:"You with", title:"1Course:", label:"Solutions:", items:withItems, border:"#BBF7D0", headBg:"#F0FDF4", titleColor:"#166534", itemBorder:"#BBF7D0" },
-          ].map((col, ci) => (
-            <div key={ci} style={{ borderRadius:14, border:`2px solid ${col.border}`, overflow:"hidden" }}>
-              <div style={{ padding: isMobile ? "8px 10px" : "12px 16px", background:col.headBg, borderBottom:`1px solid ${col.border}`, textAlign:"center" }}>
-                <p style={{ fontSize: isMobile ? 10 : 13, color:"#64748B", margin:"0 0 1px" }}>{col.prefix}</p>
-                <p style={{ fontSize: isMobile ? 12 : 14, fontWeight:800, color:col.titleColor, margin:0 }}>{col.title}</p>
-              </div>
-              <div style={{ padding: isMobile ? 10 : 16 }}>
-                {col.items.map((item, i) => (
-                  <div key={i} style={{ paddingBottom: isMobile ? 8 : 12, marginBottom: isMobile ? 8 : 12, borderBottom:i<col.items.length-1?`1px solid ${col.itemBorder}`:"none", textAlign:"left" }}>
-                    <p style={{ fontSize: isMobile ? 10 : 12, color:col.titleColor, margin:"0 0 1px", fontWeight:700 }}>{col.label}</p>
-                    <p style={{ fontSize: isMobile ? 11 : 13, color:"#374151", margin:0 }}>{item}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+if (step === "comparison") {
+  const withoutItems = ["AI feels too complex","No recognized credential","Don't know how to use AI","Invisible to employers"];
+  const withItems = ["Clear, step-by-step path","Shareable AI credential","Reliable results from AI","Stand out from other workers"];
+  const certDate = new Date(Date.now() + 28*24*60*60*1000).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"});
+  const charH = isMobile ? 130 : 150;
 
+  return (
+    <div style={{ width:"100%", textAlign:"center" }}>
+      <h2 style={{ fontSize: isMobile ? 18 : 22, fontWeight:900, color:"#0f172a", margin:"0 0 6px", lineHeight:1.3 }}>Your Personalized AI<br/>Certificate Program</h2>
+      <p style={{ fontSize: isMobile ? 12 : 14, color:"#64748B", margin:"0 0 2px" }}>We expect you to earn your AI Certificate</p>
+      <p style={{ fontSize: isMobile ? 13 : 14, fontWeight:800, color:"#0f172a", margin:`0 0 ${charH/2}px`, textDecoration:"underline" }}>by {certDate}</p>
+
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap: isMobile ? 10 : 14 }}>
+
+        {/* Without column */}
+        <div style={{ position:"relative", paddingTop: charH/2 }}>
+          <img src="https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784114538455-Characters.webp"
+            alt="without"
+            style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%) translateY(-26%)", height:charH, objectFit:"contain", zIndex:2 }}/>
+          <div style={{ borderRadius:16, border:"2px solid #FCA5A5", background:"#FFF5F5", padding: isMobile ? "40px 12px 14px" : "40px 16px 18px", textAlign:"left", position:"relative", zIndex:1 }}>
+            <p style={{ fontSize: isMobile ? 11 : 12, color:"#64748B", margin:"0 0 2px" }}>You without</p>
+            <p style={{ fontSize: isMobile ? 15 : 17, fontWeight:900, color:"#0f172a", margin:"0 0 10px" }}>Coursiv</p>
+            <div style={{ borderTop:"1.5px solid #FCA5A5", marginBottom:10 }}/>
+            <p style={{ fontSize: isMobile ? 12 : 13, fontWeight:800, color:"#0f172a", margin:"0 0 10px" }}>Struggles:</p>
+            {withoutItems.map((item, i) => (
+              <div key={i}>
+                <p style={{ fontSize: isMobile ? 12 : 13, color:"#374151", margin:"0 0 8px", lineHeight:1.4 }}>{item}</p>
+                {i < withoutItems.length - 1 && <div style={{ borderTop:"1px solid #FCA5A5", marginBottom:8 }}/>}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* With column */}
+        <div style={{ position:"relative", paddingTop: charH/2 }}>
+          <img src="https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784114541530-Characters-1.webp"
+            alt="with"
+            style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%) translateY(-26%)", height:charH, objectFit:"contain", zIndex:2 }}/>
+          <div style={{ borderRadius:16, border:"2px solid #86EFAC", background:"#F0FDF4", padding: isMobile ? "40px 12px 14px" : "40px 16px 18px", textAlign:"left", position:"relative", zIndex:1 }}>
+            <p style={{ fontSize: isMobile ? 11 : 12, color:"#64748B", margin:"0 0 2px" }}>You with</p>
+            <p style={{ fontSize: isMobile ? 15 : 17, fontWeight:900, color:"#0f172a", margin:"0 0 10px" }}>Coursiv:</p>
+            <div style={{ borderTop:"1.5px solid #86EFAC", marginBottom:10 }}/>
+            <p style={{ fontSize: isMobile ? 12 : 13, fontWeight:800, color:"#0f172a", margin:"0 0 10px" }}>Solutions:</p>
+            {withItems.map((item, i) => (
+              <div key={i}>
+                <p style={{ fontSize: isMobile ? 12 : 13, color:"#374151", margin:"0 0 8px", lineHeight:1.4 }}>{item}</p>
+                {i < withItems.length - 1 && <div style={{ borderTop:"1px solid #86EFAC", marginBottom:8 }}/>}
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
   // ── signup ───────────────────────────────────────────────────────────────────
   if (step === "signup") {
     return (
