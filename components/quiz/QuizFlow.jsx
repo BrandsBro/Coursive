@@ -1157,8 +1157,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
       <p style={{ fontSize:20, fontWeight:900, color:"#5B4EFF", margin:"0 0 8px" }}>Personal AI Challenge!</p>
       <p style={{ fontSize:14, color:"#64748B", margin:"0 0 24px" }}>Don't miss your chance to master AI with personalized offer 🎁</p>
 
-      <canvas ref={canvasRef} width={sz} height={sz} style={{ display:"block", margin:"0 auto 24px" }}/>
-
+<canvas ref={canvasRef} width={sz} height={sz} onClick={spin} style={{ display:"block", margin:"0 auto 24px", cursor: spinning||won ? "default" : "pointer" }}/>
       <button onClick={spin} disabled={spinning || won}
         style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background: spinning||won ? "#94A3B8" : "linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, cursor: spinning||won ? "not-allowed" : "pointer" }}>
         {spinning ? "SPINNING..." : "SPIN"}
