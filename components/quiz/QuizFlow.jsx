@@ -1,6 +1,5 @@
 "use client";
 import { useBranding } from "@/lib/useBranding";
-
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronRight, Check, ArrowLeft } from "lucide-react";
@@ -134,8 +133,6 @@ export default function QuizFlow({ blocks }) {
   return (
     <div style={{ minHeight:"100vh", background:"#fff", display:"flex", flexDirection:"column" }}>
       {toast && <QuizToast message={toast} onClose={() => setToast("")}/>}
-
-      {/* Top bar */}
       <div style={{ position:"sticky", top:0, background:"#fff", zIndex:50 }}>
         <div style={{ padding:"14px 20px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div style={{ width:80 }}>
@@ -151,8 +148,7 @@ export default function QuizFlow({ blocks }) {
               <span style={{ fontSize:13, fontWeight:700, color:"#94A3B8" }}>
                 {isInEndSequence
                   ? `${visibleBlocks.length + END_SEQUENCE.indexOf(endStep) + 1} / ${visibleBlocks.length + END_SEQUENCE.length}`
-                  : `${currentIdx + 1} / ${visibleBlocks.length + END_SEQUENCE.length}`
-                }
+                  : `${currentIdx + 1} / ${visibleBlocks.length + END_SEQUENCE.length}`}
               </span>
             )}
           </div>
@@ -164,7 +160,6 @@ export default function QuizFlow({ blocks }) {
         )}
       </div>
 
-      {/* Content */}
       <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"32px 12px 120px", maxWidth:650, margin:"0 auto", width:"100%" }}>
         {showResume && (
           <div style={{ width:"100%", background:"#EEF2FF", border:"1.5px solid #C7D2FE", borderRadius:16, padding:"16px 20px", marginBottom:24, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
@@ -199,7 +194,6 @@ export default function QuizFlow({ blocks }) {
   );
 }
 
-// ─── QuizBlock ─────────────────────────────────────────────────────────────────
 function QuizBlock({ block, answers, onChoice, onNext }) {
   const c = block.content || {};
 
@@ -210,7 +204,6 @@ function QuizBlock({ block, answers, onChoice, onNext }) {
     const selected = answers[block.id];
     const labelColor = c.labelColor || "#5B4EFF";
     const textColor = c.textColor || "#ffffff";
-
     return (
       <div style={{ width:"100%", textAlign:"center" }}>
         <h1 style={{ fontSize:28, fontWeight:900, color:"#0f172a", margin:"0 0 8px", lineHeight:1.2 }}>{c.question || "Question"}</h1>
@@ -312,7 +305,6 @@ function QuizBlock({ block, answers, onChoice, onNext }) {
   return null;
 }
 
-// ─── WheelStep ─────────────────────────────────────────────────────────────────
 function WheelStep({ name, onClaim }) {
   const canvasRef = useRef(null);
   const [spinning, setSpinning] = useState(false);
@@ -331,14 +323,10 @@ function WheelStep({ name, onClaim }) {
     const outerR = sz / 2 - 4;
     const innerR = outerR - 10;
     ctx.clearRect(0, 0, sz, sz);
-
-    // Outer ring
     ctx.beginPath();
     ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
     ctx.fillStyle = "#3730A3";
     ctx.fill();
-
-    // Segments
     for (let i = 0; i < segCount; i++) {
       const startA = -Math.PI / 2 + rot + i * segAngle;
       const endA = startA + segAngle;
@@ -351,8 +339,6 @@ function WheelStep({ name, onClaim }) {
       ctx.strokeStyle = "#fff";
       ctx.lineWidth = 2;
       ctx.stroke();
-
-      // Label
       const midA = startA + segAngle / 2;
       ctx.save();
       ctx.translate(cx + innerR * 0.65 * Math.cos(midA), cy + innerR * 0.65 * Math.sin(midA));
@@ -365,8 +351,6 @@ function WheelStep({ name, onClaim }) {
       });
       ctx.restore();
     }
-
-    // Gold dots on outer ring
     for (let i = 0; i < 16; i++) {
       const a = (i / 16) * 2 * Math.PI;
       ctx.beginPath();
@@ -374,14 +358,10 @@ function WheelStep({ name, onClaim }) {
       ctx.fillStyle = "#D4AF37";
       ctx.fill();
     }
-
-    // Center circle
     ctx.beginPath();
     ctx.arc(cx, cy, sz * 0.06, 0, 2 * Math.PI);
     ctx.fillStyle = "#3730A3";
     ctx.fill();
-
-    // Pointer triangle at top
     ctx.beginPath();
     ctx.moveTo(cx, cy - outerR + 2);
     ctx.lineTo(cx - 10, cy - outerR + 20);
@@ -392,3 +372,324 @@ function WheelStep({ name, onClaim }) {
   }
 
   useEffect(() => { drawWheel(0); }, []);
+
+  const spin = () => {
+    if (spinning || won) return;
+    setSpinning(true);
+    const targetRot = 10 * Math.PI + (5 * Math.PI) / 6;
+    const duration = 5500;
+    const start = performance.now();
+    const animate = (now) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 4);
+      drawWheel(targetRot * eased);
+      if (progress < 1) requestAnimationFrame(animate);
+      else { setSpinning(false); setWon(true); }
+    };
+    requestAnimationFrame(animate);
+  };
+
+  return (
+    <div style={{ width:"100%", textAlign:"center" }}>
+      <h2 style={{ fontSize:22, fontWeight:900, color:"#0f172a", margin:"0 0 4px" }}>Spin & Unlock Your</h2>
+      <p style={{ fontSize:20, fontWeight:900, color:"#5B4EFF", margin:"0 0 8px" }}>Personal AI Challenge!</p>
+      <p style={{ fontSize:14, color:"#64748B", margin:"0 0 24px" }}>Don't miss your chance to master AI with personalized offer 🎁</p>
+      <canvas ref={canvasRef} width={sz} height={sz} onClick={spin} style={{ display:"block", margin:"0 auto 24px", cursor: spinning||won ? "default" : "pointer" }}/>
+      <button onClick={spin} disabled={spinning || won}
+        style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background: spinning||won ? "#94A3B8" : "linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, cursor: spinning||won ? "not-allowed" : "pointer" }}>
+        {spinning ? "SPINNING..." : "SPIN"}
+      </button>
+      {won && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.6)", zIndex:200, display:"flex", alignItems:"flex-end", justifyContent:"center" }}>
+          <div style={{ background:"#fff", borderRadius:"24px 24px 0 0", padding:"28px 24px 48px", width:"100%", maxWidth:480, textAlign:"center" }}>
+            <h3 style={{ fontSize:22, fontWeight:900, color:"#0f172a", margin:"0 0 16px" }}>Woo hoo! 🥳</h3>
+            <div style={{ background:"linear-gradient(135deg,#EEF2FF,#F5F3FF)", borderRadius:16, padding:"20px 16px", marginBottom:14, position:"relative", overflow:"hidden" }}>
+              {[["#ef4444",5,10],["#22c55e",75,20],["#f59e0b",30,60],["#5B4EFF",85,15],["#ec4899",20,70],["#f59e0b",60,80],["#22c55e",45,5]].map(([c,l,t],i) => (
+                <div key={i} style={{ position:"absolute", width:8, height:14, borderRadius:2, background:c, left:l+"%", top:t+"%", transform:`rotate(${i*25}deg)`, opacity:0.8 }}/>
+              ))}
+              <p style={{ fontSize:14, fontWeight:700, color:"#374151", margin:"0 0 6px", position:"relative", zIndex:1 }}>
+                {name ? `${name}, you won a discount` : "You won a discount"}
+              </p>
+              <p style={{ fontSize:38, fontWeight:900, color:"#5B4EFF", margin:0, position:"relative", zIndex:1 }}>50% off</p>
+            </div>
+            <p style={{ fontSize:13, color:"#64748B", margin:"0 0 20px" }}>It will be applied automatically</p>
+            <button onClick={onClaim} style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, cursor:"pointer" }}>
+              CLAIM MY DISCOUNT
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, blocks, showToast, onNext }) {
+  const router = useRouter();
+  const [selectedPlan, setSelectedPlan] = useState("4-Week Plan");
+  const [showPayment, setShowPayment] = useState(false);
+  const [paymentType] = useState("one_time");
+  const [timeLeft, setTimeLeft] = useState(10 * 60);
+  const [pricingData, setPricingData] = useState(null);
+  const [sliderPos, setSliderPos] = useState(0);
+
+  useEffect(() => {
+    if (step === "sales") {
+      supabase.from("settings").select("value").eq("key","pricing").single().then(({ data }) => {
+        if (data?.value) setPricingData(data.value);
+      });
+    }
+  }, [step]);
+
+  useEffect(() => {
+    if (step === "sales") {
+      const t = setInterval(() => setTimeLeft(p => Math.max(0, p-1)), 1000);
+      return () => clearInterval(t);
+    }
+  }, [step]);
+
+  useEffect(() => {
+    if (step === "summary") {
+      const t = setTimeout(() => setSliderPos(15), 300);
+      return () => clearTimeout(t);
+    }
+  }, [step]);
+
+  const mins = String(Math.floor(timeLeft/60)).padStart(2,"0");
+  const secs = String(timeLeft%60).padStart(2,"0");
+
+  const handleGetPlan = () => {
+    if (!name || !email) { showToast("Please go back and fill in your name and email"); return; }
+    setShowPayment(true);
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowPayment(false);
+    sessionStorage.clear();
+    router.push("/payment-success");
+  };
+
+  if (step === "wheel") return <WheelStep name={name} onClaim={onNext}/>;
+
+  if (step === "loading") {
+    const reviewIdx = Math.floor((loadingPct / 100) * FIXED_REVIEWS.length);
+    const review = FIXED_REVIEWS[Math.min(reviewIdx, FIXED_REVIEWS.length-1)];
+    return (
+      <div style={{ width:"100%", textAlign:"center", paddingTop:20 }}>
+        <div style={{ position:"relative", width:140, height:140, margin:"0 auto 24px" }}>
+          <svg width="140" height="140" viewBox="0 0 140 140">
+            <circle cx="70" cy="70" r="60" fill="none" stroke="#F1F5F9" strokeWidth="10"/>
+            <circle cx="70" cy="70" r="60" fill="none" stroke="#5B4EFF" strokeWidth="10"
+              strokeDasharray={`${2*Math.PI*60}`}
+              strokeDashoffset={`${2*Math.PI*60*(1-loadingPct/100)}`}
+              strokeLinecap="round" transform="rotate(-90 70 70)"
+              style={{ transition:"stroke-dashoffset 0.1s ease" }}/>
+          </svg>
+          <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+            <span style={{ fontSize:28, fontWeight:900, color:"#0f172a" }}>{loadingPct}%</span>
+          </div>
+        </div>
+        <p style={{ fontSize:15, color:"#64748B", margin:"0 0 40px" }}>Analyzing answers to personalize your A.I. Certificate Program...</p>
+        <hr style={{ border:"none", borderTop:"1px solid #F1F5F9", margin:"0 0 32px" }}/>
+        <p style={{ fontSize:28, fontWeight:900, color:"#5B4EFF", margin:"0 0 4px" }}>2,000,000+ people</p>
+        <p style={{ fontSize:18, fontWeight:700, color:"#0f172a", margin:"0 0 24px" }}>have chosen 1Course</p>
+        <div style={{ background:"#fff", borderRadius:16, border:"1.5px solid #F1F5F9", padding:"20px 24px", textAlign:"left", boxShadow:"0 4px 20px rgba(0,0,0,0.06)" }}>
+          <div style={{ display:"flex", gap:2, marginBottom:8 }}>
+            {[1,2,3,4,5].map(s => <span key={s} style={{ fontSize:22, color:s<=review.stars?"#22c55e":"#E2E8F0" }}>★</span>)}
+          </div>
+          <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
+            <p style={{ fontSize:15, fontWeight:700, color:"#0f172a", margin:0 }}>{review.title}</p>
+            <p style={{ fontSize:13, color:"#94A3B8", margin:0 }}>{review.name}</p>
+          </div>
+          <p style={{ fontSize:14, color:"#374151", margin:0, lineHeight:1.6 }}>"{review.text}"</p>
+        </div>
+        <p style={{ fontSize:12, color:"#94A3B8", marginTop:12 }}>Featured reviews from Trustpilot.</p>
+      </div>
+    );
+  }
+
+  if (step === "summary") {
+    return (
+      <div style={{ width:"100%" }}>
+        <h2 style={{ fontSize:24, fontWeight:900, color:"#0f172a", margin:"0 0 8px", textAlign:"center" }}>Your Personal Summary</h2>
+        <p style={{ fontSize:14, color:"#64748B", margin:"0 0 24px", textAlign:"center" }}>The quiz indicates that what's held you back is time, not capability</p>
+        <div style={{ background:"#F8FAFC", borderRadius:16, padding:20, marginBottom:20 }}>
+          <p style={{ fontSize:14, fontWeight:700, color:"#0f172a", margin:"0 0 8px", textAlign:"center" }}>A.I. Skills</p>
+          <p style={{ fontSize:48, fontWeight:900, color:"#0f172a", margin:"0 0 12px", textAlign:"center" }}>Low</p>
+          <div style={{ height:12, borderRadius:999, background:"linear-gradient(to right,#ef4444,#f59e0b,#22c55e)", position:"relative", marginBottom:8 }}>
+            <div style={{ position:"absolute", left:`${sliderPos}%`, top:"50%", transform:"translate(-50%,-50%)", width:20, height:20, borderRadius:"50%", background:"#fff", border:"3px solid #374151", boxShadow:"0 2px 8px rgba(0,0,0,0.15)", transition:"left 1.8s cubic-bezier(0.25,0.46,0.45,0.94)" }}/>
+          </div>
+          <div style={{ display:"flex", justifyContent:"space-between" }}>
+            <span style={{ fontSize:11, color:"#64748B" }}>Low</span>
+            <span style={{ fontSize:11, color:"#64748B" }}>Medium</span>
+            <span style={{ fontSize:11, color:"#64748B" }}>High</span>
+          </div>
+        </div>
+        {[
+          { icon:"🎯", label:"Your focus", value:"Future-proofing your role" },
+          { icon:"⭐", label:"Your readiness", value:"Ready to learn online" },
+          { icon:"🕐", label:"Your pace", value:"20 min a day" },
+          { icon:"📚", label:"Learning experience", value:"Self-taught so far" },
+        ].map((item, i) => (
+          <div key={i} style={{ display:"flex", alignItems:"center", gap:14, padding:"14px 16px", background:"#fff", borderRadius:14, border:"1.5px solid #F1F5F9", marginBottom:10 }}>
+            <div style={{ width:40, height:40, borderRadius:12, background:"#EEF2FF", display:"flex", alignItems:"center", justifyContent:"center", fontSize:20, flexShrink:0 }}>{item.icon}</div>
+            <div>
+              <p style={{ fontSize:12, color:"#94A3B8", margin:"0 0 2px" }}>{item.label}</p>
+              <p style={{ fontSize:15, fontWeight:700, color:"#0f172a", margin:0 }}>{item.value}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (step === "comparison") {
+    const withoutItems = ["AI feels too complex","No recognized credential","Don't know how to use AI","Invisible to employers"];
+    const withItems = ["Clear, step-by-step path","Shareable AI credential","Reliable results from AI","Stand out from other workers"];
+    const certDate = new Date(Date.now() + 28*24*60*60*1000).toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"});
+    const charH = 100;
+    return (
+      <div style={{ width:"100%", textAlign:"center" }}>
+        <h2 style={{ fontSize:22, fontWeight:900, color:"#0f172a", margin:"0 0 6px", lineHeight:1.3 }}>Your Personalized AI<br/>Certificate Program</h2>
+        <p style={{ fontSize:14, color:"#64748B", margin:"0 0 2px" }}>We expect you to earn your AI Certificate</p>
+        <p style={{ fontSize:14, fontWeight:800, color:"#0f172a", margin:`0 0 ${charH/2}px`, textDecoration:"underline" }}>by {certDate}</p>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+          <div style={{ position:"relative", paddingTop: charH/2 }}>
+            <img src="https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784114538455-Characters.webp" alt="without" style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%) translateY(10%)", height:charH, objectFit:"contain", zIndex:2 }}/>
+            <div style={{ borderRadius:16, border:"2px solid #FCA5A5", background:"#FFF5F5", padding:"60px 12px 16px", textAlign:"left", position:"relative", zIndex:1 }}>
+              <p style={{ fontSize:12, color:"#64748B", margin:"0 0 2px" }}>You without</p>
+              <p style={{ fontSize:16, fontWeight:900, color:"#0f172a", margin:"0 0 10px" }}>1Course</p>
+              <div style={{ borderTop:"1.5px solid #FCA5A5", marginBottom:10 }}/>
+              <p style={{ fontSize:13, fontWeight:800, color:"#0f172a", margin:"0 0 10px" }}>Struggles:</p>
+              {withoutItems.map((item, i) => (
+                <div key={i}>
+                  <p style={{ fontSize:12, color:"#374151", margin:"0 0 8px", lineHeight:1.4 }}>{item}</p>
+                  {i < withoutItems.length - 1 && <div style={{ borderTop:"1px solid #FCA5A5", marginBottom:8 }}/>}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ position:"relative", paddingTop: charH/2 }}>
+            <img src="https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784114541530-Characters-1.webp" alt="with" style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%) translateY(10%)", height:charH, objectFit:"contain", zIndex:2 }}/>
+            <div style={{ borderRadius:16, border:"2px solid #86EFAC", background:"#F0FDF4", padding:"60px 12px 16px", textAlign:"left", position:"relative", zIndex:1 }}>
+              <p style={{ fontSize:12, color:"#64748B", margin:"0 0 2px" }}>You with</p>
+              <p style={{ fontSize:16, fontWeight:900, color:"#0f172a", margin:"0 0 10px" }}>1Course:</p>
+              <div style={{ borderTop:"1.5px solid #86EFAC", marginBottom:10 }}/>
+              <p style={{ fontSize:13, fontWeight:800, color:"#0f172a", margin:"0 0 10px" }}>Solutions:</p>
+              {withItems.map((item, i) => (
+                <div key={i}>
+                  <p style={{ fontSize:12, color:"#374151", margin:"0 0 8px", lineHeight:1.4 }}>{item}</p>
+                  {i < withItems.length - 1 && <div style={{ borderTop:"1px solid #86EFAC", marginBottom:8 }}/>}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (step === "signup") {
+    return (
+      <div style={{ width:"100%", maxWidth:480, margin:"0 auto" }}>
+        <div style={{ textAlign:"center", marginBottom:32 }}>
+          <div style={{ width:64, height:64, borderRadius:20, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 16px", fontSize:28 }}>🎓</div>
+          <h1 style={{ fontSize:26, fontWeight:900, color:"#0f172a", margin:"0 0 8px", lineHeight:1.2 }}>Your A.I. Program is Ready!</h1>
+          <p style={{ fontSize:15, color:"#64748B", margin:0 }}>Enter your details to continue</p>
+        </div>
+        <div style={{ display:"flex", justifyContent:"center", gap:20, marginBottom:28 }}>
+          {["🔒 Secure","✅ Free to start","🚀 Instant access"].map((b,i) => (
+            <span key={i} style={{ fontSize:12, fontWeight:600, color:"#64748B" }}>{b}</span>
+          ))}
+        </div>
+        <div style={{ background:"#fff", borderRadius:20, border:"1.5px solid #E2E8F0", padding:"28px 24px", boxShadow:"0 8px 32px rgba(0,0,0,0.06)" }}>
+          <div style={{ display:"flex", flexDirection:"column", gap:16 }}>
+            <div>
+              <label style={{ display:"block", fontSize:12, fontWeight:700, color:"#374151", marginBottom:6, textTransform:"uppercase", letterSpacing:0.5 }}>Full Name</label>
+              <input value={name} onChange={e=>setName(e.target.value)} placeholder="e.g. John Smith"
+                style={{ width:"100%", padding:"14px 16px", borderRadius:12, border:"2px solid #E2E8F0", fontSize:15, outline:"none", boxSizing:"border-box" }}
+                onFocus={e=>e.target.style.borderColor="#5B4EFF"} onBlur={e=>e.target.style.borderColor="#E2E8F0"}/>
+            </div>
+            <div>
+              <label style={{ display:"block", fontSize:12, fontWeight:700, color:"#374151", marginBottom:6, textTransform:"uppercase", letterSpacing:0.5 }}>Email Address</label>
+              <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="e.g. john@gmail.com" type="email"
+                style={{ width:"100%", padding:"14px 16px", borderRadius:12, border:"2px solid #E2E8F0", fontSize:15, outline:"none", boxSizing:"border-box" }}
+                onFocus={e=>e.target.style.borderColor="#5B4EFF"} onBlur={e=>e.target.style.borderColor="#E2E8F0"}/>
+            </div>
+          </div>
+          <p style={{ fontSize:11, color:"#94A3B8", margin:"16px 0 0", textAlign:"center" }}>By continuing you agree to our Terms of Service</p>
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:8, justifyContent:"center", marginTop:20 }}>
+          <div style={{ display:"flex" }}>
+            {["👩","👨","👩🏽","👨🏿","👩🏻"].map((e,i) => (
+              <div key={i} style={{ width:28, height:28, borderRadius:"50%", background:"#E2E8F0", border:"2px solid #fff", marginLeft:i>0?-8:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>{e}</div>
+            ))}
+          </div>
+          <p style={{ fontSize:12, color:"#64748B", margin:0 }}>Join <strong>2,000,000+</strong> A.I. learners</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (step === "sales") {
+    const plans = pricingData?.plans ? pricingData.plans.map(p => ({
+      name: p.name, price: p.salePrice, originalPrice: p.regularPrice,
+      weeks: p.id==="weekly" ? 1 : p.id==="monthly" ? 4 : 12, popular: p.id==="monthly",
+    })) : [
+      { name:"1-Week Plan", price:"6.93", originalPrice:"13.86", weeks:1 },
+      { name:"4-Week Plan", price:"19.99", originalPrice:"39.99", weeks:4, popular:true },
+      { name:"12-Week Plan", price:"39.99", originalPrice:"79.99", weeks:12 },
+    ];
+    return (
+      <>
+        <div style={{ width:"100%", textAlign:"center", paddingBottom:40 }}>
+          <h1 style={{ fontSize:24, fontWeight:900, color:"#0f172a", margin:"0 0 4px" }}>Your Personalized A.I. Certificate Program is Ready!</h1>
+          <p style={{ fontSize:14, color:"#5B4EFF", fontWeight:700, margin:"0 0 24px" }}>Become the Master of A.I.</p>
+          <div style={{ display:"flex", flexDirection:"column", gap:12, marginBottom:20 }}>
+            {plans.map((plan) => (
+              <div key={plan.name} onClick={() => setSelectedPlan(plan.name)}
+                style={{ padding:"20px 24px", borderRadius:16, border:`2px solid ${selectedPlan===plan.name?"#5B4EFF":"#E2E8F0"}`, background:selectedPlan===plan.name?"#EEF2FF":"#fff", cursor:"pointer", position:"relative", transition:"all 0.15s" }}>
+                {plan.popular && <div style={{ position:"absolute", top:-12, left:"50%", transform:"translateX(-50%)", background:"#5B4EFF", color:"#fff", fontSize:11, fontWeight:800, padding:"3px 14px", borderRadius:999, whiteSpace:"nowrap" }}>👍 MOST POPULAR</div>}
+                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ fontSize:16, fontWeight:800, color:"#0f172a" }}>{plan.name}</span>
+                    <span style={{ background:"#ef4444", color:"#fff", fontSize:10, fontWeight:800, padding:"2px 8px", borderRadius:999 }}>50% OFF</span>
+                  </div>
+                  <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                    <span style={{ fontSize:14, color:"#94A3B8", textDecoration:"line-through" }}>${plan.originalPrice}</span>
+                    <span style={{ fontSize:24, fontWeight:900, color:"#5B4EFF" }}>${plan.price}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize:13, color:"#64748B", margin:"0 0 20px" }}>People using plan for 3 months achieve twice as many results as for 1 month</p>
+          {pricingData && (() => {
+            const planData = pricingData.plans?.find(p => p.name === selectedPlan);
+            if (!planData?.legalText) return null;
+            const legalHtml = planData.legalText
+              .replace(/{salePrice}/g, "$" + planData.salePrice)
+              .replace(/{regularPrice}/g, "$" + (planData.regularPrice||""))
+              .replace(/{4weekRegularPrice}/g, "$" + (pricingData.plans?.find(p=>p.id==="monthly")?.regularPrice||"39.99"))
+              .replace(/{12weekRegularPrice}/g, "$" + (pricingData.plans?.find(p=>p.id==="quarterly")?.regularPrice||"69.99"))
+              .replace(/{name}/g, planData.name)
+              .replace(/{duration}/g, String(planData.duration))
+              .replace(/1course\.io\/profile/g, "<a href='https://1course.io/profile' style='color:#5B4EFF;font-weight:700;text-decoration:underline'>my profile</a>");
+            return <p style={{ fontSize:11, color:"#94A3B8", lineHeight:1.7, margin:"0 0 16px", textAlign:"center" }} dangerouslySetInnerHTML={{ __html: legalHtml }}/>;
+          })()}
+          <button onClick={handleGetPlan} style={{ width:"100%", padding:"18px", borderRadius:16, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, cursor:"pointer", boxShadow:"0 8px 24px rgba(91,78,255,0.4)", marginBottom:12 }}>
+            GET MY PLAN →
+          </button>
+          <div style={{ display:"flex", justifyContent:"center", gap:16, marginTop:12 }}>
+            <span style={{ fontSize:12, color:"#64748B" }}>⏱ {mins}:{secs} left</span>
+            <span style={{ fontSize:12, color:"#64748B" }}>🔒 Secure checkout</span>
+          </div>
+        </div>
+        {showPayment && (
+          <PaymentModal plan={selectedPlan} paymentType={paymentType} email={email} name={name} onClose={() => setShowPayment(false)} onSuccess={handlePaymentSuccess}/>
+        )}
+      </>
+    );
+  }
+
+  return null;
+}
