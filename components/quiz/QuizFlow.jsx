@@ -1004,7 +1004,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
             />
             <div style={{ borderRadius:16, border:"2px solid #FCA5A5", background:"#FFF5F5", padding:"60px 12px 16px", textAlign:"left", position:"relative", zIndex:1 }}>
               <p style={{ fontSize:12, color:"#64748B", margin:"0 0 2px" }}>You without</p>
-              <p style={{ fontSize:16, fontWeight:900, color:"#0f172a", margin:"0 0 10px" }}>Coursiv</p>
+              <p style={{ fontSize:16, fontWeight:900, color:"#0f172a", margin:"0 0 10px" }}>1Course</p>
               <div style={{ borderTop:"1.5px solid #FCA5A5", marginBottom:10 }}/>
               <p style={{ fontSize:13, fontWeight:800, color:"#0f172a", margin:"0 0 10px" }}>Struggles:</p>
               {withoutItems.map((item, i) => (
@@ -1368,7 +1368,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
             />
             <div style={{ borderRadius:16, border:"2px solid #86EFAC", background:"#F0FDF4", padding:"60px 12px 16px", textAlign:"left", position:"relative", zIndex:1 }}>
               <p style={{ fontSize:12, color:"#64748B", margin:"0 0 2px" }}>You with</p>
-              <p style={{ fontSize:16, fontWeight:900, color:"#0f172a", margin:"0 0 10px" }}>Coursiv:</p>
+              <p style={{ fontSize:16, fontWeight:900, color:"#0f172a", margin:"0 0 10px" }}>1Course:</p>
               <div style={{ borderTop:"1.5px solid #86EFAC", marginBottom:10 }}/>
               <p style={{ fontSize:13, fontWeight:800, color:"#0f172a", margin:"0 0 10px" }}>Solutions:</p>
               {withItems.map((item, i) => (
