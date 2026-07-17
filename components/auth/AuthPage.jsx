@@ -11,7 +11,7 @@ const PERKS = [
   "Track progress across all AI courses",
   "Earn verified certificates",
   "Join daily challenges & streaks",
-  "Access 500+ AI prompts library",
+
 ];
 
 export default function AuthPage({ mode }) {
