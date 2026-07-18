@@ -9,9 +9,7 @@ export default function HeroSection() {
       <div style={{ position:"absolute", top:"20%", left:"50%", transform:"translateX(-50%)", width: isMobile ? 300 : 600, height: isMobile ? 300 : 600, borderRadius:"50%", background:"radial-gradient(circle,rgba(91,78,255,0.18) 0%,transparent 70%)", pointerEvents:"none" }}/>
       <div style={{ maxWidth:1100, margin:"0 auto", width:"100%", display:"grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 40 : 60, alignItems:"center" }}>
         <div style={{ textAlign: isMobile ? "center" : "left" }}>
-          <div style={{ display:"inline-flex", alignItems:"center", gap:8, background:"rgba(91,78,255,0.15)", border:"1px solid rgba(91,78,255,0.3)", borderRadius:999, padding:"5px 14px", marginBottom:20 }}>
-            <span style={{ fontSize:12, color:"#a78bfa", fontWeight:600 }}>🔥 GALAX · DALL-E</span>
-          </div>
+        
           <h1 style={{ fontSize: isMobile ? 36 : 52, fontWeight:900, color:"#fff", margin:"0 0 16px", lineHeight:1.1 }}>
             Upgrade your life<br/>with practical <span style={{ color:"#5B4EFF" }}>AI skills</span>
           </h1>
