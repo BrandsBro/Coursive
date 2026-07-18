@@ -25,7 +25,8 @@ export default function AdminMedia() {
     setUploading(true);
     for (const file of Array.from(files)) {
       const type = file.type.startsWith("image/") ? "image" : file.type.startsWith("video/") ? "video" : "audio";
-      const path = `uploads/${Date.now()}-${file.name}`;
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const path = `uploads/${Date.now()}-${safeName}`;
       const res = await fetch("/api/admin/upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
