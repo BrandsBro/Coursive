@@ -17,7 +17,7 @@ const AI_ICONS = [
 
 const CARDS = [
   {
-    img: "https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784370965698-Screenshot_2026-07-18_at_3.52.13_PM.png",
+    img: "https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784380559473-Screenshot_2026-07-18_at_7.15.56_PM.png",
     title: "Get your AI certificate",
     desc: "Explore your personal learning plan and become a master of AI",
     href: "https://1course.io/quiz",
