@@ -15,7 +15,7 @@ export default function Testimonials() {
         <div style={{ textAlign:"center", marginBottom:40 }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:6, flexWrap:"wrap", justifyContent:"center" }}>
             {[1,2,3,4,5].map(s=><span key={s} style={{ fontSize:20, color:"#f59e0b" }}>★</span>)}
-            <span style={{ fontSize:13, color:"rgba(255,255,255,0.5)", marginLeft:4 }}>4.5 rating · Based on reviews across iOS, Android and Web</span>
+            <span style={{ fontSize:13, color:"rgba(255,255,255,0.5)", marginLeft:4 }}>4.8 rating · Based on reviews across iOS, Android and Web</span>
           </div>
         </div>
         <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap:16 }}>

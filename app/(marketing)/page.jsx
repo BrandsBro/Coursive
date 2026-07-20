@@ -8,8 +8,8 @@ import InAction from "@/components/home/InAction";
 import AITools from "@/components/home/AITools";
 import AIIsATool from "@/components/home/AIIsATool";
 import Testimonials from "@/components/home/Testimonials";
-import AboutSection from "@/components/home/AboutSection";
-import SupportSection from "@/components/home/SupportSection";
+
+
 import CTASection from "@/components/home/CTASection";
 import FAQSection from "@/components/home/FAQSection";
 import HomeFooter from "@/components/home/HomeFooter";
@@ -27,8 +27,8 @@ export default function HomePage() {
       <AITools/>
       <AIIsATool/>
       <Testimonials/>
-      <AboutSection/>
-      <SupportSection/>
+   
+   
       <CTASection/>
       <FAQSection/>
       <HomeFooter/>
