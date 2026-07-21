@@ -1,3 +1,4 @@
+
 "use client";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -18,31 +19,14 @@ function useIsMobile(breakpoint = 480) {
 }
 
 export default function PlanPage({ pricingData }) {
-  const branding   = useBranding();
-  const router     = useRouter();
-  const isMobile   = useIsMobile();
+  const branding      = useBranding();
+  const router        = useRouter();
+  const isMobile      = useIsMobile();
 
-  const [selectedPlan, setSelectedPlan] = useState("4-Week Plan");
-  const [showPayment,  setShowPayment]  = useState(false);
-  const [couponCode,   setCouponCode]   = useState("");
-  const [couponData,   setCouponData]   = useState(null);
-  const [couponError,  setCouponError]  = useState("");
-  const [couponLoading, setCouponLoading] = useState(false);
-
-  const applyCoupon = async () => {
-    if (!couponCode.trim()) return;
-    setCouponLoading(true); setCouponError(""); setCouponData(null);
-    const plan = plans.find(p => p.name === selectedPlan);
-    const amount = Math.round(parseFloat(plan?.price || 0) * 100);
-    const res = await fetch("/api/discount/validate", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ code: couponCode, amount })
-    });
-    const data = await res.json();
-    if (data.ok) setCouponData(data);
-    else setCouponError(data.error || "Invalid code");
-    setCouponLoading(false);
-  };
+  const [selectedPlan,  setSelectedPlan]  = useState("4-Week Plan");
+  const [showPayment,   setShowPayment]   = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsError,    setTermsError]    = useState(false);
 
   const [email,    setEmail]    = useState("");
   const [name,     setName]     = useState("");
@@ -56,8 +40,13 @@ export default function PlanPage({ pricingData }) {
       setEmail(e);
       setName(n);
     }
-    const t = setInterval(() => setTimeLeft(p => Math.max(0, p - 1)), 1000);
-    return () => clearInterval(t);
+    const interval = setInterval(() => {
+      setTimeLeft(p => {
+        if (p <= 1) return 10 * 60; // reset back to 10 minutes when it hits 0
+        return p - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const mins = String(Math.floor(timeLeft / 60)).padStart(2, "0");
@@ -66,12 +55,9 @@ export default function PlanPage({ pricingData }) {
   const t = {
     h1:           isMobile ? 19  : 24,
     subtitle:     isMobile ? 13  : 14,
-    timerBadge:   isMobile ? 11  : 13,
     cardPad:      isMobile ? "13px 14px" : "18px 20px",
     planName:     isMobile ? 13  : 15,
-    saleBadge:    isMobile ? 8   : 9,
     origPrice:    isMobile ? 11  : 12,
-    salePrice:    isMobile ? 20  : 24,
     popularBadge: isMobile ? 9   : 10,
     legal:        isMobile ? 10  : 11,
     ctaFont:      isMobile ? 15  : 16,
@@ -118,9 +104,9 @@ export default function PlanPage({ pricingData }) {
 
   /* ── per-day price renderer ── */
   const renderPerDay = (plan) => {
-    const isSelected = selectedPlan === plan.name;
+    const isSelected  = selectedPlan === plan.name;
     const activeColor = isSelected ? "#5B4EFF" : "#94A3B8";
-    const raw = plan.perDayPrice || "";
+    const raw         = plan.perDayPrice || "";
     const [whole, cents] = raw.includes(".") ? raw.split(".") : [raw, ""];
 
     return (
@@ -148,6 +134,16 @@ export default function PlanPage({ pricingData }) {
     );
   };
 
+  /* ── CTA click handler ── */
+  const handleCtaClick = () => {
+    if (!termsAccepted) {
+      setTermsError(true);
+      return;
+    }
+    setTermsError(false);
+    setShowPayment(true);
+  };
+
   return (
     <div style={{ minHeight:"100vh", background:"#fff", display:"flex", flexDirection:"column" }}>
 
@@ -163,7 +159,7 @@ export default function PlanPage({ pricingData }) {
       {/* ── Content ── */}
       <div style={{ flex:1, maxWidth:560, margin:"0 auto", width:"100%", padding: t.contentPad, boxSizing:"border-box" }}>
 
-        {/* Title block */}
+        {/* ── Title block ── */}
         <div style={{ textAlign:"center", marginBottom: t.mb }}>
           <h1 style={{ fontSize: t.h1, fontWeight:900, color:"#0f172a", margin:"0 0 6px", lineHeight:1.25 }}>
             Your A.I. Certificate Program is Ready!
@@ -171,59 +167,102 @@ export default function PlanPage({ pricingData }) {
           <p style={{ fontSize: t.subtitle, color:"#5B4EFF", fontWeight:700, margin:"0 0 4px" }}>
             Become the Master of A.I.
           </p>
-          <div style={{ display:"flex", justifyContent:"center", gap:12, marginTop:8, flexWrap:"wrap" }}>
-            <span style={{ fontSize: t.timerBadge, color:"#64748B" }}>⏱ {mins}:{secs} left</span>
-            <span style={{ fontSize: t.timerBadge, color:"#64748B" }}>🔒 Secure checkout</span>
-          </div>
-        </div>
 
-        {/* Coupon field */}
-        <div style={{ margin:"12px 0" }}>
-          <div style={{ display:"flex", gap:8 }}>
-            <input
-              value={couponCode}
-              onChange={e => { setCouponCode(e.target.value.toUpperCase()); setCouponData(null); setCouponError(""); }}
-              onKeyDown={e => e.key === "Enter" && applyCoupon()}
-              placeholder="Have a coupon code?"
-              maxLength={20}
-              style={{
-                flex:1, padding:"11px 14px", borderRadius:12,
-                border:`1.5px solid ${couponData?"#22c55e":couponError?"#ef4444":"#E2E8F0"}`,
-                fontSize:13, outline:"none", textTransform:"uppercase",
-                letterSpacing:1, background:"#fff"
-              }}
-            />
-            <button
-              onClick={applyCoupon}
-              disabled={couponLoading || !couponCode.trim()}
-              style={{
-                padding:"11px 16px", borderRadius:12, border:"none",
-                background:"#0f172a", color:"#fff", fontSize:13, fontWeight:700,
-                cursor:"pointer", flexShrink:0, opacity:!couponCode.trim()?0.5:1
+          {/* ── Countdown timer ── */}
+          <div style={{ marginTop: isMobile ? 14 : 18, marginBottom: isMobile ? 4 : 6 }}>
+            <p style={{
+              fontSize: isMobile ? 12 : 13,
+              fontWeight: 600,
+              color: "#0f172a",
+              margin: "0 0 10px",
+              letterSpacing: 0.2,
+            }}>
+              Discount expires in
+            </p>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap: isMobile ? 8 : 12 }}>
+
+              {/* MIN box */}
+              <div style={{
+                background: "#fff",
+                borderRadius: 10,
+                boxShadow: "0 2px 12px rgba(0,0,0,0.13)",
+                padding: isMobile ? "10px 18px" : "12px 24px",
+                textAlign: "center",
+                minWidth: isMobile ? 62 : 76,
               }}>
-              {couponLoading ? "..." : "Apply"}
-            </button>
-          </div>
-          {couponError && (
-            <p style={{ fontSize:12, color:"#ef4444", margin:"6px 0 0", fontWeight:600 }}>❌ {couponError}</p>
-          )}
-          {couponData && (
-            <div style={{ display:"flex", alignItems:"center", gap:8, marginTop:8, padding:"10px 14px", background:"#F0FDF4", border:"1.5px solid #BBF7D0", borderRadius:12 }}>
-              <span style={{ fontSize:18 }}>🎉</span>
-              <div>
-                <p style={{ fontSize:13, fontWeight:700, color:"#166534", margin:0 }}>{couponData.label} applied!</p>
-                <p style={{ fontSize:11, color:"#166534", margin:"2px 0 0" }}>Discount: -${(couponData.discountAmount/100).toFixed(2)}</p>
+                <span style={{
+                  fontSize: isMobile ? 30 : 36,
+                  fontWeight: 800,
+                  color: "#0f172a",
+                  lineHeight: 1,
+                  display: "block",
+                  fontVariantNumeric: "tabular-nums",
+                }}>
+                  {mins}
+                </span>
+                <span style={{
+                  fontSize: isMobile ? 9 : 10,
+                  fontWeight: 700,
+                  color: "#94A3B8",
+                  letterSpacing: 1.5,
+                  marginTop: 4,
+                  display: "block",
+                }}>
+                  MIN
+                </span>
+              </div>
+
+              {/* Colon separator */}
+              <span style={{
+                fontSize: isMobile ? 28 : 34,
+                fontWeight: 900,
+                color: "#0f172a",
+                lineHeight: 1,
+                paddingBottom: 14,
+              }}>
+                :
+              </span>
+
+              {/* SEC box */}
+              <div style={{
+                background: "#fff",
+                borderRadius: 10,
+                boxShadow: "0 2px 12px rgba(0,0,0,0.13)",
+                padding: isMobile ? "10px 18px" : "12px 24px",
+                textAlign: "center",
+                minWidth: isMobile ? 62 : 76,
+              }}>
+                <span style={{
+                  fontSize: isMobile ? 30 : 36,
+                  fontWeight: 800,
+                  color: "#0f172a",
+                  lineHeight: 1,
+                  display: "block",
+                  fontVariantNumeric: "tabular-nums",
+                }}>
+                  {secs}
+                </span>
+                <span style={{
+                  fontSize: isMobile ? 9 : 10,
+                  fontWeight: 700,
+                  color: "#94A3B8",
+                  letterSpacing: 1.5,
+                  marginTop: 4,
+                  display: "block",
+                }}>
+                  SEC
+                </span>
               </div>
             </div>
-          )}
+          </div>
         </div>
 
-        {/* Plans */}
+        {/* ── Plans ── */}
         <div style={{ display:"flex", flexDirection:"column", gap:0, marginBottom: isMobile ? 14 : 20 }}>
           {plans.map((plan, idx) => (
             <div key={plan.name}>
 
-              {/* MOST POPULAR banner — sits between cards */}
+              {/* MOST POPULAR banner */}
               {plan.popular && (
                 <div style={{
                   background:"#7C3AED",
@@ -241,19 +280,7 @@ export default function PlanPage({ pricingData }) {
 
               {/* Plan card */}
               <div
-                onClick={async () => {
-                  setSelectedPlan(plan.name);
-                  if (couponCode.trim()) {
-                    const amount = Math.round(parseFloat(plan.price) * 100);
-                    const res = await fetch("/api/discount/validate", {
-                      method:"POST", headers:{"Content-Type":"application/json"},
-                      body: JSON.stringify({ code: couponCode, amount })
-                    });
-                    const data = await res.json();
-                    if (data.ok) setCouponData(data);
-                    else { setCouponData(null); setCouponError(data.error || "Invalid"); }
-                  }
-                }}
+                onClick={() => setSelectedPlan(plan.name)}
                 style={{
                   padding:      t.cardPad,
                   borderRadius: plan.popular ? "0 0 10px 10px" : 10,
@@ -268,8 +295,6 @@ export default function PlanPage({ pricingData }) {
 
                   {/* Left: radio + name + prices */}
                   <div style={{ display:"flex", alignItems:"center", gap:10, flexShrink:1, minWidth:0 }}>
-
-                    {/* Radio button */}
                     <div style={{
                       width:18, height:18, borderRadius:"50%", flexShrink:0,
                       border:`2px solid ${selectedPlan === plan.name ? "#7C3AED" : "#CBD5E1"}`,
@@ -281,7 +306,6 @@ export default function PlanPage({ pricingData }) {
                       )}
                     </div>
 
-                    {/* Name + prices */}
                     <div>
                       <span style={{ fontSize: t.planName, fontWeight:800, color:"#0f172a", display:"block", letterSpacing:0.3 }}>
                         {plan.name.toUpperCase().replace(" ", "-")}
@@ -290,22 +314,9 @@ export default function PlanPage({ pricingData }) {
                         <span style={{ fontSize: t.origPrice, color:"#94A3B8", textDecoration:"line-through" }}>
                           ${plan.originalPrice}
                         </span>
-                        {couponData ? (() => {
-                          const planAmount = Math.round(parseFloat(plan.price) * 100);
-                          const disc = couponData.discount?.type === "percentage"
-                            ? Math.round(planAmount * couponData.discount.value / 100)
-                            : Math.round(couponData.discount?.value * 100 || 0);
-                          const final = Math.max(planAmount - disc, 0) / 100;
-                          return (
-                            <span style={{ fontSize: t.origPrice, color:"#22c55e", fontWeight:700 }}>
-                              ${final.toFixed(2)}
-                            </span>
-                          );
-                        })() : (
-                          <span style={{ fontSize: t.origPrice, color:"#374151", fontWeight:700 }}>
-                            ${plan.price}
-                          </span>
-                        )}
+                        <span style={{ fontSize: t.origPrice, color:"#374151", fontWeight:700 }}>
+                          ${plan.price}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -318,7 +329,7 @@ export default function PlanPage({ pricingData }) {
           ))}
         </div>
 
-        {/* Legal text */}
+        {/* ── Legal text ── */}
         {getLegalText() && (
           <p
             style={{ fontSize: t.legal, color:"#94A3B8", lineHeight:1.7, margin:"0 0 16px", textAlign:"center" }}
@@ -326,19 +337,77 @@ export default function PlanPage({ pricingData }) {
           />
         )}
 
-        {/* CTA */}
+        {/* ── Terms & Conditions checkbox ── */}
+        <div style={{ marginBottom: isMobile ? 14 : 18 }}>
+          <label style={{ display:"flex", alignItems:"flex-start", gap:10, cursor:"pointer" }}>
+            <div
+              onClick={() => { setTermsAccepted(v => !v); setTermsError(false); }}
+              style={{
+                width: 18, height: 18, minWidth: 18,
+                borderRadius: 4, marginTop: 1,
+                border: `2px solid ${termsError ? "#ef4444" : termsAccepted ? "#5B4EFF" : "#CBD5E1"}`,
+                background: termsAccepted ? "#5B4EFF" : "#fff",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", transition: "all 0.15s",
+              }}
+            >
+              {termsAccepted && (
+                <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                  <path d="M1 4L3.5 6.5L9 1" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              )}
+            </div>
+
+            <span style={{ fontSize: isMobile ? 11 : 12, color:"#374151", lineHeight:1.6 }}>
+              I agree to the 1Course{" "}
+              <a href="https://1course.io/terms-condition" target="_blank" rel="noopener noreferrer"
+                style={{ color:"#5B4EFF", fontWeight:700, textDecoration:"underline" }}>
+                Terms of Service
+              </a>
+              {", "}
+              <a href="https://1course.io/privacy" target="_blank" rel="noopener noreferrer"
+                style={{ color:"#5B4EFF", fontWeight:700, textDecoration:"underline" }}>
+                Privacy Policy
+              </a>
+              {", "}
+              <a href="https://1course.io/subscription-terms" target="_blank" rel="noopener noreferrer"
+                style={{ color:"#5B4EFF", fontWeight:700, textDecoration:"underline" }}>
+                Subscription Policy
+              </a>
+              {", and "}
+              <a href="https://1course.io/refund-policy" target="_blank" rel="noopener noreferrer"
+                style={{ color:"#5B4EFF", fontWeight:700, textDecoration:"underline" }}>
+                Money Back Guarantee
+              </a>
+              {"."}
+            </span>
+          </label>
+
+          {termsError && (
+            <p style={{ fontSize: isMobile ? 11 : 12, color:"#ef4444", margin:"6px 0 0 28px", fontWeight:600 }}>
+              ⚠️ Please accept the terms to continue.
+            </p>
+          )}
+        </div>
+
+        {/* ── CTA ── */}
         <button
-          onClick={() => setShowPayment(true)}
+          onClick={handleCtaClick}
           style={{
             width:"100%", padding: t.ctaPad, borderRadius:14, border:"none",
-            background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)",
-            color:"#fff", fontSize: t.ctaFont, fontWeight:800,
-            cursor:"pointer", boxShadow:"0 8px 24px rgba(91,78,255,0.4)",
+            background: termsAccepted
+              ? "linear-gradient(135deg,#5B4EFF,#8B5CF6)"
+              : "#E2E8F0",
+            color: termsAccepted ? "#fff" : "#94A3B8",
+            fontSize: t.ctaFont, fontWeight:800,
+            cursor: termsAccepted ? "pointer" : "not-allowed",
+            boxShadow: termsAccepted ? "0 8px 24px rgba(91,78,255,0.4)" : "none",
+            transition: "all 0.2s",
           }}>
           GET MY PLAN →
         </button>
 
-        {/* Trust badges */}
+        {/* ── Trust badges ── */}
         <div style={{ display:"flex", justifyContent:"center", gap: t.trustGap, marginTop:8, flexWrap:"wrap" }}>
           {["🔒 Secure payment","✅ Cancel anytime","🚀 Instant access"].map((b, i) => (
             <span key={i} style={{ fontSize: t.trustFont, color:"#64748B" }}>{b}</span>
@@ -346,27 +415,13 @@ export default function PlanPage({ pricingData }) {
         </div>
       </div>
 
-      {/* Payment modal */}
+      {/* ── Payment modal ── */}
       {showPayment && (
         <PaymentModal
           plan={selectedPlan}
           paymentType="one_time"
           email={email}
           name={name}
-          discountCode={couponData ? couponCode : null}
-          discountAmount={couponData ? (() => {
-            const planAmount = Math.round(parseFloat(plans.find(p=>p.name===selectedPlan)?.price||0) * 100);
-            return couponData.discount?.type === "percentage"
-              ? Math.round(planAmount * couponData.discount.value / 100)
-              : Math.round(couponData.discount?.value * 100 || 0);
-          })() : 0}
-          displayPrice={couponData ? (() => {
-            const planAmount = Math.round(parseFloat(plans.find(p=>p.name===selectedPlan)?.price||0) * 100);
-            const disc = couponData.discount?.type === "percentage"
-              ? Math.round(planAmount * couponData.discount.value / 100)
-              : Math.round(couponData.discount?.value * 100 || 0);
-            return `$${(Math.max(planAmount - disc, 0)/100).toFixed(2)}`;
-          })() : null}
           onClose={() => setShowPayment(false)}
           onSuccess={() => {
             setShowPayment(false);
@@ -378,3 +433,8 @@ export default function PlanPage({ pricingData }) {
     </div>
   );
 }
+
+
+
+
+

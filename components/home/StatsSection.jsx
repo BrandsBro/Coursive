@@ -6,7 +6,7 @@ export default function StatsSection() {
     <section style={{ padding: isMobile ? "48px 20px" : "80px 32px" }}>
       <div style={{ maxWidth:1100, margin:"0 auto" }}>
         <div style={{ textAlign:"center", marginBottom:40 }}>
-          <p style={{ fontSize: isMobile ? 20 : 28, fontWeight:900, color:"#514DEF", margin:"0 0 8px", lineHeight:1.3 }}>55K jobs lost to AI in 2025. <span style={{ color:"#fff" }}>12x more than two years ago</span></p>
+          <p style={{ fontSize: isMobile ? 20 : 28, fontWeight:900, color:"#514DEF", margin:"0 0 8px", lineHeight:1.3 }}>55K jobs lost to AI in 2025. <span style={{ color:"#fff" }}><br></br>12x more than two years ago</span></p>
           <p style={{ fontSize:14, color:"rgba(255,255,255,0.4)", margin:0 }}>AI won't replace you. Someone using AI will. Be that person.</p>
         </div>
         <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4,1fr)", gap:16 }}>
