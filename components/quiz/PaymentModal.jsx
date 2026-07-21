@@ -15,12 +15,25 @@ const CARD_STYLE = {
 // Plans loaded dynamically from admin pricing settings
 // Fallback hardcoded prices
 const PLANS = {
-  "1-Week Plan":  { price:"$6.93",  recurringPrice:"$5.99",  label:"1-Week AI Program",  weeks:1  },
-  "4-Week Plan":  { price:"$19.99", recurringPrice:"$16.99", label:"4-Week AI Program",  weeks:4  },
-  "12-Week Plan": { price:"$39.99", recurringPrice:"$32.99", label:"12-Week AI Program", weeks:12 },
+  "1-Week Plan":  { price:"$6.93",  recurringPrice:"$5.99",  label:"1-Week AI Program",  certLabel:"1-Week AI Certificate Program",  weeks:1  },
+  "4-Week Plan":  { price:"$19.99", recurringPrice:"$16.99", label:"4-Week AI Program",  certLabel:"28-Day AI Certificate Program",  weeks:4  },
+  "12-Week Plan": { price:"$39.99", recurringPrice:"$32.99", label:"12-Week AI Program", certLabel:"12-Week AI Certificate Program", weeks:12 },
 };
 
-function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, displayPrice: propDisplayPrice, discountCode, discountAmount=0 }) {
+const DISCOUNT_RATE = 0.5; // 50% introductory offer
+
+// Parses a display price string like "$19.99" into a number. Returns null if unparseable.
+function parsePrice(str) {
+  if (typeof str !== "string") return null;
+  const match = str.replace(/,/g, "").match(/[\d.]+/);
+  return match ? parseFloat(match[0]) : null;
+}
+
+function formatPrice(amount, currencySymbol = "$") {
+  return `${currencySymbol}${amount.toFixed(2)}`;
+}
+
+function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, displayPrice: propDisplayPrice, discountCode, discountAmount=0, currencySymbol="$" }) {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
@@ -28,6 +41,15 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
 
   const planInfo = PLANS[plan] || PLANS["4-Week Plan"];
   const displayPrice = propDisplayPrice || planInfo.price;
+
+  // Derive the pre-discount ("original") price from the final display price,
+  // assuming a straight 50% introductory discount unless the parsed price is unavailable.
+  const discountedNumeric = parsePrice(displayPrice);
+  const originalNumeric = discountedNumeric != null ? discountedNumeric / (1 - DISCOUNT_RATE) : null;
+  const discountNumeric = originalNumeric != null ? originalNumeric - discountedNumeric : null;
+
+  const originalPriceLabel = originalNumeric != null ? formatPrice(originalNumeric, currencySymbol) : displayPrice;
+  const discountLabel = discountNumeric != null ? `-${formatPrice(discountNumeric, currencySymbol)}` : null;
 
   const handlePay = async () => {
     if (!stripe || !elements) return;
@@ -73,9 +95,19 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
       {/* Order summary */}
       <div style={{ background:"#F8FAFC", borderRadius:12, padding:"16px 18px", marginBottom:20 }}>
         <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-          <span style={{ fontSize:14, color:"#374151" }}>{planInfo.label}</span>
-          <span style={{ fontSize:14, fontWeight:700, color:"#0f172a" }}>{displayPrice}</span>
+          <span style={{ fontSize:14, color:"#374151" }}>{planInfo.certLabel}</span>
+          <span style={{ fontSize:14, fontWeight:700, color:"#0f172a" }}>{originalPriceLabel}</span>
         </div>
+        <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
+          <span style={{ fontSize:14, color:"#374151" }}>AI Certificate</span>
+          <span style={{ fontSize:14, fontWeight:700, color:"#0f172a" }}>FREE</span>
+        </div>
+        {discountLabel && (
+          <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
+            <span style={{ fontSize:14, color:"#374151" }}>{Math.round(DISCOUNT_RATE*100)}% Introductory offer discount</span>
+            <span style={{ fontSize:14, fontWeight:700, color:"#DC2626" }}>{discountLabel}</span>
+          </div>
+        )}
         {paymentType === "recurring" && (
           <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
             <span style={{ fontSize:12, color:"#22c55e", fontWeight:600 }}>🔄 Auto-renew discount</span>
@@ -121,6 +153,19 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
         </div>
       )}
 
+      {/* Trust / guarantee badge shown before confirming payment */}
+      <div style={{ display:"flex", justifyContent:"center", marginBottom:14 }}>
+        <div style={{
+          display:"flex", alignItems:"center", gap:6,
+          background:"#ECFDF5", border:"1px solid #A7F3D0",
+          borderRadius:999, padding:"8px 16px",
+          fontSize:13, fontWeight:700, color:"#047857",
+        }}>
+          <span>✅</span>
+          <span>Unlock Full Access • Money-Back Guarantee</span>
+        </div>
+      </div>
+
       <button onClick={handlePay} disabled={loading || !stripe}
         style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, cursor:loading?"not-allowed":"pointer", opacity:loading?0.7:1, marginBottom:12 }}>
         {loading ? "Processing..." : `🔒 Confirm Payment ${displayPrice}`}
@@ -154,6 +199,7 @@ export default function PaymentModal({ plan, paymentType, email, name, onClose, 
         price: isRenewal ? `${pricingSettings.currencySymbol||"$"}${p.regularPrice||p.originalPrice||p.introPrice}` : `${pricingSettings.currencySymbol||"$"}${p.salePrice||p.introPrice}`,
         recurringPrice: isRenewal ? `${pricingSettings.currencySymbol||"$"}${p.regularPrice||p.originalPrice||p.introPrice}` : `${pricingSettings.currencySymbol||"$"}${p.salePrice||p.introPrice}`,
         label: p.name,
+        certLabel: p.certLabel || `${Math.round((p.duration||28)/7)}-Week AI Certificate Program`,
         weeks: Math.round(p.duration/7),
       }
     ])
@@ -163,6 +209,8 @@ export default function PaymentModal({ plan, paymentType, email, name, onClose, 
   const design = pricingSettings || {};
   const activePlanInfo = (dynamicPlans && dynamicPlans[plan]) || PLANS[plan] || PLANS["4-Week Plan"];
   const activeDisplayPrice = propDisplayPrice || activePlanInfo.price;
+  const currencySymbol = pricingSettings?.currencySymbol || "$";
+
   return (
     <div style={{ position:"fixed", inset:0, zIndex:200, background:"rgba(15,23,42,0.6)", backdropFilter:"blur(4px)", display:"flex", alignItems:"center", justifyContent:"center", padding:20 }}>
       <div style={{ background:"#fff", borderRadius:24, padding:"28px 24px", width:"100%", maxWidth:440, boxShadow:"0 32px 80px rgba(0,0,0,0.3)", position:"relative", maxHeight:"90vh", overflowY:"auto" }}>
@@ -174,7 +222,7 @@ export default function PaymentModal({ plan, paymentType, email, name, onClose, 
           </p>
         </div>
         <Elements stripe={stripePromise} options={{ appearance:{ theme:"stripe" } }}>
-          <CheckoutForm plan={plan} paymentType={paymentType} email={email} name={name} onSuccess={onSuccess} onClose={onClose} displayPrice={activeDisplayPrice} discountCode={discountCode} discountAmount={discountAmount}/>
+          <CheckoutForm plan={plan} paymentType={paymentType} email={email} name={name} onSuccess={onSuccess} onClose={onClose} displayPrice={activeDisplayPrice} discountCode={discountCode} discountAmount={discountAmount} currencySymbol={currencySymbol}/>
         </Elements>
       </div>
     </div>
