@@ -12,17 +12,14 @@ const CARD_STYLE = {
   },
 };
 
-// Plans loaded dynamically from admin pricing settings
-// Fallback hardcoded prices
 const PLANS = {
   "1-Week Plan":  { price:"$6.93",  recurringPrice:"$5.99",  label:"1-Week AI Program",  certLabel:"1-Week AI Certificate Program",  weeks:1  },
   "4-Week Plan":  { price:"$19.99", recurringPrice:"$16.99", label:"4-Week AI Program",  certLabel:"28-Day AI Certificate Program",  weeks:4  },
   "12-Week Plan": { price:"$39.99", recurringPrice:"$32.99", label:"12-Week AI Program", certLabel:"12-Week AI Certificate Program", weeks:12 },
 };
 
-const DISCOUNT_RATE = 0.5; // 50% introductory offer
+const DISCOUNT_RATE = 0.5;
 
-// Parses a display price string like "$19.99" into a number. Returns null if unparseable.
 function parsePrice(str) {
   if (typeof str !== "string") return null;
   const match = str.replace(/,/g, "").match(/[\d.]+/);
@@ -42,8 +39,6 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
   const planInfo = PLANS[plan] || PLANS["4-Week Plan"];
   const displayPrice = propDisplayPrice || planInfo.price;
 
-  // Derive the pre-discount ("original") price from the final display price,
-  // assuming a straight 50% introductory discount unless the parsed price is unavailable.
   const discountedNumeric = parsePrice(displayPrice);
   const originalNumeric = discountedNumeric != null ? discountedNumeric / (1 - DISCOUNT_RATE) : null;
   const discountNumeric = originalNumeric != null ? originalNumeric - discountedNumeric : null;
@@ -153,21 +148,32 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
         </div>
       )}
 
-      {/* Trust / guarantee badge shown before confirming payment */}
+      {/* ✅ FIXED: Trust badge — 2 lines on mobile */}
       <div style={{ display:"flex", justifyContent:"center", marginBottom:14 }}>
         <div style={{
-          display:"flex", alignItems:"center", gap:6,
-          background:"#ECFDF5", border:"1px solid #A7F3D0",
-          borderRadius:999, padding:"8px 16px",
-          fontSize:13, fontWeight:700, color:"#047857",
+          display:"flex",
+          alignItems:"center",
+          justifyContent:"center",
+          gap:6,
+          background:"#ECFDF5",
+          border:"1px solid #A7F3D0",
+          borderRadius:16,
+          padding:"10px 16px",
+          textAlign:"center",
         }}>
-          <span>✅</span>
-          <span>Unlock Full Access • Money-Back Guarantee</span>
+          <span style={{ fontSize:16, flexShrink:0 }}>✅</span>
+          <div style={{ display:"flex", flexDirection:"column", lineHeight:1.35 }}>
+            <span style={{ fontSize:13, fontWeight:800, color:"#047857" }}>Unlock Full Access</span>
+            <span style={{ fontSize:12, fontWeight:600, color:"#059669" }}>Money-Back Guarantee</span>
+          </div>
         </div>
       </div>
 
-      <button onClick={handlePay} disabled={loading || !stripe}
-        style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, cursor:loading?"not-allowed":"pointer", opacity:loading?0.7:1, marginBottom:12 }}>
+      <button
+        onClick={handlePay}
+        disabled={loading || !stripe}
+        style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, cursor:loading?"not-allowed":"pointer", opacity:loading?0.7:1, marginBottom:12 }}
+      >
         {loading ? "Processing..." : `🔒 Confirm Payment ${displayPrice}`}
       </button>
 
@@ -191,7 +197,6 @@ export default function PaymentModal({ plan, paymentType, email, name, onClose, 
       .then(({ data }) => { if (data?.value) setPricingSettings(data.value); });
   }, []);
 
-  // Build dynamic PLANS from settings
   const dynamicPlans = pricingSettings?.plans ? Object.fromEntries(
     pricingSettings.plans.filter(p=>p.active).map(p => [
       p.name,
