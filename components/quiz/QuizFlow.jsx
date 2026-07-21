@@ -13,7 +13,7 @@ const FIXED_REVIEWS = [
   { name:"Ahmed K.", stars:5, title:"Changed my career", text:"Within 2 weeks I was using AI tools at work and my manager noticed. Highly recommend to everyone." },
 ];
 
-const END_SEQUENCE = ["loading", "summary", "comparison", "signup", "wheel"];
+const END_SEQUENCE = ["loading", "summary", "comparison", "signup"];
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
@@ -161,7 +161,7 @@ export default function QuizFlow({ blocks }) {
     }
   }, [endStep]);
 
-  const showNextStepBtn = !["question_choice", "question_challenge", "question_icon", "loading", "sales", "wheel"].includes(
+  const showNextStepBtn = !["question_choice", "question_challenge", "question_icon", "loading", "sales"].includes(
     isInEndSequence ? endStep : currentBlock?.type
   );
 
@@ -178,7 +178,7 @@ export default function QuizFlow({ blocks }) {
       <div style={{ position:"sticky", top:0, background:"#fff", zIndex:50 }}>
         <div style={{ padding: isMobile ? "10px 14px" : "14px 20px", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div style={{ width:56 }}>
-            {(currentIdx > 0 || isInEndSequence) && endStep !== "loading" && endStep !== "sales" && endStep !== "wheel" && (
+            {(currentIdx > 0 || isInEndSequence) && endStep !== "loading" && endStep !== "sales" && (
               <button onClick={goBack} style={{ display:"flex", alignItems:"center", background:"none", border:"none", color:"#374151", cursor:"pointer" }}>
                 <ArrowLeft size={isMobile ? 16 : 18}/>
               </button>
@@ -186,7 +186,7 @@ export default function QuizFlow({ blocks }) {
           </div>
           {branding.logoApp && <img src={branding.logoApp} alt="1Course" className="logo-app" style={{ objectFit:"contain", padding:4, maxHeight: isMobile ? 30 : 40 }}/>}
           <div style={{ width:56, textAlign:"right" }}>
-            {endStep !== "sales" && endStep !== "wheel" && (
+            {endStep !== "sales" && (
               <span style={{ fontSize: isMobile ? 11 : 13, fontWeight:700, color:"#94A3B8" }}>
                 {isInEndSequence
                   ? `${visibleBlocks.length + END_SEQUENCE.indexOf(endStep) + 1} / ${visibleBlocks.length + END_SEQUENCE.length}`
@@ -195,7 +195,7 @@ export default function QuizFlow({ blocks }) {
             )}
           </div>
         </div>
-        {endStep !== "sales" && endStep !== "wheel" && (
+        {endStep !== "sales" && (
           <div style={{ height:3, background:"#F1F5F9" }}>
             <div style={{ height:"100%", background:"linear-gradient(to right,#5B4EFF,#8B5CF6)", width:`${progress}%`, transition:"width 0.4s ease" }}/>
           </div>
@@ -400,94 +400,6 @@ function QuizBlock({ block, answers, onChoice, onNext, isMobile }) {
   return null;
 }
 
-function WheelStep({ name, onClaim }) {
-  const canvasRef = useRef(null);
-  const [spinning, setSpinning] = useState(false);
-  const [won, setWon] = useState(false);
-  const sz = 280;
-  const segments = ["20%\noff","30%\noff","40%\noff","50%\noff","10%\noff","15%\noff"];
-  const colors = ["#C4BFEE","#9E98E8","#C4BFEE","#9E98E8","#C4BFEE","#9E98E8"];
-  const segCount = 6;
-  const segAngle = (2 * Math.PI) / segCount;
-
-  function drawWheel(rot) {
-    const canvas = canvasRef.current; if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    const cx = sz/2, cy = sz/2, outerR = sz/2-4, innerR = outerR-10;
-    ctx.clearRect(0,0,sz,sz);
-    ctx.beginPath(); ctx.arc(cx,cy,outerR,0,2*Math.PI); ctx.fillStyle="#3730A3"; ctx.fill();
-    for (let i=0;i<segCount;i++) {
-      const startA=-Math.PI/2+rot+i*segAngle, endA=startA+segAngle;
-      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,innerR,startA,endA); ctx.closePath();
-      ctx.fillStyle=colors[i]; ctx.fill(); ctx.strokeStyle="#fff"; ctx.lineWidth=2; ctx.stroke();
-      const midA=startA+segAngle/2;
-      ctx.save(); ctx.translate(cx+innerR*0.65*Math.cos(midA),cy+innerR*0.65*Math.sin(midA));
-      ctx.rotate(midA+Math.PI/2); ctx.textAlign="center"; ctx.fillStyle="#1e1b4b";
-      ctx.font=`bold ${Math.round(sz*0.065)}px sans-serif`;
-      segments[i].split("\n").forEach((line,li,arr) => ctx.fillText(line,0,(li-(arr.length-1)/2)*sz*0.08));
-      ctx.restore();
-    }
-    for (let i=0;i<16;i++) {
-      const a=(i/16)*2*Math.PI;
-      ctx.beginPath(); ctx.arc(cx+(outerR-5)*Math.cos(a),cy+(outerR-5)*Math.sin(a),5,0,2*Math.PI);
-      ctx.fillStyle="#D4AF37"; ctx.fill();
-    }
-    ctx.beginPath(); ctx.arc(cx,cy,sz*0.06,0,2*Math.PI); ctx.fillStyle="#3730A3"; ctx.fill();
-    ctx.beginPath(); ctx.moveTo(cx,cy-outerR+2); ctx.lineTo(cx-10,cy-outerR+20); ctx.lineTo(cx+10,cy-outerR+20);
-    ctx.closePath(); ctx.fillStyle="#1e1b4b"; ctx.fill();
-  }
-
-  useEffect(() => { drawWheel(0); }, []);
-
-  const spin = () => {
-    if (spinning || won) return;
-    setSpinning(true);
-    const targetRot = 10*Math.PI+(5*Math.PI)/6;
-    const duration = 5500, start = performance.now();
-    const animate = (now) => {
-      const progress = Math.min((now-start)/duration,1);
-      const eased = 1-Math.pow(1-progress,4);
-      drawWheel(targetRot*eased);
-      if (progress<1) requestAnimationFrame(animate);
-      else { setSpinning(false); setWon(true); }
-    };
-    requestAnimationFrame(animate);
-  };
-
-  return (
-    <div style={{ width:"100%", textAlign:"center" }}>
-      <h2 style={{ fontSize:22, fontWeight:900, color:"#0f172a", margin:"0 0 4px" }}>Spin & Unlock Your</h2>
-      <p style={{ fontSize:20, fontWeight:900, color:"#5B4EFF", margin:"0 0 8px" }}>Personal AI Challenge!</p>
-      <p style={{ fontSize:14, color:"#64748B", margin:"0 0 24px" }}>Don't miss your chance to master AI with a personalized offer 🎁</p>
-      <canvas ref={canvasRef} width={sz} height={sz} onClick={spin} style={{ display:"block", margin:"0 auto 24px", cursor:spinning||won?"default":"pointer" }}/>
-      <button onClick={spin} disabled={spinning||won}
-        style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:spinning||won?"#94A3B8":"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, cursor:spinning||won?"not-allowed":"pointer" }}>
-        {spinning?"SPINNING...":"SPIN"}
-      </button>
-      {won && (
-        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.6)", zIndex:200, display:"flex", alignItems:"flex-end", justifyContent:"center" }}>
-          <div style={{ background:"#fff", borderRadius:"24px 24px 0 0", padding:"28px 24px 48px", width:"100%", maxWidth:480, textAlign:"center" }}>
-            <h3 style={{ fontSize:22, fontWeight:900, color:"#0f172a", margin:"0 0 16px" }}>Woo hoo! 🥳</h3>
-            <div style={{ background:"linear-gradient(135deg,#EEF2FF,#F5F3FF)", borderRadius:16, padding:"20px 16px", marginBottom:14, position:"relative", overflow:"hidden" }}>
-              {[["#ef4444",5,10],["#22c55e",75,20],["#f59e0b",30,60],["#5B4EFF",85,15],["#ec4899",20,70],["#f59e0b",60,80],["#22c55e",45,5]].map(([c,l,t],i) => (
-                <div key={i} style={{ position:"absolute", width:8, height:14, borderRadius:2, background:c, left:l+"%", top:t+"%", transform:`rotate(${i*25}deg)`, opacity:0.8 }}/>
-              ))}
-              <p style={{ fontSize:14, fontWeight:700, color:"#374151", margin:"0 0 6px", position:"relative", zIndex:1 }}>
-                {name?`${name}, you won a discount`:"You won a discount"}
-              </p>
-              <p style={{ fontSize:38, fontWeight:900, color:"#5B4EFF", margin:0, position:"relative", zIndex:1 }}>50% off</p>
-            </div>
-            <p style={{ fontSize:13, color:"#64748B", margin:"0 0 20px" }}>It will be applied automatically</p>
-            <button onClick={onClaim} style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, cursor:"pointer" }}>
-              CLAIM MY DISCOUNT
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, blocks, showToast, isMobile, onNext }) {
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState("4-Week Plan");
@@ -521,8 +433,6 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
   const secs = String(timeLeft%60).padStart(2,"0");
   const handleGetPlan = () => { if (!name || !email) { showToast("Please go back and fill in your name and email"); return; } setShowPayment(true); };
   const handlePaymentSuccess = () => { setShowPayment(false); sessionStorage.clear(); router.push("/payment-success"); };
-
-  if (step === "wheel") return <WheelStep name={name} onClaim={onNext}/>;
 
   if (step === "loading") {
     const reviewIdx = Math.floor((loadingPct / 100) * FIXED_REVIEWS.length);
