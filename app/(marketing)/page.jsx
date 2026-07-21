@@ -19,7 +19,7 @@ export default function HomePage() {
     <div style={{ background:"#0a081e", minHeight:"100vh", color:"#fff" }}>
       <HomeNav/>
       <HeroSection/>
-      <TrustedSection/>
+
       <StatsSection/>
       <Why1Course/>
       <HowItWorks/>
