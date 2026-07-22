@@ -20,6 +20,7 @@ export default function PaymentSuccessPage() {
           currency: "USD",
           content_name: plan,
           content_type: "product",
+          order_id: new URLSearchParams(window.location.search).get("eid") || "",
         }, { eventID: eventId });
       }
     }
