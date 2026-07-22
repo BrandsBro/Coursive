@@ -300,8 +300,10 @@ export async function POST(req) {
           email,
           value: parseFloat(amount),
           currency: "USD",
+          contentName: plan,
+          contentType: "product",
+          orderId: paymentIntentId,
           eventId: purchaseEventId || eventId,
-        // Log for debugging
 
           contentName: plan,
           orderId: paymentIntentId,
