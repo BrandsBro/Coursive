@@ -5,7 +5,10 @@ const hash = (val) => val ? crypto.createHash("sha256").update(val.trim().toLowe
 
 export async function POST(req) {
   try {
-    const { eventName, email, phone, value, currency, eventId, contentName, orderId, clientIp, clientUserAgent, fbp, fbc } = await req.json();
+    const body = await req.json();
+    const { eventName, email, phone, value, currency, eventId, contentName, orderId, fbp, fbc } = body;
+    const clientIp = body.clientIp || req.headers.get("x-forwarded-for")?.split(",")[0] || req.headers.get("x-real-ip") || "";
+    const clientUserAgent = body.clientUserAgent || req.headers.get("user-agent") || "";
     const pixelId = process.env.META_PIXEL_ID;
     const accessToken = process.env.META_CAPI_TOKEN;
     if (!pixelId || !accessToken || accessToken === "your_access_token_here") {
