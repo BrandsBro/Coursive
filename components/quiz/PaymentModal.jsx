@@ -74,7 +74,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
         const res2 = await fetch("/api/stripe/create-account", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, name, plan, paymentType, paymentIntentId: paymentIntent.id }),
+          body: JSON.stringify({ email, name, plan, paymentType, paymentIntentId: paymentIntent.id, purchaseEventId }),
         });
         const result = await res2.json();
         if (result.error) throw new Error(result.error);
