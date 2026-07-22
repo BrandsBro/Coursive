@@ -1,4 +1,5 @@
 "use client";
+import { trackEvent } from "@/lib/meta";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { useBranding } from "@/lib/useBranding";
