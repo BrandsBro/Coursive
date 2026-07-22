@@ -518,7 +518,7 @@ export default function PlanPage({ pricingData }) {
           email={email}
           name={name}
           onClose={() => setShowPayment(false)}
-          onSuccess={() => { setShowPayment(false); sessionStorage.clear(); router.push("/payment-success"); }}
+          onSuccess={(eventId) => { setShowPayment(false); sessionStorage.clear(); const planObj = plans.find(p=>p.name===selectedPlan); const value = planObj?.price || "19.99"; router.push(`/payment-success?plan=${encodeURIComponent(selectedPlan)}&value=${value}&eid=${eventId||""}`); }}
         />
       )}
     </div>
