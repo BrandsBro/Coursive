@@ -7,54 +7,7 @@ export default function PaymentSuccessPage() {
   const router = useRouter();
   const [count, setCount] = useState(5);
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.fbq) {
-      const params = new URLSearchParams(window.location.search);
-      const value = parseFloat(params.get("value") || "19.99");
-      const plan = params.get("plan") || "AI Course";
-      const eventId = params.get("eid") || "";
-      const orderId = params.get("pid") || params.get("eid") || "";
 
-      const getCookie = (name) => {
-        const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-        return match ? match[2] : undefined;
-      };
-
-      let fbc = getCookie("_fbc");
-      if (!fbc) {
-        const fbclid = params.get("fbclid");
-        if (fbclid) fbc = `fb.1.${Math.floor(Date.now()/1000)}.${fbclid}`;
-      }
-
-      let externalId, email, name;
-      try {
-        externalId = localStorage.getItem("user_id") || undefined;
-        email = localStorage.getItem("user_email") || undefined;
-        name = localStorage.getItem("user_name") || undefined;
-      } catch(e) {}
-
-      if (eventId) {
-        // Re-init pixel with user data for better matching
-        if (email) {
-          window.fbq("init", "1707573550631351", {
-            em: email,
-            external_id: externalId,
-            fn: name ? name.split(" ")[0] : undefined,
-            ln: name && name.split(" ")[1] ? name.split(" ")[1] : undefined,
-            fbp: getCookie("_fbp"),
-            fbc,
-          });
-        }
-        window.fbq("track", "Purchase", {
-          value,
-          currency: "USD",
-          content_name: plan,
-          content_type: "product",
-          order_id: orderId,
-        }, { eventID: eventId });
-      }
-    }
-  }, []);
 
   useEffect(() => {
     const t = setInterval(() => {

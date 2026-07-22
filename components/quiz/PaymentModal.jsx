@@ -79,6 +79,16 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
         });
         const result = await res2.json();
         if (result.error) throw new Error(result.error);
+        // Fire browser Purchase immediately before redirect
+        if (typeof window !== "undefined" && window.fbq) {
+          window.fbq("track", "Purchase", {
+            value: parseFloat(discountAmount > 0 ? (parseFloat(activePlanInfo?.price?.replace("$","") || "19.99") - discountAmount/100) : parseFloat(activePlanInfo?.price?.replace("$","") || "19.99")),
+            currency: "USD",
+            content_name: plan,
+            content_type: "product",
+            order_id: paymentIntent.id,
+          }, { eventID: purchaseEventId });
+        }
         onSuccess(purchaseEventId, paymentIntent.id);
       }
     } catch (e) {
