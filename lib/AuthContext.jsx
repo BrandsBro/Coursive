@@ -12,13 +12,19 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+      const u = session?.user ?? null;
+      setUser(u);
+      if (u?.id) localStorage.setItem("user_id", u.id);
+      else localStorage.removeItem("user_id");
       setLoading(false);
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      const u = session?.user ?? null;
+      setUser(u);
+      if (u?.id) localStorage.setItem("user_id", u.id);
+      else localStorage.removeItem("user_id");
       setLoading(false);
     });
 
