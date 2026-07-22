@@ -34,19 +34,24 @@ export default function PaymentSuccessPage() {
       } catch(e) {}
 
       if (eventId) {
+        // Re-init pixel with user data for better matching
+        if (email) {
+          window.fbq("init", "1707573550631351", {
+            em: email,
+            external_id: externalId,
+            fn: name ? name.split(" ")[0] : undefined,
+            ln: name && name.split(" ")[1] ? name.split(" ")[1] : undefined,
+            fbp: getCookie("_fbp"),
+            fbc,
+          });
+        }
         window.fbq("track", "Purchase", {
           value,
           currency: "USD",
           content_name: plan,
           content_type: "product",
           order_id: orderId,
-        }, {
-          eventID: eventId,
-          ...(email && { em: email }),
-          ...(externalId && { external_id: externalId }),
-          ...(fbc && { fbc }),
-          ...(getCookie("_fbp") && { fbp: getCookie("_fbp") }),
-        });
+        }, { eventID: eventId });
       }
     }
   }, []);
