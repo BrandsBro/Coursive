@@ -13,7 +13,7 @@ export default function PaymentSuccessPage() {
       const value = parseFloat(params.get("value") || "19.99");
       const plan = params.get("plan") || "AI Course";
       const eventId = params.get("eid") || "";
-      const orderId = params.get("eid") || "";
+      const orderId = params.get("pid") || params.get("eid") || "";
 
       const getCookie = (name) => {
         const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));

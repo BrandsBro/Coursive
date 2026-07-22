@@ -79,8 +79,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
         });
         const result = await res2.json();
         if (result.error) throw new Error(result.error);
-        console.log("[Meta] Firing browser Purchase with eventId:", purchaseEventId);
-        onSuccess(purchaseEventId);
+        onSuccess(purchaseEventId, paymentIntent.id);
       }
     } catch (e) {
       setError(e.message);
