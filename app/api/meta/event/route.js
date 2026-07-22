@@ -22,7 +22,9 @@ export async function POST(req) {
       ...(fbp && { fbp }),
       ...(fbc && { fbc }),
     };
+    const testCode = process.env.META_TEST_CODE;
     const payload = {
+      ...(testCode && { test_event_code: testCode }),
       data: [{
         event_name: eventName,
         event_time: Math.floor(Date.now() / 1000),
