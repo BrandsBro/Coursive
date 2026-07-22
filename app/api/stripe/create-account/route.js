@@ -291,6 +291,7 @@ export async function POST(req) {
     try {
       const { randomUUID } = await import("crypto");
       const eventId = randomUUID();
+      console.log("[Meta] Server Purchase eventId:", purchaseEventId || eventId, "purchaseEventId from body:", purchaseEventId);
       await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}api/meta/event`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -300,6 +301,8 @@ export async function POST(req) {
           value: parseFloat(amount),
           currency: "USD",
           eventId: purchaseEventId || eventId,
+        // Log for debugging
+
           contentName: plan,
           orderId: paymentIntentId,
         }),

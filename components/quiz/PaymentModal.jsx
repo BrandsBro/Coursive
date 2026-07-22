@@ -53,6 +53,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
 
     try {
       const purchaseEventId = (crypto.randomUUID?.() || Math.random().toString(36).slice(2));
+      console.log("[Meta] Generated purchaseEventId:", purchaseEventId);
       const res = await fetch("/api/stripe/payment-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -78,6 +79,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
         });
         const result = await res2.json();
         if (result.error) throw new Error(result.error);
+        console.log("[Meta] Firing browser Purchase with eventId:", purchaseEventId);
         onSuccess(purchaseEventId);
       }
     } catch (e) {
