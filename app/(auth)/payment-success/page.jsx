@@ -8,6 +8,22 @@ export default function PaymentSuccessPage() {
   const [count, setCount] = useState(5);
 
   useEffect(() => {
+    // Fire Meta Pixel Purchase event
+    if (typeof window !== "undefined" && window.fbq) {
+      const params = new URLSearchParams(window.location.search);
+      const value = parseFloat(params.get("value") || "19.99");
+      const plan = params.get("plan") || "AI Course";
+      const eventId = params.get("eid") || "";
+      window.fbq("track", "Purchase", {
+        value,
+        currency: "USD",
+        content_name: plan,
+        content_type: "product",
+      }, { eventID: eventId });
+    }
+  }, []);
+
+  useEffect(() => {
     const t = setInterval(() => {
       setCount(c => {
         if (c <= 1) {

@@ -77,7 +77,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
         });
         const result = await res2.json();
         if (result.error) throw new Error(result.error);
-        onSuccess();
+        onSuccess(crypto.randomUUID?.() || "");
       }
     } catch (e) {
       setError(e.message);
