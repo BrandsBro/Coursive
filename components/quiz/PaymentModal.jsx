@@ -81,8 +81,9 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
         if (result.error) throw new Error(result.error);
         // Fire browser Purchase immediately before redirect
         if (typeof window !== "undefined" && window.fbq) {
+          const purchaseValue = parseFloat(displayPrice?.replace("$","") || "19.99");
           window.fbq("track", "Purchase", {
-            value: parseFloat(discountAmount > 0 ? (parseFloat(activePlanInfo?.price?.replace("$","") || "19.99") - discountAmount/100) : parseFloat(activePlanInfo?.price?.replace("$","") || "19.99")),
+            value: isNaN(purchaseValue) ? 19.99 : purchaseValue,
             currency: "USD",
             content_name: plan,
             content_type: "product",
