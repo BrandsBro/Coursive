@@ -192,9 +192,16 @@ function fallbackEmailHtml(
 
 export async function POST(req) {
   try {
-    const { email, name, plan, paymentType, paymentIntentId, purchaseEventId } =
-      await req.json();
+    const body = await req.json();
+    const { email, name, plan, paymentType, paymentIntentId } = body;
+    let purchaseEventId = body.purchaseEventId;
     console.log("Creating account for:", email, name, plan, paymentType);
+    if (!purchaseEventId && paymentIntentId) {
+      try {
+        const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
+        purchaseEventId = pi.metadata?.purchaseEventId || "";
+      } catch(e) {}
+    }
 
     const tempPassword = Math.random().toString(36).slice(2, 10) + "A1!";
 

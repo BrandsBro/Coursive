@@ -21,7 +21,7 @@ async function getPlanAmount(planName) {
 
 export async function POST(req) {
   try {
-    const { plan, email, name, discountCode, discountAmount } = await req.json();
+    const { plan, email, name, discountCode, discountAmount, purchaseEventId } = await req.json();
     const amount = await getPlanAmount(plan);
     // Apply discount
     let finalAmount = amount;
@@ -37,7 +37,7 @@ export async function POST(req) {
       amount: finalAmount,
       currency: "usd",
       payment_method_types: ["card"],
-      metadata: { plan, email, name },
+      metadata: { plan, email, name, purchaseEventId: purchaseEventId || '' },
       ...(email && email.includes("@") ? { receipt_email: email } : {}),
     });
     return NextResponse.json({ clientSecret: paymentIntent.client_secret });
