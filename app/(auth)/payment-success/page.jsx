@@ -8,20 +8,45 @@ export default function PaymentSuccessPage() {
   const [count, setCount] = useState(5);
 
   useEffect(() => {
-    // Fire Meta Pixel Purchase event - eventId must match server CAPI
     if (typeof window !== "undefined" && window.fbq) {
       const params = new URLSearchParams(window.location.search);
       const value = parseFloat(params.get("value") || "19.99");
       const plan = params.get("plan") || "AI Course";
       const eventId = params.get("eid") || "";
+      const orderId = params.get("eid") || "";
+
+      const getCookie = (name) => {
+        const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+        return match ? match[2] : undefined;
+      };
+
+      let fbc = getCookie("_fbc");
+      if (!fbc) {
+        const fbclid = params.get("fbclid");
+        if (fbclid) fbc = `fb.1.${Math.floor(Date.now()/1000)}.${fbclid}`;
+      }
+
+      let externalId, email, name;
+      try {
+        externalId = localStorage.getItem("user_id") || undefined;
+        email = localStorage.getItem("user_email") || undefined;
+        name = localStorage.getItem("user_name") || undefined;
+      } catch(e) {}
+
       if (eventId) {
         window.fbq("track", "Purchase", {
           value,
           currency: "USD",
           content_name: plan,
           content_type: "product",
-          order_id: new URLSearchParams(window.location.search).get("eid") || "",
-        }, { eventID: eventId });
+          order_id: orderId,
+        }, {
+          eventID: eventId,
+          ...(email && { em: email }),
+          ...(externalId && { external_id: externalId }),
+          ...(fbc && { fbc }),
+          ...(getCookie("_fbp") && { fbp: getCookie("_fbp") }),
+        });
       }
     }
   }, []);
