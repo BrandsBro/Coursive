@@ -14,8 +14,15 @@ export function AuthProvider({ children }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       const u = session?.user ?? null;
       setUser(u);
-      if (u?.id) localStorage.setItem("user_id", u.id);
-      else localStorage.removeItem("user_id");
+      if (u?.id) {
+        localStorage.setItem("user_id", u.id);
+        localStorage.setItem("user_email", u.email || "");
+        localStorage.setItem("user_name", u.user_metadata?.full_name || "");
+      } else {
+        localStorage.removeItem("user_id");
+        localStorage.removeItem("user_email");
+        localStorage.removeItem("user_name");
+      }
       setLoading(false);
     });
 
@@ -23,8 +30,15 @@ export function AuthProvider({ children }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       const u = session?.user ?? null;
       setUser(u);
-      if (u?.id) localStorage.setItem("user_id", u.id);
-      else localStorage.removeItem("user_id");
+      if (u?.id) {
+        localStorage.setItem("user_id", u.id);
+        localStorage.setItem("user_email", u.email || "");
+        localStorage.setItem("user_name", u.user_metadata?.full_name || "");
+      } else {
+        localStorage.removeItem("user_id");
+        localStorage.removeItem("user_email");
+        localStorage.removeItem("user_name");
+      }
       setLoading(false);
     });
 

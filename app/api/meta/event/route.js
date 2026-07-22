@@ -6,7 +6,7 @@ const hash = (val) => val ? crypto.createHash("sha256").update(val.trim().toLowe
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { eventName, email, phone, value, currency, eventId, contentName, orderId, fbp, fbc, externalId } = body;
+    const { eventName, email, phone, name, value, currency, eventId, contentName, orderId, fbp, fbc, externalId } = body;
     const clientIp = body.clientIp || req.headers.get("x-forwarded-for")?.split(",")[0] || req.headers.get("x-real-ip") || "";
     const clientUserAgent = body.clientUserAgent || req.headers.get("user-agent") || "";
     const pixelId = process.env.META_PIXEL_ID;
@@ -22,6 +22,8 @@ export async function POST(req) {
       ...(fbp && { fbp }),
       ...(fbc && { fbc }),
       ...(externalId && { external_id: [hash(externalId)] }),
+      ...(name && { fn: [hash(name.split(" ")[0])] }),
+      ...(name && name.split(" ")[1] && { ln: [hash(name.split(" ")[1])] }),
     };
     const testCode = process.env.META_TEST_CODE;
     const payload = {
