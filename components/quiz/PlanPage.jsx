@@ -373,6 +373,7 @@ export default function PlanPage({ pricingData }) {
   const handleCtaClick = () => {
     if (!termsAccepted) { setTermsError(true); return; }
     setTermsError(false);
+    trackEvent("InitiateCheckout", { contentName: selectedPlan });
     setShowPayment(true);
   };
 
