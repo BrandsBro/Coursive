@@ -302,7 +302,6 @@ export async function POST(req) {
           currency: "USD",
           contentName: plan,
           contentType: "product",
-          orderId: paymentIntentId,
           eventId: purchaseEventId || eventId,
 
           contentName: plan,
