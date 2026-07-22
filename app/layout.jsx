@@ -1,3 +1,4 @@
+import MetaPixelTracker from "@/components/MetaPixelTracker";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/AuthContext";
@@ -107,7 +108,8 @@ export default async function RootLayout({ children }) {
       <body className={inter.className} suppressHydrationWarning>
         <AuthProvider>
           <BrandingProvider initialBranding={branding}>
-            {children}
+            <MetaPixelTracker/>
+      {children}
           </BrandingProvider>
         </AuthProvider>
       </body>

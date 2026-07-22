@@ -282,10 +282,20 @@ export async function POST(req) {
 
     // Fire Meta CAPI Purchase event
     try {
+      const { randomUUID } = await import("crypto");
+      const eventId = randomUUID();
       await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}api/meta/event`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ eventName: "Purchase", email, value: parseFloat(amount), currency: "USD" }),
+        body: JSON.stringify({
+          eventName: "Purchase",
+          email,
+          value: parseFloat(amount),
+          currency: "USD",
+          eventId,
+          contentName: plan,
+          orderId: paymentIntentId,
+        }),
       });
     } catch(e) { console.error("Meta CAPI error:", e); }
 
