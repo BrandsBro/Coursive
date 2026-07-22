@@ -52,10 +52,11 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
     setError("");
 
     try {
+      const purchaseEventId = (crypto.randomUUID?.() || Math.random().toString(36).slice(2));
       const res = await fetch("/api/stripe/payment-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, email, name, paymentType, discountCode, discountAmount }),
+        body: JSON.stringify({ plan, email, name, paymentType, discountCode, discountAmount, purchaseEventId }),
       });
       const { clientSecret, error: apiError } = await res.json();
       if (apiError) throw new Error(apiError);
@@ -77,7 +78,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
         });
         const result = await res2.json();
         if (result.error) throw new Error(result.error);
-        onSuccess(crypto.randomUUID?.() || "");
+        onSuccess(purchaseEventId);
       }
     } catch (e) {
       setError(e.message);

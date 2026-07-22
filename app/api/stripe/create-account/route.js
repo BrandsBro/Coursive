@@ -192,7 +192,7 @@ function fallbackEmailHtml(
 
 export async function POST(req) {
   try {
-    const { email, name, plan, paymentType, paymentIntentId } =
+    const { email, name, plan, paymentType, paymentIntentId, purchaseEventId } =
       await req.json();
     console.log("Creating account for:", email, name, plan, paymentType);
 
@@ -292,7 +292,7 @@ export async function POST(req) {
           email,
           value: parseFloat(amount),
           currency: "USD",
-          eventId,
+          eventId: purchaseEventId || eventId,
           contentName: plan,
           orderId: paymentIntentId,
         }),
