@@ -38,8 +38,8 @@ function useIsMobile() {
 // ── Separate component so hooks run unconditionally ──────────────────────────
 function SocialProofStep({ isMobile }) {
   const stats = [
-    { value: "2M+",   label: "Users learned\nnew skills" },
-    { value: "670k+", label: "Users earned\nAI certificates" },
+    { value: "200K+",   label: "Users learned\nnew skills" },
+    { value: "50k+", label: "Users earned\nAI certificates" },
     { value: "93%",   label: "Positive reviews\non Trustpilot\n(as of June 2026)" },
   ];
 
