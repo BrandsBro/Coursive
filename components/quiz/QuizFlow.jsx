@@ -251,7 +251,7 @@ export default function QuizFlow({ blocks }) {
   );
 
   const getMaxWidth = () => {
-    if (currentBlock?.type === "question_challenge") return 400;
+    if (currentBlock?.type === "question_challenge") return 550;
     if (currentBlock?.type === "image_section") return 1200;
     return 600;
   };
@@ -400,27 +400,26 @@ if (block.type === "question_challenge") {
 
       {/* 1. Main title first */}
       {c.challengeTitle && (
-        <h1 style={{ fontSize: isMobile ? 22 : 28, fontWeight:900, color:"#0f172a", margin:"0 0 8px", letterSpacing:"0.5px" }}>
+        <h1 style={{ fontSize: isMobile ? 18 : 26, fontWeight:900, color:"#0f172a", margin:"0 0 8px", letterSpacing:"0.5px" }}>
           {c.challengeTitle}
         </h1>
       )}
 
       {/* 2. preTitle block AFTER main title */}
       {(c.preTitle || c.preTitleLine2) && (
-        <div style={{ textAlign:"center", marginBottom: isMobile ? 10 : 14 }}>
-          {c.preTitle && (
-            <p style={{ fontSize: c.preTitleSize || 14, margin:"0 0 3px", lineHeight:1.4, fontWeight:700 }}>
-              {c.preTitle}
-            </p>
-          )}
-          {c.preTitleLine2 && (
-            <p style={{ fontSize: (c.preTitleSize || 14) - 2, color:"#64748B", margin:0, lineHeight:1.4,fontWeight:700 }}>
-              {c.preTitleLine2}
-            </p>
-          )}
-        </div>
-      )}
-
+  <div style={{ textAlign:"center", marginBottom: isMobile ? 10 : 14 }}>
+    {c.preTitle && (
+      <p style={{ fontSize: isMobile ? c.preTitleSize || 14 : (c.preTitleSize || 14) + 2, margin:"0 0 3px", lineHeight:1.4, fontWeight:700 }}>
+        {c.preTitle}
+      </p>
+    )}
+    {c.preTitleLine2 && (
+      <p style={{ fontSize: isMobile ? (c.preTitleSize || 14) - 7 : c.preTitleSize || 14, color:"#64748B", margin:0, lineHeight:1.4, fontWeight:700 }}>
+        {c.preTitleLine2}
+      </p>
+    )}
+  </div>
+)}
       {/* 3. Question subtitle */}
       {c.question && (
         <p style={{ fontSize: isMobile ? 14 : 17, color:"#64748B", margin: isMobile ? "0 0 60px" : "0 0 16px" }}>
@@ -441,7 +440,7 @@ if (block.type === "question_challenge") {
                     <div className="quiz-shimmer" style={{ position:"absolute", bottom:0, left:"50%", transform:"translateX(-50%)", width:"100%", height:imgH, background:"linear-gradient(90deg,#E2E8F0 25%,#CBD5E1 50%,#E2E8F0 75%)", backgroundSize:"200% 100%", borderRadius: isMobile ? 14 : 18, zIndex:1 }}/>
                     <img src={imgUrl} alt={label} loading="eager" fetchPriority="high" decoding="async"
                       onLoad={e => { e.target.style.opacity=1; const s=e.target.previousSibling; if(s) s.style.display="none"; }}
-                      style={{ position:"absolute", bottom: isMobile ? 48 : 52, left:"50%", transform:"translateX(-50%)", width:"100%", height:imgH, objectFit:"cover", objectPosition:"center top", display:"block", opacity:0, transition:"opacity 0.3s ease", zIndex:2, pointerEvents:"none" }}/>
+                      style={{ position:"absolute", bottom: isMobile ? 20 : 52, left:"50%", transform:"translateX(-50%)", width:"100%", height:imgH, objectFit:"cover", objectPosition:"center top", display:"block", opacity:0, transition:"opacity 0.3s ease", zIndex:2, pointerEvents:"none" }}/>
                   </>
                 )}
                 <div style={{ position:"relative", zIndex:3, padding: isMobile ? "10px 12px" : "12px 16px", background:labelColor, display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, flexShrink:0, minHeight: isMobile ? 48 : 52, borderRadius:`0 0 ${isMobile?14:18}px ${isMobile?14:18}px` }}>

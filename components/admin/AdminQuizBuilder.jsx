@@ -376,6 +376,14 @@ function BlockEditor({ type, content, onChange }) {
     </span>
   </div>
 </Field>
+<Field label="Challenge title">
+  <input
+    value={content.challengeTitle || ""}
+    onChange={e => u("challengeTitle", e.target.value)}
+    placeholder="28-DAY AI CHALLENGE"
+    style={inputStyle({ fontWeight: 700, letterSpacing: "0.4px" })}
+  />
+</Field>
         <Field label="Question">
           <input value={content.question || ""} onChange={e => u("question", e.target.value)} placeholder="How would you describe yourself?" style={inputStyle()} />
         </Field>
