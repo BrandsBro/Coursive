@@ -240,7 +240,7 @@ useEffect(() => {
     loadingRef.current = setInterval(() => {
       step++;
       setLoadingPct(Math.min(Math.round((step / steps) * 100), 100));
-      if (step >= steps) { clearInterval(loadingRef.current); setTimeout(() => setEndStep("summary"), 400); }
+      if (step >= steps) { clearInterval(loadingRef.current); setTimeout(() => setEndStep(END_SEQUENCE[1]), 400); }
     }, 150);
     return () => clearInterval(loadingRef.current);
   }
