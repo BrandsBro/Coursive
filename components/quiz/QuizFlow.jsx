@@ -483,7 +483,7 @@ if (block.type === "question_challenge") {
     const bullets = (c2.bullets || []).filter(b => b && b.trim());
     const textContent = (
       <div style={{ flex:1, display:"flex", flexDirection:"column", justifyContent:"center", alignItems: isMobile ? "center" : "flex-start", textAlign: isMobile ? "center" : "left" }}>
-        <h1 style={{ fontSize: isMobile ? 20 : 32, fontWeight:900, color:"#5B4EFF", margin:"0 0 8px", lineHeight:1.2 }}>{c2.heading}</h1>
+        <h1 style={{ fontSize: isMobile ? 20 : 28, fontWeight:900, color:"#5B4EFF", margin:"0 0 8px", lineHeight:1.2 }}>{c2.heading}</h1>
         {c2.subtext && <p style={{ fontSize: isMobile ? 13 : 16, color:"#374151", margin:"0 0 14px", lineHeight:1.6 }}>{c2.subtext}</p>}
         {bullets.map((b,i) => (
           <div key={i} style={{ display:"flex", alignItems:"center", gap:10, padding: isMobile ? "9px 12px" : "12px 16px", background:"#F8FAFC", borderRadius:12, marginBottom:8, width:"100%" }}>
@@ -495,19 +495,31 @@ if (block.type === "question_challenge") {
         ))}
       </div>
     );
-    const imageContent = c2.imageUrl ? (
-      <div style={{ flex:1, borderRadius:16, overflow:"hidden", minHeight: isMobile ? 180 : 280, width:"100%" }}>
-        <img src={c2.imageUrl} alt="" loading="eager" fetchPriority="high" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}/>
-      </div>
-    ) : null;
+const imageContent = c2.imageUrl ? (
+  <img
+    src={c2.imageUrl}
+    alt=""
+    loading="eager"
+    fetchPriority="high"
+    style={{
+      width: "100%",
+      height: isMobile ? 280 : "100%",
+      objectFit: "cover",
+      objectPosition: "center top",
+      display: "block",
+      borderRadius: 16,
+      maxHeight: isMobile ? "auto" : 420,
+    }}
+  />
+) : null;
     if (isMobile) return <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:16, alignItems:"center" }}>{textContent}{imageContent}</div>;
     if (layout === "image-top") return <div style={{ width:"100%" }}>{imageContent && <div style={{ marginBottom:24 }}>{imageContent}</div>}{textContent}</div>;
     if (layout === "fullwidth") return <div style={{ width:"100%" }}>{c2.imageUrl && <div style={{ borderRadius:16, overflow:"hidden", marginBottom:20 }}><img src={c2.imageUrl} alt="" loading="eager" style={{ width:"100%", display:"block" }}/></div>}{textContent}</div>;
-    return (
-      <div style={{ width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, alignItems:"center" }}>
-        {layout === "image-left" ? <>{imageContent}{textContent}</> : <>{textContent}{imageContent}</>}
-      </div>
-    );
+   return (
+  <div style={{ width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, alignItems:"stretch" }}>
+    {layout === "image-left" ? <>{imageContent}{textContent}</> : <>{textContent}{imageContent}</>}
+  </div>
+);
   }
 
   return null;
