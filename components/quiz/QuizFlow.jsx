@@ -13,7 +13,16 @@ const FIXED_REVIEWS = [
   { name:"Ahmed K.", stars:5, title:"Changed my career", text:"Within 2 weeks I was using AI tools at work and my manager noticed. Highly recommend to everyone." },
 ];
 
-const END_SEQUENCE = ["loading", "summary", "comparison", "signup"];
+const PROOF_IMAGES = [
+  "https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784795498476-Web_riview_.jpg",
+  "https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784797454351-Alex_Charter_.png",
+  "https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784795497390-Sara.jpg",
+  "https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784795496332-James_.jpg",
+  "https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784795495453-Emilly_.jpg",
+  "https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784795494244-Comment_and_reply_Mobile_ss_.jpg.png",
+];
+
+const END_SEQUENCE = ["loading", "summary", "comparison", "signup", "social_proof"];
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
@@ -24,6 +33,81 @@ function useIsMobile() {
     return () => window.removeEventListener("resize", check);
   }, []);
   return isMobile;
+}
+
+// ── Separate component so hooks run unconditionally ──────────────────────────
+function SocialProofStep({ isMobile }) {
+  const stats = [
+    { value: "2M+",   label: "Users learned\nnew skills" },
+    { value: "670k+", label: "Users earned\nAI certificates" },
+    { value: "93%",   label: "Positive reviews\non Trustpilot\n(as of June 2026)" },
+  ];
+
+  return (
+    <div style={{ width: "100%", textAlign: "center" }}>
+
+      {/* Title */}
+      <h2 style={{
+        fontSize: isMobile ? 20 : 26, fontWeight: 900, color: "#0f172a",
+        margin: "0 0 20px", lineHeight: 1.25
+      }}>
+        See How 1Course<br/>Empowers Learners
+      </h2>
+
+      {/* Stats row */}
+      <div style={{
+        display: "grid", gridTemplateColumns: "1fr 1fr 1fr",
+        gap: isMobile ? 8 : 16, marginBottom: isMobile ? 24 : 32
+      }}>
+        {stats.map((s, i) => (
+          <div key={i} style={{
+            background: "#F8FAFC", borderRadius: 14,
+            padding: isMobile ? "12px 6px" : "18px 12px",
+            border: "1.5px solid #E2E8F0"
+          }}>
+            <p style={{
+              fontSize: isMobile ? 20 : 28, fontWeight: 900,
+              color: "#5B4EFF", margin: "0 0 4px"
+            }}>{s.value}</p>
+            <p style={{
+              fontSize: isMobile ? 10 : 12, color: "#64748B",
+              margin: 0, lineHeight: 1.4, whiteSpace: "pre-line"
+            }}>{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Label */}
+      <div style={{
+        background: "#EEF2FF", borderRadius: 12,
+        padding: isMobile ? "10px 14px" : "12px 20px", marginBottom: 20
+      }}>
+        <p style={{ fontSize: isMobile ? 13 : 15, fontWeight: 800, color: "#4338CA", margin: 0 }}>
+          Hear What Others Are Saying About 1Course
+        </p>
+      </div>
+
+      {/* Images stacked vertically */}
+      <div style={{ display: "flex", flexDirection: "column", gap: isMobile ? 12 : 16 }}>
+        {PROOF_IMAGES.map((src, i) => (
+          <div key={i} style={{
+            width: "100%", borderRadius: 16, overflow: "hidden",
+            background: "#F1F5F9",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.08)"
+          }}>
+            <img
+              src={src}
+              alt={`proof-${i}`}
+              style={{
+                width: "100%", display: "block",
+                objectFit: "cover"
+              }}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function QuizFlow({ blocks }) {
@@ -117,6 +201,7 @@ export default function QuizFlow({ blocks }) {
       if (idx < END_SEQUENCE.length - 1) {
         setEndStep(END_SEQUENCE[idx + 1]);
       } else {
+        // last step = social_proof → go to plan
         sessionStorage.clear();
         router.push(`/plan?name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`);
       }
@@ -231,7 +316,7 @@ export default function QuizFlow({ blocks }) {
         <div style={{ position:"fixed", bottom:0, left:0, right:0, padding: isMobile ? "10px 14px" : "16px 20px", background:"#fff", borderTop:"1px solid #F1F5F9" }}>
           <div style={{ maxWidth:600, margin:"0 auto" }}>
             <button onClick={goNext} style={{ width:"100%", padding: isMobile ? "13px" : "16px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize: isMobile ? 14 : 16, fontWeight:700, cursor:"pointer", boxShadow:"0 4px 16px rgba(91,78,255,0.4)" }}>
-              {endStep === "signup" ? "NEXT STEP" : "CONTINUE"}
+            {endStep === "signup" ? "NEXT STEP" : "CONTINUE"}
             </button>
           </div>
         </div>
@@ -592,6 +677,11 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
         </div>
       </div>
     );
+  }
+
+  // ── Social proof step — rendered via separate component for clean hook usage
+  if (step === "social_proof") {
+    return <SocialProofStep isMobile={isMobile} />;
   }
 
   if (step === "sales") {
