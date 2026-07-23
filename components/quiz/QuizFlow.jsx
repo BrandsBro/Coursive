@@ -631,21 +631,7 @@ if (step === "summary") {
         </div>
       </div>
 
-      {/* Summary rows */}
-      {[
-        { icon:"🎯", label:"Your focus", value:"Future-proofing your role" },
-        { icon:"⭐", label:"Your readiness", value:"Ready to learn online" },
-        { icon:"🕐", label:"Your pace", value:"20 min a day" },
-        { icon:"📚", label:"Learning experience", value:"Self-taught so far" },
-      ].map((item, i) => (
-        <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding: isMobile ? "11px 12px" : "14px 16px", background:"#fff", borderRadius:12, border:"1.5px solid #F1F5F9", marginBottom:8 }}>
-          <div style={{ width: isMobile ? 34 : 40, height: isMobile ? 34 : 40, borderRadius:10, background:"#EEF2FF", display:"flex", alignItems:"center", justifyContent:"center", fontSize: isMobile ? 16 : 20, flexShrink:0 }}>{item.icon}</div>
-          <div>
-            <p style={{ fontSize: isMobile ? 11 : 12, color:"#94A3B8", margin:"0 0 1px" }}>{item.label}</p>
-            <p style={{ fontSize: isMobile ? 13 : 15, fontWeight:700, color:"#0f172a", margin:0 }}>{item.value}</p>
-          </div>
-        </div>
-      ))}
+    
     </div>
   );
 }
