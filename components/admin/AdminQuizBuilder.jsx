@@ -450,15 +450,33 @@ function BlockEditor({ type, content, onChange }) {
     );
   }
 
-  // ── image_section ────────────────────────────────────────────────────────────
+// ── image_section ────────────────────────────────────────────────────────────
   if (type === "image_section") {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <Field label="Heading">
           <input value={content.heading || ""} onChange={e => u("heading", e.target.value)} placeholder="AI is Easier Than You Think" style={inputStyle()} />
         </Field>
+        <Field label="Heading font size" hint="px">
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <input type="range" min={14} max={60} value={content.headingSize || 28}
+              onChange={e => u("headingSize", parseInt(e.target.value))} style={{ flex: 1 }} />
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#374151", minWidth: 36 }}>
+              {content.headingSize || 28}px
+            </span>
+          </div>
+        </Field>
         <Field label="Subtext" hint="optional">
           <textarea value={content.subtext || ""} onChange={e => u("subtext", e.target.value)} style={inputStyle({ minHeight: 70, resize: "vertical" })} />
+        </Field>
+        <Field label="Description font size" hint="px">
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <input type="range" min={10} max={36} value={content.subtextSize || 16}
+              onChange={e => u("subtextSize", parseInt(e.target.value))} style={{ flex: 1 }} />
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#374151", minWidth: 36 }}>
+              {content.subtextSize || 16}px
+            </span>
+          </div>
         </Field>
         <Field label="Image">
           <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
@@ -490,8 +508,8 @@ function BlockEditor({ type, content, onChange }) {
             <input value={content.imageUrl || ""} onChange={e => u("imageUrl", e.target.value)} placeholder="https://..." style={inputStyle()} />
           )}
           {content.imageUrl && (
-            <div style={{ marginTop: 8, borderRadius: 12, overflow: "hidden", height: 100 }}>
-              <img src={content.imageUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            <div style={{ marginTop: 8, borderRadius: 12, overflow: "hidden" }}>
+              <img src={content.imageUrl} alt="" style={{ width: "100%", height: "auto", display: "block", borderRadius: 12 }} />
             </div>
           )}
         </Field>
@@ -502,6 +520,15 @@ function BlockEditor({ type, content, onChange }) {
             placeholder={"No prior AI knowledge required\nWork at your own pace"}
             style={inputStyle({ minHeight: 80, resize: "vertical" })}
           />
+        </Field>
+        <Field label="Bullet points font size" hint="px">
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <input type="range" min={10} max={28} value={content.bulletsSize || 15}
+              onChange={e => u("bulletsSize", parseInt(e.target.value))} style={{ flex: 1 }} />
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#374151", minWidth: 36 }}>
+              {content.bulletsSize || 15}px
+            </span>
+          </div>
         </Field>
         <Field label="Layout">
           <select value={content.layout || "image-right"} onChange={e => u("layout", e.target.value)} style={inputStyle()}>
@@ -514,7 +541,6 @@ function BlockEditor({ type, content, onChange }) {
       </div>
     );
   }
-
   // ── loading ──────────────────────────────────────────────────────────────────
   if (type === "loading") {
     return (
