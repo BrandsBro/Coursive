@@ -557,6 +557,9 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
   const handleGetPlan = () => { if (!name || !email) { showToast("Please go back and fill in your name and email"); return; } setShowPayment(true); };
   const handlePaymentSuccess = () => { setShowPayment(false); sessionStorage.clear(); router.push("/payment-success"); };
 
+// Slow down your interval too, e.g:
+  // useEffect(() => { const t = setInterval(() => setLoadingPct(p => Math.min(p + 1, 100)), 80); return () => clearInterval(t); }, []);
+
   if (step === "loading") {
     const reviewIdx = Math.floor((loadingPct / 100) * FIXED_REVIEWS.length);
     const review = FIXED_REVIEWS[Math.min(reviewIdx, FIXED_REVIEWS.length-1)];
@@ -569,7 +572,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
             <circle cx={cs/2} cy={cs/2} r={r} fill="none" stroke="#F1F5F9" strokeWidth="8"/>
             <circle cx={cs/2} cy={cs/2} r={r} fill="none" stroke="#5B4EFF" strokeWidth="8"
               strokeDasharray={`${2*Math.PI*r}`} strokeDashoffset={`${2*Math.PI*r*(1-loadingPct/100)}`}
-              strokeLinecap="round" transform={`rotate(-90 ${cs/2} ${cs/2})`} style={{ transition:"stroke-dashoffset 0.1s ease" }}/>
+              strokeLinecap="round" transform={`rotate(-90 ${cs/2} ${cs/2})`} style={{ transition:"stroke-dashoffset 0.5s ease" }}/>
           </svg>
           <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
             <span style={{ fontSize: isMobile ? 20 : 28, fontWeight:900, color:"#0f172a" }}>{loadingPct}%</span>
@@ -577,7 +580,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
         </div>
         <p style={{ fontSize: isMobile ? 13 : 15, color:"#64748B", margin:"0 0 24px" }}>Analyzing answers to personalize your A.I. Certificate Program...</p>
         <hr style={{ border:"none", borderTop:"1px solid #F1F5F9", margin:"0 0 20px" }}/>
-        <p style={{ fontSize: isMobile ? 20 : 28, fontWeight:900, color:"#5B4EFF", margin:"0 0 4px" }}>2,000,000+ people</p>
+        <p style={{ fontSize: isMobile ? 20 : 28, fontWeight:900, color:"#5B4EFF", margin:"0 0 4px" }}>200K+ people</p>
         <p style={{ fontSize: isMobile ? 14 : 18, fontWeight:700, color:"#0f172a", margin:"0 0 18px" }}>have chosen 1Course</p>
         <div style={{ background:"#fff", borderRadius:16, border:"1.5px solid #F1F5F9", padding: isMobile ? "14px" : "20px 24px", textAlign:"left", boxShadow:"0 4px 20px rgba(0,0,0,0.06)" }}>
           <div style={{ display:"flex", gap:2, marginBottom:8 }}>
