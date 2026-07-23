@@ -345,16 +345,16 @@ function BlockEditor({ type, content, onChange }) {
     const setOptImg = (i, v) => { const a = [...optionImages]; a[i] = v; u("optionImages", a); };
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <Field label="Pre-title text" hint="above the title">
-        
+     <Field label="Pre-title text" hint="shows below main title">
   <input
     value={content.preTitle || ""}
     onChange={e => u("preTitle", e.target.value)}
-    placeholder="e.g. 🎯 Welcome to..."
+    placeholder="Master the AI Tools Companies Actually Use"
     style={inputStyle()}
   />
 </Field>
-  <Field  label="Pre-title line 2" hint="optional">
+
+<Field label="Pre-title line 2" hint="optional">
   <input
     value={content.preTitleLine2 || ""}
     onChange={e => u("preTitleLine2", e.target.value)}
@@ -362,12 +362,11 @@ function BlockEditor({ type, content, onChange }) {
     style={inputStyle()}
   />
 </Field>
+
 <Field label="Pre-title font size" hint="px">
   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
     <input
-      type="range"
-      min={10}
-      max={48}
+      type="range" min={10} max={48}
       value={content.preTitleSize || 14}
       onChange={e => u("preTitleSize", parseInt(e.target.value))}
       style={{ flex: 1 }}
@@ -377,9 +376,6 @@ function BlockEditor({ type, content, onChange }) {
     </span>
   </div>
 </Field>
-        <Field label="Challenge title">
-          <input value={content.challengeTitle || ""} onChange={e => u("challengeTitle", e.target.value)} placeholder="28-DAY AI CHALLENGE" style={inputStyle({ fontWeight: 700, letterSpacing: "0.4px" })} />
-        </Field>
         <Field label="Question">
           <input value={content.question || ""} onChange={e => u("question", e.target.value)} placeholder="How would you describe yourself?" style={inputStyle()} />
         </Field>
@@ -683,31 +679,32 @@ function BlockPreview({ block, idx, isActive, onClick }) {
   const renderPreview = () => {
     switch (block.type) {
 
-      case "question_challenge": {
-        const opts = (c.options || []).filter(Boolean);
-        const imgs = c.optionImages || [];
-        const hasImgs = imgs.some(Boolean);
-        const labelColor = c.labelColor || "#5B4EFF";
-        return (
-          <div>
-          {(c.preTitle || c.preTitleLine2) && (
-  <div style={{ textAlign: "center", marginBottom: 6 }}>
-    {c.preTitle && (
-      <p style={{ fontSize: c.preTitleSize || 14, color: "#374151", margin: "0 0 2px", lineHeight: 1.4, fontWeight: 700 }}>
-        {c.preTitle}
-      </p>
-    )}
-    {c.preTitleLine2 && (
-      <p style={{ fontSize: (c.preTitleSize || 14) - 2, color: "#64748B", margin: 0, lineHeight: 1.4 }}>
-        {c.preTitleLine2}
-      </p>
-    )}
-  </div>
-)}
-            {c.challengeTitle && (
-              <h3 style={{ fontSize: 14, fontWeight: 900, color: "#0f172a", margin: "0 0 4px", letterSpacing: "0.3px" }}>{c.challengeTitle}</h3>
-            )}
-            <p style={{ fontSize: 12, color: "#64748B", margin: "0 0 10px" }}>{c.question || "Question"}</p>
+  case "question_challenge": {
+  const opts = (c.options || []).filter(Boolean);
+  const imgs = c.optionImages || [];
+  const hasImgs = imgs.some(Boolean);
+  const labelColor = c.labelColor || "#5B4EFF";
+  return (
+    <div>
+      {c.challengeTitle && (
+        <h3 style={{ fontSize: 14, fontWeight: 900, color: "#0f172a", margin: "0 0 6px", letterSpacing: "0.3px" }}>{c.challengeTitle}</h3>
+      )}
+      {(c.preTitle || c.preTitleLine2) && (
+        <div style={{ textAlign: "center", marginBottom: 8 }}>
+          {c.preTitle && (
+            <p style={{ fontSize: c.preTitleSize || 14, color: "#374151", margin: "0 0 2px", lineHeight: 1.4, fontWeight: 700 }}>
+              {c.preTitle}
+            </p>
+          )}
+          {c.preTitleLine2 && (
+            <p style={{ fontSize: (c.preTitleSize || 14) - 2, color: "#64748B", margin: 0, lineHeight: 1.4 }}>
+              {c.preTitleLine2}
+            </p>
+          )}
+        </div>
+      )}
+      <p style={{ fontSize: 12, color: "#64748B", margin: "0 0 10px" }}>{c.question || "Question"}</p>
+  
             <div style={{ display: "grid", gridTemplateColumns: hasImgs && opts.length === 2 ? "1fr 1fr" : "1fr", gap: 10 }}>
               {opts.map((opt, i) => (
   <div key={i} style={{ borderRadius: 12, border: "1.5px solid #E2E8F0", overflow: "hidden", background: "#F1F5F9", display: "flex", flexDirection: "column" }}>
@@ -977,7 +974,7 @@ function getDefaultContent(type) {
     case "question_choice":
       return { question: "", subtitle: "", options: ["Option 1", "Option 2"], optionImages: [], isSplit: "no", labelColor: "#5B4EFF", textColor: "#ffffff" };
     case "question_challenge":
-      return {preTitle: "", preTitleSize: 14, preTitleLine2: "",   challengeTitle: "28-DAY AI CHALLENGE", question: "How would you describe yourself?", options: ["Option 1", "Option 2"], optionImages: [], isSplit: "yes", labelColor: "#5B4EFF" };
+      return {preTitle: "", preTitleSize: 14,    challengeTitle: "28-DAY AI CHALLENGE", preTitleLine2: "",question: "How would you describe yourself?", options: ["Option 1", "Option 2"], optionImages: [], isSplit: "yes", labelColor: "#5B4EFF" };
     case "question_icon":
       return { question: "", subtitle: "", options: [{ label: "Option 1", emoji: "✍️" }, { label: "Option 2", emoji: "📊" }] };
     case "image_section":
