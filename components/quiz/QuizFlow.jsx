@@ -414,7 +414,7 @@ if (block.type === "question_challenge") {
       </p>
     )}
     {c.preTitleLine2 && (
-      <p style={{ fontSize: isMobile ? (c.preTitleSize || 14) - 7 : c.preTitleSize || 14, color:"#64748B", margin:0, lineHeight:1.4, fontWeight:700 }}>
+      <p style={{ fontSize: isMobile ? (c.preTitleSize || 14) - 2 : c.preTitleSize || 14, color:"#64748B", margin:0, lineHeight:1.4, fontWeight:700 }}>
         {c.preTitleLine2}
       </p>
     )}
