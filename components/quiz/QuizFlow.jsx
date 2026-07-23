@@ -22,7 +22,7 @@ const PROOF_IMAGES = [
   "https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784795494244-Comment_and_reply_Mobile_ss_.jpg.png",
 ];
 
-const END_SEQUENCE = ["loading","signup", "summary","comparison", "social_proof"];
+const END_SEQUENCE = ["loading","signup", "summary", "comparison", "social_proof"];
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
