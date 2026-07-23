@@ -397,16 +397,20 @@ function QuizBlock({ block, answers, onChoice, onNext, isMobile }) {
     const imgH = isMobile ? 180 : 220;
     return (
       <div style={{ width:"100%", textAlign:"center" }}>
-         {c.preTitle && (
-        <p style={{
-          fontSize: c.preTitleSize || 14,
-          color: "#374151",
-          margin: "0 0 6px",
-          lineHeight: 1.4,
-        }}>
-          {c.preTitle}
-        </p>
-      )}
+      {(c.preTitle || c.preTitleLine2) && (
+  <div style={{ textAlign: "center", marginBottom: isMobile ? 8 : 12 }}>
+    {c.preTitle && (
+      <p style={{ fontSize: c.preTitleSize || 14, color: "#374151", margin: "0 0 4px", lineHeight: 1.4, fontWeight: 700 }}>
+        {c.preTitle}
+      </p>
+    )}
+    {c.preTitleLine2 && (
+      <p style={{ fontSize: (c.preTitleSize || 14) - 2, color: "#64748B", margin: 0, lineHeight: 1.4 }}>
+        {c.preTitleLine2}
+      </p>
+    )}
+  </div>
+)}
         {c.challengeTitle && <h1 style={{ fontSize: isMobile ? 22 : 28, fontWeight:900, color:"#0f172a", margin:"0 0 10px", letterSpacing:"0.5px" }}>{c.challengeTitle}</h1>}
         {c.question && <p style={{ fontSize: isMobile ? 14 : 17, color:"#64748B", margin: isMobile ? "0 0 60px" : "0 0 16px" }}>{c.question}</p>}
         <div style={{ display:"grid", gridTemplateColumns:`repeat(${cols}, 1fr)`, gap: isMobile ? 16 : 32, maxWidth: isMobile ? "92%" : 480, margin:"0 auto", paddingTop: isMobile ? 0 : 90 }}>
