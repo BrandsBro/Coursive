@@ -22,7 +22,7 @@ const PROOF_IMAGES = [
   "https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784795494244-Comment_and_reply_Mobile_ss_.jpg.png",
 ];
 
-const END_SEQUENCE = ["loading", "summary", "comparison", "signup", "social_proof"];
+const END_SEQUENCE = ["loading", "summary", "signup","comparison", "social_proof"];
 
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false);
@@ -580,7 +580,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
         </div>
         <p style={{ fontSize: isMobile ? 13 : 15, color:"#64748B", margin:"0 0 24px" }}>Analyzing answers to personalize your A.I. Certificate Program...</p>
         <hr style={{ border:"none", borderTop:"1px solid #F1F5F9", margin:"0 0 20px" }}/>
-        <p style={{ fontSize: isMobile ? 20 : 28, fontWeight:900, color:"#5B4EFF", margin:"0 0 4px" }}>200K+ people</p>
+        <p style={{ fontSize: isMobile ? 20 : 28, fontWeight:900, color:"#5B4EFF", margin:"0 0 4px" }}>2,00,000 people</p>
         <p style={{ fontSize: isMobile ? 14 : 18, fontWeight:700, color:"#0f172a", margin:"0 0 18px" }}>have chosen 1Course</p>
         <div style={{ background:"#fff", borderRadius:16, border:"1.5px solid #F1F5F9", padding: isMobile ? "14px" : "20px 24px", textAlign:"left", boxShadow:"0 4px 20px rgba(0,0,0,0.06)" }}>
           <div style={{ display:"flex", gap:2, marginBottom:8 }}>
