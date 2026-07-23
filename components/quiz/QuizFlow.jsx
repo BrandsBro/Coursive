@@ -236,7 +236,7 @@ useEffect(() => {
   if (endStep === "loading") {
     setLoadingPct(0);
     let step = 0;
-    const steps = 150;
+    const steps = 100;
     loadingRef.current = setInterval(() => {
       step++;
       setLoadingPct(Math.min(Math.round((step / steps) * 100), 100));
