@@ -36,32 +36,6 @@ function inputStyle(extra = {}) {
   };
 }
 
-// ─── Safe helpers ─────────────────────────────────────────────────────────────
-// Options can be strings OR {label, emoji} or {label, imageUrl} objects depending
-// on block type and legacy data — always coerce to a display string safely.
-function safeOptStr(opt) {
-  if (!opt) return "";
-  if (typeof opt === "string") return opt;
-  if (typeof opt === "object") return opt.label || opt.text || JSON.stringify(opt);
-  return String(opt);
-}
-
-// Extract a short preview label from any block's content without crashing on objects
-function extractLabel(content) {
-  if (!content) return "Click to edit";
-  const candidates = [
-    content.challengeTitle,
-    content.question,
-    content.title,
-    content.heading,
-    content.text,
-  ];
-  for (const c of candidates) {
-    if (c && typeof c === "string" && c.trim()) return c.trim();
-  }
-  return "Click to edit";
-}
-
 // ─── Color Picker Helpers ──────────────────────────────────────────────────────
 function hexToRgb(hex) {
   const r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -371,6 +345,29 @@ function BlockEditor({ type, content, onChange }) {
     const setOptImg = (i, v) => { const a = [...optionImages]; a[i] = v; u("optionImages", a); };
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <Field label="Pre-title text" hint="above the title">
+  <input
+    value={content.preTitle || ""}
+    onChange={e => u("preTitle", e.target.value)}
+    placeholder="e.g. 🎯 Welcome to..."
+    style={inputStyle()}
+  />
+</Field>
+<Field label="Pre-title font size" hint="px">
+  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+    <input
+      type="range"
+      min={10}
+      max={48}
+      value={content.preTitleSize || 14}
+      onChange={e => u("preTitleSize", parseInt(e.target.value))}
+      style={{ flex: 1 }}
+    />
+    <span style={{ fontSize: 12, fontWeight: 700, color: "#374151", minWidth: 32 }}>
+      {content.preTitleSize || 14}px
+    </span>
+  </div>
+</Field>
         <Field label="Challenge title">
           <input value={content.challengeTitle || ""} onChange={e => u("challengeTitle", e.target.value)} placeholder="28-DAY AI CHALLENGE" style={inputStyle({ fontWeight: 700, letterSpacing: "0.4px" })} />
         </Field>
@@ -684,6 +681,16 @@ function BlockPreview({ block, idx, isActive, onClick }) {
         const labelColor = c.labelColor || "#5B4EFF";
         return (
           <div>
+            {c.preTitle && (
+  <p style={{
+    fontSize: c.preTitleSize || 14,
+    color: "#374151",
+    margin: "0 0 6px",
+    lineHeight: 1.4,
+  }}>
+    {c.preTitle}
+  </p>
+)}
             {c.challengeTitle && (
               <h3 style={{ fontSize: 14, fontWeight: 900, color: "#0f172a", margin: "0 0 4px", letterSpacing: "0.3px" }}>{c.challengeTitle}</h3>
             )}
@@ -697,7 +704,7 @@ function BlockPreview({ block, idx, isActive, onClick }) {
                     </div>
                   )}
                   <div style={{ padding: "8px 10px", background: labelColor, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
-                    <span style={{ fontSize: 12, fontWeight: 700, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{safeOptStr(opt)}</span>
+                    <span style={{ fontSize: 12, fontWeight: 700, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{opt}</span>
                     <div style={{ width: 20, height: 20, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <span style={{ color: "#fff", fontSize: 10 }}>›</span>
                     </div>
@@ -912,7 +919,7 @@ function SortableBlock({ block, idx, isActive, onToggle, onChange, onPathChange,
         <div style={{ flex: 1, minWidth: 0, cursor: "pointer" }} onClick={onToggle}>
           <p style={{ fontSize: 13, fontWeight: 700, color: def.color, margin: 0 }}>{idx + 1}. {def.label}</p>
           <p style={{ fontSize: 11, color: "#94A3B8", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-            {extractLabel(block.content)}
+            {block.content?.challengeTitle || block.content?.question || block.content?.title || block.content?.heading || block.content?.text || "Click to edit"}
           </p>
         </div>
         <select
@@ -955,7 +962,7 @@ function getDefaultContent(type) {
     case "question_choice":
       return { question: "", subtitle: "", options: ["Option 1", "Option 2"], optionImages: [], isSplit: "no", labelColor: "#5B4EFF", textColor: "#ffffff" };
     case "question_challenge":
-      return { challengeTitle: "28-DAY AI CHALLENGE", question: "How would you describe yourself?", options: ["Option 1", "Option 2"], optionImages: [], isSplit: "yes", labelColor: "#5B4EFF" };
+      return {preTitle: "", preTitleSize: 14,    challengeTitle: "28-DAY AI CHALLENGE", question: "How would you describe yourself?", options: ["Option 1", "Option 2"], optionImages: [], isSplit: "yes", labelColor: "#5B4EFF" };
     case "question_icon":
       return { question: "", subtitle: "", options: [{ label: "Option 1", emoji: "✍️" }, { label: "Option 2", emoji: "📊" }] };
     case "image_section":
