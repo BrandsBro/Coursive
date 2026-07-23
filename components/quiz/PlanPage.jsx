@@ -185,15 +185,15 @@ export default function PlanPage({ pricingData }) {
     return (
       <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", flexShrink:0 }}>
         <div style={{ display:"flex", alignItems:"flex-start", gap:1 }}>
-          <span style={{ fontSize: isMobile ? 11 : 12, fontWeight:800, color:col, marginTop:2 }}>$</span>
-          <span style={{ fontSize: isMobile ? 24 : 28, fontWeight:900, color:col, lineHeight:1 }}>{whole || "0"}</span>
+          <span style={{ fontSize: isMobile ? 11 : 15, fontWeight:800, color:col, marginTop:2 }}>$</span>
+          <span style={{ fontSize: isMobile ? 24 : 38, fontWeight:900, color:col, lineHeight:1 }}>{whole || "0"}</span>
           <div style={{ display:"flex", flexDirection:"column", marginTop:2 }}>
-            <span style={{ fontSize: isMobile ? 11 : 12, fontWeight:800, color:col, lineHeight:1 }}>{cents ? `.${cents}` : ""}</span>
-            <span style={{ fontSize: isMobile ? 8 : 9, color:"#94A3B8", fontWeight:600, whiteSpace:"nowrap", marginTop:2 }}>/ day</span>
+            <span style={{ fontSize: isMobile ? 11 : 15, fontWeight:800, color:col, lineHeight:1 }}>{cents ? `.${cents}` : ""}</span>
+            <span style={{ fontSize: isMobile ? 8 : 11, color:"#94A3B8", fontWeight:600, whiteSpace:"nowrap", marginTop:2 }}>/ day</span>
           </div>
         </div>
         {plan.perDayOriginalPrice && (
-          <span style={{ fontSize: isMobile ? 9 : 10, color:"#94A3B8", textDecoration:"line-through" }}>${plan.perDayOriginalPrice}</span>
+          <span style={{ fontSize: isMobile ? 9 : 12, color:"#94A3B8", textDecoration:"line-through" }}>${plan.perDayOriginalPrice}</span>
         )}
       </div>
     );
@@ -212,27 +212,27 @@ export default function PlanPage({ pricingData }) {
       {/* ── Header ── */}
       <div style={{ padding: isMobile ? "8px 16px" : "12px 20px", borderBottom:"1px solid #F1F5F9", display:"flex", alignItems:"center", justifyContent:"center" }}>
         {branding.logoApp
-          ? <img src={branding.logoApp} alt="1Course" className="logo-app" style={{ objectFit:"contain", padding:2, maxHeight: isMobile ? 26 : 36 }}/>
-          : <span style={{ fontSize: isMobile ? 15 : 18, fontWeight:900, color:"#0f172a" }}>✦ 1Course</span>
+          ? <img src={branding.logoApp} alt="1Course" className="logo-app" style={{ objectFit:"contain", padding:2, maxHeight: isMobile ? 26 : 48 }}/>
+          : <span style={{ fontSize: isMobile ? 15 : 24, fontWeight:900, color:"#0f172a" }}>✦ 1Course</span>
         }
       </div>
 
       {/* ── Content ── */}
-      <div style={{ flex:1, maxWidth:520, margin:"0 auto", width:"100%", padding: isMobile ? "12px 12px 110px" : "24px 20px 120px", boxSizing:"border-box" }}>
+      <div style={{ flex:1, maxWidth: isMobile ? 520 : 600, margin:"0 auto", width:"100%", padding: isMobile ? "12px 12px 110px" : "36px 28px 140px", boxSizing:"border-box" }}>
 
         {/* ── Title + countdown inline ── */}
         <div style={{ marginBottom: isMobile ? 10 : 16 }}>
-          <h1 style={{ fontSize: isMobile ? 16 : 22, fontWeight:900, color:"#0f172a", margin:"0 0 2px", lineHeight:1.2, textAlign:"center" }}>
+          <h1 style={{ fontSize: isMobile ? 16 : 28, fontWeight:900, color:"#0f172a", margin:"0 0 4px", lineHeight:1.2, textAlign:"center" }}>
             Your A.I. Certificate Program is Ready!
           </h1>
-          <p style={{ fontSize: isMobile ? 12 : 13, color:"#5B4EFF", fontWeight:700, margin:"0 0 8px", textAlign:"center" }}>
+          <p style={{ fontSize: isMobile ? 12 : 16, color:"#5B4EFF", fontWeight:700, margin:"0 0 10px", textAlign:"center" }}>
             Become the Master of A.I.
           </p>
 
           {/* Compact countdown */}
           <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, background:"#FFF7ED", border:"1px solid #FED7AA", borderRadius:10, padding: isMobile ? "7px 14px" : "9px 18px" }}>
-            <span style={{ fontSize: isMobile ? 11 : 12, fontWeight:600, color:"#9A3412" }}>⏱ Discount expires in</span>
-            <span style={{ fontSize: isMobile ? 16 : 19, fontWeight:900, color:"#9A3412", fontVariantNumeric:"tabular-nums", letterSpacing:1 }}>{mins}:{secs}</span>
+            <span style={{ fontSize: isMobile ? 11 : 15, fontWeight:600, color:"#9A3412" }}>⏱ Discount expires in</span>
+            <span style={{ fontSize: isMobile ? 16 : 24, fontWeight:900, color:"#9A3412", fontVariantNumeric:"tabular-nums", letterSpacing:1 }}>{mins}:{secs}</span>
           </div>
         </div>
 
@@ -241,14 +241,14 @@ export default function PlanPage({ pricingData }) {
           {plans.map((plan, idx) => (
             <div key={plan.name}>
               {plan.popular && (
-                <div style={{ background:"#7C3AED", color:"#fff", fontSize: isMobile ? 9 : 10, fontWeight:800, padding: isMobile ? "5px 14px" : "6px 16px", textAlign:"center", borderRadius:"8px 8px 0 0", marginTop: idx === 0 ? 6 : 0 }}>
+                <div style={{ background:"#7C3AED", color:"#fff", fontSize: isMobile ? 9 : 12, fontWeight:800, padding: isMobile ? "5px 14px" : "8px 20px", textAlign:"center", borderRadius:"8px 8px 0 0", marginTop: idx === 0 ? 6 : 0 }}>
                   👍 MOST POPULAR
                 </div>
               )}
               <div
                 onClick={() => setSelectedPlan(plan.name)}
                 style={{
-                  padding: isMobile ? "10px 12px" : "14px 18px",
+                  padding: isMobile ? "10px 12px" : "18px 22px",
                   borderRadius: plan.popular ? "0 0 8px 8px" : 8,
                   border:`2px solid ${selectedPlan === plan.name ? "#7C3AED" : "#E2E8F0"}`,
                   background: selectedPlan === plan.name ? "#FAF8FF" : "#fff",
@@ -256,16 +256,17 @@ export default function PlanPage({ pricingData }) {
                 }}>
                 <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:8 }}>
                   <div style={{ display:"flex", alignItems:"center", gap:8, flexShrink:1, minWidth:0 }}>
-                    <div style={{ width:16, height:16, borderRadius:"50%", flexShrink:0, border:`2px solid ${selectedPlan === plan.name ? "#7C3AED" : "#CBD5E1"}`, background: selectedPlan === plan.name ? "#7C3AED" : "#fff", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                      {selectedPlan === plan.name && <div style={{ width:6, height:6, borderRadius:"50%", background:"#fff" }}/>}
+                    <div style={{ width: isMobile ? 16 : 20, height: isMobile ? 16 : 20, borderRadius:"50%", flexShrink:0, border:`2px solid ${selectedPlan === plan.name ? "#7C3AED" : "#CBD5E1"}`, background: selectedPlan === plan.name ? "#7C3AED" : "#fff", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                      {selectedPlan === plan.name && <div style={{ width: isMobile ? 6 : 8, height: isMobile ? 6 : 8, borderRadius:"50%", background:"#fff" }}/>}
                     </div>
                     <div>
-                      <span style={{ fontSize: isMobile ? 12 : 14, fontWeight:800, color:"#0f172a", display:"block", letterSpacing:0.3 }}>
+                      <span style={{ fontSize: isMobile ? 12 : 17, fontWeight:800, color:"#0f172a", display:"block", letterSpacing:0.3 }}>
                         {plan.name.toUpperCase().replace(" ", "-")}
                       </span>
                       <div style={{ display:"flex", alignItems:"center", gap:5, marginTop:2 }}>
-                        <span style={{ fontSize: isMobile ? 10 : 11, color:"#94A3B8", textDecoration:"line-through" }}>${plan.originalPrice}</span>
-                        <span style={{ fontSize: isMobile ? 10 : 11, color:"#374151", fontWeight:700 }}>${plan.price}</span>
+                        <span style={{ fontSize: isMobile ? 10 : 13, color:"#94A3B8", textDecoration:"line-through" }}>${plan.originalPrice}</span>
+                        <span style={{ fontSize: isMobile ? 10 : 13, color:"#374151", fontWeight:700 }}>${plan.price}</span>
+
                       </div>
                     </div>
                   </div>
@@ -290,14 +291,14 @@ export default function PlanPage({ pricingData }) {
           <label style={{ display:"flex", alignItems:"flex-start", gap:8, cursor:"pointer" }}>
             <div
               onClick={() => { setTermsAccepted(v => !v); setTermsError(false); }}
-              style={{ width:16, height:16, minWidth:16, borderRadius:4, marginTop:1, border:`2px solid ${termsError ? "#ef4444" : termsAccepted ? "#5B4EFF" : "#CBD5E1"}`, background: termsAccepted ? "#5B4EFF" : "#fff", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", transition:"all 0.15s" }}>
+              style={{ width: isMobile ? 16 : 20, height: isMobile ? 16 : 20, minWidth: isMobile ? 16 : 20, borderRadius:4, marginTop:1, border:`2px solid ${termsError ? "#ef4444" : termsAccepted ? "#5B4EFF" : "#CBD5E1"}`, background: termsAccepted ? "#5B4EFF" : "#fff", display:"flex", alignItems:"center", justifyContent:"center", cursor:"pointer", transition:"all 0.15s" }}>
               {termsAccepted && (
                 <svg width="9" height="7" viewBox="0 0 10 8" fill="none">
                   <path d="M1 4L3.5 6.5L9 1" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               )}
             </div>
-            <span style={{ fontSize: isMobile ? 10 : 11, color:"#374151", lineHeight:1.5 }}>
+            <span style={{ fontSize: isMobile ? 10 : 13, color:"#374151", lineHeight:1.5 }}>
               I agree to the{" "}
               <a href="https://1course.io/terms-condition" target="_blank" rel="noopener noreferrer" style={{ color:"#5B4EFF", fontWeight:700, textDecoration:"underline" }}>Terms</a>{", "}
               <a href="https://1course.io/privacy" target="_blank" rel="noopener noreferrer" style={{ color:"#5B4EFF", fontWeight:700, textDecoration:"underline" }}>Privacy</a>{", "}
@@ -313,14 +314,14 @@ export default function PlanPage({ pricingData }) {
         {/* ── CTA ── */}
         <button
           onClick={handleCtaClick}
-          style={{ width:"100%", padding: isMobile ? "13px" : "16px", borderRadius:12, border:"none", background: termsAccepted ? "linear-gradient(135deg,#5B4EFF,#8B5CF6)" : "#E2E8F0", color: termsAccepted ? "#fff" : "#94A3B8", fontSize: isMobile ? 14 : 16, fontWeight:800, cursor: termsAccepted ? "pointer" : "not-allowed", boxShadow: termsAccepted ? "0 6px 20px rgba(91,78,255,0.4)" : "none", transition:"all 0.2s" }}>
+          style={{ width:"100%", padding: isMobile ? "13px" : "20px", borderRadius:12, border:"none", background: termsAccepted ? "linear-gradient(135deg,#5B4EFF,#8B5CF6)" : "#E2E8F0", color: termsAccepted ? "#fff" : "#94A3B8", fontSize: isMobile ? 14 : 20, fontWeight:800, cursor: termsAccepted ? "pointer" : "not-allowed", boxShadow: termsAccepted ? "0 6px 20px rgba(91,78,255,0.4)" : "none", transition:"all 0.2s" }}>
           GET MY PLAN →
         </button>
 
         {/* ── Trust badges ── */}
         <div style={{ display:"flex", justifyContent:"center", gap: isMobile ? 10 : 18, marginTop:8, flexWrap:"wrap" }}>
           {["🔒 Secure","✅ Cancel anytime","🚀 Instant access"].map((b, i) => (
-            <span key={i} style={{ fontSize: isMobile ? 10 : 11, color:"#64748B" }}>{b}</span>
+            <span key={i} style={{ fontSize: isMobile ? 10 : 14, color:"#64748B" }}>{b}</span>
           ))}
         </div>
 
