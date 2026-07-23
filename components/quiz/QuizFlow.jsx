@@ -232,19 +232,19 @@ export default function QuizFlow({ blocks }) {
     }, 280);
   };
 
-  useEffect(() => {
-    if (endStep === "loading") {
-      setLoadingPct(0);
-      let step = 0;
-      const steps = 60;
-      loadingRef.current = setInterval(() => {
-        step++;
-        setLoadingPct(Math.min(Math.round((step / steps) * 100), 100));
-        if (step >= steps) { clearInterval(loadingRef.current); setTimeout(() => setEndStep("summary"), 400); }
-      }, 50);
-      return () => clearInterval(loadingRef.current);
-    }
-  }, [endStep]);
+useEffect(() => {
+  if (endStep === "loading") {
+    setLoadingPct(0);
+    let step = 0;
+    const steps = 150;
+    loadingRef.current = setInterval(() => {
+      step++;
+      setLoadingPct(Math.min(Math.round((step / steps) * 100), 100));
+      if (step >= steps) { clearInterval(loadingRef.current); setTimeout(() => setEndStep("summary"), 400); }
+    }, 150);
+    return () => clearInterval(loadingRef.current);
+  }
+}, [endStep]);
 
   const showNextStepBtn = !["question_choice", "question_challenge", "question_icon", "loading", "sales"].includes(
     isInEndSequence ? endStep : currentBlock?.type
@@ -572,7 +572,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
             <circle cx={cs/2} cy={cs/2} r={r} fill="none" stroke="#F1F5F9" strokeWidth="8"/>
             <circle cx={cs/2} cy={cs/2} r={r} fill="none" stroke="#5B4EFF" strokeWidth="8"
               strokeDasharray={`${2*Math.PI*r}`} strokeDashoffset={`${2*Math.PI*r*(1-loadingPct/100)}`}
-              strokeLinecap="round" transform={`rotate(-90 ${cs/2} ${cs/2})`} style={{ transition:"stroke-dashoffset 0.5s ease" }}/>
+              strokeLinecap="round" transform={`rotate(-90 ${cs/2} ${cs/2})`} style={{ transition:"stroke-dashoffset 1s ease" }}/>
           </svg>
           <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
             <span style={{ fontSize: isMobile ? 20 : 28, fontWeight:900, color:"#0f172a" }}>{loadingPct}%</span>
