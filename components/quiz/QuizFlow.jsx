@@ -597,39 +597,58 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
     );
   }
 
-  if (step === "summary") {
-    return (
-      <div style={{ width:"100%" }}>
-        <h2 style={{ fontSize: isMobile ? 18 : 24, fontWeight:900, color:"#0f172a", margin:"0 0 6px", textAlign:"center" }}>Your Personal Summary</h2>
-        <p style={{ fontSize: isMobile ? 12 : 14, color:"#64748B", margin:"0 0 18px", textAlign:"center" }}>The quiz indicates that what's held you back is time, not capability</p>
-        <div style={{ background:"#F8FAFC", borderRadius:16, padding: isMobile ? 14 : 20, marginBottom:14 }}>
-          <p style={{ fontSize: isMobile ? 12 : 14, fontWeight:700, color:"#0f172a", margin:"0 0 6px", textAlign:"center" }}>A.I. Skills</p>
-          <p style={{ fontSize: isMobile ? 32 : 48, fontWeight:900, color:"#0f172a", margin:"0 0 10px", textAlign:"center" }}>Low</p>
-          <div style={{ height: isMobile ? 10 : 12, borderRadius:999, background:"linear-gradient(to right,#ef4444,#f59e0b,#22c55e)", position:"relative", marginBottom:8 }}>
-            <div style={{ position:"absolute", left:`${sliderPos}%`, transition:"left 1.8s cubic-bezier(0.25,0.46,0.45,0.94)", top:-4, width:18, height:18, borderRadius:"50%", background:"#fff", border:"3px solid #374151", transform:"translateX(-50%)" }}/>
-          </div>
-          <div style={{ display:"flex", justifyContent:"space-between" }}>
-            {["Low","Medium","High"].map(l => <span key={l} style={{ fontSize:11, color:"#64748B" }}>{l}</span>)}
+if (step === "summary") {
+  const potential = Math.floor(Math.random() * 6) + 85; // 85–90, computed once on render
+
+  return (
+    <div style={{ width:"100%" }}>
+      <h2 style={{ fontSize: isMobile ? 18 : 24, fontWeight:900, color:"#0f172a", margin:"0 0 6px", textAlign:"center" }}>Your Personal Summary</h2>
+      <p style={{ fontSize: isMobile ? 12 : 14, color:"#64748B", margin:"0 0 18px", textAlign:"center", lineHeight:1.6 }}>
+        The quiz indicates that your current barrier to AI prompting might be lack of clarity and low AI skills.
+      </p>
+
+      {/* AI Skills card */}
+      <div style={{ background:"#F8FAFC", borderRadius:16, padding: isMobile ? 14 : 20, marginBottom:14 }}>
+        <p style={{ fontSize: isMobile ? 12 : 14, fontWeight:700, color:"#0f172a", margin:"0 0 6px", textAlign:"center" }}>A.I. Skills</p>
+        <p style={{ fontSize: isMobile ? 32 : 48, fontWeight:900, color:"#0f172a", margin:"0 0 10px", textAlign:"center" }}>Low</p>
+        <div style={{ height: isMobile ? 10 : 12, borderRadius:999, background:"linear-gradient(to right,#ef4444,#f59e0b,#22c55e)", position:"relative", marginBottom:8 }}>
+          <div style={{ position:"absolute", left:`${sliderPos}%`, transition:"left 1.8s cubic-bezier(0.25,0.46,0.45,0.94)", top:-4, width:18, height:18, borderRadius:"50%", background:"#fff", border:"3px solid #374151", transform:"translateX(-50%)" }}/>
+        </div>
+        <div style={{ display:"flex", justifyContent:"space-between" }}>
+          {["Low","Medium","High"].map(l => <span key={l} style={{ fontSize:11, color:"#64748B" }}>{l}</span>)}
+        </div>
+      </div>
+
+      {/* Potential card */}
+      <div style={{ background:"#F8FAFC", borderRadius:16, padding: isMobile ? 14 : 20, marginBottom:14 }}>
+        <p style={{ fontSize: isMobile ? 12 : 14, fontWeight:700, color:"#0f172a", margin:"0 0 6px", textAlign:"center" }}>Potential</p>
+        <p style={{ fontSize: isMobile ? 36 : 52, fontWeight:900, color:"#0f172a", margin:"0 0 12px", textAlign:"center" }}>{potential}%</p>
+        <div style={{ background:"#F0FDF4", border:"1.5px solid #86EFAC", borderRadius:12, padding: isMobile ? "10px 12px" : "12px 16px", display:"flex", alignItems:"center", gap:10 }}>
+          <span style={{ fontSize: isMobile ? 20 : 24, flexShrink:0 }}>💡</span>
+          <p style={{ fontSize: isMobile ? 12 : 13, fontWeight:700, color:"#15803D", margin:0, lineHeight:1.4 }}>
+            Still, your answers indicates high potential to master AI
+          </p>
+        </div>
+      </div>
+
+      {/* Summary rows */}
+      {[
+        { icon:"🎯", label:"Your focus", value:"Future-proofing your role" },
+        { icon:"⭐", label:"Your readiness", value:"Ready to learn online" },
+        { icon:"🕐", label:"Your pace", value:"20 min a day" },
+        { icon:"📚", label:"Learning experience", value:"Self-taught so far" },
+      ].map((item, i) => (
+        <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding: isMobile ? "11px 12px" : "14px 16px", background:"#fff", borderRadius:12, border:"1.5px solid #F1F5F9", marginBottom:8 }}>
+          <div style={{ width: isMobile ? 34 : 40, height: isMobile ? 34 : 40, borderRadius:10, background:"#EEF2FF", display:"flex", alignItems:"center", justifyContent:"center", fontSize: isMobile ? 16 : 20, flexShrink:0 }}>{item.icon}</div>
+          <div>
+            <p style={{ fontSize: isMobile ? 11 : 12, color:"#94A3B8", margin:"0 0 1px" }}>{item.label}</p>
+            <p style={{ fontSize: isMobile ? 13 : 15, fontWeight:700, color:"#0f172a", margin:0 }}>{item.value}</p>
           </div>
         </div>
-        {[
-          { icon:"🎯", label:"Your focus", value:"Future-proofing your role" },
-          { icon:"⭐", label:"Your readiness", value:"Ready to learn online" },
-          { icon:"🕐", label:"Your pace", value:"20 min a day" },
-          { icon:"📚", label:"Learning experience", value:"Self-taught so far" },
-        ].map((item, i) => (
-          <div key={i} style={{ display:"flex", alignItems:"center", gap:12, padding: isMobile ? "11px 12px" : "14px 16px", background:"#fff", borderRadius:12, border:"1.5px solid #F1F5F9", marginBottom:8 }}>
-            <div style={{ width: isMobile ? 34 : 40, height: isMobile ? 34 : 40, borderRadius:10, background:"#EEF2FF", display:"flex", alignItems:"center", justifyContent:"center", fontSize: isMobile ? 16 : 20, flexShrink:0 }}>{item.icon}</div>
-            <div>
-              <p style={{ fontSize: isMobile ? 11 : 12, color:"#94A3B8", margin:"0 0 1px" }}>{item.label}</p>
-              <p style={{ fontSize: isMobile ? 13 : 15, fontWeight:700, color:"#0f172a", margin:0 }}>{item.value}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
+      ))}
+    </div>
+  );
+}
   if (step === "comparison") {
     const withoutItems = ["AI feels too complex","No recognized credential","Don't know how to use AI","Invisible to employers"];
     const withItems = ["Clear, step-by-step path","Shareable AI credential","Reliable results from AI","Stand out from other workers"];
@@ -683,11 +702,12 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
       <div style={{ width:"100%", maxWidth:480, margin:"0 auto" }}>
         <div style={{ textAlign:"center", marginBottom: isMobile ? 18 : 32 }}>
           <div style={{ width: isMobile ? 50 : 64, height: isMobile ? 50 : 64, borderRadius:18, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 12px", fontSize: isMobile ? 22 : 28 }}>🎓</div>
-          <h1 style={{ fontSize: isMobile ? 19 : 26, fontWeight:900, color:"#0f172a", margin:"0 0 6px", lineHeight:1.2 }}>Your A.I. Program is Ready!</h1>
-          <p style={{ fontSize: isMobile ? 13 : 15, color:"#64748B", margin:0 }}>Enter your details to continue</p>
+          <h1 style={{ fontSize: isMobile ? 19 : 26, fontWeight:900, color:"#0f172a", margin:"0 0 6px", lineHeight:1.2 }}>Unlock Your Personalized AI Learning Plan
+</h1>
+        
         </div>
         <div style={{ display:"flex", justifyContent:"center", gap: isMobile ? 10 : 20, marginBottom: isMobile ? 16 : 28, flexWrap:"wrap" }}>
-          {["🔒 Secure","✅ Free to start","🚀 Instant access"].map((b,i) => (
+          {["❌ No spam. ✅ Only Personalized Results."].map((b,i) => (
             <span key={i} style={{ fontSize: isMobile ? 11 : 12, fontWeight:600, color:"#64748B" }}>{b}</span>
           ))}
         </div>
@@ -714,7 +734,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
               <div key={i} style={{ width:26, height:26, borderRadius:"50%", background:"#E2E8F0", border:"2px solid #fff", marginLeft:i>0?-8:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:13 }}>{e}</div>
             ))}
           </div>
-          <p style={{ fontSize: isMobile ? 11 : 12, color:"#64748B", margin:0 }}>Join <strong>2,000,000+</strong> A.I. learners</p>
+          <p style={{ fontSize: isMobile ? 11 : 12, color:"#64748B", margin:0 }}>Join <strong>2,00,000+</strong> A.I. learners</p>
         </div>
       </div>
     );
