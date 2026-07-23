@@ -44,7 +44,7 @@ function SocialProofStep({ isMobile }) {
   ];
 
   return (
-    <div style={{ width: "100%", textAlign: "center" }}>
+    <div id="how" style={{ width: "100%", textAlign: "center" }} >
 
       {/* Title */}
       <h2 style={{

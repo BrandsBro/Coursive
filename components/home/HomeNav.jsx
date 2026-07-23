@@ -20,8 +20,8 @@ export default function HomeNav() {
 
   const links = [
     { label:"Home",           id:"hero" },
-    { label:"About",          id:"about" },
-    { label:"Support Center", id:"support" },
+    { label:"Features",          id:"features" },
+    { label:"How it Woks", id:"how" },
     { label:"Reviews",        id:"reviews" },
     { label:"FAQ",            id:"faq" },
   ];

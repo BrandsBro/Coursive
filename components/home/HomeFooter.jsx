@@ -51,8 +51,8 @@ export default function HomeFooter() {
               title: "Menu",
               links: [
                 { label: "Home", id: "hero" },
-                { label: "About", id: "about" },
-                { label: "Support Center", id: "support" },
+                { label: "Features", id: "features" },
+                { label: "How it Works", id: "how" },
                 { label: "Reviews", id: "reviews" },
                 { label: "FAQ", id: "faq" },
               ],

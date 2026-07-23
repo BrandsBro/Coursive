@@ -16,7 +16,7 @@ const DAYS = ["Start here","Day 1","Day 2","Day 3","Day 4","Day 5","Day 6","Day 
 
 function AppMockup() {
   return (
-    <div style={{ width:210, background:"#12103a", borderRadius:16, padding:14, flexShrink:0 }}>
+    <div id="features"style={{ width:210, background:"#12103a", borderRadius:16, padding:14, flexShrink:0 }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
         <span style={{ fontSize:13, fontWeight:700, color:"#fff" }}>AI Mastery</span>
         <span style={{ fontSize:10, background:"#5B4EFF", color:"#fff", borderRadius:6, padding:"2px 8px", fontWeight:600 }}>28 modules</span>

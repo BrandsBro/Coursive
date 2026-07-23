@@ -28,7 +28,7 @@ export default function HowItWorks() {
   const isMobile = useIsMobile();
 
   return (
-    <section style={{ padding: isMobile ? "48px 20px" : "80px 32px" }}>
+    <section id="how" style={{ padding: isMobile ? "48px 20px" : "80px 32px" }}>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <p style={{ textAlign:"center", fontSize:13, fontWeight:700, color:"rgba(255,255,255,0.3)", letterSpacing:1, marginBottom:8 }}>
           HOW IT WORKS
