@@ -521,13 +521,29 @@ function BlockEditor({ type, content, onChange }) {
             style={inputStyle({ minHeight: 80, resize: "vertical" })}
           />
         </Field>
-        <Field label="Bullet points font size" hint="px">
+       <Field label="Bullet points font size" hint="px">
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <input type="range" min={10} max={28} value={content.bulletsSize || 15}
               onChange={e => u("bulletsSize", parseInt(e.target.value))} style={{ flex: 1 }} />
             <span style={{ fontSize: 12, fontWeight: 700, color: "#374151", minWidth: 36 }}>
               {content.bulletsSize || 15}px
             </span>
+          </div>
+        </Field>
+        <Field label="Show bullet icon">
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              onClick={() => u("showBulletIcon", true)}
+              style={{ flex: 1, padding: "8px", borderRadius: 8, border: `1.5px solid ${content.showBulletIcon !== false ? "#6366f1" : "#E2E8F0"}`, background: content.showBulletIcon !== false ? "#EEF2FF" : "#fff", fontSize: 12, fontWeight: 600, color: content.showBulletIcon !== false ? "#6366f1" : "#64748B", cursor: "pointer" }}
+            >
+              ✅ Show icon
+            </button>
+            <button
+              onClick={() => u("showBulletIcon", false)}
+              style={{ flex: 1, padding: "8px", borderRadius: 8, border: `1.5px solid ${content.showBulletIcon === false ? "#6366f1" : "#E2E8F0"}`, background: content.showBulletIcon === false ? "#EEF2FF" : "#fff", fontSize: 12, fontWeight: 600, color: content.showBulletIcon === false ? "#6366f1" : "#64748B", cursor: "pointer" }}
+            >
+              ✖ Hide icon
+            </button>
           </div>
         </Field>
         <Field label="Layout">
