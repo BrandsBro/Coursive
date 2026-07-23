@@ -486,15 +486,15 @@ const textContent = (
     <h1 style={{ fontSize: c2.headingSize || (isMobile ? 20 : 28), fontWeight:900, color:"#5B4EFF", margin:"0 0 8px", lineHeight:1.2 }}>{c2.heading}</h1>
     {c2.subtext && <p style={{ fontSize: c2.subtextSize || (isMobile ? 13 : 16), color:"#374151", margin:"0 0 14px", lineHeight:1.6 }}>{c2.subtext}</p>}
     {bullets.map((b, i) => (
-  <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: isMobile ? "9px 12px" : "12px 16px", background: "#F8FAFC", borderRadius: 12, marginBottom: 8, width: "100%" }}>
-    {c2.showBulletIcon !== false && (
-      <div style={{ width: isMobile ? 22 : 28, height: isMobile ? 22 : 28, borderRadius: "50%", background: "#5B4EFF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-        <Check size={isMobile ? 11 : 14} color="#fff" />
+      <div key={i} style={{ display:"flex", alignItems:"center", gap: c2.showBulletIcon !== false ? 10 : 0, padding: isMobile ? "9px 12px" : "12px 16px", background:"#F8FAFC", borderRadius:12, marginBottom:8, width:"100%" }}>
+        {c2.showBulletIcon !== false && (
+          <div style={{ width: isMobile ? 22 : 28, height: isMobile ? 22 : 28, borderRadius:"50%", background:"#5B4EFF", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+            <Check size={isMobile ? 11 : 14} color="#fff" />
+          </div>
+        )}
+        <span style={{ fontSize: c2.bulletsSize || (isMobile ? 13 : 15), color:"#0f172a", fontWeight:500 }}>{b}</span>
       </div>
-    )}
-    <span style={{ fontSize: c2.bulletsSize || (isMobile ? 13 : 15), color: "#0f172a", fontWeight: 500 }}>{b}</span>
-  </div>
-))}
+    ))}
   </div>
 );
 const imageContent = c2.imageUrl ? (
