@@ -236,7 +236,7 @@ useEffect(() => {
   if (endStep === "loading") {
     setLoadingPct(0);
     let step = 0;
-    const steps = 100;
+    const steps = 80;
     loadingRef.current = setInterval(() => {
       step++;
       setLoadingPct(Math.min(Math.round((step / steps) * 100), 100));
@@ -572,7 +572,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
             <circle cx={cs/2} cy={cs/2} r={r} fill="none" stroke="#F1F5F9" strokeWidth="8"/>
             <circle cx={cs/2} cy={cs/2} r={r} fill="none" stroke="#5B4EFF" strokeWidth="8"
               strokeDasharray={`${2*Math.PI*r}`} strokeDashoffset={`${2*Math.PI*r*(1-loadingPct/100)}`}
-              strokeLinecap="round" transform={`rotate(-90 ${cs/2} ${cs/2})`} style={{ transition:"stroke-dashoffset 1s ease" }}/>
+              strokeLinecap="round" transform={`rotate(-90 ${cs/2} ${cs/2})`} style={{ transition:"stroke-dashoffset 0.8s ease" }}/>
           </svg>
           <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
             <span style={{ fontSize: isMobile ? 20 : 28, fontWeight:900, color:"#0f172a" }}>{loadingPct}%</span>
