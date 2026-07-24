@@ -10,8 +10,8 @@ export default function InAction() {
         <p style={{ fontSize:15, color:"rgba(255,255,255,0.4)", margin:"0 0 40px" }}>Real skills, real numbers. Real career growth.</p>
         <div style={{ display:"grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap:16 }}>
           {[
-            { value:"1,027k+", label:"Members with AI certificates" },
-            { value:"10,466k+", label:"Minutes of hands-on AI practice" },
+            { value:"200k+", label:"Members with AI certificates" },
+            { value:"50k+", label:"Minutes of hands-on AI practice" },
             { value:"100k+", label:"Prompts built on real-world projects" },
           ].map((s,i) => (
             <div key={i} style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:20, padding:"28px 24px" }}>
