@@ -15,9 +15,9 @@ const PLAN_WEEKS = {
 };
 
 const PLAN_PRICES = {
-  "1-Week Plan": { one_time: 6.93, recurring: 5.99 },
-  "4-Week Plan": { one_time: 19.99, recurring: 16.99 },
-  "12-Week Plan": { one_time: 39.99, recurring: 32.99 },
+  "1-Week Plan": { one_time: 6.93, recurring: 6.93 },
+  "4-Week Plan": { one_time: 19.99, recurring: 19.99 },
+  "12-Week Plan": { one_time: 39.99, recurring: 39.99 },
 };
 
 function generateEmailHtml(blocks, name, email, tempPassword, tmpl) {
