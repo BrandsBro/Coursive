@@ -41,8 +41,18 @@ export default function SettingsPage() {
 
   const handleCancel = async () => {
     setCancelling(true);
-    await supabase.from("subscriptions").update({ status: "cancelled" }).eq("id", sub.id);
-    setSub(prev => ({ ...prev, status: "cancelled" }));
+    try {
+      // Cancel Stripe subscription if exists
+      if (sub.stripe_subscription_id) {
+        await fetch("/api/stripe/cancel-subscription", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ subscriptionId: sub.stripe_subscription_id }),
+        });
+      }
+      await supabase.from("subscriptions").update({ status: "cancelled" }).eq("id", sub.id);
+      setSub(prev => ({ ...prev, status: "cancelled" }));
+    } catch(e) { console.error("Cancel error:", e); }
     setShowManage(false);
     setCancelling(false);
   };
