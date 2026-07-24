@@ -42,6 +42,25 @@ export async function POST(req) {
       invoice_settings: { default_payment_method: paymentMethodId }
     });
 
+    // Check for existing active subscription
+    const existingSubs = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "active",
+      limit: 1,
+    });
+    if (existingSubs.data.length > 0) {
+      const existingSub = existingSubs.data[0];
+      console.log("Customer already has active subscription:", existingSub.id);
+      const invoice = await stripe.invoices.retrieve(existingSub.latest_invoice, { expand: ["payment_intent"] });
+      return NextResponse.json({
+        subscriptionId: existingSub.id,
+        clientSecret: invoice.payment_intent?.client_secret || "",
+        customerId,
+        paymentIntentId: invoice.payment_intent?.id || "",
+        status: "succeeded",
+      });
+    }
+
     // Create price
     const price = await stripe.prices.create({
       currency: "usd",
