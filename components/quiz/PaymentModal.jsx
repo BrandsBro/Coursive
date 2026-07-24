@@ -114,9 +114,6 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
         body: JSON.stringify({
           email, name, plan, paymentType, paymentIntentId, purchaseEventId,
           stripeSubscriptionId, stripeCustomerId,
-          fbp: getCookie("_fbp"),
-          fbc: getCookie("_fbc"),
-          externalId: localStorage.getItem("user_id") || undefined,
         }),
       });
       const result = await res2.json();
