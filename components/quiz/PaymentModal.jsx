@@ -138,15 +138,15 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
           <span style={{ fontSize:14, color:"#374151" }}>AI Certificate</span>
           <span style={{ fontSize:14, fontWeight:700, color:"#0f172a" }}>FREE</span>
         </div>
-        {discountLabel && (
+        {discountLabel && paymentType !== "recurring" && (
           <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
             <span style={{ fontSize:14, color:"#374151" }}>{Math.round(DISCOUNT_RATE*100)}% Introductory offer discount</span>
             <span style={{ fontSize:14, fontWeight:700, color:"#DC2626" }}>{discountLabel}</span>
           </div>
         )}
-        {paymentType === "recurring" && (
+        {false && paymentType === "recurring" && (
           <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-            <span style={{ fontSize:12, color:"#22c55e", fontWeight:600 }}>🔄 Auto-renew discount</span>
+
             <span style={{ fontSize:12, color:"#22c55e", fontWeight:700 }}>-15%</span>
           </div>
         )}
@@ -154,7 +154,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
           <span style={{ fontSize:15, fontWeight:800, color:"#0f172a" }}>Total</span>
           <span style={{ fontSize:15, fontWeight:800, color:"#5B4EFF" }}>{displayPrice}</span>
         </div>
-        {paymentType === "recurring" && (
+        {false && paymentType === "recurring" && (
           <p style={{ fontSize:11, color:"#94A3B8", margin:"8px 0 0" }}>Billed every {planInfo.weeks} week{planInfo.weeks>1?"s":""} · Cancel anytime</p>
         )}
       </div>
