@@ -72,15 +72,21 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
         console.log("[Sub] Response:", JSON.stringify(subData));
         if (subData.error) throw new Error(subData.error);
 
-        const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(subData.clientSecret, {
-          payment_method: paymentMethod.id,
-        });
-        if (confirmError) throw new Error(confirmError.message);
-        if (paymentIntent.status !== "succeeded") throw new Error("Payment failed");
-
-        paymentIntentId = paymentIntent.id;
-        stripeSubscriptionId = subData.subscriptionId;
-        stripeCustomerId = subData.customerId;
+        if (subData.status === "succeeded") {
+          // Already confirmed server-side
+          paymentIntentId = subData.paymentIntentId;
+          stripeSubscriptionId = subData.subscriptionId;
+          stripeCustomerId = subData.customerId;
+        } else {
+          const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(subData.clientSecret, {
+            payment_method: paymentMethod.id,
+          });
+          if (confirmError) throw new Error(confirmError.message);
+          if (paymentIntent.status !== "succeeded") throw new Error("Payment failed");
+          paymentIntentId = subData.paymentIntentId || paymentIntent.id;
+          stripeSubscriptionId = subData.subscriptionId;
+          stripeCustomerId = subData.customerId;
+        }
 
       } else {
         const res = await fetch("/api/stripe/payment-intent", {
