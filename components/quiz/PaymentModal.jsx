@@ -117,6 +117,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
 
       if (typeof window !== "undefined" && window.fbq) {
         const purchaseValue = parseFloat(displayPrice?.replace("$","") || "19.99");
+        window.fbq("init", "1707573550631351", { em: email });
         window.fbq("track", "Purchase", {
           value: isNaN(purchaseValue) ? 19.99 : purchaseValue,
           currency: "USD",
