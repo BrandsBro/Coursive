@@ -117,7 +117,17 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
 
       if (typeof window !== "undefined" && window.fbq) {
         const purchaseValue = parseFloat(displayPrice?.replace("$","") || "19.99");
-        window.fbq("init", "1707573550631351", { em: email });
+        const getCookie = (n) => { const m = document.cookie.match(new RegExp("(^| )" + n + "=([^;]+)")); return m ? m[2] : undefined; };
+        const nameParts = (name || "").trim().split(" ");
+        const externalId = localStorage.getItem("user_id") || undefined;
+        window.fbq("init", "1707573550631351", {
+          em: email,
+          fn: nameParts[0] || undefined,
+          ln: nameParts[1] || undefined,
+          external_id: externalId,
+          fbp: getCookie("_fbp"),
+          fbc: getCookie("_fbc"),
+        });
         window.fbq("track", "Purchase", {
           value: isNaN(purchaseValue) ? 19.99 : purchaseValue,
           currency: "USD",
