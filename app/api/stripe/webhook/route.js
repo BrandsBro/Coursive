@@ -24,25 +24,25 @@ export async function POST(req) {
 
   if (event.type === "invoice.payment_succeeded") {
     const invoice = event.data.object;
+
+    // First payment handled by create-account directly
+    if (invoice.billing_reason === "subscription_create") {
+      return NextResponse.json({ received: true });
+    }
+
     if (invoice.subscription) {
       const sub = await stripe.subscriptions.retrieve(invoice.subscription);
-      const { plan, email, name } = sub.metadata;
+      const { plan, email } = sub.metadata;
       if (plan && email) {
         const weeks = plan === "1-Week Plan" ? 1 : plan === "4-Week Plan" ? 4 : 12;
-        const amount = invoice.amount_paid / 100;
-        try {
-          await fetch(process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "") + "/api/stripe/create-account", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email, name, plan,
-              paymentType: "recurring",
-              paymentIntentId: invoice.payment_intent,
-              stripeSubscriptionId: invoice.subscription,
-              stripeCustomerId: sub.customer,
-            }),
-          });
-        } catch(e) { console.error("Create account error:", e); }
+        const newExpiry = new Date();
+        newExpiry.setDate(newExpiry.getDate() + weeks * 7);
+        const { error } = await supabase
+          .from("subscriptions")
+          .update({ status: "active", expires_at: newExpiry.toISOString() })
+          .eq("stripe_subscription_id", invoice.subscription);
+        if (error) console.error("Renewal update error:", error);
+        else console.log("Subscription renewed for:", email, "until:", newExpiry);
       }
     }
   }
