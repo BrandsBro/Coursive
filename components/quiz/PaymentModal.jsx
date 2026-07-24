@@ -110,7 +110,13 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
       const res2 = await fetch("/api/stripe/create-account", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, name, plan, paymentType, paymentIntentId, purchaseEventId, stripeSubscriptionId, stripeCustomerId }),
+        body: JSON.stringify({
+          email, name, plan, paymentType, paymentIntentId, purchaseEventId,
+          stripeSubscriptionId, stripeCustomerId,
+          fbp: getCookie("_fbp"),
+          fbc: getCookie("_fbc"),
+          externalId: localStorage.getItem("user_id") || undefined,
+        }),
       });
       const result = await res2.json();
       if (result.error) throw new Error(result.error);
