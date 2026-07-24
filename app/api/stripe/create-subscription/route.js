@@ -31,48 +31,50 @@ export async function POST(req) {
       await supabase.from("profiles").update({ stripe_customer_id: customerId }).eq("email", email);
     }
 
+    // Attach payment method
     await stripe.paymentMethods.attach(paymentMethodId, { customer: customerId });
     await stripe.customers.update(customerId, {
       invoice_settings: { default_payment_method: paymentMethodId }
     });
 
+    // Create price
     const price = await stripe.prices.create({
       currency: "usd",
       unit_amount: planConfig.amount,
-      recurring: { interval: planConfig.interval, interval_count: planConfig.interval_count },
+      recurring: {
+        interval: planConfig.interval,
+        interval_count: planConfig.interval_count,
+      },
       product_data: { name: plan },
     });
 
+    // Create subscription and pay immediately
     const subscription = await stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: price.id }],
+      default_payment_method: paymentMethodId,
       payment_behavior: "default_incomplete",
-      payment_settings: {
-        save_default_payment_method: "on_subscription",
-        payment_method_types: ["card"],
-      },
       expand: ["latest_invoice.payment_intent"],
       metadata: { plan, email, name },
     });
 
-    const invoice = subscription.latest_invoice;
-    let paymentIntent = invoice?.payment_intent;
-
-    // If no payment intent on invoice, retrieve it separately
-    if (!paymentIntent && invoice?.id) {
-      const fullInvoice = await stripe.invoices.retrieve(invoice.id, {
-        expand: ["payment_intent"],
-      });
-      paymentIntent = fullInvoice.payment_intent;
-    }
-
     console.log("Sub status:", subscription.status);
-    console.log("Invoice status:", invoice?.status);
-    console.log("PI status:", paymentIntent?.status);
-    console.log("PI client_secret exists:", !!paymentIntent?.client_secret);
+    console.log("Invoice:", subscription.latest_invoice?.status);
+
+    const paymentIntent = subscription.latest_invoice?.payment_intent;
 
     if (!paymentIntent?.client_secret) {
-      throw new Error("No payment intent found for subscription");
+      // Try to pay the invoice manually
+      const paidInvoice = await stripe.invoices.pay(subscription.latest_invoice.id, {
+        expand: ["payment_intent"],
+      });
+      const pi = paidInvoice.payment_intent;
+      if (!pi?.client_secret) throw new Error("Could not get payment intent");
+      return NextResponse.json({
+        subscriptionId: subscription.id,
+        clientSecret: pi.client_secret,
+        customerId,
+      });
     }
 
     return NextResponse.json({
