@@ -34,7 +34,7 @@ export async function POST(req) {
         try {
           const sub = await stripe.subscriptions.retrieve(invoice.subscription);
           const { plan } = sub.metadata;
-          const fullAmount = plan === "1-Week Plan" ? 693 : plan === "4-Week Plan" ? 3999 : 7999;
+          const fullAmount = plan === "1-Week Plan" ? 1386 : plan === "4-Week Plan" ? 3999 : 7999;
           const price = await stripe.prices.create({
             currency: "usd",
             unit_amount: fullAmount,
@@ -51,6 +51,9 @@ export async function POST(req) {
           console.log("Updated subscription to full price:", fullAmount / 100);
         } catch(e) { console.error("Price update error:", e.message); }
       }
+      return NextResponse.json({ received: true });
+    }
+    if (invoice.billing_reason !== "subscription_cycle") {
       return NextResponse.json({ received: true });
     }
 
