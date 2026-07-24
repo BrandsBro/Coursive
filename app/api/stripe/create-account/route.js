@@ -307,8 +307,6 @@ export async function POST(req) {
           orderId: paymentIntentId,
           eventId: purchaseEventId || eventId,
 
-          contentName: plan,
-          orderId: paymentIntentId,
         }),
       });
     } catch(e) { console.error("Meta CAPI error:", e); }
