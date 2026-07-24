@@ -31,7 +31,7 @@ export async function POST(req) {
         const weeks = plan === "1-Week Plan" ? 1 : plan === "4-Week Plan" ? 4 : 12;
         const amount = invoice.amount_paid / 100;
         try {
-          await fetch(process.env.NEXT_PUBLIC_SITE_URL + "/api/stripe/create-account", {
+          await fetch(process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "") + "/api/stripe/create-account", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
