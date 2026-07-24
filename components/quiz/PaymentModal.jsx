@@ -121,9 +121,6 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
         const nameParts = (name || "").trim().split(" ");
         const externalId = localStorage.getItem("user_id") || undefined;
         window.fbq("init", "1707573550631351", {
-          em: email,
-          fn: nameParts[0] || undefined,
-          ln: nameParts[1] || undefined,
           external_id: externalId,
           fbp: getCookie("_fbp"),
           fbc: getCookie("_fbc"),
