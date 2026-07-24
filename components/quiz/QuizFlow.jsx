@@ -527,7 +527,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
   const router = useRouter();
   const [selectedPlan, setSelectedPlan] = useState("4-Week Plan");
   const [showPayment, setShowPayment] = useState(false);
-  const [paymentType] = useState("one_time");
+  const [paymentType] = useState("recurring");
   const [timeLeft, setTimeLeft] = useState(10 * 60);
   const [pricingData, setPricingData] = useState(null);
   const [sliderPos, setSliderPos] = useState(0);
