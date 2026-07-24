@@ -31,26 +31,20 @@ const doubled = [...reviews, ...reviews];
 
 export default function Testimonials() {
   const isMobile = useIsMobile();
-  const track1 = useRef(null);
-  const track2 = useRef(null);
+  const trackRef = useRef(null);
 
   useEffect(() => {
-    const speed = 0.4;
-    let pos1 = 0;
-    let pos2 = 0;
+    const speed = 0.5;
+    let pos = 0;
     let raf;
-
     const cardW = isMobile ? 280 : 340;
     const gap = 16;
     const totalW = reviews.length * (cardW + gap);
 
     const animate = () => {
-      pos1 -= speed;
-      pos2 -= speed;
-      if (Math.abs(pos1) >= totalW) pos1 = 0;
-      if (Math.abs(pos2) >= totalW) pos2 = 0;
-      if (track1.current) track1.current.style.transform = `translateX(${pos1}px)`;
-      if (track2.current) track2.current.style.transform = `translateX(${pos2}px)`;
+      pos -= speed;
+      if (Math.abs(pos) >= totalW) pos = 0;
+      if (trackRef.current) trackRef.current.style.transform = `translateX(${pos}px)`;
       raf = requestAnimationFrame(animate);
     };
 
@@ -59,25 +53,6 @@ export default function Testimonials() {
   }, [isMobile]);
 
   const cardW = isMobile ? 280 : 340;
-
-  const Card = ({ r, i }) => (
-    <div key={i} style={{
-      flexShrink: 0,
-      width: cardW,
-      marginRight: 16,
-      background: "rgba(255,255,255,0.03)",
-      border: "1px solid rgba(255,255,255,0.07)",
-      borderRadius: 20,
-      padding: 24,
-    }}>
-      <div style={{ display:"flex", gap:2, marginBottom:12 }}>
-        {[1,2,3,4,5].map(s=><span key={s} style={{ fontSize:16, color:s<=r.stars?"#f59e0b":"rgba(255,255,255,0.15)" }}>★</span>)}
-      </div>
-      <p style={{ fontSize:14, color:"rgba(255,255,255,0.7)", margin:"0 0 16px", lineHeight:1.7 }}>"{r.text}"</p>
-      <p style={{ fontSize:13, fontWeight:700, color:"#fff", margin:"0 0 2px" }}>{r.name}</p>
-      <p style={{ fontSize:12, color:"rgba(255,255,255,0.35)", margin:0 }}>{r.role}</p>
-    </div>
-  );
 
   return (
     <section id="reviews" style={{ padding: isMobile ? "48px 0" : "80px 0", overflow:"hidden" }}>
@@ -92,17 +67,26 @@ export default function Testimonials() {
         </div>
       </div>
 
-      {/* Row 1 - left to right */}
-      <div style={{ overflow:"hidden", marginBottom:16, WebkitMaskImage:"linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)" }}>
-        <div ref={track1} style={{ display:"flex", width:"max-content" }}>
-          {doubled.map((r, i) => <Card key={i} r={r} i={i} />)}
-        </div>
-      </div>
-
-      {/* Row 2 - offset */}
-      <div style={{ overflow:"hidden", WebkitMaskImage:"linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%)" }}>
-        <div ref={track2} style={{ display:"flex", width:"max-content", transform:`translateX(-${cardW * 3}px)` }}>
-          {doubled.map((r, i) => <Card key={i} r={r} i={i} />)}
+      <div style={{ overflow:"hidden", WebkitMaskImage:"linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%)" }}>
+        <div ref={trackRef} style={{ display:"flex", width:"max-content" }}>
+          {doubled.map((r, i) => (
+            <div key={i} style={{
+              flexShrink: 0,
+              width: cardW,
+              marginRight: 16,
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.07)",
+              borderRadius: 20,
+              padding: 24,
+            }}>
+              <div style={{ display:"flex", gap:2, marginBottom:12 }}>
+                {[1,2,3,4,5].map(s=><span key={s} style={{ fontSize:16, color:s<=r.stars?"#f59e0b":"rgba(255,255,255,0.15)" }}>★</span>)}
+              </div>
+              <p style={{ fontSize:14, color:"rgba(255,255,255,0.7)", margin:"0 0 16px", lineHeight:1.7 }}>"{r.text}"</p>
+              <p style={{ fontSize:13, fontWeight:700, color:"#fff", margin:"0 0 2px" }}>{r.name}</p>
+              <p style={{ fontSize:12, color:"rgba(255,255,255,0.35)", margin:0 }}>{r.role}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
