@@ -27,8 +27,30 @@ export async function POST(req) {
 
     // First payment handled by create-account directly
     console.log("Invoice billing_reason:", invoice.billing_reason, "subscription:", invoice.subscription);
+    
     if (invoice.billing_reason === "subscription_create") {
-      console.log("Skipping first payment invoice");
+      console.log("First payment - upgrading to full price for next renewal");
+      if (invoice.subscription) {
+        try {
+          const sub = await stripe.subscriptions.retrieve(invoice.subscription);
+          const { plan } = sub.metadata;
+          const fullAmount = plan === "1-Week Plan" ? 693 : plan === "4-Week Plan" ? 3999 : 7999;
+          const price = await stripe.prices.create({
+            currency: "usd",
+            unit_amount: fullAmount,
+            recurring: {
+              interval: sub.items.data[0].price.recurring.interval,
+              interval_count: sub.items.data[0].price.recurring.interval_count,
+            },
+            product_data: { name: plan + " (Full Price)" },
+          });
+          await stripe.subscriptions.update(invoice.subscription, {
+            items: [{ id: sub.items.data[0].id, price: price.id }],
+            proration_behavior: "none",
+          });
+          console.log("Updated subscription to full price:", fullAmount / 100);
+        } catch(e) { console.error("Price update error:", e.message); }
+      }
       return NextResponse.json({ received: true });
     }
 
