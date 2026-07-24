@@ -22,6 +22,42 @@ export async function POST(req) {
     return NextResponse.json({ error: e.message }, { status: 400 });
   }
 
+  if (event.type === "invoice.payment_succeeded") {
+    const invoice = event.data.object;
+    if (invoice.subscription) {
+      const sub = await stripe.subscriptions.retrieve(invoice.subscription);
+      const { plan, email, name } = sub.metadata;
+      if (plan && email) {
+        const weeks = plan === "1-Week Plan" ? 1 : plan === "4-Week Plan" ? 4 : 12;
+        const amount = invoice.amount_paid / 100;
+        try {
+          await fetch(process.env.NEXT_PUBLIC_SITE_URL + "api/stripe/create-account", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email, name, plan,
+              paymentType: "recurring",
+              paymentIntentId: invoice.payment_intent,
+              stripeSubscriptionId: invoice.subscription,
+              stripeCustomerId: sub.customer,
+            }),
+          });
+        } catch(e) { console.error("Create account error:", e); }
+      }
+    }
+  }
+
+  if (event.type === "customer.subscription.deleted") {
+    const sub = event.data.object;
+    const { email } = sub.metadata;
+    if (email) {
+      await supabase.from("subscriptions")
+        .update({ status: "cancelled" })
+        .eq("stripe_subscription_id", sub.id);
+      console.log("Subscription cancelled for:", email);
+    }
+  }
+
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
     const { name, email } = session.metadata;

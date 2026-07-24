@@ -193,7 +193,7 @@ function fallbackEmailHtml(
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { email, name, plan, paymentType, paymentIntentId } = body;
+    const { email, name, plan, paymentType, paymentIntentId, stripeSubscriptionId, stripeCustomerId } = body;
     let purchaseEventId = body.purchaseEventId;
     console.log("Creating account for:", email, name, plan, paymentType);
     if (!purchaseEventId && paymentIntentId) {
@@ -268,6 +268,8 @@ export async function POST(req) {
         status: "active",
         amount_paid: amount,
         stripe_payment_intent_id: paymentIntentId,
+        stripe_subscription_id: stripeSubscriptionId || null,
+        stripe_customer_id: stripeCustomerId || null,
         started_at: startFrom.toISOString(),
         expires_at: expiresAt.toISOString(),
         next_billing_at: nextBillingAt?.toISOString(),
