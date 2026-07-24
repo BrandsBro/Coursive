@@ -47,21 +47,32 @@ export async function POST(req) {
       customer: customerId,
       items: [{ price: price.id }],
       payment_behavior: "default_incomplete",
-      payment_settings: { save_default_payment_method: "on_subscription" },
+      payment_settings: {
+        save_default_payment_method: "on_subscription",
+        payment_method_types: ["card"],
+      },
       expand: ["latest_invoice.payment_intent"],
       metadata: { plan, email, name },
     });
 
-    console.log("Sub status:", subscription.status);
-    console.log("Invoice status:", subscription.latest_invoice?.status);
-    console.log("Payment intent:", subscription.latest_invoice?.payment_intent?.status);
-
     const invoice = subscription.latest_invoice;
-    const paymentIntent = invoice?.payment_intent;
+    let paymentIntent = invoice?.payment_intent;
+
+    // If no payment intent on invoice, retrieve it separately
+    if (!paymentIntent && invoice?.id) {
+      const fullInvoice = await stripe.invoices.retrieve(invoice.id, {
+        expand: ["payment_intent"],
+      });
+      paymentIntent = fullInvoice.payment_intent;
+    }
+
+    console.log("Sub status:", subscription.status);
+    console.log("Invoice status:", invoice?.status);
+    console.log("PI status:", paymentIntent?.status);
+    console.log("PI client_secret exists:", !!paymentIntent?.client_secret);
 
     if (!paymentIntent?.client_secret) {
-      console.error("No client_secret. Invoice:", JSON.stringify(invoice?.status), "PI:", JSON.stringify(paymentIntent?.status));
-      throw new Error("No payment intent client_secret found. Sub status: " + subscription.status);
+      throw new Error("No payment intent found for subscription");
     }
 
     return NextResponse.json({
