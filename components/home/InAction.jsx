@@ -15,7 +15,7 @@ export default function InAction() {
             { value:"100k+", label:"Prompts built on real-world projects" },
           ].map((s,i) => (
             <div key={i} style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:20, padding:"28px 24px" }}>
-              <p style={{ fontSize: isMobile ? 28 : 36, fontWeight:900, color:"#5B4EFF", margin:"0 0 8px" }}>{s.value}</p>
+              <p style={{ fontSize: isMobile ? 28 : 36, fontWeight:900, color:"white", margin:"0 0 8px" }}>{s.value}</p>
               <p style={{ fontSize:14, color:"rgba(255,255,255,0.5)", margin:0 }}>{s.label}</p>
             </div>
           ))}
