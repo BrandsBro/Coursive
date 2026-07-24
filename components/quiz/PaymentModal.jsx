@@ -50,48 +50,76 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
     if (!stripe || !elements) return;
     setLoading(true);
     setError("");
-
     try {
       const purchaseEventId = (crypto.randomUUID?.() || Math.random().toString(36).slice(2));
-      console.log("[Meta] Generated purchaseEventId:", purchaseEventId);
-      const res = await fetch("/api/stripe/payment-intent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, email, name, paymentType, discountCode, discountAmount, purchaseEventId }),
-      });
-      const { clientSecret, error: apiError } = await res.json();
-      if (apiError) throw new Error(apiError);
+      let paymentIntentId, stripeSubscriptionId, stripeCustomerId;
 
-      const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: elements.getElement(CardNumberElement),
+      if (paymentType === "recurring") {
+        const cardElement = elements.getElement(CardNumberElement);
+        const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
+          type: "card",
+          card: cardElement,
           billing_details: { name, email },
-        },
-      });
+        });
+        if (pmError) throw new Error(pmError.message);
 
-      if (stripeError) throw new Error(stripeError.message);
-
-      if (paymentIntent.status === "succeeded") {
-        const res2 = await fetch("/api/stripe/create-account", {
+        const res = await fetch("/api/stripe/create-subscription", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, name, plan, paymentType, paymentIntentId: paymentIntent.id, purchaseEventId }),
+          body: JSON.stringify({ plan, email, name, paymentMethodId: paymentMethod.id }),
         });
-        const result = await res2.json();
-        if (result.error) throw new Error(result.error);
-        // Fire browser Purchase immediately before redirect
-        if (typeof window !== "undefined" && window.fbq) {
-          const purchaseValue = parseFloat(displayPrice?.replace("$","") || "19.99");
-          window.fbq("track", "Purchase", {
-            value: isNaN(purchaseValue) ? 19.99 : purchaseValue,
-            currency: "USD",
-            content_name: plan,
-            content_type: "product",
-            order_id: paymentIntent.id,
-          }, { eventID: purchaseEventId });
-        }
-        onSuccess(purchaseEventId, paymentIntent.id);
+        const subData = await res.json();
+        if (subData.error) throw new Error(subData.error);
+
+        const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(subData.clientSecret, {
+          payment_method: paymentMethod.id,
+        });
+        if (confirmError) throw new Error(confirmError.message);
+        if (paymentIntent.status !== "succeeded") throw new Error("Payment failed");
+
+        paymentIntentId = paymentIntent.id;
+        stripeSubscriptionId = subData.subscriptionId;
+        stripeCustomerId = subData.customerId;
+
+      } else {
+        const res = await fetch("/api/stripe/payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan, email, name, paymentType, discountCode, discountAmount, purchaseEventId }),
+        });
+        const { clientSecret, error: apiError } = await res.json();
+        if (apiError) throw new Error(apiError);
+        const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: {
+            card: elements.getElement(CardNumberElement),
+            billing_details: { name, email },
+          },
+        });
+        if (stripeError) throw new Error(stripeError.message);
+        if (paymentIntent.status !== "succeeded") throw new Error("Payment failed");
+        paymentIntentId = paymentIntent.id;
       }
+
+      const res2 = await fetch("/api/stripe/create-account", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, name, plan, paymentType, paymentIntentId, purchaseEventId, stripeSubscriptionId, stripeCustomerId }),
+      });
+      const result = await res2.json();
+      if (result.error) throw new Error(result.error);
+
+      if (typeof window !== "undefined" && window.fbq) {
+        const purchaseValue = parseFloat(displayPrice?.replace("$","") || "19.99");
+        window.fbq("track", "Purchase", {
+          value: isNaN(purchaseValue) ? 19.99 : purchaseValue,
+          currency: "USD",
+          content_name: plan,
+          content_type: "product",
+          order_id: paymentIntentId,
+        }, { eventID: purchaseEventId });
+      }
+      onSuccess(purchaseEventId, paymentIntentId);
+
     } catch (e) {
       setError(e.message);
     }
