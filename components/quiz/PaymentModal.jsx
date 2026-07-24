@@ -264,7 +264,7 @@ export default function PaymentModal({ plan, paymentType, email, name, onClose, 
         <div style={{ textAlign:"center", marginBottom:20 }}>
           <h2 style={{ fontSize:20, fontWeight:900, color:"#0f172a", margin:"0 0 4px" }}>Complete your order</h2>
           <p style={{ fontSize:13, color:"#64748B", margin:0 }}>
-            {paymentType==="recurring" ? "🔄 Auto-renew — Cancel anytime" : "One-time payment"}
+            "Cancel anytime"
           </p>
         </div>
         <Elements stripe={stripePromise} options={{ appearance:{ theme:"stripe" } }}>
