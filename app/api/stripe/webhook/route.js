@@ -15,17 +15,11 @@ export async function POST(req) {
   const sig = req.headers.get("stripe-signature");
 
   let event;
-  if (process.env.STRIPE_WEBHOOK_BYPASS === "true") {
-    try { event = JSON.parse(body); } catch(e) {
-      return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-    }
-  } else {
-    try {
-      event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-    } catch (e) {
-      console.error("Webhook signature error:", e.message);
-      return NextResponse.json({ error: e.message }, { status: 400 });
-    }
+  try {
+    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+  } catch (e) {
+    console.error("Webhook signature error:", e.message);
+    return NextResponse.json({ error: e.message }, { status: 400 });
   }
 
   if (event.type === "invoice.payment_succeeded") {
