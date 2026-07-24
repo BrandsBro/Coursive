@@ -138,6 +138,12 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
           <span style={{ fontSize:14, color:"#374151" }}>AI Certificate</span>
           <span style={{ fontSize:14, fontWeight:700, color:"#0f172a" }}>FREE</span>
         </div>
+        {paymentType === "recurring" && (
+          <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
+            <span style={{ fontSize:14, color:"#374151" }}>50% OFF</span>
+            <span style={{ fontSize:14, fontWeight:700, color:"#DC2626" }}>-{originalPriceLabel && displayPrice ? `$${(parseFloat(originalPriceLabel.replace("$","")) - parseFloat(displayPrice.replace("$",""))).toFixed(2)}` : ""}</span>
+          </div>
+        )}
         {discountLabel && paymentType !== "recurring" && (
           <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
             <span style={{ fontSize:14, color:"#374151" }}>{Math.round(DISCOUNT_RATE*100)}% Introductory offer discount</span>
