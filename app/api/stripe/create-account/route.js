@@ -300,6 +300,7 @@ export async function POST(req) {
         body: JSON.stringify({
           eventName: "Purchase",
           email,
+          name,
           value: parseFloat(amount),
           currency: "USD",
           contentName: plan,
