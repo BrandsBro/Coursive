@@ -69,6 +69,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
           body: JSON.stringify({ plan, email, name, paymentMethodId: paymentMethod.id }),
         });
         const subData = await res.json();
+        console.log("[Sub] Response:", JSON.stringify(subData));
         if (subData.error) throw new Error(subData.error);
 
         const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(subData.clientSecret, {
@@ -221,7 +222,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
         disabled={loading || !stripe}
         style={{ width:"100%", padding:"16px", borderRadius:14, border:"none", background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", color:"#fff", fontSize:16, fontWeight:800, cursor:loading?"not-allowed":"pointer", opacity:loading?0.7:1, marginBottom:12 }}
       >
-        {loading ? "Processing..." : `🔒 Confirm Payment ${displayPrice}`}
+        {loading ? "Processing..." : `🔒 Confirm Payment `}
       </button>
 
       <div style={{ textAlign:"center" }}>
