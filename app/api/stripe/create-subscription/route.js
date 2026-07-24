@@ -8,7 +8,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-const PLAN_INTERVALS = {
+const PLAN_CONFIG = {
   "1-Week Plan":  { interval: "week",  interval_count: 1,  amount: 693  },
   "4-Week Plan":  { interval: "week",  interval_count: 4,  amount: 1999 },
   "12-Week Plan": { interval: "week",  interval_count: 12, amount: 3999 },
@@ -17,7 +17,7 @@ const PLAN_INTERVALS = {
 export async function POST(req) {
   try {
     const { email, name, plan, paymentMethodId } = await req.json();
-    const planConfig = PLAN_INTERVALS[plan] || PLAN_INTERVALS["4-Week Plan"];
+    const config = PLAN_CONFIG[plan] || PLAN_CONFIG["4-Week Plan"];
 
     let customerId;
     const { data: profile } = await supabase
@@ -31,8 +31,13 @@ export async function POST(req) {
       await supabase.from("profiles").update({ stripe_customer_id: customerId }).eq("email", email);
     }
 
-    // Attach payment method
-    await stripe.paymentMethods.attach(paymentMethodId, { customer: customerId });
+    // Attach payment method to customer
+    try {
+      await stripe.paymentMethods.attach(paymentMethodId, { customer: customerId });
+    } catch(e) {
+      if (!e.message.includes("already been attached")) throw e;
+    }
+
     await stripe.customers.update(customerId, {
       invoice_settings: { default_payment_method: paymentMethodId }
     });
@@ -40,47 +45,40 @@ export async function POST(req) {
     // Create price
     const price = await stripe.prices.create({
       currency: "usd",
-      unit_amount: planConfig.amount,
-      recurring: {
-        interval: planConfig.interval,
-        interval_count: planConfig.interval_count,
-      },
+      unit_amount: config.amount,
+      recurring: { interval: config.interval, interval_count: config.interval_count },
       product_data: { name: plan },
     });
 
-    // Create subscription and pay immediately
+    // Create subscription with off_session to force immediate payment
     const subscription = await stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: price.id }],
       default_payment_method: paymentMethodId,
-      payment_behavior: "default_incomplete",
-      expand: ["latest_invoice.payment_intent"],
+      payment_behavior: "error_if_incomplete",
+      off_session: true,
       metadata: { plan, email, name },
     });
 
-    console.log("Sub status:", subscription.status);
-    console.log("Invoice:", subscription.latest_invoice?.status);
+    console.log("Sub created:", subscription.id, "status:", subscription.status);
 
-    const paymentIntent = subscription.latest_invoice?.payment_intent;
-
-    if (!paymentIntent?.client_secret) {
-      // Try to pay the invoice manually
-      const paidInvoice = await stripe.invoices.pay(subscription.latest_invoice.id, {
-        expand: ["payment_intent"],
-      });
-      const pi = paidInvoice.payment_intent;
-      if (!pi?.client_secret) throw new Error("Could not get payment intent");
-      return NextResponse.json({
-        subscriptionId: subscription.id,
-        clientSecret: pi.client_secret,
-        customerId,
-      });
-    }
+    // Subscription paid immediately - create a payment intent for confirmation
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: config.amount,
+      currency: "usd",
+      customer: customerId,
+      payment_method: paymentMethodId,
+      confirm: true,
+      off_session: true,
+      metadata: { plan, email, name, subscriptionId: subscription.id },
+    });
 
     return NextResponse.json({
       subscriptionId: subscription.id,
       clientSecret: paymentIntent.client_secret,
       customerId,
+      paymentIntentId: paymentIntent.id,
+      status: paymentIntent.status,
     });
   } catch(e) {
     console.error("Subscription error:", e.message);
