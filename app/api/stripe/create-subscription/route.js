@@ -92,6 +92,24 @@ export async function POST(req) {
       metadata: { plan, email, name, subscriptionId: subscription.id },
     });
 
+    // Schedule price update to full price for next renewal
+    const fullAmount = config.amount === 693 ? 693 : config.amount === 1999 ? 3999 : 7999;
+    if (fullAmount !== config.amount) {
+      try {
+        const fullPrice = await stripe.prices.create({
+          currency: "usd",
+          unit_amount: fullAmount,
+          recurring: { interval: config.interval, interval_count: config.interval_count },
+          product_data: { name: plan + " (Full Price)" },
+        });
+        await stripe.subscriptions.update(subscription.id, {
+          items: [{ id: subscription.items.data[0].id, price: fullPrice.id }],
+          proration_behavior: "none",
+        });
+        console.log("Updated to full price:", fullAmount / 100, "for next renewal");
+      } catch(e) { console.error("Price update error:", e.message); }
+    }
+
     return NextResponse.json({
       subscriptionId: subscription.id,
       clientSecret: paymentIntent.client_secret,
