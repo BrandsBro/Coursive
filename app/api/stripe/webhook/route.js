@@ -26,13 +26,16 @@ export async function POST(req) {
     const invoice = event.data.object;
 
     // First payment handled by create-account directly
+    console.log("Invoice billing_reason:", invoice.billing_reason, "subscription:", invoice.subscription);
     if (invoice.billing_reason === "subscription_create") {
+      console.log("Skipping first payment invoice");
       return NextResponse.json({ received: true });
     }
 
     if (invoice.subscription) {
       const sub = await stripe.subscriptions.retrieve(invoice.subscription);
       const { plan, email } = sub.metadata;
+      console.log("Renewal for:", email, "plan:", plan, "sub:", invoice.subscription);
       if (plan && email) {
         const weeks = plan === "1-Week Plan" ? 1 : plan === "4-Week Plan" ? 4 : 12;
         const newExpiry = new Date();
