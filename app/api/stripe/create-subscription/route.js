@@ -93,7 +93,7 @@ export async function POST(req) {
     });
 
     // Schedule price update to full price for next renewal
-    const fullAmount = config.amount === 693 ? 693 : config.amount === 1999 ? 3999 : 7999;
+    const fullAmount = config.amount === 693 ? 1386 : config.amount === 1999 ? 3999 : 7999;
     if (fullAmount !== config.amount) {
       try {
         const fullPrice = await stripe.prices.create({
