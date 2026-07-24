@@ -17,10 +17,8 @@ const PLAN_INTERVALS = {
 export async function POST(req) {
   try {
     const { email, name, plan, paymentMethodId } = await req.json();
-
     const planConfig = PLAN_INTERVALS[plan] || PLAN_INTERVALS["4-Week Plan"];
 
-    // Get or create Stripe customer
     let customerId;
     const { data: profile } = await supabase
       .from("profiles").select("stripe_customer_id").eq("email", email).single();
@@ -33,13 +31,11 @@ export async function POST(req) {
       await supabase.from("profiles").update({ stripe_customer_id: customerId }).eq("email", email);
     }
 
-    // Attach payment method to customer
     await stripe.paymentMethods.attach(paymentMethodId, { customer: customerId });
     await stripe.customers.update(customerId, {
       invoice_settings: { default_payment_method: paymentMethodId }
     });
 
-    // Create price on the fly
     const price = await stripe.prices.create({
       currency: "usd",
       unit_amount: planConfig.amount,
@@ -47,7 +43,6 @@ export async function POST(req) {
       product_data: { name: plan },
     });
 
-    // Create subscription
     const subscription = await stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: price.id }],
@@ -57,7 +52,17 @@ export async function POST(req) {
       metadata: { plan, email, name },
     });
 
-    const paymentIntent = subscription.latest_invoice.payment_intent;
+    console.log("Sub status:", subscription.status);
+    console.log("Invoice status:", subscription.latest_invoice?.status);
+    console.log("Payment intent:", subscription.latest_invoice?.payment_intent?.status);
+
+    const invoice = subscription.latest_invoice;
+    const paymentIntent = invoice?.payment_intent;
+
+    if (!paymentIntent?.client_secret) {
+      console.error("No client_secret. Invoice:", JSON.stringify(invoice?.status), "PI:", JSON.stringify(paymentIntent?.status));
+      throw new Error("No payment intent client_secret found. Sub status: " + subscription.status);
+    }
 
     return NextResponse.json({
       subscriptionId: subscription.id,
@@ -65,7 +70,7 @@ export async function POST(req) {
       customerId,
     });
   } catch(e) {
-    console.error("Subscription error:", e);
+    console.error("Subscription error:", e.message);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
