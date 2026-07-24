@@ -140,7 +140,7 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
         </div>
         {paymentType === "recurring" && (
           <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-            <span style={{ fontSize:14, color:"#374151" }}>50% OFF</span>
+            <span style={{ fontSize:14, color:"#374151" }}>50% Introductory offer discount</span>
             <span style={{ fontSize:14, fontWeight:700, color:"#DC2626" }}>-{originalPriceLabel && displayPrice ? `$${(parseFloat(originalPriceLabel.replace("$","")) - parseFloat(displayPrice.replace("$",""))).toFixed(2)}` : ""}</span>
           </div>
         )}
