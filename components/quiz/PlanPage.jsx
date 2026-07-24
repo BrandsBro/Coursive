@@ -334,7 +334,7 @@ export default function PlanPage({ pricingData }) {
       {showPayment && (
         <PaymentModal
           plan={selectedPlan}
-          paymentType="one_time"
+          paymentType="recurring"
           email={email}
           name={name}
           onClose={() => setShowPayment(false)}
