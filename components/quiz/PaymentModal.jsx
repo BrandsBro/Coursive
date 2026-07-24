@@ -1,4 +1,5 @@
 "use client";
+import { trackEvent } from "@/lib/meta";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
@@ -121,24 +122,17 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
       const result = await res2.json();
       if (result.error) throw new Error(result.error);
 
-      if (typeof window !== "undefined" && window.fbq) {
-        const purchaseValue = parseFloat(displayPrice?.replace("$","") || "19.99");
-        const getCookie = (n) => { const m = document.cookie.match(new RegExp("(^| )" + n + "=([^;]+)")); return m ? m[2] : undefined; };
-        const nameParts = (name || "").trim().split(" ");
-        const externalId = localStorage.getItem("user_id") || undefined;
-        window.fbq("init", "1707573550631351", {
-          external_id: externalId,
-          fbp: getCookie("_fbp"),
-          fbc: getCookie("_fbc"),
-        });
-        window.fbq("track", "Purchase", {
-          value: isNaN(purchaseValue) ? 19.99 : purchaseValue,
-          currency: "USD",
-          content_name: plan,
-          content_type: "product",
-          order_id: paymentIntentId,
-        }, { eventID: purchaseEventId });
-      }
+      const purchaseValue = parseFloat(displayPrice?.replace("$","") || "19.99");
+      await trackEvent("Purchase", {
+        value: isNaN(purchaseValue) ? 19.99 : purchaseValue,
+        currency: "USD",
+        contentName: plan,
+        contentType: "product",
+        orderId: paymentIntentId,
+        email,
+        name,
+        eventId: purchaseEventId,
+      });
       onSuccess(purchaseEventId, paymentIntentId);
 
     } catch (e) {
