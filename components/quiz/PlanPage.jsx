@@ -202,10 +202,7 @@ export default function PlanPage({ pricingData }) {
   const handleCtaClick = () => {
     if (!termsAccepted) { setTermsError(true); return; }
     setTermsError(false);
-    const _email = typeof window !== "undefined" ? (localStorage.getItem("user_email") || email || "") : "";
-    const _name = typeof window !== "undefined" ? (localStorage.getItem("user_name") || name || "") : "";
-    const _externalId = typeof window !== "undefined" ? (localStorage.getItem("user_id") || "") : "";
-    trackEvent("InitiateCheckout", { contentName: selectedPlan, email: _email, name: _name, externalId: _externalId });
+trackEvent("InitiateCheckout", { contentName: selectedPlan, email, name });
     setShowPayment(true);
   };
 
