@@ -289,29 +289,6 @@ export async function POST(req) {
       type: paymentType,
     });
 
-    // Fire Meta CAPI Purchase event
-    try {
-      const { randomUUID } = await import("crypto");
-      const eventId = randomUUID();
-      const capiCallId = Math.random().toString(36).slice(2);
-      console.log("[Meta CAPI Purchase] callId:", capiCallId, "eventId:", purchaseEventId || eventId);
-      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}api/meta/event`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          eventName: "Purchase",
-          email,
-          name,
-          value: parseFloat(amount),
-          currency: "USD",
-          contentName: plan,
-          contentType: "product",
-          orderId: paymentIntentId,
-          eventId: purchaseEventId || eventId,
-
-        }),
-      });
-    } catch(e) { console.error("Meta CAPI error:", e); }
 
 
     // Mark lead as converted
