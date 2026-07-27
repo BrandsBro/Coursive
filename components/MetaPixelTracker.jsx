@@ -21,6 +21,19 @@ export default function MetaPixelTracker() {
       name = localStorage.getItem("user_name") || undefined;
     } catch(e) {}
 
+    // Re-init pixel with user data if logged in for better matching
+    if (email || externalId) {
+      const nameParts = (name || "").trim().split(" ");
+      window.fbq("init", "1707573550631351", {
+        em: email,
+        fn: nameParts[0] || undefined,
+        ln: nameParts.slice(1).join(" ") || undefined,
+        external_id: externalId,
+        fbp: getCookie("_fbp"),
+        fbc: getCookie("_fbc"),
+      });
+    }
+
     const pageName = pathname === "/" ? "Home" : pathname.replace("/", "").replace(/-/g, " ");
     trackEvent("PageView", { email, name, externalId });
     trackEvent("ViewContent", { contentName: pageName, contentType: "page", email, name, externalId });
