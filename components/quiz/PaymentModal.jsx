@@ -70,7 +70,6 @@ function CheckoutForm({ plan, paymentType, email, name, onSuccess, onClose, disp
           body: JSON.stringify({ plan, email, name, paymentMethodId: paymentMethod.id }),
         });
         const subData = await res.json();
-        console.log("[Sub] Response:", JSON.stringify(subData));
         if (subData.error) throw new Error(subData.error);
 
         if (subData.status === "succeeded") {
