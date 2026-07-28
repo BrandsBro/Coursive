@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { addToKlaviyoList, trackKlaviyoEvent } from "@/lib/klaviyo";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -437,6 +438,27 @@ export async function POST(req) {
 
     if (emailError) console.error("Email error:", emailError);
     else console.log("Email sent to:", email);
+
+    // Add to Klaviyo customers list
+    try {
+      const nameParts = (name || "").trim().split(" ");
+      await addToKlaviyoList(process.env.KLAVIYO_CUSTOMERS_LIST_ID, {
+        email,
+        firstName: nameParts[0] || "",
+        lastName: nameParts.slice(1).join(" ") || "",
+        properties: {
+          plan,
+          amount: parseFloat(amount),
+          expires_at: expiresAt,
+          source: "purchase",
+        },
+      });
+      await trackKlaviyoEvent(email, "Purchase", {
+        plan,
+        amount: parseFloat(amount),
+        currency: "USD",
+      });
+    } catch(e) { console.error("Klaviyo customers error:", e); }
 
     return NextResponse.json({ success: true });
   } catch (e) {
