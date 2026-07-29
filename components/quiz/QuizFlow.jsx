@@ -22,6 +22,11 @@ const PROOF_IMAGES = [
   "https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784795494244-Comment_and_reply_Mobile_ss_.jpg.png",
 ];
 
+const CHARACTER_IMAGES = [
+  "https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784114538455-Characters.webp",
+  "https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784114541530-Characters-1.webp",
+];
+
 const END_SEQUENCE = ["loading","signup", "summary", "comparison", "social_proof"];
 
 function useIsMobile() {
@@ -98,6 +103,8 @@ function SocialProofStep({ isMobile }) {
             <img
               src={src}
               alt={`proof-${i}`}
+              loading="eager"
+              fetchPriority="high"
               style={{
                 width: "100%", display: "block",
                 objectFit: "cover"
@@ -148,7 +155,9 @@ export default function QuizFlow({ blocks }) {
 
   const loadingRef = useRef(null);
 
+  // Preload ALL images (block images + static end-sequence images) immediately on mount
   useEffect(() => {
+    // Block images
     (blocks || []).forEach((block, idx) => {
       const c = block.content || {};
       const srcs = [...(c.optionImages || []), c.imageUrl, c.headerImage].filter(Boolean);
@@ -157,6 +166,13 @@ export default function QuizFlow({ blocks }) {
         if (idx === 0) img.fetchPriority = "high";
         img.src = src;
       });
+    });
+
+    // Static end-sequence images — preload eagerly so they're cached before user reaches those steps
+    [...PROOF_IMAGES, ...CHARACTER_IMAGES].forEach(src => {
+      const img = new Image();
+      img.fetchPriority = "high";
+      img.src = src;
     });
   }, []);
 
@@ -232,19 +248,19 @@ export default function QuizFlow({ blocks }) {
     }, 280);
   };
 
-useEffect(() => {
-  if (endStep === "loading") {
-    setLoadingPct(0);
-    let step = 0;
-    const steps = 20;
-loadingRef.current = setInterval(() => {
-  step++;
-  setLoadingPct(Math.min(Math.round((step / steps) * 100), 100));
-  if (step >= steps) { clearInterval(loadingRef.current); setTimeout(() => setEndStep(END_SEQUENCE[1]), 400); }
-}, 50);
-    return () => clearInterval(loadingRef.current);
-  }
-}, [endStep]);
+  useEffect(() => {
+    if (endStep === "loading") {
+      setLoadingPct(0);
+      let step = 0;
+      const steps = 20;
+      loadingRef.current = setInterval(() => {
+        step++;
+        setLoadingPct(Math.min(Math.round((step / steps) * 100), 100));
+        if (step >= steps) { clearInterval(loadingRef.current); setTimeout(() => setEndStep(END_SEQUENCE[1]), 400); }
+      }, 50);
+      return () => clearInterval(loadingRef.current);
+    }
+  }, [endStep]);
 
   const showNextStepBtn = !["question_choice", "question_challenge", "question_icon", "loading", "sales"].includes(
     isInEndSequence ? endStep : currentBlock?.type
@@ -362,7 +378,7 @@ function QuizBlock({ block, answers, onChoice, onNext, isMobile }) {
                   <div className="quiz-shimmer" style={{ position:"absolute", inset:0, background:"linear-gradient(90deg,#E2E8F0 25%,#CBD5E1 50%,#E2E8F0 75%)", backgroundSize:"200% 100%" }}/>
                   <img src={optionImages[i]} alt={opt} loading="eager" fetchPriority="high" decoding="async"
                     onLoad={e => { e.target.style.opacity=1; const s=e.target.previousSibling; if(s) s.style.display="none"; }}
-                    style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 15%", display:"block", opacity:0, transition:"opacity 0.3s ease" }}/>
+                    style={{ position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 15%", display:"block", opacity:0, transition:"opacity 0.08s ease" }}/>
                 </div>
               )}
               {!optionImages[i] && (
@@ -388,44 +404,45 @@ function QuizBlock({ block, answers, onChoice, onNext, isMobile }) {
     );
   }
 
-if (block.type === "question_challenge") {
-  const options = (c.options || []).filter(Boolean);
-  const optionImages = c.optionImages || [];
-  const labelColor = c.labelColor || "#5B4EFF";
-  const cols = options.length <= 3 ? options.length : 2;
-  const cardH = isMobile ? 160 : 200;
-  const imgH = isMobile ? 180 : 220;
-  return (
-    <div style={{ width:"100%", textAlign:"center" }}>
+  if (block.type === "question_challenge") {
+    const options = (c.options || []).filter(Boolean);
+    const optionImages = c.optionImages || [];
+    const labelColor = c.labelColor || "#5B4EFF";
+    const cols = options.length <= 3 ? options.length : 2;
+    const cardH = isMobile ? 160 : 200;
+    const imgH = isMobile ? 180 : 220;
+    return (
+      <div style={{ width:"100%", textAlign:"center" }}>
 
-      {/* 1. Main title first */}
-      {c.challengeTitle && (
-        <h1 style={{ fontSize: isMobile ? 18 : 26, fontWeight:900, color:"#0f172a", margin:"0 0 8px", letterSpacing:"0.5px" }}>
-          {c.challengeTitle}
-        </h1>
-      )}
+        {/* 1. Main title first */}
+        {c.challengeTitle && (
+          <h1 style={{ fontSize: isMobile ? 18 : 26, fontWeight:900, color:"#0f172a", margin:"0 0 8px", letterSpacing:"0.5px" }}>
+            {c.challengeTitle}
+          </h1>
+        )}
 
-      {/* 2. preTitle block AFTER main title */}
-      {(c.preTitle || c.preTitleLine2) && (
-  <div style={{ textAlign:"center", marginBottom: isMobile ? 10 : 14 }}>
-    {c.preTitle && (
-      <p style={{ fontSize: isMobile ? c.preTitleSize || 14 : (c.preTitleSize || 14) + 2, margin:"0 0 3px", lineHeight:1.4, fontWeight:700 }}>
-        {c.preTitle}
-      </p>
-    )}
-    {c.preTitleLine2 && (
-      <p style={{ fontSize: isMobile ? (c.preTitleSize || 14) - 8 : c.preTitleSize || 14, color:"#64748B", margin:0, lineHeight:1.4, fontWeight:700 }}>
-        {c.preTitleLine2}
-      </p>
-    )}
-  </div>
-)}
-      {/* 3. Question subtitle */}
-      {c.question && (
-        <p style={{ fontSize: isMobile ? 14 : 17, color:"#64748B", margin: isMobile ? "0 0 60px" : "0 0 16px" }}>
-          {c.question}
-        </p>
-      )}
+        {/* 2. preTitle block AFTER main title */}
+        {(c.preTitle || c.preTitleLine2) && (
+          <div style={{ textAlign:"center", marginBottom: isMobile ? 10 : 14 }}>
+            {c.preTitle && (
+              <p style={{ fontSize: isMobile ? c.preTitleSize || 14 : (c.preTitleSize || 14) + 2, margin:"0 0 3px", lineHeight:1.4, fontWeight:700 }}>
+                {c.preTitle}
+              </p>
+            )}
+            {c.preTitleLine2 && (
+              <p style={{ fontSize: isMobile ? (c.preTitleSize || 14) - 8 : c.preTitleSize || 14, color:"#64748B", margin:0, lineHeight:1.4, fontWeight:700 }}>
+                {c.preTitleLine2}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* 3. Question subtitle */}
+        {c.question && (
+          <p style={{ fontSize: isMobile ? 14 : 17, color:"#64748B", margin: isMobile ? "0 0 60px" : "0 0 16px" }}>
+            {c.question}
+          </p>
+        )}
 
         <div style={{ display:"grid", gridTemplateColumns:`repeat(${cols}, 1fr)`, gap: isMobile ? 16 : 32, maxWidth: isMobile ? "92%" : 480, margin:"0 auto", paddingTop: isMobile ? 0 : 90 }}>
           {options.map((opt, i) => {
@@ -440,7 +457,7 @@ if (block.type === "question_challenge") {
                     <div className="quiz-shimmer" style={{ position:"absolute", bottom:0, left:"50%", transform:"translateX(-50%)", width:"100%", height:imgH, background:"linear-gradient(90deg,#E2E8F0 25%,#CBD5E1 50%,#E2E8F0 75%)", backgroundSize:"200% 100%", borderRadius: isMobile ? 14 : 18, zIndex:1 }}/>
                     <img src={imgUrl} alt={label} loading="eager" fetchPriority="high" decoding="async"
                       onLoad={e => { e.target.style.opacity=1; const s=e.target.previousSibling; if(s) s.style.display="none"; }}
-                      style={{ position:"absolute", bottom: isMobile ? 20 : 52, left:"50%", transform:"translateX(-50%)", width:"100%", height:imgH, objectFit:"cover", objectPosition:"center top", display:"block", opacity:0, transition:"opacity 0.3s ease", zIndex:2, pointerEvents:"none" }}/>
+                      style={{ position:"absolute", bottom: isMobile ? 20 : 52, left:"50%", transform:"translateX(-50%)", width:"100%", height:imgH, objectFit:"cover", objectPosition:"center top", display:"block", opacity:0, transition:"opacity 0.08s ease", zIndex:2, pointerEvents:"none" }}/>
                   </>
                 )}
                 <div style={{ position:"relative", zIndex:3, padding: isMobile ? "10px 12px" : "12px 16px", background:labelColor, display:"flex", alignItems:"center", justifyContent:"space-between", gap:8, flexShrink:0, minHeight: isMobile ? 48 : 52, borderRadius:`0 0 ${isMobile?14:18}px ${isMobile?14:18}px` }}>
@@ -477,49 +494,50 @@ if (block.type === "question_challenge") {
     );
   }
 
-if (block.type === "image_section") {
-  const c2 = block.content || {};
-  const layout = c2.layout || "image-right";
-  const bullets = (c2.bullets || []).filter(b => b && b.trim());
-  const hasImage = !!c2.imageUrl;
+  if (block.type === "image_section") {
+    const c2 = block.content || {};
+    const layout = c2.layout || "image-right";
+    const bullets = (c2.bullets || []).filter(b => b && b.trim());
+    const hasImage = !!c2.imageUrl;
 
-  const textContent = (
-    <div style={{ flex:1, display:"flex", flexDirection:"column", justifyContent:"center", alignItems: !hasImage || isMobile ? "center" : "flex-start", textAlign: !hasImage || isMobile ? "center" : "left" }}>
-      <h1 style={{ fontSize: c2.headingSize || (isMobile ? 20 : 28), fontWeight:900, color:"#5B4EFF", margin:"0 0 8px", lineHeight:1.2 }}>{c2.heading}</h1>
-      {c2.subtext && <p style={{ fontSize: c2.subtextSize || (isMobile ? 13 : 16), color:"#374151", margin:"0 0 14px", lineHeight:1.6 }}>{c2.subtext}</p>}
-      {bullets.map((b, i) => (
-        <div key={i} style={{ display:"flex", alignItems:"center", gap: c2.showBulletIcon !== false ? 10 : 0, padding: isMobile ? "9px 12px" : "12px 16px", background:"#F8FAFC", borderRadius:12, marginBottom:8, width:"100%" }}>
-          {c2.showBulletIcon !== false && (
-            <div style={{ width: isMobile ? 22 : 28, height: isMobile ? 22 : 28, borderRadius:"50%", background:"#5B4EFF", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
-              <Check size={isMobile ? 11 : 14} color="#fff" />
-            </div>
-          )}
-          <span style={{ fontSize: c2.bulletsSize || (isMobile ? 13 : 15), color:"#0f172a", fontWeight:500 }}>{b}</span>
-        </div>
-      ))}
-    </div>
-  );
+    const textContent = (
+      <div style={{ flex:1, display:"flex", flexDirection:"column", justifyContent:"center", alignItems: !hasImage || isMobile ? "center" : "flex-start", textAlign: !hasImage || isMobile ? "center" : "left" }}>
+        <h1 style={{ fontSize: c2.headingSize || (isMobile ? 20 : 28), fontWeight:900, color:"#5B4EFF", margin:"0 0 8px", lineHeight:1.2 }}>{c2.heading}</h1>
+        {c2.subtext && <p style={{ fontSize: c2.subtextSize || (isMobile ? 13 : 16), color:"#374151", margin:"0 0 14px", lineHeight:1.6 }}>{c2.subtext}</p>}
+        {bullets.map((b, i) => (
+          <div key={i} style={{ display:"flex", alignItems:"center", gap: c2.showBulletIcon !== false ? 10 : 0, padding: isMobile ? "9px 12px" : "12px 16px", background:"#F8FAFC", borderRadius:12, marginBottom:8, width:"100%" }}>
+            {c2.showBulletIcon !== false && (
+              <div style={{ width: isMobile ? 22 : 28, height: isMobile ? 22 : 28, borderRadius:"50%", background:"#5B4EFF", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
+                <Check size={isMobile ? 11 : 14} color="#fff" />
+              </div>
+            )}
+            <span style={{ fontSize: c2.bulletsSize || (isMobile ? 13 : 15), color:"#0f172a", fontWeight:500 }}>{b}</span>
+          </div>
+        ))}
+      </div>
+    );
 
-  const imageContent = c2.imageUrl ? (
-    <img
-      src={c2.imageUrl}
-      alt=""
-      loading="eager"
-      fetchPriority="high"
-      style={{ width:"100%", height:"auto", display:"block", borderRadius:16 }}
-    />
-  ) : null;
+    const imageContent = c2.imageUrl ? (
+      <img
+        src={c2.imageUrl}
+        alt=""
+        loading="eager"
+        fetchPriority="high"
+        style={{ width:"100%", height:"auto", display:"block", borderRadius:16 }}
+      />
+    ) : null;
 
-  if (!hasImage) return <div style={{ width:"100%", display:"flex", flexDirection:"column", alignItems:"center" }}>{textContent}</div>;
-  if (isMobile) return <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:16, alignItems:"center" }}>{textContent}{imageContent}</div>;
-  if (layout === "image-top") return <div style={{ width:"100%" }}>{imageContent && <div style={{ marginBottom:24 }}>{imageContent}</div>}{textContent}</div>;
-  if (layout === "fullwidth") return <div style={{ width:"100%" }}>{c2.imageUrl && <div style={{ borderRadius:16, overflow:"hidden", marginBottom:20 }}><img src={c2.imageUrl} alt="" loading="eager" style={{ width:"100%", display:"block" }}/></div>}{textContent}</div>;
-  return (
-    <div style={{ width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, alignItems:"stretch" }}>
-      {layout === "image-left" ? <>{imageContent}{textContent}</> : <>{textContent}{imageContent}</>}
-    </div>
-  );
-}
+    if (!hasImage) return <div style={{ width:"100%", display:"flex", flexDirection:"column", alignItems:"center" }}>{textContent}</div>;
+    if (isMobile) return <div style={{ width:"100%", display:"flex", flexDirection:"column", gap:16, alignItems:"center" }}>{textContent}{imageContent}</div>;
+    if (layout === "image-top") return <div style={{ width:"100%" }}>{imageContent && <div style={{ marginBottom:24 }}>{imageContent}</div>}{textContent}</div>;
+    if (layout === "fullwidth") return <div style={{ width:"100%" }}>{c2.imageUrl && <div style={{ borderRadius:16, overflow:"hidden", marginBottom:20 }}><img src={c2.imageUrl} alt="" loading="eager" fetchPriority="high" style={{ width:"100%", display:"block" }}/></div>}{textContent}</div>;
+    return (
+      <div style={{ width:"100%", display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, alignItems:"stretch" }}>
+        {layout === "image-left" ? <>{imageContent}{textContent}</> : <>{textContent}{imageContent}</>}
+      </div>
+    );
+  }
+
   return null;
 }
 
@@ -556,9 +574,6 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
   const secs = String(timeLeft%60).padStart(2,"0");
   const handleGetPlan = () => { if (!name || !email) { showToast("Please go back and fill in your name and email"); return; } setShowPayment(true); };
   const handlePaymentSuccess = () => { setShowPayment(false); sessionStorage.clear(); router.push("/payment-success"); };
-
-// Slow down your interval too, e.g:
- 
 
   if (step === "loading") {
     const reviewIdx = Math.floor((loadingPct / 100) * FIXED_REVIEWS.length);
@@ -597,44 +612,42 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
     );
   }
 
-if (step === "summary") {
-  const potential = Math.floor(Math.random() * 6) + 85; // 85–90, computed once on render
+  if (step === "summary") {
+    const potential = Math.floor(Math.random() * 6) + 85;
+    return (
+      <div style={{ width:"100%" }}>
+        <h2 style={{ fontSize: isMobile ? 18 : 24, fontWeight:900, color:"#0f172a", margin:"0 0 6px", textAlign:"center" }}>Your Personal Summary</h2>
+        <p style={{ fontSize: isMobile ? 12 : 14, color:"#64748B", margin:"0 0 18px", textAlign:"center", lineHeight:1.6 }}>
+          The quiz indicates that your current barrier to AI prompting might be lack of clarity and low AI skills.
+        </p>
 
-  return (
-    <div style={{ width:"100%" }}>
-      <h2 style={{ fontSize: isMobile ? 18 : 24, fontWeight:900, color:"#0f172a", margin:"0 0 6px", textAlign:"center" }}>Your Personal Summary</h2>
-      <p style={{ fontSize: isMobile ? 12 : 14, color:"#64748B", margin:"0 0 18px", textAlign:"center", lineHeight:1.6 }}>
-        The quiz indicates that your current barrier to AI prompting might be lack of clarity and low AI skills.
-      </p>
-
-      {/* AI Skills card */}
-      <div style={{ background:"#F8FAFC", borderRadius:16, padding: isMobile ? 14 : 20, marginBottom:14 }}>
-        <p style={{ fontSize: isMobile ? 12 : 14, fontWeight:700, color:"#0f172a", margin:"0 0 6px", textAlign:"center" }}>A.I. Skills</p>
-        <p style={{ fontSize: isMobile ? 32 : 48, fontWeight:900, color:"#0f172a", margin:"0 0 10px", textAlign:"center" }}>Low</p>
-        <div style={{ height: isMobile ? 10 : 12, borderRadius:999, background:"linear-gradient(to right,#ef4444,#f59e0b,#22c55e)", position:"relative", marginBottom:8 }}>
-          <div style={{ position:"absolute", left:`${sliderPos}%`, transition:"left 1.8s cubic-bezier(0.25,0.46,0.45,0.94)", top:-4, width:18, height:18, borderRadius:"50%", background:"#fff", border:"3px solid #374151", transform:"translateX(-50%)" }}/>
+        {/* AI Skills card */}
+        <div style={{ background:"#F8FAFC", borderRadius:16, padding: isMobile ? 14 : 20, marginBottom:14 }}>
+          <p style={{ fontSize: isMobile ? 12 : 14, fontWeight:700, color:"#0f172a", margin:"0 0 6px", textAlign:"center" }}>A.I. Skills</p>
+          <p style={{ fontSize: isMobile ? 32 : 48, fontWeight:900, color:"#0f172a", margin:"0 0 10px", textAlign:"center" }}>Low</p>
+          <div style={{ height: isMobile ? 10 : 12, borderRadius:999, background:"linear-gradient(to right,#ef4444,#f59e0b,#22c55e)", position:"relative", marginBottom:8 }}>
+            <div style={{ position:"absolute", left:`${sliderPos}%`, transition:"left 1.8s cubic-bezier(0.25,0.46,0.45,0.94)", top:-4, width:18, height:18, borderRadius:"50%", background:"#fff", border:"3px solid #374151", transform:"translateX(-50%)" }}/>
+          </div>
+          <div style={{ display:"flex", justifyContent:"space-between" }}>
+            {["Low","Medium","High"].map(l => <span key={l} style={{ fontSize:11, color:"#64748B" }}>{l}</span>)}
+          </div>
         </div>
-        <div style={{ display:"flex", justifyContent:"space-between" }}>
-          {["Low","Medium","High"].map(l => <span key={l} style={{ fontSize:11, color:"#64748B" }}>{l}</span>)}
+
+        {/* Potential card */}
+        <div style={{ background:"#F8FAFC", borderRadius:16, padding: isMobile ? 14 : 20, marginBottom:14 }}>
+          <p style={{ fontSize: isMobile ? 12 : 14, fontWeight:700, color:"#0f172a", margin:"0 0 6px", textAlign:"center" }}>Potential</p>
+          <p style={{ fontSize: isMobile ? 36 : 52, fontWeight:900, color:"#0f172a", margin:"0 0 12px", textAlign:"center" }}>{potential}%</p>
+          <div style={{ background:"#F0FDF4", border:"1.5px solid #86EFAC", borderRadius:12, padding: isMobile ? "10px 12px" : "12px 16px", display:"flex", alignItems:"center", gap:10 }}>
+            <span style={{ fontSize: isMobile ? 20 : 24, flexShrink:0 }}>💡</span>
+            <p style={{ fontSize: isMobile ? 12 : 13, fontWeight:700, color:"#15803D", margin:0, lineHeight:1.4 }}>
+              Still, your answers indicates high potential to master AI
+            </p>
+          </div>
         </div>
       </div>
+    );
+  }
 
-      {/* Potential card */}
-      <div style={{ background:"#F8FAFC", borderRadius:16, padding: isMobile ? 14 : 20, marginBottom:14 }}>
-        <p style={{ fontSize: isMobile ? 12 : 14, fontWeight:700, color:"#0f172a", margin:"0 0 6px", textAlign:"center" }}>Potential</p>
-        <p style={{ fontSize: isMobile ? 36 : 52, fontWeight:900, color:"#0f172a", margin:"0 0 12px", textAlign:"center" }}>{potential}%</p>
-        <div style={{ background:"#F0FDF4", border:"1.5px solid #86EFAC", borderRadius:12, padding: isMobile ? "10px 12px" : "12px 16px", display:"flex", alignItems:"center", gap:10 }}>
-          <span style={{ fontSize: isMobile ? 20 : 24, flexShrink:0 }}>💡</span>
-          <p style={{ fontSize: isMobile ? 12 : 13, fontWeight:700, color:"#15803D", margin:0, lineHeight:1.4 }}>
-            Still, your answers indicates high potential to master AI
-          </p>
-        </div>
-      </div>
-
-    
-    </div>
-  );
-}
   if (step === "comparison") {
     const withoutItems = ["AI feels too complex","No recognized credential","Don't know how to use AI","Invisible to employers"];
     const withItems = ["Clear, step-by-step path","Shareable AI credential","Reliable results from AI","Stand out from other workers"];
@@ -647,35 +660,35 @@ if (step === "summary") {
         <p style={{ fontSize: isMobile ? 13 : 14, fontWeight:800, color:"#0f172a", margin:`0 0 ${charH/2}px`, textDecoration:"underline" }}>by {certDate}</p>
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap: isMobile ? 10 : 14 }}>
           <div style={{ position:"relative", paddingTop: charH/2 }}>
-            <img src="https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784114538455-Characters.webp" alt="without"
+            <img src={CHARACTER_IMAGES[0]} alt="without" loading="eager" fetchPriority="high"
               style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%) translateY(-26%)", height:charH, objectFit:"contain", zIndex:2 }}/>
             <div style={{ borderRadius:16, border:"2px solid #FCA5A5", background:"#FFF5F5", padding: isMobile ? "40px 12px 14px" : "40px 16px 18px", textAlign:"left", position:"relative", zIndex:1 }}>
               <p style={{ fontSize: isMobile ? 11 : 12, color:"#64748B", margin:"0 0 2px" }}>You without</p>
               <p style={{ fontSize: isMobile ? 15 : 17, fontWeight:900, color:"#0f172a", margin:"0 0 10px" }}>1Course</p>
               <div style={{ borderTop:"1.5px solid #FCA5A5", marginBottom:10 }}/>
               <p style={{ fontSize: isMobile ? 12 : 13, fontWeight:800, color:"#0f172a", margin:"0 0 10px" }}>Struggles:</p>
-           {withoutItems.map((item, i) => (
-  <div key={i}>
-    <p style={{ fontSize: isMobile ? 12 : 13, color:"#374151", margin:"0 0 8px", lineHeight:1.4 }}>❌ {item}</p>
-    {i < withoutItems.length-1 && <div style={{ borderTop:"1px solid #FCA5A5", marginBottom:8 }}/>}
-  </div>
-))}
+              {withoutItems.map((item, i) => (
+                <div key={i}>
+                  <p style={{ fontSize: isMobile ? 12 : 13, color:"#374151", margin:"0 0 8px", lineHeight:1.4 }}>❌ {item}</p>
+                  {i < withoutItems.length-1 && <div style={{ borderTop:"1px solid #FCA5A5", marginBottom:8 }}/>}
+                </div>
+              ))}
             </div>
           </div>
           <div style={{ position:"relative", paddingTop: charH/2 }}>
-            <img src="https://xisywmtqebmjrmgiedvi.supabase.co/storage/v1/object/public/lesson-media/uploads/1784114541530-Characters-1.webp" alt="with"
+            <img src={CHARACTER_IMAGES[1]} alt="with" loading="eager" fetchPriority="high"
               style={{ position:"absolute", top:0, left:"50%", transform:"translateX(-50%) translateY(-26%)", height:charH, objectFit:"contain", zIndex:2 }}/>
             <div style={{ borderRadius:16, border:"2px solid #86EFAC", background:"#F0FDF4", padding: isMobile ? "40px 12px 14px" : "40px 16px 18px", textAlign:"left", position:"relative", zIndex:1 }}>
               <p style={{ fontSize: isMobile ? 11 : 12, color:"#64748B", margin:"0 0 2px" }}>You with</p>
               <p style={{ fontSize: isMobile ? 15 : 17, fontWeight:900, color:"#0f172a", margin:"0 0 10px" }}>1Course:</p>
               <div style={{ borderTop:"1.5px solid #86EFAC", marginBottom:10 }}/>
               <p style={{ fontSize: isMobile ? 12 : 13, fontWeight:800, color:"#0f172a", margin:"0 0 10px" }}>Solutions:</p>
-           {withItems.map((item, i) => (
-  <div key={i}>
-    <p style={{ fontSize: isMobile ? 12 : 13, color:"#374151", margin:"0 0 8px", lineHeight:1.4 }}>✅ {item}</p>
-    {i < withItems.length-1 && <div style={{ borderTop:"1px solid #86EFAC", marginBottom:8 }}/>}
-  </div>
-))}
+              {withItems.map((item, i) => (
+                <div key={i}>
+                  <p style={{ fontSize: isMobile ? 12 : 13, color:"#374151", margin:"0 0 8px", lineHeight:1.4 }}>✅ {item}</p>
+                  {i < withItems.length-1 && <div style={{ borderTop:"1px solid #86EFAC", marginBottom:8 }}/>}
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -688,9 +701,7 @@ if (step === "summary") {
       <div style={{ width:"100%", maxWidth:480, margin:"0 auto" }}>
         <div style={{ textAlign:"center", marginBottom: isMobile ? 18 : 32 }}>
           <div style={{ width: isMobile ? 50 : 64, height: isMobile ? 50 : 64, borderRadius:18, background:"linear-gradient(135deg,#5B4EFF,#8B5CF6)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 12px", fontSize: isMobile ? 22 : 28 }}>🎓</div>
-          <h1 style={{ fontSize: isMobile ? 19 : 26, fontWeight:900, color:"#0f172a", margin:"0 0 6px", lineHeight:1.2 }}>Unlock Your Personalized AI Learning Plan
-</h1>
-        
+          <h1 style={{ fontSize: isMobile ? 19 : 26, fontWeight:900, color:"#0f172a", margin:"0 0 6px", lineHeight:1.2 }}>Unlock Your Personalized AI Learning Plan</h1>
         </div>
         <div style={{ display:"flex", justifyContent:"center", gap: isMobile ? 10 : 20, marginBottom: isMobile ? 16 : 28, flexWrap:"wrap" }}>
           {["❌ No spam. ✅ Only Personalized Results."].map((b,i) => (
@@ -726,7 +737,6 @@ if (step === "summary") {
     );
   }
 
-  // ── Social proof step — rendered via separate component for clean hook usage
   if (step === "social_proof") {
     return <SocialProofStep isMobile={isMobile} />;
   }
