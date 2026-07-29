@@ -654,12 +654,12 @@ if (step === "summary") {
               <p style={{ fontSize: isMobile ? 15 : 17, fontWeight:900, color:"#0f172a", margin:"0 0 10px" }}>1Course</p>
               <div style={{ borderTop:"1.5px solid #FCA5A5", marginBottom:10 }}/>
               <p style={{ fontSize: isMobile ? 12 : 13, fontWeight:800, color:"#0f172a", margin:"0 0 10px" }}>Struggles:</p>
-              {withoutItems.map((item, i) => (
-                <div key={i}>
-                  <p style={{ fontSize: isMobile ? 12 : 13, color:"#374151", margin:"0 0 8px", lineHeight:1.4 }}>{item}</p>
-                  {i < withoutItems.length-1 && <div style={{ borderTop:"1px solid #FCA5A5", marginBottom:8 }}/>}
-                </div>
-              ))}
+           {withoutItems.map((item, i) => (
+  <div key={i}>
+    <p style={{ fontSize: isMobile ? 12 : 13, color:"#374151", margin:"0 0 8px", lineHeight:1.4 }}>❌ {item}</p>
+    {i < withoutItems.length-1 && <div style={{ borderTop:"1px solid #FCA5A5", marginBottom:8 }}/>}
+  </div>
+))}
             </div>
           </div>
           <div style={{ position:"relative", paddingTop: charH/2 }}>
@@ -670,12 +670,12 @@ if (step === "summary") {
               <p style={{ fontSize: isMobile ? 15 : 17, fontWeight:900, color:"#0f172a", margin:"0 0 10px" }}>1Course:</p>
               <div style={{ borderTop:"1.5px solid #86EFAC", marginBottom:10 }}/>
               <p style={{ fontSize: isMobile ? 12 : 13, fontWeight:800, color:"#0f172a", margin:"0 0 10px" }}>Solutions:</p>
-              {withItems.map((item, i) => (
-                <div key={i}>
-                  <p style={{ fontSize: isMobile ? 12 : 13, color:"#374151", margin:"0 0 8px", lineHeight:1.4 }}>{item}</p>
-                  {i < withItems.length-1 && <div style={{ borderTop:"1px solid #86EFAC", marginBottom:8 }}/>}
-                </div>
-              ))}
+           {withItems.map((item, i) => (
+  <div key={i}>
+    <p style={{ fontSize: isMobile ? 12 : 13, color:"#374151", margin:"0 0 8px", lineHeight:1.4 }}>✅ {item}</p>
+    {i < withItems.length-1 && <div style={{ borderTop:"1px solid #86EFAC", marginBottom:8 }}/>}
+  </div>
+))}
             </div>
           </div>
         </div>
