@@ -236,12 +236,12 @@ useEffect(() => {
   if (endStep === "loading") {
     setLoadingPct(0);
     let step = 0;
-    const steps = 80;
-    loadingRef.current = setInterval(() => {
-      step++;
-      setLoadingPct(Math.min(Math.round((step / steps) * 100), 100));
-      if (step >= steps) { clearInterval(loadingRef.current); setTimeout(() => setEndStep(END_SEQUENCE[1]), 400); }
-    }, 150);
+    const steps = 20;
+loadingRef.current = setInterval(() => {
+  step++;
+  setLoadingPct(Math.min(Math.round((step / steps) * 100), 100));
+  if (step >= steps) { clearInterval(loadingRef.current); setTimeout(() => setEndStep(END_SEQUENCE[1]), 400); }
+}, 50);
     return () => clearInterval(loadingRef.current);
   }
 }, [endStep]);
@@ -558,7 +558,7 @@ function EndBlock({ step, loadingPct, email, setEmail, name, setName, answers, b
   const handlePaymentSuccess = () => { setShowPayment(false); sessionStorage.clear(); router.push("/payment-success"); };
 
 // Slow down your interval too, e.g:
-  // useEffect(() => { const t = setInterval(() => setLoadingPct(p => Math.min(p + 1, 100)), 80); return () => clearInterval(t); }, []);
+ 
 
   if (step === "loading") {
     const reviewIdx = Math.floor((loadingPct / 100) * FIXED_REVIEWS.length);
