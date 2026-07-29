@@ -130,7 +130,7 @@ export default function PlanPage({ pricingData }) {
 
   const [selectedPlan,  setSelectedPlan]  = useState("4-Week Plan");
   const [showPayment,   setShowPayment]   = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(true);
   const [termsError,    setTermsError]    = useState(false);
   const [email,    setEmail]    = useState("");
   const [name,     setName]     = useState("");
