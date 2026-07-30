@@ -12,7 +12,7 @@ export async function POST(req) {
     if (!email) return NextResponse.json({ error: "Email required" }, { status: 400 });
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}reset-password`,
+      redirectTo: `https://1course.io/reset-password`,
     });
 
     if (error) return NextResponse.json({ error: error.message }, { status: 400 });
