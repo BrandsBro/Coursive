@@ -16,7 +16,17 @@ function ResetPasswordForm() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    if (!token) setError("Invalid reset link. Please request a new one.");
+    const hash = window.location.hash;
+    console.log("URL hash:", hash);
+    const params = new URLSearchParams(hash.replace("#", ""));
+    const accessToken = params.get("access_token");
+    const type = params.get("type");
+    console.log("Token:", accessToken, "Type:", type);
+    if (accessToken && type === "recovery") {
+      setToken(accessToken);
+    } else {
+      setError("Invalid reset link. Please request a new one.");
+    }
   }, [token]);
 
   const handleReset = async () => {
