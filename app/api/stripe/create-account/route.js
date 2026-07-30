@@ -1,8 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
+import { addToKlaviyoList, trackKlaviyoEvent } from "@/lib/klaviyo";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -303,8 +302,7 @@ export async function POST(req) {
       const adminEmails = notifSettings?.value?.emails || [];
       if (adminEmails.length > 0) {
         const { Resend } = await import("resend");
-        const resend = new Resend(process.env.RESEND_API_KEY);
-        await resend.emails.send({
+                await resend.emails.send({
           from: "1Course <noreply@1course.io>",
           to: adminEmails,
           subject: `New Purchase: ${plan} - ${name}`,
