@@ -302,7 +302,8 @@ export async function POST(req) {
       const adminEmails = notifSettings?.value?.emails || [];
       if (adminEmails.length > 0) {
         const { Resend } = await import("resend");
-                await resend.emails.send({
+        const resendAdmin = new Resend(process.env.RESEND_API_KEY);
+        await resendAdmin.emails.send({
           from: "1Course <noreply@1course.io>",
           to: adminEmails,
           subject: `New Purchase: ${plan} - ${name}`,
@@ -426,15 +427,27 @@ export async function POST(req) {
       );
     }
 
-    const { error: emailError } = await resend.emails.send({
-      from: "noreply@1course.io",
-      to: email,
-      subject: emailSubject,
-      html: emailHtml,
-    });
-
-    if (emailError) console.error("Email error:", emailError);
-    else console.log("Email sent to:", email);
+    // Add to Klaviyo customers list with credentials
+    try {
+      const nameParts = (name || "").trim().split(" ");
+      await addToKlaviyoList(process.env.KLAVIYO_CUSTOMERS_LIST_ID, {
+        email,
+        firstName: nameParts[0] || "",
+        lastName: nameParts.slice(1).join(" ") || "",
+        properties: {
+          plan,
+          amount: parseFloat(amount),
+          temp_password: tempPassword,
+          source: "purchase",
+        },
+      });
+      await trackKlaviyoEvent(email, "Purchase", {
+        plan,
+        amount: parseFloat(amount),
+        currency: "USD",
+      });
+      console.log("Klaviyo customer added:", email);
+    } catch(e) { console.error("Klaviyo error:", e); }
 
 
 
