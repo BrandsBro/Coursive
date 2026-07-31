@@ -22,7 +22,7 @@ export default function SubscriptionGuard({ children }) {
         .from("subscriptions")
         .select("*")
         .eq("user_id", user.id)
-        .eq("status", "active")
+        .in("status", ["active", "cancelled"])
         .order("created_at", { ascending: false })
         .limit(1)
         .single();
