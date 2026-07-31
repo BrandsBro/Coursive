@@ -21,12 +21,15 @@ export async function GET(req) {
     threeDaysStart.setHours(0, 0, 0, 0);
     threeDaysFromNow.setHours(23, 59, 59, 999);
 
-    const { data: subscriptions } = await supabase
+    const { data: subscriptions, error: subError } = await supabase
       .from("subscriptions")
       .select("*, profiles(email, full_name)")
       .eq("status", "active")
       .gte("expires_at", threeDaysStart.toISOString())
       .lte("expires_at", threeDaysFromNow.toISOString());
+    
+    console.log("Subscriptions found:", subscriptions?.length, "Error:", subError?.message);
+    console.log("Date range:", threeDaysStart.toISOString(), "to", threeDaysFromNow.toISOString());
 
     if (!subscriptions?.length) {
       return NextResponse.json({ ok: true, count: 0 });
