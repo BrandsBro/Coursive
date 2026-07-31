@@ -21,15 +21,14 @@ export async function GET(req) {
     threeDaysStart.setHours(0, 0, 0, 0);
     threeDaysFromNow.setHours(23, 59, 59, 999);
 
-    const { data: subscriptions, error: subError } = await supabase
+    const { data: subscriptions } = await supabase
       .from("subscriptions")
-      .select("*, profiles(email, full_name)")
+      .select("user_id, plan, expires_at")
       .eq("status", "active")
       .gte("expires_at", threeDaysStart.toISOString())
       .lte("expires_at", threeDaysFromNow.toISOString());
-    
-    console.log("Subscriptions found:", subscriptions?.length, "Error:", subError?.message);
-    console.log("Date range:", threeDaysStart.toISOString(), "to", threeDaysFromNow.toISOString());
+
+    console.log("Subscriptions found:", subscriptions?.length);
 
     if (!subscriptions?.length) {
       return NextResponse.json({ ok: true, count: 0 });
@@ -37,7 +36,9 @@ export async function GET(req) {
 
     let count = 0;
     for (const sub of subscriptions) {
-      const email = sub.profiles?.email;
+      const { data: profile } = await supabase
+        .from("profiles").select("email").eq("id", sub.user_id).single();
+      const email = profile?.email;
       if (!email) continue;
       await trackKlaviyoEvent(email, "Subscription Renewing Soon", {
         plan: sub.plan,
