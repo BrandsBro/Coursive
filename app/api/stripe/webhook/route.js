@@ -70,7 +70,13 @@ export async function POST(req) {
           .update({ status: "active", expires_at: newExpiry.toISOString() })
           .eq("stripe_subscription_id", invoice.subscription);
         if (error) console.error("Renewal update error:", error);
-        else console.log("Subscription renewed for:", email, "until:", newExpiry);
+        else {
+          console.log("Subscription renewed for:", email, "until:", newExpiry);
+          try {
+            const { trackKlaviyoEvent } = await import("@/lib/klaviyo");
+            await trackKlaviyoEvent(email, "Subscription Renewed", { plan, renewed_until: newExpiry.toISOString() });
+          } catch(e) { console.error("Klaviyo renewal error:", e); }
+        }
       }
     }
   }
