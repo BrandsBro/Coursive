@@ -43,13 +43,15 @@ export default function SettingsPage() {
     setCancelling(true);
     try {
       // Cancel Stripe subscription if exists
-      if (sub.stripe_subscription_id) {
-        await fetch("/api/stripe/cancel-subscription", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ subscriptionId: sub.stripe_subscription_id }),
-        });
-      }
+      await fetch("/api/stripe/cancel-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subscriptionId: sub.stripe_subscription_id || null,
+          email: user?.email,
+          plan: sub.plan,
+        }),
+      });
       await supabase.from("subscriptions").update({ status: "cancelled" }).eq("id", sub.id);
       setSub(prev => ({ ...prev, status: "cancelled" }));
     } catch(e) { console.error("Cancel error:", e); }

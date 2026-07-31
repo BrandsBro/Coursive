@@ -8,8 +8,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
   try {
-    const { subscriptionId } = await req.json();
-    await stripe.subscriptions.update(subscriptionId, { cancel_at_period_end: true });
+    const { subscriptionId, email, plan } = await req.json();
+    if (subscriptionId) await stripe.subscriptions.update(subscriptionId, { cancel_at_period_end: true });
 
     // Get customer email and notify via Klaviyo
     try {
